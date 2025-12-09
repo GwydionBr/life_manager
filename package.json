@@ -20,15 +20,23 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@clerk/tanstack-react-start": "^0.27.7",
     "@mantine/core": "^8.3.9",
     "@mantine/hooks": "^8.3.9",
     "@netlify/vite-plugin-tanstack-start": "^1.2.2",
+    "@tanstack/devtools-vite": "^0.3.12",
+    "@tanstack/react-devtools": "^0.8.4",
+    "@tanstack/react-query": "^5.90.12",
+    "@tanstack/react-query-devtools": "^5.91.1",
     "@tanstack/react-router": "^1.139.14",
+    "@tanstack/react-router-devtools": "^1.140.0",
+    "@tanstack/react-router-ssr-query": "^1.140.0",
     "@tanstack/react-start": "^1.139.14",
     "postcss": "^8.5.6",
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",
     "react": "^19.2.1",
-    "react-dom": "^19.2.1"
+    "react-dom": "^19.2.1",
+    "redaxios": "^0.5.1"
   }
 }
