@@ -5,7 +5,6 @@ import "@mantine/core/styles.css";
 import type { ReactNode } from "react";
 import {
   Outlet,
-  createRootRoute,
   HeadContent,
   Scripts,
   createRootRouteWithContext,

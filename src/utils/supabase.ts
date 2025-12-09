@@ -1,0 +1,24 @@
+import { getCookies, setCookie } from "@tanstack/react-start/server";
+import { createServerClient } from "@supabase/ssr";
+
+export function getSupabaseServerClient() {
+  return createServerClient(
+    process.env.VITE_SUPABASE_URL!,
+    process.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return Object.entries(getCookies()).map(([name, value]) => ({
+            name,
+            value,
+          }));
+        },
+        setAll(cookies) {
+          cookies.forEach((cookie) => {
+            setCookie(cookie.name, cookie.value);
+          });
+        },
+      },
+    }
+  );
+}

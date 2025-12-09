@@ -24,6 +24,8 @@
     "@mantine/core": "^8.3.9",
     "@mantine/hooks": "^8.3.9",
     "@netlify/vite-plugin-tanstack-start": "^1.2.2",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.87.1",
     "@tanstack/devtools-vite": "^0.3.12",
     "@tanstack/react-devtools": "^0.8.4",
     "@tanstack/react-query": "^5.90.12",
