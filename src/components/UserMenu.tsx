@@ -1,25 +1,13 @@
 import { Menu, Button, Text, Avatar } from "@mantine/core";
-import { createServerFn } from "@tanstack/react-start";
-import { getSupabaseServerClient } from "@/utils/supabase";
 import { useRouter } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { profileQueryOptions } from "@/queries/use-profile";
+import { signOut } from "@/actions/auth/signOut";
 
-const signOut = createServerFn({ method: "POST" }).handler(async () => {
-  const supabase = getSupabaseServerClient();
-  const { error } = await supabase.auth.signOut();
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return { success: true };
-});
-
-interface UserMenuProps {
-  userEmail?: string | null;
-}
-
-export function UserMenu({ userEmail }: UserMenuProps) {
+export function UserMenu() {
   const router = useRouter();
+
+  const { data: profile } = useQuery(profileQueryOptions);
 
   const handleSignOut = async () => {
     try {
@@ -34,9 +22,14 @@ export function UserMenu({ userEmail }: UserMenuProps) {
   return (
     <Menu shadow="md" width={200}>
       <Menu.Target>
-        <Button variant="subtle" style={{ padding: "0 8px" }}>
-          <Avatar color="violet" radius="xl" size="sm">
-            {userEmail?.charAt(0).toUpperCase() || "U"}
+        <Button variant="transparent" style={{ padding: "0 8px" }}>
+          <Avatar
+            src={profile?.avatar_url || undefined}
+            color="violet"
+            radius="xl"
+            size="sm"
+          >
+            {profile?.full_name?.charAt(0).toUpperCase() || "U"}
           </Avatar>
         </Button>
       </Menu.Target>
@@ -44,7 +37,10 @@ export function UserMenu({ userEmail }: UserMenuProps) {
       <Menu.Dropdown>
         <Menu.Label>
           <Text size="sm" truncate>
-            {userEmail || "User"}
+            {profile?.full_name ||
+              profile?.username ||
+              profile?.email ||
+              "User"}
           </Text>
         </Menu.Label>
         <Menu.Divider />

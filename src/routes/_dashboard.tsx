@@ -45,7 +45,7 @@ function DashboardLayout() {
           </Group>
           <Group>
             <SchemeToggle />
-            <UserMenu userEmail={user?.email} />
+            <UserMenu />
           </Group>
         </Group>
       </AppShell.Header>
