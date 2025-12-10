@@ -1,9 +1,9 @@
 import { Center, Stack, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
-import { getTest } from "../actions/get-test";
+import { getTest } from "@/actions/get-test";
 import { useQuery } from "@tanstack/react-query";
 
-export const Route = createFileRoute("/test")({
+export const Route = createFileRoute("/_dashboard/test")({
   component: Test,
 });
 

@@ -4,6 +4,7 @@ import tsConfigPaths from "vite-tsconfig-paths";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { nitro } from "nitro/vite";
+import path from "path";
 
 export default defineConfig({
   server: {
@@ -24,6 +25,10 @@ export default defineConfig({
       {
         find: "use-sync-external-store/shim/index.js",
         replacement: "react",
+      },
+      {
+        find: "@",
+        replacement: path.resolve(__dirname, "./src"),
       },
     ],
   },

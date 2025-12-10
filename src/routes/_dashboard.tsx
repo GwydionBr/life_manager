@@ -22,14 +22,13 @@ function DashboardLayout() {
       <AppShell.Header>
         <Group h="100%" px="md" justify="space-between">
           <Group>
-            <Title order={3} c="violet">
-              Habbit Ruler
-            </Title>
+            <Button component={Link} to="/dashboard" variant="subtle">
+              <Title order={3} c="violet">
+                Habbit Ruler
+              </Title>
+            </Button>
           </Group>
           <Group>
-            <Button component={Link} to="/dashboard" variant="subtle">
-              Dashboard
-            </Button>
             <UserButton />
           </Group>
         </Group>
