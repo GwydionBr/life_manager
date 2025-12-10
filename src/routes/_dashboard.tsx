@@ -29,6 +29,14 @@ function DashboardLayout() {
             </Button>
           </Group>
           <Group>
+            <Button component={Link} to="/tasks" variant="subtle">
+              Tasks
+            </Button>
+            <Button component={Link} to="/test" variant="subtle">
+              Test
+            </Button>
+          </Group>
+          <Group>
             <UserButton />
           </Group>
         </Group>
