@@ -42,6 +42,7 @@ const fetchSupabaseAuth = createServerFn({ method: "GET" }).handler(
 
 const theme = createTheme({
   /** Put your mantine theme override here */
+  primaryColor: "grape",
 });
 
 export const Route = createRootRouteWithContext<{
