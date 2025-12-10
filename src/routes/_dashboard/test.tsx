@@ -1,4 +1,4 @@
-import { Center, Stack, Title } from "@mantine/core";
+import { Stack, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 import { getTest } from "@/actions/get-test";
 import { useQuery } from "@tanstack/react-query";

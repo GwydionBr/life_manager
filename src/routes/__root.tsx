@@ -15,17 +15,30 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { QueryClient } from "@tanstack/react-query";
-import { auth } from "@clerk/tanstack-react-start/server";
 import { createServerFn } from "@tanstack/react-start";
-import { ClerkProvider } from "@clerk/tanstack-react-start";
+import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
+import { NotFound } from "@/components/NotFound";
+import { getSupabaseServerClient } from "@/utils/supabase";
 
-const fetchClerkAuth = createServerFn({ method: "GET" }).handler(async () => {
-  const { userId } = await auth();
+const fetchSupabaseAuth = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const supabase = getSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  return {
-    userId,
-  };
-});
+    return {
+      userId: user?.id ?? null,
+      user: user
+        ? {
+            id: user.id,
+            email: user.email,
+            userMetadata: user.user_metadata,
+          }
+        : null,
+    };
+  }
+);
 
 const theme = createTheme({
   /** Put your mantine theme override here */
@@ -35,10 +48,11 @@ export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
   beforeLoad: async () => {
-    const { userId } = await fetchClerkAuth();
+    const { userId, user } = await fetchSupabaseAuth();
 
     return {
       userId,
+      user,
     };
   },
   head: () => ({
@@ -58,10 +72,6 @@ export const Route = createRootRouteWithContext<{
     links: [
       {
         rel: "icon",
-        href: "/favicon.ico",
-      },
-      {
-        rel: "icon",
         type: "image/svg+xml",
         href: "/favicon.svg",
       },
@@ -70,6 +80,10 @@ export const Route = createRootRouteWithContext<{
         type: "image/png",
         sizes: "96x96",
         href: "/favicon-96x96.png",
+      },
+      {
+        rel: "icon",
+        href: "/favicon.ico",
       },
       {
         rel: "apple-touch-icon",
@@ -81,18 +95,24 @@ export const Route = createRootRouteWithContext<{
       },
     ],
   }),
+  errorComponent: (props) => {
+    return (
+      <RootDocument>
+        <DefaultCatchBoundary {...props} />
+      </RootDocument>
+    );
+  },
+  notFoundComponent: () => <NotFound />,
   component: RootComponent,
 });
 
 function RootComponent() {
   return (
-    <ClerkProvider>
-      <RootDocument>
-        <MantineProvider theme={theme} defaultColorScheme="auto">
-          <Outlet />
-        </MantineProvider>
-      </RootDocument>
-    </ClerkProvider>
+    <RootDocument>
+      <MantineProvider theme={theme} defaultColorScheme="auto">
+        <Outlet />
+      </MantineProvider>
+    </RootDocument>
   );
 }
 

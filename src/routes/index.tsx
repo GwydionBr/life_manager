@@ -8,14 +8,19 @@ import {
   Stack,
   Box,
   Group,
+  Modal,
 } from "@mantine/core";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/tanstack-react-start";
+import { useState } from "react";
+import { AuthForm } from "@/components/AuthForm";
 
 export const Route = createFileRoute("/")({
   component: Home,
 });
 
 function Home() {
+  const { userId } = Route.useRouteContext();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
   return (
     <Container size="md" py="xl">
       <Stack align="center" gap="xl" mt="10vh">
@@ -41,7 +46,7 @@ function Home() {
         </Box>
 
         <Group mt="xl">
-          <SignedIn>
+          {userId ? (
             <Button
               component={Link}
               to="/dashboard"
@@ -51,18 +56,16 @@ function Home() {
             >
               Go to Dashboard
             </Button>
-          </SignedIn>
-          <SignedOut>
-            <SignInButton mode="modal">
-              <Button
-                size="lg"
-                variant="gradient"
-                gradient={{ from: "violet", to: "grape", deg: 135 }}
-              >
-                Get Started
-              </Button>
-            </SignInButton>
-          </SignedOut>
+          ) : (
+            <Button
+              size="lg"
+              variant="gradient"
+              gradient={{ from: "violet", to: "grape", deg: 135 }}
+              onClick={() => setAuthModalOpen(true)}
+            >
+              Get Started
+            </Button>
+          )}
         </Group>
 
         <Stack gap="md" mt="xl" maw={500}>
@@ -78,6 +81,15 @@ function Home() {
           </Box>
         </Stack>
       </Stack>
+
+      <Modal
+        opened={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        title="Authentication"
+        centered
+      >
+        <AuthForm />
+      </Modal>
     </Container>
   );
 }

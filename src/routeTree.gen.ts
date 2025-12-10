@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardTestRouteImport } from './routes/_dashboard/test'
-import { Route as DashboardTasksRouteImport } from './routes/_dashboard/tasks'
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard/dashboard'
 
 const DashboardRoute = DashboardRouteImport.update({
@@ -29,11 +28,6 @@ const DashboardTestRoute = DashboardTestRouteImport.update({
   path: '/test',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardTasksRoute = DashboardTasksRouteImport.update({
-  id: '/tasks',
-  path: '/tasks',
-  getParentRoute: () => DashboardRoute,
-} as any)
 const DashboardDashboardRoute = DashboardDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -43,13 +37,11 @@ const DashboardDashboardRoute = DashboardDashboardRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardDashboardRoute
-  '/tasks': typeof DashboardTasksRoute
   '/test': typeof DashboardTestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardDashboardRoute
-  '/tasks': typeof DashboardTasksRoute
   '/test': typeof DashboardTestRoute
 }
 export interface FileRoutesById {
@@ -57,20 +49,18 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_dashboard': typeof DashboardRouteWithChildren
   '/_dashboard/dashboard': typeof DashboardDashboardRoute
-  '/_dashboard/tasks': typeof DashboardTasksRoute
   '/_dashboard/test': typeof DashboardTestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/tasks' | '/test'
+  fullPaths: '/' | '/dashboard' | '/test'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/tasks' | '/test'
+  to: '/' | '/dashboard' | '/test'
   id:
     | '__root__'
     | '/'
     | '/_dashboard'
     | '/_dashboard/dashboard'
-    | '/_dashboard/tasks'
     | '/_dashboard/test'
   fileRoutesById: FileRoutesById
 }
@@ -102,13 +92,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTestRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/tasks': {
-      id: '/_dashboard/tasks'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof DashboardTasksRouteImport
-      parentRoute: typeof DashboardRoute
-    }
     '/_dashboard/dashboard': {
       id: '/_dashboard/dashboard'
       path: '/dashboard'
@@ -121,13 +104,11 @@ declare module '@tanstack/react-router' {
 
 interface DashboardRouteChildren {
   DashboardDashboardRoute: typeof DashboardDashboardRoute
-  DashboardTasksRoute: typeof DashboardTasksRoute
   DashboardTestRoute: typeof DashboardTestRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardDashboardRoute: DashboardDashboardRoute,
-  DashboardTasksRoute: DashboardTasksRoute,
   DashboardTestRoute: DashboardTestRoute,
 }
 
