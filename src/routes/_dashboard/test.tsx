@@ -8,17 +8,17 @@ export const Route = createFileRoute("/_dashboard/test")({
 });
 
 function Test() {
-  const { data = [] } = useQuery({
-    queryKey: ["test"],
-    queryFn: getTest,
-  });
-  console.log(data);
+  // const { data = [] } = useQuery({
+  //   queryKey: ["test"],
+  //   queryFn: getTest,
+  // });
+  // console.log(data);
   return (
     <Stack align="center">
       <Title order={1}>Test Route</Title>
-      {data.map((item) => (
+      {/* {data.map((item) => (
         <div key={item.id}>{item.title}</div>
-      ))}
+      ))} */}
     </Stack>
   );
 }

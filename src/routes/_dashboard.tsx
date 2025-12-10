@@ -7,12 +7,19 @@ import {
 import { AppShell, Group, Title, Button } from "@mantine/core";
 import { UserMenu } from "@/components/UserMenu";
 import SchemeToggle from "@/components/Scheme/SchemeToggleButton";
+import { settingsQueryOptions } from "@/queries/use-settings";
+import { profileQueryOptions } from "@/queries/use-profile";
 
 export const Route = createFileRoute("/_dashboard")({
   beforeLoad: ({ context }) => {
     if (!context.userId) {
       throw redirect({ to: "/" });
     }
+  },
+  loader: async ({ context }) => {
+    const { queryClient } = context;
+    await queryClient.ensureQueryData(settingsQueryOptions);
+    await queryClient.ensureQueryData(profileQueryOptions);
   },
   component: DashboardLayout,
 });
