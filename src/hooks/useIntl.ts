@@ -14,17 +14,11 @@ import * as intl from "@/utils/intl";
 export function useIntl() {
   const locale = useUserPreferences((state) => state.locale);
   const format24h = useUserPreferences((state) => state.format24h);
-  const defaultCurrency = useUserPreferences((state) => state.defaultCurrency);
-  const defaultFinanceCurrency = useUserPreferences(
-    (state) => state.defaultFinanceCurrency
-  );
 
   return {
     // User preferences
     locale,
     format24h,
-    defaultCurrency,
-    defaultFinanceCurrency,
 
     // Date & Time formatting with user preferences applied
     formatDate: (date: Date, options?: Intl.DateTimeFormatOptions) =>
@@ -50,11 +44,11 @@ export function useIntl() {
     formatDuration: intl.formatDuration,
 
     // Number & Money formatting with user preferences applied
-    formatMoney: (amount: number, currency?: Currency) =>
-      intl.formatMoney(amount, currency ?? defaultCurrency, locale),
+    formatMoney: (amount: number, currency: Currency) =>
+      intl.formatMoney(amount, currency, locale),
 
-    formatFinanceMoney: (amount: number, currency?: Currency) =>
-      intl.formatMoney(amount, currency ?? defaultFinanceCurrency, locale),
+    formatFinanceMoney: (amount: number, currency: Currency) =>
+      intl.formatMoney(amount, currency, locale),
 
     formatNumber: (value: number, options?: Intl.NumberFormatOptions) =>
       intl.formatNumber(value, locale, options),
@@ -62,8 +56,8 @@ export function useIntl() {
     formatPercent: (value: number, decimals?: number) =>
       intl.formatPercent(value, locale, decimals),
 
-    getCurrencySymbol: (currency?: Currency) =>
-      intl.getCurrencySymbol(currency ?? defaultCurrency, locale),
+    getCurrencySymbol: (currency: Currency) =>
+      intl.getCurrencySymbol(currency, locale),
 
     // Access to raw Intl utilities if needed
     intl,

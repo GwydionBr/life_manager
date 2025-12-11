@@ -1,4 +1,7 @@
-import { Database } from "./db.types";
+import { Database, Tables, TablesUpdate } from "./db.types";
+
+export type Settings = Tables<"settings">;
+export type SettingsUpdate = TablesUpdate<"settings">;
 
 export type RoundingDirection =
   Database["public"]["Enums"]["roundingDirection"];

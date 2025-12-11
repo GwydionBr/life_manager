@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useSettings } from "@/queries/use-settings";
+import { useSettings } from "@/queries/settings/use-settings";
 import { useUserPreferences } from "@/stores/userPreferencesStore";
 
 /**

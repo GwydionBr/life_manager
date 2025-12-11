@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getSupabaseServerClient } from "@/utils/supabase";
+import { getSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { Database } from "@/types/db.types";
 
 type SettingsUpdate = Database["public"]["Tables"]["settings"]["Update"];

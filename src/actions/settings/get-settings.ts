@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getSupabaseServerClient } from "@/utils/supabase";
+import { getSupabaseServerClient } from "@/lib/supabaseServerClient";
 
 export const getSettings = createServerFn({ method: "GET" }).handler(
   async () => {
@@ -7,7 +7,7 @@ export const getSettings = createServerFn({ method: "GET" }).handler(
     const { data, error } = await supabase
       .from("settings")
       .select("*")
-      .single()
+      .single();
 
     if (error) {
       throw new Error(error.message);

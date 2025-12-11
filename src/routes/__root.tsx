@@ -18,7 +18,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/NotFound";
-import { getSupabaseServerClient } from "@/utils/supabase";
+import { getSupabaseServerClient } from "@/lib/supabaseServerClient";
 
 const fetchSupabaseAuth = createServerFn({ method: "GET" }).handler(
   async () => {

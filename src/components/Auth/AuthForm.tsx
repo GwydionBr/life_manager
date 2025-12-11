@@ -11,7 +11,7 @@ import {
   Alert,
 } from "@mantine/core";
 import { createServerFn } from "@tanstack/react-start";
-import { getSupabaseServerClient } from "@/utils/supabase";
+import { getSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 

@@ -3,7 +3,7 @@
  * This demonstrates the various formatting functions available.
  */
 import { useIntl } from "@/hooks/useIntl";
-import { useUpdateSettings } from "@/hooks/useUpdateSettings";
+import { useUpdateSettings } from "@/queries/settings/use-update-settings";
 import { Stack, Text, Button, Group, Select } from "@mantine/core";
 import { Locale } from "@/types/settings.types";
 
@@ -64,13 +64,11 @@ export function IntlExample() {
 
       {/* Money Examples */}
       <Stack gap="xs">
-        <Text fw={600}>
-          Money (using default currency: {intl.defaultCurrency}):
-        </Text>
-        <Text>Amount: {intl.formatMoney(1234.56)}</Text>
-        <Text>Symbol: {intl.getCurrencySymbol()}</Text>
+        <Text fw={600}>Money (using EUR: ):</Text>
+        <Text>Amount: {intl.formatMoney(1234.56, "EUR")}</Text>
+        <Text>Symbol: {intl.getCurrencySymbol("EUR")}</Text>
         <Text>EUR: {intl.formatMoney(9999.99, "EUR")}</Text>
-        <Text>Finance: {intl.formatFinanceMoney(5000)}</Text>
+        <Text>Finance: {intl.formatFinanceMoney(5000, "EUR")}</Text>
       </Stack>
 
       {/* Number Examples */}

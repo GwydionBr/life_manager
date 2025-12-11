@@ -8,7 +8,7 @@ import { AppShell, Group, Title, Button } from "@mantine/core";
 import { UserMenu } from "@/components/User/UserMenu";
 import SchemeToggle from "@/components/Scheme/SchemeToggleButton";
 import { SettingsSync } from "@/components/Settings/SettingsSync";
-import { settingsQueryOptions } from "@/queries/use-settings";
+import { settingsQueryOptions } from "@/queries/settings/use-settings";
 import { profileQueryOptions } from "@/queries/use-profile";
 
 export const Route = createFileRoute("/_dashboard")({
