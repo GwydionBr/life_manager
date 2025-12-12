@@ -1,6 +1,7 @@
 // src/routes/__root.tsx
 /// <reference types="vite/client" />
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 
 import type { ReactNode } from "react";
 import {

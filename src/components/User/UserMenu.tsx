@@ -1,7 +1,7 @@
 import { Menu, Button, Text, Avatar } from "@mantine/core";
 import { useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { profileQueryOptions } from "@/queries/use-profile";
+import { profileQueryOptions } from "@/queries/profile/use-profile";
 import { signOut } from "@/actions/auth/signOut";
 
 export function UserMenu() {

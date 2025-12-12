@@ -1,0 +1,6 @@
+.customRoundingAmountContainer {
+  border: 1px solid
+    light-dark(var(--mantine-color-teal-6), var(--mantine-color-teal-4));
+  border-radius: var(--mantine-radius-md);
+  padding: var(--mantine-spacing-xs);
+}

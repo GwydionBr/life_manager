@@ -59,6 +59,11 @@ export function useIntl() {
     getCurrencySymbol: (currency: Currency) =>
       intl.getCurrencySymbol(currency, locale),
 
+    getLocalizedText: (de: string, en: string) => {
+      if (locale === "de-DE") return de;
+      else return en;
+    },
+
     // Access to raw Intl utilities if needed
     intl,
   };

@@ -202,3 +202,12 @@ export function getWeekdayName(
   const date = new Date(2024, 0, dayIndex); // Jan 2024 starts on Monday
   return new Intl.DateTimeFormat(locale, { weekday: format }).format(date);
 }
+
+/**
+ * Get the localized text for a given string
+ * @example getLocalizedText("Hallo", "Hello", "de-DE") // "Hallo"
+ */
+export function getLocalizedText(de: string, en: string, locale: Locale): string {
+  if (locale === "de-DE") return de;
+  else return en;
+}

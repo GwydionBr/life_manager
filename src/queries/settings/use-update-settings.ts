@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { updateSettings } from "@/actions/settings/update-settings";
 import { SettingsUpdate, Settings } from "@/types/settings.types";
 import { settingsQueryKey } from "./use-settings";
@@ -19,7 +19,7 @@ export function useUpdateSettings() {
       });
     },
     onMutate: async (data, context) => {
-      await context.client.cancelQueries({ queryKey: ["todos"] });
+      await context.client.cancelQueries({ queryKey: settingsQueryKey });
 
       const previousSettings =
         context.client.getQueryData<Settings>(settingsQueryKey);
@@ -34,7 +34,7 @@ export function useUpdateSettings() {
       return { previousSettings };
     },
     onError: (err, data, onMutateResult, context) => {
-      // Invalidate to refetch from server on error
+      console.error(err);
       context.client.setQueryData<Settings>(
         settingsQueryKey,
         onMutateResult?.previousSettings

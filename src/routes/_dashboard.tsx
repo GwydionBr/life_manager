@@ -1,15 +1,8 @@
-import {
-  createFileRoute,
-  redirect,
-  Outlet,
-  Link,
-} from "@tanstack/react-router";
-import { AppShell, Group, Title, Button } from "@mantine/core";
-import { UserMenu } from "@/components/User/UserMenu";
-import SchemeToggle from "@/components/Scheme/SchemeToggleButton";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { SettingsSync } from "@/components/Settings/SettingsSync";
 import { settingsQueryOptions } from "@/queries/settings/use-settings";
-import { profileQueryOptions } from "@/queries/use-profile";
+import { profileQueryOptions } from "@/queries/profile/use-profile";
+import { Shell } from "@/components/AppShell/Shell";
 
 export const Route = createFileRoute("/_dashboard")({
   beforeLoad: ({ context }) => {
@@ -29,32 +22,7 @@ function DashboardLayout() {
   return (
     <>
       <SettingsSync />
-      <AppShell header={{ height: 60 }} padding="md">
-        <AppShell.Header>
-          <Group h="100%" px="md" justify="space-between">
-            <Group>
-              <Button component={Link} to="/dashboard" variant="transparent">
-                <Title order={3} c="violet">
-                  Habbit Ruler
-                </Title>
-              </Button>
-            </Group>
-            <Group>
-              <Button component={Link} to="/test" variant="subtle">
-                Test
-              </Button>
-            </Group>
-            <Group>
-              <SchemeToggle />
-              <UserMenu />
-            </Group>
-          </Group>
-        </AppShell.Header>
-
-        <AppShell.Main>
-          <Outlet />
-        </AppShell.Main>
-      </AppShell>
+      <Shell />
     </>
   );
 }
