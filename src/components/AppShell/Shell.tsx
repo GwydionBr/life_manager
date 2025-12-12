@@ -16,7 +16,7 @@ export function Shell() {
           <Group>
             <Button component={Link} to="/dashboard" variant="transparent">
               <Title order={3} c="violet">
-                Habbit Ruler
+                Life Manager
               </Title>
             </Button>
           </Group>
