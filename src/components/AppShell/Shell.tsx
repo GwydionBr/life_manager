@@ -4,7 +4,7 @@ import { useLocation } from "@tanstack/react-router";
 
 import { AppShell, Group, Button, Title, ActionIcon } from "@mantine/core";
 import { Link, Outlet } from "@tanstack/react-router";
-import SchemeToggle from "@/components/Scheme/SchemeToggleButton";
+import SchemeToggle from "@/components/Scheme/SchemeToggle";
 import { UserMenu } from "@/components/User/UserMenu";
 import {
   IconBriefcase,
@@ -71,13 +71,13 @@ export function Shell() {
               {getLocalizedText("Gewohnheiten", "Habbit Tracker")}
             </Button>
           </Group>
-          <Group>
+          <Group gap="xs">
             <ActionIcon
-              size="lg"
+              size="xl"
               variant="subtle"
               onClick={() => setIsModalOpen(true)}
             >
-              <IconSettings />
+              <IconSettings stroke={1.5}/>
             </ActionIcon>
             <SchemeToggle />
             <UserMenu />

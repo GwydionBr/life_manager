@@ -10,9 +10,9 @@ import {
   Text,
   useMantineColorScheme,
 } from "@mantine/core";
-import DarkSchemeButton from "@/components/Scheme/DarkSchemeButton";
-import LightSchemeButton from "@/components/Scheme/LightSchemeButton";
-import SystemSchemeButton from "@/components/Scheme/SystemSchemeButton";
+import { DarkSchemeButton } from "@/components/Scheme/DarkScheme";
+import { LightSchemeButton } from "@/components/Scheme/LightScheme";
+import { SystemSchemeButton } from "@/components/Scheme/SystemScheme";
 
 export default function SchemeToggle() {
   const { getLocalizedText } = useIntl();
