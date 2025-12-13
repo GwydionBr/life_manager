@@ -19,6 +19,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/NotFound";
 import { getSupabaseServerClient } from "@/lib/supabaseServerClient";
+import useSettingsStore from "@/stores/settingsStore";
 
 const fetchSupabaseAuth = createServerFn({ method: "GET" }).handler(
   async () => {
@@ -39,11 +40,6 @@ const fetchSupabaseAuth = createServerFn({ method: "GET" }).handler(
     };
   }
 );
-
-const theme = createTheme({
-  /** Put your mantine theme override here */
-  primaryColor: "teal",
-});
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -108,6 +104,12 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
+  const { primaryColor } = useSettingsStore();
+  const theme = createTheme({
+    /** Put your mantine theme override here */
+    primaryColor: primaryColor,
+  });
+  
   return (
     <RootDocument>
       <MantineProvider theme={theme} defaultColorScheme="auto">

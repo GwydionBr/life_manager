@@ -9,17 +9,13 @@ import {
   IconBriefcase,
   IconSettings,
   IconCalendar,
+  IconTarget,
 } from "@tabler/icons-react";
 import WorkSettings from "./Work/WorkSettings";
 import CalendarSettings from "./Calendar/CalendarSettings";
 
-export enum SettingsTab {
-  GENERAL = "general",  
-  WORK = "work",
-  FINANCE = "finance",
-  CALENDAR = "calendar",
-  // GROUP = "group",
-}
+import { SettingsTab } from "@/stores/settingsStore";
+import HabbitTrackerSettings from "./HabbitTracker/HabbitTrackerSettings";
 
 export default function SettingsModal() {
   const { getLocalizedText } = useIntl();
@@ -33,9 +29,7 @@ export default function SettingsModal() {
       title={
         <Group gap="xs">
           <IconSettings size={16} />
-          <Text fw={600}>
-            {getLocalizedText("Einstellungen", "Settings")}
-          </Text>
+          <Text fw={600}>{getLocalizedText("Einstellungen", "Settings")}</Text>
         </Group>
       }
       size="80%"
@@ -72,12 +66,12 @@ export default function SettingsModal() {
           >
             {getLocalizedText("Kalender", "Calendar")}
           </Tabs.Tab>
-          {/* <Tabs.Tab
-            value={SettingsTab.GROUP}
-            leftSection={<IconUsers size={16} />}
+          <Tabs.Tab
+            value={SettingsTab.HABBIT}
+            leftSection={<IconTarget size={16} />}
           >
-            {getLocalizedText("Gruppen", "Group")}
-          </Tabs.Tab> */}
+            {getLocalizedText("Habit Tracker", "Habit Tracker")}
+          </Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value={SettingsTab.GENERAL}>
           <DefaultSettings />
@@ -91,9 +85,9 @@ export default function SettingsModal() {
         <Tabs.Panel value={SettingsTab.CALENDAR}>
           <CalendarSettings />
         </Tabs.Panel>
-        {/* <Tabs.Panel value={SettingsTab.GROUP}>
-          <GroupSettings />
-        </Tabs.Panel> */}
+        <Tabs.Panel value={SettingsTab.HABBIT}>
+          <HabbitTrackerSettings />
+        </Tabs.Panel>
       </Tabs>
     </Modal>
   );

@@ -1,5 +1,3 @@
-"use client";
-
 import { useMemo } from "react";
 import { useIntl } from "@/hooks/useIntl";
 import { useSettings } from "@/queries/settings/use-settings";

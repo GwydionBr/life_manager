@@ -7,7 +7,8 @@ import { Radio, Select, Stack } from "@mantine/core";
 
 import { currencies } from "@/constants/settings";
 import { Currency } from "@/types/settings.types";
-import SettingsRow from "../../SettingsRow";
+import SettingsRow from "@/components/Settings/SettingsRow";
+import FinanceColorSettings from "@/components/Settings/Finances/FinanceColorSettings";
 
 export default function FinanceDefaultSettings() {
   const { getLocalizedText } = useIntl();
@@ -38,11 +39,17 @@ export default function FinanceDefaultSettings() {
 
   const handleCCWChange = (value: string) => {
     setShowCCW(value as "true" | "false" | "null");
-    updateSettings({ show_change_curreny_window: value === "null" ? null : value === "true" });
+    updateSettings({
+      show_change_curreny_window: value === "null" ? null : value === "true",
+    });
   };
 
   return (
     <Stack w="100%">
+      <SettingsRow
+        title={getLocalizedText("Modulfarbe", "Module Color")}
+        children={<FinanceColorSettings />}
+      />
       <SettingsRow
         title={getLocalizedText(
           "Standard Finanzwährung",
@@ -57,7 +64,9 @@ export default function FinanceDefaultSettings() {
               "Select Finance Currency"
             )}
             value={default_finance_currency}
-            onChange={(value) => updateSettings({ default_finance_currency: value as Currency })}
+            onChange={(value) =>
+              updateSettings({ default_finance_currency: value as Currency })
+            }
           />
         }
       />
