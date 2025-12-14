@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as DashboardWorkRouteImport } from './routes/_dashboard/work'
 import { Route as DashboardTestRouteImport } from './routes/_dashboard/test'
 import { Route as DashboardHabbitTrackerRouteImport } from './routes/_dashboard/habbit-tracker'
@@ -25,6 +26,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthIndexRoute = AuthIndexRouteImport.update({
+  id: '/auth/',
+  path: '/auth/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardWorkRoute = DashboardWorkRouteImport.update({
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/habbit-tracker': typeof DashboardHabbitTrackerRoute
   '/test': typeof DashboardTestRoute
   '/work': typeof DashboardWorkRoute
+  '/auth': typeof AuthIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/habbit-tracker': typeof DashboardHabbitTrackerRoute
   '/test': typeof DashboardTestRoute
   '/work': typeof DashboardWorkRoute
+  '/auth': typeof AuthIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/_dashboard/habbit-tracker': typeof DashboardHabbitTrackerRoute
   '/_dashboard/test': typeof DashboardTestRoute
   '/_dashboard/work': typeof DashboardWorkRoute
+  '/auth/': typeof AuthIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/habbit-tracker'
     | '/test'
     | '/work'
+    | '/auth'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/habbit-tracker'
     | '/test'
     | '/work'
+    | '/auth'
   id:
     | '__root__'
     | '/'
@@ -116,11 +127,13 @@ export interface FileRouteTypes {
     | '/_dashboard/habbit-tracker'
     | '/_dashboard/test'
     | '/_dashboard/work'
+    | '/auth/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  AuthIndexRoute: typeof AuthIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -137,6 +150,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/': {
+      id: '/auth/'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_dashboard/work': {
@@ -209,6 +229,7 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  AuthIndexRoute: AuthIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

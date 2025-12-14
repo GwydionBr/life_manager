@@ -1,141 +1,229 @@
-import { useState } from "react";
-import {
-  Paper,
-  TextInput,
-  PasswordInput,
-  Button,
-  Title,
-  Text,
-  Anchor,
-  Stack,
-  Alert,
-} from "@mantine/core";
-import { createServerFn } from "@tanstack/react-start";
-import { getSupabaseServerClient } from "@/lib/supabaseServerClient";
+import { useEffect, useState } from "react";
+import { useForm } from "@mantine/form";
+import { upperFirst, useToggle } from "@mantine/hooks";
+import { useIntl } from "@/hooks/useIntl";
 import { useRouter } from "@tanstack/react-router";
-import { z } from "zod";
 
-const signUp = createServerFn({ method: "POST" })
-  .inputValidator(z.object({ email: z.string(), password: z.string() }))
-  .handler(async ({ data }) => {
-    const supabase = getSupabaseServerClient();
-    const { data: authData, error } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-    });
+import {
+  Anchor,
+  Button,
+  Checkbox,
+  Divider,
+  Group,
+  Paper,
+  PaperProps,
+  PasswordInput,
+  ScrollArea,
+  Stack,
+  TextInput,
+  Title,
+} from "@mantine/core";
+import GithubButton from "@/components/Auth/SocialButtons/GithubButton";
 
-    if (error) {
-      throw new Error(error.message);
-    }
+import PasswordStrength from "./PasswordStrenght";
+import { signIn, signUp } from "@/actions/auth/credentials";
+import { showNotification } from "@mantine/notifications";
+type AuthType = "login" | "register";
 
-    return { success: true, user: authData.user };
-  });
+interface AuthenticationFormProps extends PaperProps {
+  defaultType?: AuthType;
+}
 
-const signIn = createServerFn({ method: "POST" })
-  .inputValidator(z.object({ email: z.string(), password: z.string() }))
-  .handler(async ({ data }) => {
-    const supabase = getSupabaseServerClient();
-    const { data: authData, error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return { success: true, user: authData.user };
-  });
-
-export function AuthForm() {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export default function AuthenticationForm({
+  defaultType = "login",
+  ...props
+}: AuthenticationFormProps) {
+  const [type, toggle] = useToggle(["login", "register"] as const);
+  const [isLoading, setIsLoading] = useState(false);
+  const { getLocalizedText } = useIntl();
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+  useEffect(() => {
+    toggle(defaultType);
+  }, [defaultType]);
 
+  async function handleSubmit(values: typeof form.values) {
+    setIsLoading(true);
     try {
-      if (isLogin) {
-        await signIn({ data: { email, password } });
+      if (type === "login") {
+        await signIn({ data: values });
       } else {
-        await signUp({ data: { email, password } });
+        await signUp({ data: values });
       }
-
-      // Redirect to dashboard after successful auth
       router.invalidate();
-      window.location.href = "/dashboard";
-    } catch (err: any) {
-      setError(err.message || "Authentication failed");
+      router.navigate({ to: "/dashboard" });
+    } catch (error) {
+      console.error(error);
+      showNotification({
+        title: getLocalizedText("Fehler", "Error"),
+        message: getLocalizedText(
+          "Fehler beim Anmelden",
+          "Error while logging in"
+        ),
+        color: "red",
+      });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  };
+  }
+
+  async function handleGithub() {
+    // TODO: Implement Github login
+    // await signInWithGithub();
+    console.log("signInWithGithub");
+  }
+
+  const form = useForm({
+    initialValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+      terms: false,
+    },
+    validate: {
+      email: (value) =>
+        /^(?!\.)(?!.*\.\.)([a-z0-9_'+\-\.]*)[a-z0-9_+-]@([a-z0-9][a-z0-9\-]*\.)+[a-z]{2,}$/i.test(
+          value
+        )
+          ? null
+          : getLocalizedText("Ungültige E-Mail Adresse", "Invalid email"),
+      password: (value) =>
+        value.length <= 6
+          ? getLocalizedText(
+              "Passwort muss mindestens 6 Zeichen lang sein",
+              "Password must be at least 6 characters long"
+            )
+          : null,
+      confirmPassword: (value, values) =>
+        type === "register" && value !== values.password
+          ? getLocalizedText(
+              "Passwörter stimmen nicht überein",
+              "Passwords do not match"
+            )
+          : null,
+      terms: (value) =>
+        type === "register" && value !== true
+          ? getLocalizedText(
+              "Sie müssen die Nutzungsbedingungen akzeptieren",
+              "You must accept the terms and conditions"
+            )
+          : null,
+    },
+  });
 
   return (
-    <Paper radius="md" p="xl" withBorder>
-      <Title order={2} ta="center" mb="md">
-        {isLogin ? "Welcome back!" : "Create account"}
-      </Title>
-
-      <form onSubmit={handleSubmit}>
-        <Stack gap="md">
-          {error && (
-            <Alert color="red" title="Error">
-              {error}
-            </Alert>
-          )}
-
-          <TextInput
-            required
-            label="Email"
-            placeholder="your@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.currentTarget.value)}
-            disabled={loading}
-          />
-
-          <PasswordInput
-            required
-            label="Password"
-            placeholder="Your password"
-            value={password}
-            onChange={(e) => setPassword(e.currentTarget.value)}
-            disabled={loading}
-            minLength={6}
-          />
-
-          <Button
-            type="submit"
-            fullWidth
-            loading={loading}
-            variant="gradient"
-            gradient={{ from: "violet", to: "grape", deg: 135 }}
-          >
-            {isLogin ? "Sign in" : "Sign up"}
-          </Button>
-        </Stack>
-      </form>
-
-      <Text ta="center" mt="md">
-        {isLogin ? "Don't have an account? " : "Already have an account? "}
-        <Anchor
-          component="button"
-          type="button"
-          onClick={() => {
-            setIsLogin(!isLogin);
-            setError(null);
-          }}
-          disabled={loading}
+    <ScrollArea>
+      <Paper radius="md" p="xl" {...props}>
+        <Title
+          order={2}
+          ta="center"
+          mt="md"
+          mb={50}
+          c="var(--mantine-color-text)"
         >
-          {isLogin ? "Sign up" : "Sign in"}
-        </Anchor>
-      </Text>
-    </Paper>
+          {getLocalizedText(
+            "Willkommen beim Life Manager",
+            "Welcome to Life Manager"
+          )}
+        </Title>
+        <Group grow mb="md" mt="md">
+          <GithubButton radius="xl" onClick={handleGithub}>
+            {getLocalizedText("Mit Github fortfahren", "Continue with Github")}
+          </GithubButton>
+        </Group>
+        <Divider
+          label={getLocalizedText(
+            "Oder mit E-Mail fortfahren",
+            "Or continue with email"
+          )}
+          labelPosition="center"
+          my="lg"
+        />
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+          <Stack>
+            <TextInput
+              required
+              label={getLocalizedText("E-Mail", "Email")}
+              radius="md"
+              size="md"
+              placeholder={getLocalizedText(
+                "email@beispiel.com",
+                "email@example.com"
+              )}
+              {...form.getInputProps("email")}
+            />
+            {type === "register" ? (
+              <Stack>
+                <PasswordStrength
+                  currentPassword={form.values.password}
+                  required
+                  radius="md"
+                  size="md"
+                  label={getLocalizedText("Passwort", "Password")}
+                  placeholder={getLocalizedText(
+                    "Dein Passwort",
+                    "Your password"
+                  )}
+                  {...form.getInputProps("password")}
+                />
+                <PasswordInput
+                  required
+                  radius="md"
+                  size="md"
+                  label={getLocalizedText(
+                    "Bestätige Passwort",
+                    "Confirm Password"
+                  )}
+                  placeholder={getLocalizedText(
+                    "Bestätige dein Passwort",
+                    "Confirm your password"
+                  )}
+                  {...form.getInputProps("confirmPassword")}
+                />
+                <Checkbox
+                  required
+                  label={getLocalizedText(
+                    "Ich akzeptiere die Nutzungsbedingungen",
+                    "I accept terms and conditions"
+                  )}
+                  {...form.getInputProps("terms")}
+                />
+              </Stack>
+            ) : (
+              <PasswordInput
+                required
+                radius="md"
+                size="md"
+                label={getLocalizedText("Passwort", "Password")}
+                placeholder={getLocalizedText("Dein Passwort", "Your password")}
+                {...form.getInputProps("password")}
+              />
+            )}
+          </Stack>
+          <Group justify="space-between" mt="xl">
+            <Anchor
+              component="button"
+              type="button"
+              c="dimmed"
+              onClick={() => toggle()}
+              size="sm"
+            >
+              {type === "register"
+                ? getLocalizedText(
+                    "Hast du bereits ein Konto? Login",
+                    "Already have an account? Login"
+                  )
+                : getLocalizedText(
+                    "Hast du noch kein Konto? Registrieren",
+                    "Don't have an account? Register"
+                  )}
+            </Anchor>
+            <Button type="submit" radius="xl" loading={isLoading} size="md">
+              {upperFirst(type)}
+            </Button>
+          </Group>
+        </form>
+      </Paper>
+    </ScrollArea>
   );
 }

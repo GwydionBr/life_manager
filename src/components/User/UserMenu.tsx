@@ -5,7 +5,6 @@ import {
   Avatar,
   Group,
   Stack,
-  Divider,
   Badge,
   Box,
   useMantineColorScheme,
@@ -17,7 +16,6 @@ import { signOut } from "@/actions/auth/signOut";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useIntl } from "@/hooks/useIntl";
 import {
-  IconUser,
   IconSettings,
   IconLogout,
   IconDashboard,
@@ -28,9 +26,8 @@ import {
   IconCalendar,
   IconTarget,
 } from "@tabler/icons-react";
-import { DarkSchemeIcon } from "../Scheme/DarkScheme";
-import { LightSchemeIcon } from "../Scheme/LightScheme";
-import { SystemSchemeIcon } from "../Scheme/SystemScheme";
+import { DarkSchemeIcon } from "@/components/Scheme/DarkScheme";
+import { LightSchemeIcon } from "@/components/Scheme/LightScheme";
 
 export function UserMenu() {
   const router = useRouter();
@@ -44,9 +41,10 @@ export function UserMenu() {
     try {
       await signOut();
       router.invalidate();
-      window.location.href = "/";
+      router.navigate({ to: "/" });
     } catch (error) {
       console.error("Sign out error:", error);
+      throw new Error("Sign out error");
     }
   };
 
@@ -188,15 +186,9 @@ export function UserMenu() {
         <Menu.Item
           leftSection={
             colorScheme === "dark" ? (
-              <LightSchemeIcon
-                size={16}
-                color="var(--mantine-color-text)"
-              />
+              <LightSchemeIcon size={16} color="var(--mantine-color-text)" />
             ) : (
-              <DarkSchemeIcon
-                size={16}
-                color="var(--mantine-color-text)"
-              />
+              <DarkSchemeIcon size={16} color="var(--mantine-color-text)" />
             )
           }
           onClick={() => toggleColorScheme()}

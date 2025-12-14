@@ -7,7 +7,7 @@ import { Shell } from "@/components/AppShell/Shell";
 export const Route = createFileRoute("/_dashboard")({
   beforeLoad: ({ context }) => {
     if (!context.userId) {
-      throw redirect({ to: "/" });
+      throw redirect({ to: "/auth" });
     }
   },
   loader: async ({ context }) => {

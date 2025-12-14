@@ -8,7 +8,6 @@ import {
   Stack,
   Box,
   Group,
-  Modal,
   Card,
   SimpleGrid,
   ThemeIcon,
@@ -16,7 +15,6 @@ import {
   Divider,
 } from "@mantine/core";
 import { useState } from "react";
-import { AuthForm } from "@/components/Auth/AuthForm";
 import {
   IconClock,
   IconCalendar,
@@ -82,7 +80,6 @@ const benefits = [
 
 function Home() {
   const { userId } = Route.useRouteContext();
-  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   return (
     <Box>
@@ -145,7 +142,8 @@ function Home() {
                     size="xl"
                     variant="gradient"
                     gradient={{ from: "teal", to: "cyan", deg: 135 }}
-                    onClick={() => setAuthModalOpen(true)}
+                    component={Link}
+                    to="/auth/"
                     leftSection={<IconBolt size={20} />}
                   >
                     Get Started
@@ -293,7 +291,8 @@ function Home() {
                 size="xl"
                 variant="white"
                 color="teal"
-                onClick={() => setAuthModalOpen(true)}
+                component={Link}
+                to="/auth/"
                 leftSection={<IconBolt size={20} />}
               >
                 Sign Up Free
@@ -302,17 +301,6 @@ function Home() {
           </Stack>
         </Card>
       </Container>
-
-      {/* Auth Modal */}
-      <Modal
-        opened={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-        title="Authentication"
-        centered
-        size="md"
-      >
-        <AuthForm />
-      </Modal>
     </Box>
   );
 }
