@@ -51,7 +51,7 @@ export const DarkSchemeActionIcon = forwardRef<
       bg={navbarMode ? "" : "var(--mantine-color-dark-6)"}
       className={active ? classes.activeButton : ""}
     >
-      <DarkSchemeIcon color="var(--mantine-color-teal-4)" stroke={1.5} />
+      <DarkSchemeIcon stroke={1.5} />
     </ActionIcon>
   );
 });

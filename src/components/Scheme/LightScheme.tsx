@@ -55,7 +55,7 @@ export const LightSchemeActionIcon = forwardRef<
       }
       className={active ? classes.activeButton : ""}
     >
-      <LightSchemeIcon color="var(--mantine-color-teal-7)" stroke={1.5} />
+      <LightSchemeIcon stroke={1.5} />
     </ActionIcon>
   );
 });

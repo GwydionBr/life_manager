@@ -12,6 +12,10 @@ import {
   Box,
   ActionIcon,
   Tooltip,
+  MantineColor,
+  getThemeColor,
+  useMantineTheme,
+  alpha,
 } from "@mantine/core";
 import { useIntl } from "@/hooks/useIntl";
 import {
@@ -23,78 +27,95 @@ import {
   IconPlus,
   IconChartBar,
 } from "@tabler/icons-react";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { getGradientForColor } from "@/constants/colors";
 
 export const Route = createFileRoute("/_dashboard/dashboard")({
   component: Dashboard,
 });
 
-const apps = [
-  {
-    icon: IconBriefcase,
-    title: "Work",
-    titleDe: "Arbeit",
-    description: "Track your project hours and analyze your productivity",
-    descriptionDe:
-      "Erfasse deine Projektzeiten und analysiere deine Produktivität",
-    color: "blue",
-    gradient: { from: "blue", to: "cyan", deg: 135 },
-    link: "/work",
-    badge: "Active",
-    stats: [
-      { label: "Heute", value: "0h" },
-      { label: "Diese Woche", value: "0h" },
-    ],
-  },
-  {
-    icon: IconCurrencyDollar,
-    title: "Finance",
-    titleDe: "Finanzen",
-    description: "Manage your income, expenses and financial overview",
-    descriptionDe: "Verwalte Einnahmen, Ausgaben und Finanzübersicht",
-    color: "violet",
-    gradient: { from: "violet", to: "grape", deg: 135 },
-    link: "/finance",
-    badge: "Active",
-    stats: [
-      { label: "Diesen Monat", value: "€0" },
-      { label: "Einträge", value: "0" },
-    ],
-  },
-  {
-    icon: IconCalendar,
-    title: "Calendar",
-    titleDe: "Kalender",
-    description: "Manage appointments and schedule your time",
-    descriptionDe: "Verwalte Termine und plane deine Zeit",
-    color: "cyan",
-    gradient: { from: "cyan", to: "blue", deg: 135 },
-    link: "/calendar",
-    badge: "Active",
-    stats: [
-      { label: "Heute", value: "0" },
-      { label: "Diese Woche", value: "0" },
-    ],
-  },
-  {
-    icon: IconTarget,
-    title: "Habit Tracker",
-    titleDe: "Gewohnheiten",
-    description: "Build sustainable habits and track your daily routines",
-    descriptionDe:
-      "Baue nachhaltige Gewohnheiten auf und tracke deine Routinen",
-    color: "pink",
-    gradient: { from: "pink", to: "grape", deg: 135 },
-    link: "/habbit-tracker",
-    badge: "Active",
-    stats: [
-      { label: "Aktive Habits", value: "0" },
-      { label: "Streak", value: "0 Tage" },
-    ],
-  },
-];
-
 function Dashboard() {
   const { getLocalizedText } = useIntl();
+  const { workColor, financeColor, calendarColor, habitColor } =
+    useSettingsStore();
+  const theme = useMantineTheme();
+  // Base app configuration ohne Farben
+  const apps = [
+    {
+      id: "work",
+      icon: IconBriefcase,
+      title: "Work",
+      titleDe: "Arbeit",
+      description: "Track your project hours and analyze your productivity",
+      descriptionDe:
+        "Erfasse deine Projektzeiten und analysiere deine Produktivität",
+      link: "/work",
+      badge: "Active",
+      stats: [
+        { label: "Heute", value: "0h" },
+        { label: "Diese Woche", value: "0h" },
+      ],
+      color: {
+        base: getThemeColor(workColor, theme),
+        gradient: getGradientForColor(workColor),
+      },
+    },
+    {
+      id: "finance",
+      icon: IconCurrencyDollar,
+      title: "Finance",
+      titleDe: "Finanzen",
+      description: "Manage your income, expenses and financial overview",
+      descriptionDe: "Verwalte Einnahmen, Ausgaben und Finanzübersicht",
+      link: "/finance",
+      badge: "Active",
+      stats: [
+        { label: "Diesen Monat", value: "€0" },
+        { label: "Einträge", value: "0" },
+      ],
+      color: {
+        base: getThemeColor(financeColor, theme),
+        gradient: getGradientForColor(financeColor),
+      },
+    },
+    {
+      id: "calendar",
+      icon: IconCalendar,
+      title: "Calendar",
+      titleDe: "Kalender",
+      description: "Manage appointments and schedule your time",
+      descriptionDe: "Verwalte Termine und plane deine Zeit",
+      link: "/calendar",
+      badge: "Active",
+      stats: [
+        { label: "Heute", value: "0" },
+        { label: "Diese Woche", value: "0" },
+      ],
+      color: {
+        base: getThemeColor(calendarColor, theme),
+        gradient: getGradientForColor(calendarColor),
+      },
+    },
+    {
+      id: "habit",
+      icon: IconTarget,
+      title: "Habit Tracker",
+      titleDe: "Gewohnheiten",
+      description: "Build sustainable habits and track your daily routines",
+      descriptionDe:
+        "Baue nachhaltige Gewohnheiten auf und tracke deine Routinen",
+      link: "/habbit-tracker",
+      badge: "Active",
+      stats: [
+        { label: "Aktive Habits", value: "0" },
+        { label: "Streak", value: "0 Tage" },
+      ],
+      color: {
+        base: getThemeColor(habitColor, theme),
+        gradient: getGradientForColor(habitColor),
+      },
+    },
+  ];
 
   return (
     <Container size="xl" py="xl">
@@ -133,8 +154,7 @@ function Dashboard() {
               onMouseEnter={(e) => {
                 if (app.badge === "Active") {
                   e.currentTarget.style.transform = "translateY(-8px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 12px 32px rgba(190, 75, 219, 0.2)";
+                  e.currentTarget.style.boxShadow = `0 12px 32px ${alpha(app.color.base, 0.2)}`;
                 }
               }}
               onMouseLeave={(e) => {
@@ -152,7 +172,7 @@ function Dashboard() {
                       size={60}
                       radius="lg"
                       variant="gradient"
-                      gradient={app.gradient}
+                      gradient={app.color.gradient}
                     >
                       <app.icon size={32} />
                     </ThemeIcon>
@@ -164,7 +184,9 @@ function Dashboard() {
                         size="sm"
                         variant={app.badge === "Active" ? "gradient" : "light"}
                         gradient={
-                          app.badge === "Active" ? app.gradient : undefined
+                          app.badge === "Active"
+                            ? app.color.gradient
+                            : undefined
                         }
                         color={app.badge === "Active" ? undefined : "gray"}
                         mt={4}
@@ -180,7 +202,7 @@ function Dashboard() {
                     <ActionIcon
                       size="lg"
                       variant="subtle"
-                      color={app.color}
+                      color={app.color.base}
                       radius="xl"
                     >
                       <IconArrowRight size={20} />
@@ -215,7 +237,7 @@ function Dashboard() {
                     >
                       <ActionIcon
                         variant="light"
-                        color={app.color}
+                        color={app.color.base}
                         size="lg"
                         radius="md"
                       >
@@ -227,7 +249,7 @@ function Dashboard() {
                     >
                       <ActionIcon
                         variant="light"
-                        color={app.color}
+                        color={app.color.base}
                         size="lg"
                         radius="md"
                       >

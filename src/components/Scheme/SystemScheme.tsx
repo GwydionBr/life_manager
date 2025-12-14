@@ -2,7 +2,7 @@ import { forwardRef } from "react";
 import { useColorScheme } from "@mantine/hooks";
 
 import { IconProps, IconSunMoon } from "@tabler/icons-react";
-import { ActionIcon, HoverCard, Text } from "@mantine/core";
+import { ActionIcon, HoverCard, Text, MantineColor } from "@mantine/core";
 
 import classes from "./Scheme.module.css";
 
@@ -10,12 +10,14 @@ interface SystemSchemeActionIconProps {
   onClick?: () => void;
   active?: boolean;
   navbarMode?: boolean;
+  color?: MantineColor;
 }
 
 export function SystemSchemeButton({
   onClick,
   active,
   navbarMode,
+  color,
 }: SystemSchemeActionIconProps) {
   return (
     <HoverCard
@@ -30,6 +32,7 @@ export function SystemSchemeButton({
           onClick={onClick}
           active={active}
           navbarMode={navbarMode}
+          color={color ?? "var(--mantine-color-primary)"}
         />
       </HoverCard.Target>
       <HoverCard.Dropdown>
@@ -42,7 +45,7 @@ export function SystemSchemeButton({
 export const SystemSchemeActionIcon = forwardRef<
   HTMLButtonElement,
   SystemSchemeActionIconProps
->(({ onClick, active, navbarMode }, ref) => {
+>(({ onClick, active, navbarMode, color }, ref) => {
   const colorScheme = useColorScheme();
   return (
     <ActionIcon
@@ -60,14 +63,7 @@ export const SystemSchemeActionIcon = forwardRef<
       }
       className={active ? classes.activeButton : ""}
     >
-      <SystemSchemeIcon
-        color={
-          colorScheme === "light"
-            ? "var(--mantine-color-teal-7)"
-            : "var(--mantine-color-teal-4)"
-        }
-        stroke={1.5}
-      />
+      <SystemSchemeIcon color={color} stroke={1.5} />
     </ActionIcon>
   );
 });
