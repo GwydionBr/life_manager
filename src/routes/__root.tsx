@@ -10,8 +10,9 @@ import {
   Scripts,
   createRootRouteWithContext,
 } from "@tanstack/react-router";
-import { createTheme, MantineProvider } from "@mantine/core";
-import { ColorSchemeScript } from "@mantine/core";
+import { createTheme, MantineProvider, ColorSchemeScript } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
+import { Notifications } from "@mantine/notifications";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient } from "@tanstack/react-query";
@@ -109,11 +110,14 @@ function RootComponent() {
     /** Put your mantine theme override here */
     primaryColor: primaryColor,
   });
-  
+
   return (
     <RootDocument>
       <MantineProvider theme={theme} defaultColorScheme="auto">
-        <Outlet />
+        <ModalsProvider>
+          <Notifications />
+          <Outlet />
+        </ModalsProvider>
       </MantineProvider>
     </RootDocument>
   );

@@ -1,4 +1,4 @@
-import { useIntl } from "@/hooks/useIntl";
+
 import { Stack, Text, List } from "@mantine/core";
 import { showDeleteConfirmationModal } from "@/lib/notificationFunctions";
 
@@ -15,7 +15,6 @@ interface UseDeleteConfirmationOptions<T> {
 export function useDeleteConfirmation<T>(
   options: UseDeleteConfirmationOptions<T>
 ) {
-  const { getLocalizedText } = useIntl();
   const {
     items,
     getId,
@@ -27,6 +26,7 @@ export function useDeleteConfirmation<T>(
   } = options;
 
   const showDeleteModal = (ids: string[]) => {
+    console.log("showDeleteModal", ids);
     showDeleteConfirmationModal(
       deleteTitle,
       <Stack>

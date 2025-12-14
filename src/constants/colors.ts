@@ -1,16 +1,16 @@
 import { MantineColor, MantineGradient } from "@mantine/core";
 
 /**
- * Generiert einen passenden Gradienten basierend auf einer MantineColor
- * @param color Die Basis-Farbe für den Gradienten
- * @param deg Die Richtung des Gradienten in Grad (Standard: 135)
- * @returns Ein MantineGradient-Objekt mit from, to und deg
+ * Generates a suitable gradient based on a MantineColor
+ * @param color The base color for the gradient
+ * @param deg The direction of the gradient in degrees (default: 135)
+ * @returns A MantineGradient object with from, to, and deg
  */
 export const getGradientForColor = (
   color: MantineColor,
   deg: number = 135
 ): MantineGradient => {
-  // Mapping von Farben zu passenden Gradienten-Kombinationen
+  // Mapping of colors to matching gradient combinations
   const gradientMap: Record<string, { from: string; to: string }> = {
     // Blues
     blue: { from: "blue", to: "cyan" },
@@ -37,7 +37,7 @@ export const getGradientForColor = (
     dark: { from: "dark", to: "gray" },
   };
 
-  // Fallback für unbekannte Farben
+  // Fallback for unknown colors
   const gradient = gradientMap[color] || { from: color, to: color };
 
   return {
