@@ -1,6 +1,6 @@
 "use client";
 
-import { useUserPreferences } from "@/stores/userPreferencesStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 import { Group, List, Stack, Text } from "@mantine/core";
 import {
@@ -23,12 +23,12 @@ import { Locale } from "@/types/settings.types";
 
 // Helper function to get current locale from store (can be used outside React components)
 const getCurrentLocale = (): Locale => {
-  return useUserPreferences.getState().locale;
+  return useSettingsStore.getState().locale;
 };
 
 // Helper function to get format24h from store (can be used outside React components)
 const getFormat24h = (): boolean => {
-  return useUserPreferences.getState().format24h;
+  return useSettingsStore.getState().format_24h;
 };
 
 // Helper function to get localized text (automatically reads locale from store)

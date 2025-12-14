@@ -1,4 +1,4 @@
-import { useUserPreferences } from "@/stores/userPreferencesStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 import { Currency, Locale } from "@/types/settings.types";
 import * as intl from "@/utils/intl";
 
@@ -12,13 +12,12 @@ import * as intl from "@/utils/intl";
  * formatDate(new Date()); // Uses user's locale
  */
 export function useIntl() {
-  const locale = useUserPreferences((state) => state.locale);
-  const format24h = useUserPreferences((state) => state.format24h);
+  const { locale, format_24h } = useSettingsStore();
 
   return {
     // User preferences
     locale,
-    format24h,
+    format_24h,
 
     // Date & Time formatting with user preferences applied
     formatDate: (date: Date, options?: Intl.DateTimeFormatOptions) =>
@@ -27,10 +26,10 @@ export function useIntl() {
     formatMonth: (month: number) => intl.formatMonth(month, locale),
 
     formatDateTime: (date: Date) =>
-      intl.formatDateTime(date, locale, format24h),
+      intl.formatDateTime(date, locale, format_24h),
 
     formatTimeSpan: (start: Date, end: Date) =>
-      intl.formatTimeSpan(start, end, locale, format24h),
+      intl.formatTimeSpan(start, end, locale, format_24h),
 
     formatDateRange: (start: Date, end: Date) =>
       intl.formatDateRange(start, end, locale),

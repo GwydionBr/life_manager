@@ -9,18 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as DashboardRouteImport } from './routes/_dashboard'
+import { Route as NewUserRouteImport } from './routes/new-user'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
-import { Route as DashboardWorkRouteImport } from './routes/_dashboard/work'
-import { Route as DashboardTestRouteImport } from './routes/_dashboard/test'
-import { Route as DashboardHabbitTrackerRouteImport } from './routes/_dashboard/habbit-tracker'
-import { Route as DashboardFinanceRouteImport } from './routes/_dashboard/finance'
-import { Route as DashboardDashboardRouteImport } from './routes/_dashboard/dashboard'
-import { Route as DashboardCalendarRouteImport } from './routes/_dashboard/calendar'
+import { Route as AppWorkRouteImport } from './routes/_app/work'
+import { Route as AppTestRouteImport } from './routes/_app/test'
+import { Route as AppHabbitTrackerRouteImport } from './routes/_app/habbit-tracker'
+import { Route as AppFinanceRouteImport } from './routes/_app/finance'
+import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
+import { Route as AppCalendarRouteImport } from './routes/_app/calendar'
 
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/_dashboard',
+const NewUserRoute = NewUserRouteImport.update({
+  id: '/new-user',
+  path: '/new-user',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -33,73 +39,77 @@ const AuthIndexRoute = AuthIndexRouteImport.update({
   path: '/auth/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardWorkRoute = DashboardWorkRouteImport.update({
+const AppWorkRoute = AppWorkRouteImport.update({
   id: '/work',
   path: '/work',
-  getParentRoute: () => DashboardRoute,
+  getParentRoute: () => AppRoute,
 } as any)
-const DashboardTestRoute = DashboardTestRouteImport.update({
+const AppTestRoute = AppTestRouteImport.update({
   id: '/test',
   path: '/test',
-  getParentRoute: () => DashboardRoute,
+  getParentRoute: () => AppRoute,
 } as any)
-const DashboardHabbitTrackerRoute = DashboardHabbitTrackerRouteImport.update({
+const AppHabbitTrackerRoute = AppHabbitTrackerRouteImport.update({
   id: '/habbit-tracker',
   path: '/habbit-tracker',
-  getParentRoute: () => DashboardRoute,
+  getParentRoute: () => AppRoute,
 } as any)
-const DashboardFinanceRoute = DashboardFinanceRouteImport.update({
+const AppFinanceRoute = AppFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
-  getParentRoute: () => DashboardRoute,
+  getParentRoute: () => AppRoute,
 } as any)
-const DashboardDashboardRoute = DashboardDashboardRouteImport.update({
+const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => DashboardRoute,
+  getParentRoute: () => AppRoute,
 } as any)
-const DashboardCalendarRoute = DashboardCalendarRouteImport.update({
+const AppCalendarRoute = AppCalendarRouteImport.update({
   id: '/calendar',
   path: '/calendar',
-  getParentRoute: () => DashboardRoute,
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/calendar': typeof DashboardCalendarRoute
-  '/dashboard': typeof DashboardDashboardRoute
-  '/finance': typeof DashboardFinanceRoute
-  '/habbit-tracker': typeof DashboardHabbitTrackerRoute
-  '/test': typeof DashboardTestRoute
-  '/work': typeof DashboardWorkRoute
+  '/new-user': typeof NewUserRoute
+  '/calendar': typeof AppCalendarRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/finance': typeof AppFinanceRoute
+  '/habbit-tracker': typeof AppHabbitTrackerRoute
+  '/test': typeof AppTestRoute
+  '/work': typeof AppWorkRoute
   '/auth': typeof AuthIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/calendar': typeof DashboardCalendarRoute
-  '/dashboard': typeof DashboardDashboardRoute
-  '/finance': typeof DashboardFinanceRoute
-  '/habbit-tracker': typeof DashboardHabbitTrackerRoute
-  '/test': typeof DashboardTestRoute
-  '/work': typeof DashboardWorkRoute
+  '/new-user': typeof NewUserRoute
+  '/calendar': typeof AppCalendarRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/finance': typeof AppFinanceRoute
+  '/habbit-tracker': typeof AppHabbitTrackerRoute
+  '/test': typeof AppTestRoute
+  '/work': typeof AppWorkRoute
   '/auth': typeof AuthIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_dashboard': typeof DashboardRouteWithChildren
-  '/_dashboard/calendar': typeof DashboardCalendarRoute
-  '/_dashboard/dashboard': typeof DashboardDashboardRoute
-  '/_dashboard/finance': typeof DashboardFinanceRoute
-  '/_dashboard/habbit-tracker': typeof DashboardHabbitTrackerRoute
-  '/_dashboard/test': typeof DashboardTestRoute
-  '/_dashboard/work': typeof DashboardWorkRoute
+  '/_app': typeof AppRouteWithChildren
+  '/new-user': typeof NewUserRoute
+  '/_app/calendar': typeof AppCalendarRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/finance': typeof AppFinanceRoute
+  '/_app/habbit-tracker': typeof AppHabbitTrackerRoute
+  '/_app/test': typeof AppTestRoute
+  '/_app/work': typeof AppWorkRoute
   '/auth/': typeof AuthIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/new-user'
     | '/calendar'
     | '/dashboard'
     | '/finance'
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/new-user'
     | '/calendar'
     | '/dashboard'
     | '/finance'
@@ -120,29 +131,38 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/_dashboard'
-    | '/_dashboard/calendar'
-    | '/_dashboard/dashboard'
-    | '/_dashboard/finance'
-    | '/_dashboard/habbit-tracker'
-    | '/_dashboard/test'
-    | '/_dashboard/work'
+    | '/_app'
+    | '/new-user'
+    | '/_app/calendar'
+    | '/_app/dashboard'
+    | '/_app/finance'
+    | '/_app/habbit-tracker'
+    | '/_app/test'
+    | '/_app/work'
     | '/auth/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DashboardRoute: typeof DashboardRouteWithChildren
+  AppRoute: typeof AppRouteWithChildren
+  NewUserRoute: typeof NewUserRoute
   AuthIndexRoute: typeof AuthIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_dashboard': {
-      id: '/_dashboard'
+    '/new-user': {
+      id: '/new-user'
+      path: '/new-user'
+      fullPath: '/new-user'
+      preLoaderRoute: typeof NewUserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof DashboardRouteImport
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -159,76 +179,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_dashboard/work': {
-      id: '/_dashboard/work'
+    '/_app/work': {
+      id: '/_app/work'
       path: '/work'
       fullPath: '/work'
-      preLoaderRoute: typeof DashboardWorkRouteImport
-      parentRoute: typeof DashboardRoute
+      preLoaderRoute: typeof AppWorkRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/_dashboard/test': {
-      id: '/_dashboard/test'
+    '/_app/test': {
+      id: '/_app/test'
       path: '/test'
       fullPath: '/test'
-      preLoaderRoute: typeof DashboardTestRouteImport
-      parentRoute: typeof DashboardRoute
+      preLoaderRoute: typeof AppTestRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/_dashboard/habbit-tracker': {
-      id: '/_dashboard/habbit-tracker'
+    '/_app/habbit-tracker': {
+      id: '/_app/habbit-tracker'
       path: '/habbit-tracker'
       fullPath: '/habbit-tracker'
-      preLoaderRoute: typeof DashboardHabbitTrackerRouteImport
-      parentRoute: typeof DashboardRoute
+      preLoaderRoute: typeof AppHabbitTrackerRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/_dashboard/finance': {
-      id: '/_dashboard/finance'
+    '/_app/finance': {
+      id: '/_app/finance'
       path: '/finance'
       fullPath: '/finance'
-      preLoaderRoute: typeof DashboardFinanceRouteImport
-      parentRoute: typeof DashboardRoute
+      preLoaderRoute: typeof AppFinanceRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/_dashboard/dashboard': {
-      id: '/_dashboard/dashboard'
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardDashboardRouteImport
-      parentRoute: typeof DashboardRoute
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/_dashboard/calendar': {
-      id: '/_dashboard/calendar'
+    '/_app/calendar': {
+      id: '/_app/calendar'
       path: '/calendar'
       fullPath: '/calendar'
-      preLoaderRoute: typeof DashboardCalendarRouteImport
-      parentRoute: typeof DashboardRoute
+      preLoaderRoute: typeof AppCalendarRouteImport
+      parentRoute: typeof AppRoute
     }
   }
 }
 
-interface DashboardRouteChildren {
-  DashboardCalendarRoute: typeof DashboardCalendarRoute
-  DashboardDashboardRoute: typeof DashboardDashboardRoute
-  DashboardFinanceRoute: typeof DashboardFinanceRoute
-  DashboardHabbitTrackerRoute: typeof DashboardHabbitTrackerRoute
-  DashboardTestRoute: typeof DashboardTestRoute
-  DashboardWorkRoute: typeof DashboardWorkRoute
+interface AppRouteChildren {
+  AppCalendarRoute: typeof AppCalendarRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppFinanceRoute: typeof AppFinanceRoute
+  AppHabbitTrackerRoute: typeof AppHabbitTrackerRoute
+  AppTestRoute: typeof AppTestRoute
+  AppWorkRoute: typeof AppWorkRoute
 }
 
-const DashboardRouteChildren: DashboardRouteChildren = {
-  DashboardCalendarRoute: DashboardCalendarRoute,
-  DashboardDashboardRoute: DashboardDashboardRoute,
-  DashboardFinanceRoute: DashboardFinanceRoute,
-  DashboardHabbitTrackerRoute: DashboardHabbitTrackerRoute,
-  DashboardTestRoute: DashboardTestRoute,
-  DashboardWorkRoute: DashboardWorkRoute,
+const AppRouteChildren: AppRouteChildren = {
+  AppCalendarRoute: AppCalendarRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppFinanceRoute: AppFinanceRoute,
+  AppHabbitTrackerRoute: AppHabbitTrackerRoute,
+  AppTestRoute: AppTestRoute,
+  AppWorkRoute: AppWorkRoute,
 }
 
-const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
-  DashboardRouteChildren,
-)
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DashboardRoute: DashboardRouteWithChildren,
+  AppRoute: AppRouteWithChildren,
+  NewUserRoute: NewUserRoute,
   AuthIndexRoute: AuthIndexRoute,
 }
 export const routeTree = rootRouteImport

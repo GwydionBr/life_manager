@@ -30,7 +30,7 @@ import {
 import { useSettingsStore } from "@/stores/settingsStore";
 import { getGradientForColor } from "@/constants/colors";
 
-export const Route = createFileRoute("/_dashboard/dashboard")({
+export const Route = createFileRoute("/_app/dashboard")({
   component: Dashboard,
 });
 

@@ -1,8 +1,7 @@
-"use client";
-
 import { MantineColor } from "@mantine/core";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { Settings } from "@/types/settings.types";
 
 export enum SettingsTab {
   GENERAL = "general",
@@ -12,7 +11,7 @@ export enum SettingsTab {
   HABBIT = "habbit",
 }
 
-interface SettingsState {
+interface SettingsState extends Settings {
   isModalOpen: boolean;
   selectedTab: SettingsTab;
   isWorkNavbarOpen: boolean;
@@ -22,6 +21,7 @@ interface SettingsState {
   financeColor: MantineColor;
   calendarColor: MantineColor;
   habitColor: MantineColor;
+
 }
 
 interface SettingsActions {
@@ -34,20 +34,47 @@ interface SettingsActions {
   setFinanceColor: (color: MantineColor) => void;
   setCalendarColor: (color: MantineColor) => void;
   setHabitColor: (color: MantineColor) => void;
+  setSettingState: (adjustment: Partial<SettingsState>) => void;
 }
+
+const initialState: SettingsState = {
+  id: "",
+  isModalOpen: false,
+  selectedTab: SettingsTab.GENERAL,
+  isWorkNavbarOpen: true,
+  isFinanceNavbarOpen: true,
+  primaryColor: "teal",
+  workColor: "blue",
+  financeColor: "violet",
+  calendarColor: "lime",
+  habitColor: "red",
+
+  // Settings
+  locale: "en-US",
+  format_24h: true,
+  automaticly_stop_other_timer: false,
+  created_at: new Date().toISOString(),
+  default_currency: "USD",
+  default_finance_currency: "USD",
+  default_group_color: null,
+  default_project_hourly_payment: false,
+  default_salary_amount: 0,
+  round_in_time_sections: false,
+  rounding_amount: "min",
+  rounding_custom_amount: 0,
+  rounding_direction: "up",
+  rounding_interval: 0,
+  show_calendar_time: false,
+  show_change_curreny_window: null,
+  time_section_interval: 0,
+  user_id: "",
+  updated_at: new Date().toISOString(),
+};
 
 export const useSettingsStore = create<SettingsState & SettingsActions>()(
   persist(
     (set, get) => ({
-      isModalOpen: false,
-      selectedTab: SettingsTab.GENERAL,
-      isWorkNavbarOpen: true,
-      isFinanceNavbarOpen: true,
-      primaryColor: "teal",
-      workColor: "blue",
-      financeColor: "violet",
-      calendarColor: "lime",
-      habitColor: "red",
+      ...initialState,
 
       setSelectedTab: (tab: SettingsTab) => {
         set({ selectedTab: tab });
@@ -75,6 +102,9 @@ export const useSettingsStore = create<SettingsState & SettingsActions>()(
       },
       setHabitColor: (color: MantineColor) => {
         set({ habitColor: color });
+      },
+      setSettingState: (adjustment: Partial<SettingsState>) => {
+        set({ ...get(), ...adjustment });
       },
     }),
     {

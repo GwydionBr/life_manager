@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSettings } from "@/queries/settings/use-settings";
-import { useUserPreferences } from "@/stores/userPreferencesStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 /**
  * Component that syncs settings from React Query to Zustand store.
@@ -8,13 +8,13 @@ import { useUserPreferences } from "@/stores/userPreferencesStore";
  */
 export function SettingsSync() {
   const { data: settings } = useSettings();
-  const setPreferences = useUserPreferences((state) => state.setPreferences);
+  const { setSettingState } = useSettingsStore();
 
   useEffect(() => {
     if (settings) {
-      setPreferences(settings);
+      setSettingState(settings);
     }
-  }, [settings, setPreferences]);
+  }, [settings, setSettingState]);
 
   return null;
 }
