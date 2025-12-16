@@ -5,12 +5,12 @@ import { db } from "@/db/powersync/db";
 import { AppSchema } from "@/db/powersync/schema";
 
 // Collection basierend auf der PowerSync-Tabelle 'timer_project'
-export const listsCollection = createCollection(
+export const workProjectsCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,
-    table: AppSchema.props.lists, // Verweise auf die Lists-Tabelle
+    table: AppSchema.props.timer_project, // Verweise auf die Lists-Tabelle
   })
 );
 
-export const useLists = () =>
-  useLiveQuery((q) => q.from({ lists: listsCollection }));
+export const useWorkProjects = () =>
+  useLiveQuery((q) => q.from({ workProjects: workProjectsCollection }));

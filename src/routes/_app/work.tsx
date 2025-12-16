@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useLists } from "@/db/collections/work-project-collection";
+import { useWorkProjects } from "@/db/collections/work-project-collection";
 import { Group, Text, Stack } from "@mantine/core";
 
 export const Route = createFileRoute("/_app/work")({
@@ -9,21 +9,18 @@ export const Route = createFileRoute("/_app/work")({
 
 function RouteComponent() {
   // Führe eine Live-Query aus: alle Projekte abrufen
-  const { data: lists } = useLists();
-
+  const { data: workProjects } = useWorkProjects();
   return (
     <Stack>
-      {!lists && <Text>Lade Listen...</Text>}
-
-      {lists && lists.length === 0 && (
-        <Text c="dimmed">Keine Listen gefunden</Text>
+      {!workProjects && <Text>Lade Arbeitsprojekte...</Text>}
+      {workProjects && workProjects.length === 0 && (
+        <Text c="dimmed">Keine Arbeitsprojekte gefunden</Text>
       )}
-
-      {lists && lists.length > 0 && (
+      {workProjects && workProjects.length > 0 && (
         <ul>
-          {lists.map((list) => (
-            <Group key={list.id}>
-              <Text>{list.name}</Text>
+          {workProjects.map((workProject) => (
+            <Group key={workProject.id}>
+              <Text>{workProject.title}</Text>
             </Group>
           ))}
         </ul>
