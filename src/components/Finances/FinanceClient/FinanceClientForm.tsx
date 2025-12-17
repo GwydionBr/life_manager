@@ -9,10 +9,11 @@ import { zod4Resolver } from "mantine-form-zod-resolver";
 import { currencies } from "@/constants/settings";
 import CreateButton from "@/components/UI/Buttons/CreateButton";
 import UpdateButton from "@/components/UI/Buttons/UpdateButton";
-import { Tables } from "@/types/db.types";
 import { Currency } from "@/types/settings.types";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
 import { contactsCollection } from "@/db/collections/finance/contacts/contact-collection";
+
+import { Tables } from "@/types/db.types";
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),

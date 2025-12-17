@@ -45,23 +45,21 @@ export default function FinanceCategoryForm({
 
   function handleFormSubmit(values: z.infer<typeof schema>) {
     if (category) {
-      const result = financeCategoriesCollection.update(
+      financeCategoriesCollection.update(
         category.id,
         (draft) => {
           draft.title = values.title;
           draft.description = values.description || null;
         }
       );
-      console.log(result);
     } else {
-      const result = financeCategoriesCollection.insert({
+      financeCategoriesCollection.insert({
         id: crypto.randomUUID(),
         created_at: new Date().toISOString(),
         user_id: userId,
         title: values.title,
         description: values.description || null,
       });
-      console.log(result);
     }
     handleClose();
   }
