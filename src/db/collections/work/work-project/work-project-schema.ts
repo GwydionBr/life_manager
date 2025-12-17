@@ -56,3 +56,19 @@ export const workProjectDeserializationSchema = z.object({
   total_payout: z.string().transform((val) => parseFloat(val)),
   user_id: z.string(),
 });
+
+export const workProjectCategorySchema = z.object({
+  created_at: z.string(),
+  finance_category_id: z.string(),
+  id: z.string(),
+  timer_project_id: z.string(),
+  user_id: z.string(),
+});
+
+export const workProjectCategoryDeserializationSchema = z.object({
+  created_at: z.string(),
+  finance_category_id: z.string(),
+  id: z.string(),
+  timer_project_id: z.string(),
+  user_id: z.string(),
+});

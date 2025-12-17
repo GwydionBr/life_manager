@@ -2,6 +2,7 @@
 /// <reference types="vite/client" />
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
+import "@mantine/dates/styles.css";
 
 import type { ReactNode } from "react";
 import { useEffect } from "react";
@@ -14,6 +15,7 @@ import {
 import { createTheme, MantineProvider, ColorSchemeScript } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
+import { DatesProvider } from "@mantine/dates";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient } from "@tanstack/react-query";
@@ -123,7 +125,7 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
-  const { primaryColor } = useSettingsStore();
+  const { primaryColor, locale } = useSettingsStore();
   const theme = createTheme({
     /** Put your mantine theme override here */
     primaryColor: primaryColor,
@@ -162,7 +164,15 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
       <body>
         <MantineProvider theme={theme} defaultColorScheme="auto">
-          {children}
+          <DatesProvider
+            settings={{
+              locale: locale === "de-DE" ? "de" : "en",
+              firstDayOfWeek: locale === "de-DE" ? 1 : 0,
+              weekendDays: locale === "de-DE" ? [0, 6] : [0],
+            }}
+          >
+            {children}
+          </DatesProvider>
         </MantineProvider>
         <ReactQueryDevtools />
         <TanStackRouterDevtools />

@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import WorkCalendar from '@/components/WorkCalendar/WorkCalendar'
 
 export const Route = createFileRoute("/_app/calendar")({
   component: RouteComponent,
@@ -6,5 +7,5 @@ export const Route = createFileRoute("/_app/calendar")({
 });
 
 function RouteComponent() {
-  return <div>Hello "/_dashboard/calendar"!</div>
+  return <WorkCalendar />
 }
