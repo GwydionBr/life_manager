@@ -1,5 +1,3 @@
-"use client";
-
 import { useForm } from "@mantine/form";
 import { useIntl } from "@/hooks/useIntl";
 

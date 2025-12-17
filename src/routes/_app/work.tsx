@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useWorkProjects } from "@/db/collections/work-project-collection";
+import { useWorkProjects } from "@/db/collections/work/work-project-collection";
 import { Group, Text, Stack } from "@mantine/core";
+import { AddTestProjectButton } from "@/components/Work/Test/AddTestProjectButton";
+import { UpdateTestProjectButton } from "@/components/Work/Test/UpdateTestProjectButton";
 
 export const Route = createFileRoute("/_app/work")({
   component: RouteComponent,
@@ -10,6 +12,7 @@ export const Route = createFileRoute("/_app/work")({
 function RouteComponent() {
   // Führe eine Live-Query aus: alle Projekte abrufen
   const { data: workProjects } = useWorkProjects();
+  console.log(workProjects);
   return (
     <Stack>
       {!workProjects && <Text>Lade Arbeitsprojekte...</Text>}
@@ -25,6 +28,10 @@ function RouteComponent() {
           ))}
         </ul>
       )}
+      <Group>
+        <AddTestProjectButton />
+        <UpdateTestProjectButton />
+      </Group>
     </Stack>
   );
 }

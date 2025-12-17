@@ -1,8 +1,5 @@
-"use client";
-
 import { useForm } from "@mantine/form";
 import { useIntl } from "@/hooks/useIntl";
-import { useSettingsStore } from "@/stores/settingsStore";
 import {
   useAddBankAccountMutation,
   useUpdateBankAccountMutation,

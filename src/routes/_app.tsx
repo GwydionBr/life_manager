@@ -15,29 +15,12 @@ export const Route = createFileRoute("/_app")({
   loader: async ({ context }) => {
     const { queryClient } = context;
 
-    try {
-      // Versuche Daten zu laden (funktioniert online und offline mit PowerSync)
-      const profile =
-        await context.queryClient.ensureQueryData(profileQueryOptions);
-      if (!profile.initialized) {
-        throw redirect({ to: "/new-user" });
-      }
-      await queryClient.ensureQueryData(settingsQueryOptions);
-    } catch (error) {
-      // Offline oder Fehler beim Laden → lasse trotzdem weiter navigieren
-      // PowerSync wird die Daten im Component laden
-
-      // Nur bei echten Fehlern loggen, nicht bei Redirects (Status 307)
-      if (error instanceof Response && error.status === 307) {
-        // Redirect - das ist OK, wird vom Router gehandhabt
-        throw error;
-      }
-
-      // Bei anderen Fehlern (z.B. offline): Weiter navigieren
-      console.debug(
-        "Loader: Using offline mode, data will load from PowerSync"
-      );
+    const profile =
+      await context.queryClient.ensureQueryData(profileQueryOptions);
+    if (!profile.initialized) {
+      throw redirect({ to: "/new-user" });
     }
+    await queryClient.ensureQueryData(settingsQueryOptions);
   },
   component: AppLayout,
 });
