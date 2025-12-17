@@ -1,6 +1,6 @@
 import { useIntl } from "@/hooks/useIntl";
 import useSettingsStore from "@/stores/settingsStore";
-import ModuleColorPicker from "../ModuleColorPicker";
+import ModuleColorPicker from "@/components/Settings/ModuleColorPicker";
 
 export default function CalendarColorSettings() {
   const { getLocalizedText } = useIntl();

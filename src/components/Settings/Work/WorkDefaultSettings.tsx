@@ -1,9 +1,9 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { useIntl } from "@/hooks/useIntl";
-import { useSettings } from "@/db/queries/settings/use-settings";
-import { useUpdateSettings } from "@/db/queries/settings/use-update-settings";
+import {
+  useSettings,
+  settingsCollection,
+} from "@/db/collections/settings/settings-collection";
 
 import { Button, Group, NumberInput, Select, Switch } from "@mantine/core";
 
@@ -12,7 +12,6 @@ import { Currency } from "@/types/settings.types";
 
 export default function WorkDefaultSettings() {
   const { data: settings } = useSettings();
-  const { mutate: updateSettings, isPending } = useUpdateSettings();
   const { getLocalizedText } = useIntl();
 
   const [salaryAmount, setSalaryAmount] = useState(0);
@@ -24,7 +23,10 @@ export default function WorkDefaultSettings() {
   }, [settings.default_salary_amount]);
 
   function handleCustomSubmit() {
-    updateSettings({ default_salary_amount: salaryAmount });
+    if (!settings) return;
+    settingsCollection.update(settings.id, (draft) => {
+      draft.default_salary_amount = salaryAmount;
+    });
   }
 
   const {
@@ -36,12 +38,7 @@ export default function WorkDefaultSettings() {
   return (
     <Group>
       {salaryAmount !== default_salary_amount && (
-        <Button
-          mt="lg"
-          onClick={handleCustomSubmit}
-          loading={isPending}
-          disabled={isPending}
-        >
+        <Button mt="lg" onClick={handleCustomSubmit}>
           {getLocalizedText("Speichern", "Save")}
         </Button>
       )}
@@ -78,7 +75,9 @@ export default function WorkDefaultSettings() {
         )}
         value={default_currency}
         onChange={(value) =>
-          updateSettings({ default_currency: value as Currency })
+          settingsCollection.update(settings.id, (draft) => {
+            draft.default_currency = value as Currency;
+          })
         }
       />
       <Switch
@@ -86,8 +85,8 @@ export default function WorkDefaultSettings() {
         label={getLocalizedText("Stundenlohn", "Hourly Payment")}
         checked={default_project_hourly_payment}
         onChange={(event) =>
-          updateSettings({
-            default_project_hourly_payment: event.currentTarget.checked,
+          settingsCollection.update(settings.id, (draft) => {
+            draft.default_project_hourly_payment = event.currentTarget.checked;
           })
         }
       />

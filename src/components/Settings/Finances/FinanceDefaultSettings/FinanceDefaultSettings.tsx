@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { useSettings } from "@/db/queries/settings/use-settings";
-import { useUpdateSettings } from "@/db/queries/settings/use-update-settings";
+import {
+  useSettings,
+  settingsCollection,
+} from "@/db/collections/settings/settings-collection";
 import { useIntl } from "@/hooks/useIntl";
 
 import { Radio, Select, Stack } from "@mantine/core";
@@ -13,13 +15,6 @@ import FinanceColorSettings from "@/components/Settings/Finances/FinanceColorSet
 export default function FinanceDefaultSettings() {
   const { getLocalizedText } = useIntl();
   const { data: settings } = useSettings();
-  const { mutate: updateSettings } = useUpdateSettings();
-  // const {
-  //   defaultFinanceCurrency: financeCurrency,
-  //   setDefaultFinanceCurrency: setFinanceCurrency,
-  //   showChangeCurrencyWindow,
-  //   setShowChangeCurrencyWindow,
-  // } = useSettingsStore();
 
   if (!settings) return null;
 
@@ -39,8 +34,9 @@ export default function FinanceDefaultSettings() {
 
   const handleCCWChange = (value: string) => {
     setShowCCW(value as "true" | "false" | "null");
-    updateSettings({
-      show_change_curreny_window: value === "null" ? null : value === "true",
+    settingsCollection.update(settings.id, (draft) => {
+      draft.show_change_curreny_window =
+        value === "null" ? null : value === "true";
     });
   };
 
@@ -65,7 +61,9 @@ export default function FinanceDefaultSettings() {
             )}
             value={default_finance_currency}
             onChange={(value) =>
-              updateSettings({ default_finance_currency: value as Currency })
+              settingsCollection.update(settings.id, (draft) => {
+                draft.default_finance_currency = value as Currency;
+              })
             }
           />
         }

@@ -1,8 +1,8 @@
-"use client";
-
 import { useEffect, useState } from "react";
-import { useUpdateSettings } from "@/db/queries/settings/use-update-settings";
-import { useSettings } from "@/db/queries/settings/use-settings";
+import {
+  useSettings,
+  settingsCollection,
+} from "@/db/collections/settings/settings-collection";
 import { useIntl } from "@/hooks/useIntl";
 
 import { Box, DEFAULT_THEME, Group, Popover, Text } from "@mantine/core";
@@ -13,7 +13,6 @@ import DefaultColorPicker from "@/components/UI/DefaultColorPicker";
 export default function GroupDefaultSettings() {
   const { getLocalizedText } = useIntl();
   const { data: settings } = useSettings();
-  const { mutate: updateSettings } = useUpdateSettings();
   const [color, setColor] = useState<string | null>(null);
 
   if (!settings) return null;
@@ -25,7 +24,10 @@ export default function GroupDefaultSettings() {
   }, [default_group_color]);
 
   function handleColorChange() {
-    updateSettings({ default_group_color: color });
+    if (!settings) return;
+    settingsCollection.update(settings.id, (draft) => {
+      draft.default_group_color = color;
+    });
   }
 
   return (

@@ -1,11 +1,11 @@
 import { useIntl } from "@/hooks/useIntl";
 
 import { Stack } from "@mantine/core";
-import SettingsRow from "../SettingsRow";
-import SelectTimerRounding from "./RoundingSettings";
-import WorkDefaultSettings from "./WorkDefaultSettings";
-import TimeTrackerSettings from "./TimeTrackerSettings";
-import WorkColorSettings from "./WorkColorSettings";
+import SettingsRow from "@/components/Settings/SettingsRow";
+import SelectTimerRounding from "@/components/Settings/Work/RoundingSettings";
+import WorkDefaultSettings from "@/components/Settings/Work/WorkDefaultSettings";
+import TimeTrackerSettings from "@/components/Settings/Work/TimeTrackerSettings";
+import WorkColorSettings from "@/components/Settings/Work/WorkColorSettings";
 
 export default function WorkSettings() {
   const { getLocalizedText } = useIntl();

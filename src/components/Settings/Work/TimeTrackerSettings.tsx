@@ -1,12 +1,13 @@
 import { useIntl } from "@/hooks/useIntl";
-import { useSettings } from "@/db/queries/settings/use-settings";
-import { useUpdateSettings } from "@/db/queries/settings/use-update-settings";
+import {
+  useSettings,
+  settingsCollection,
+} from "@/db/collections/settings/settings-collection";
 
 import { Stack, Switch } from "@mantine/core";
 
 export default function TimeTrackerSettings() {
   const { data: settings } = useSettings();
-  const { mutate: updateSettings } = useUpdateSettings();
   const { getLocalizedText } = useIntl();
 
   if (!settings) return null;
@@ -22,8 +23,8 @@ export default function TimeTrackerSettings() {
         )}
         checked={automaticly_stop_other_timer}
         onChange={(event) =>
-          updateSettings({
-            automaticly_stop_other_timer: event.currentTarget.checked,
+          settingsCollection.update(settings.id, (draft) => {
+            draft.automaticly_stop_other_timer = event.currentTarget.checked;
           })
         }
       />

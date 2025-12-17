@@ -1,8 +1,8 @@
-"use client";
-
 import { useEffect, useState } from "react";
-import { useSettings } from "@/db/queries/settings/use-settings";
-import { useUpdateSettings } from "@/db/queries/settings/use-update-settings";
+import {
+  useSettings,
+  settingsCollection,
+} from "@/db/collections/settings/settings-collection";
 import { useIntl } from "@/hooks/useIntl";
 
 import {
@@ -22,12 +22,10 @@ import {
 } from "@mantine/core";
 
 import { RoundingDirection } from "@/types/settings.types";
-import { TimerRoundingSettings } from "@/types/timeTracker.types";
 
 export default function RoundingSettings() {
   const { getLocalizedText, locale } = useIntl();
   const { data: settings } = useSettings();
-  const { mutate: updateSettings, isPending } = useUpdateSettings();
 
   const [roundingIntervalState, setRoundingIntervalState] = useState(0);
 
@@ -38,7 +36,10 @@ export default function RoundingSettings() {
   }, [settings.rounding_interval]);
 
   function handleCustomSubmit() {
-    updateSettings({ rounding_interval: roundingIntervalState });
+    if (!settings) return;
+    settingsCollection.update(settings.id, (draft) => {
+      draft.rounding_interval = roundingIntervalState;
+    });
   }
 
   const roundingInTimeSections = getRoundingInTimeFragments(locale);
@@ -53,8 +54,8 @@ export default function RoundingSettings() {
         )}
         checked={settings.round_in_time_sections}
         onChange={(event) =>
-          updateSettings({
-            round_in_time_sections: event.currentTarget.checked,
+          settingsCollection.update(settings.id, (draft) => {
+            draft.round_in_time_sections = event.currentTarget.checked;
           })
         }
       />
@@ -75,7 +76,9 @@ export default function RoundingSettings() {
             data={roundingModes}
             value={settings.rounding_direction}
             onChange={(value) =>
-              updateSettings({ rounding_direction: value as RoundingDirection })
+              settingsCollection.update(settings.id, (draft) => {
+                draft.rounding_direction = value as RoundingDirection;
+              })
             }
           />
           <Transition
@@ -83,12 +86,7 @@ export default function RoundingSettings() {
             transition="fade-right"
           >
             {(styles) => (
-              <Button
-                onClick={handleCustomSubmit}
-                loading={isPending}
-                disabled={isPending}
-                style={{ ...styles }}
-              >
+              <Button onClick={handleCustomSubmit} style={{ ...styles }}>
                 {getLocalizedText("Speichern", "Save")}
               </Button>
             )}
@@ -110,7 +108,9 @@ export default function RoundingSettings() {
             )}
             value={settings.time_section_interval.toString()}
             onChange={(value) =>
-              updateSettings({ time_section_interval: Number(value) })
+              settingsCollection.update(settings.id, (draft) => {
+                draft.time_section_interval = Number(value);
+              })
             }
           />
         </Group>

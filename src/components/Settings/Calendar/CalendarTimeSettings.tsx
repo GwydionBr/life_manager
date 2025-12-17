@@ -1,12 +1,13 @@
-import { useSettings } from "@/db/queries/settings/use-settings";
-import { useUpdateSettings } from "@/db/queries/settings/use-update-settings";
+import {
+  useSettings,
+  settingsCollection,
+} from "@/db/collections/settings/settings-collection";
 import { useIntl } from "@/hooks/useIntl";
 
 import { Group, Switch } from "@mantine/core";
 
 export default function CalendarTimeSettings() {
   const { data: settings } = useSettings();
-  const { mutate: updateSettings } = useUpdateSettings();
   const { getLocalizedText } = useIntl();
 
   if (!settings) return null;
@@ -23,7 +24,9 @@ export default function CalendarTimeSettings() {
         )}
         checked={show_calendar_time}
         onChange={(event) =>
-          updateSettings({ show_calendar_time: event.currentTarget.checked })
+          settingsCollection.update(settings.id, (draft) => {
+            draft.show_calendar_time = event.currentTarget.checked;
+          })
         }
       />
     </Group>

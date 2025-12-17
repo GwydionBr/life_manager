@@ -1,7 +1,10 @@
 import { useMemo } from "react";
 import { useIntl } from "@/hooks/useIntl";
-import { useSettings } from "@/db/queries/settings/use-settings";
-import { useUpdateSettings } from "@/db/queries/settings/use-update-settings";
+import {
+  useSettings,
+  settingsCollection,
+} from "@/db/collections/settings/settings-collection";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 import { Group, Select, Text } from "@mantine/core";
 
@@ -11,8 +14,8 @@ import { locales } from "@/constants/settings";
 
 export default function LocaleSettings() {
   const { data: settings } = useSettings();
-  const { mutate: updateSettings } = useUpdateSettings();
   const { getLocalizedText } = useIntl();
+  const { setSettingState } = useSettingsStore();
 
   if (!settings) return null;
 
@@ -32,7 +35,12 @@ export default function LocaleSettings() {
         )}
         value={settings.locale}
         allowDeselect={false}
-        onChange={(value) => updateSettings({ locale: value as Locale })}
+        onChange={(value) => {
+          settingsCollection.update(settings.id, (draft) => {
+            draft.locale = value as Locale;
+          });
+          setSettingState({ locale: value as Locale });
+        }}
         leftSection={
           currentLocale && (
             <ReactCountryFlag
@@ -72,7 +80,12 @@ export default function LocaleSettings() {
           "Select Time Format"
         )}
         value={settings.format_24h ? "24h" : "12h"}
-        onChange={(value) => updateSettings({ format_24h: value === "24h" })}
+        onChange={(value) => {
+          settingsCollection.update(settings.id, (draft) => {
+            draft.format_24h = value === "24h";
+          });
+          setSettingState({ format_24h: value === "24h" });
+        }}
       />
     </Group>
   );

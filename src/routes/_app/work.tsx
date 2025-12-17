@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_app/work")({
 function RouteComponent() {
   // Führe eine Live-Query aus: alle Projekte abrufen
   const { data: workProjects } = useWorkProjects();
-  console.log(workProjects);
+
   return (
     <Stack>
       {!workProjects && <Text>Lade Arbeitsprojekte...</Text>}
