@@ -1,8 +1,8 @@
 import { useIntl } from "@/hooks/useIntl";
 import {
-  useDeleteFinanceClientMutation,
-  useFinanceClientQuery,
-} from "@/db/queries/finances/use-finance-client";
+  contactsCollection,
+  useContacts,
+} from "@/db/collections/finance/contacts/contact-collection";
 
 import { Group, Text } from "@mantine/core";
 import { IconUserPlus, IconUsers } from "@tabler/icons-react";
@@ -12,10 +12,7 @@ import { Tables } from "@/types/db.types";
 
 export default function FinanceClientSettings() {
   const { getLocalizedText, getCurrencySymbol } = useIntl();
-  const { data: financeClients = [], isPending: isFetchingFinanceClients } =
-    useFinanceClientQuery();
-  const { mutate: deleteFinanceClientsMutation } =
-    useDeleteFinanceClientMutation();
+  const { data: contacts } = useContacts();
 
   const renderRowContent = (client: Tables<"finance_client">) => (
     <>
@@ -63,25 +60,28 @@ export default function FinanceClientSettings() {
 
   return (
     <FinanceSettingsList
-      items={financeClients}
-      isLoading={isFetchingFinanceClients}
+      items={contacts}
+      isLoading={false}
       getId={(item) => item.id}
       getTitle={(item) => item.name}
       getDescription={(item) => item.description || undefined}
       renderRowContent={renderRowContent}
       renderEditForm={renderEditForm}
       renderAddForm={renderAddForm}
-      onDelete={deleteFinanceClientsMutation}
-      titleText={getLocalizedText("Finanz Kunden", "Finance Clients")}
-      emptyText={getLocalizedText("Keine Kunden gefunden", "No clients found")}
-      deleteTitle={getLocalizedText("Kunde löschen", "Delete Client")}
-      deleteMessage={getLocalizedText(
-        "Sind Sie sicher, dass Sie diese Kunden löschen möchten",
-        "Are you sure you want to delete these clients"
+      onDelete={(ids) => contactsCollection.delete(ids)}
+      titleText={getLocalizedText("Kontakte", "Contacts")}
+      emptyText={getLocalizedText(
+        "Keine Kontakte gefunden",
+        "No contacts found"
       )}
-      addText={getLocalizedText("Kunde hinzufügen", "Add Client")}
-      editText={getLocalizedText("Kunde bearbeiten", "Edit client")}
-      selectTooltip={getLocalizedText("Kunde auswählen", "Select client")}
+      deleteTitle={getLocalizedText("Kontakt löschen", "Delete Contact")}
+      deleteMessage={getLocalizedText(
+        "Sind Sie sicher, dass Sie diese Kontakte löschen möchten",
+        "Are you sure you want to delete these contacts"
+      )}
+      addText={getLocalizedText("Kontakt hinzufügen", "Add Contact")}
+      editText={getLocalizedText("Kontakt bearbeiten", "Edit Contact")}
+      selectTooltip={getLocalizedText("Kontakt auswählen", "Select Contact")}
       titleIcon={<IconUsers size={20} />}
       addIcon={<IconUserPlus />}
     />

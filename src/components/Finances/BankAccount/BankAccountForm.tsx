@@ -1,6 +1,6 @@
 import { useForm } from "@mantine/form";
 import { useIntl } from "@/hooks/useIntl";
-import { bankAccountsCollection } from "@/db/collections/finance/bank-account-collection";
+import { bankAccountsCollection } from "@/db/collections/finance/bank-account/bank-account-collection";
 import { useProfileStore } from "@/stores/profileStore";
 
 import { Stack, Select, TextInput } from "@mantine/core";

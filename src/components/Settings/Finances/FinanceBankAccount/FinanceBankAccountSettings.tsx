@@ -1,5 +1,8 @@
 import { useIntl } from "@/hooks/useIntl";
-import { bankAccountsCollection, useBankAccounts } from "@/db/collections/finance/bank-account-collection";
+import {
+  bankAccountsCollection,
+  useBankAccounts,
+} from "@/db/collections/finance/bank-account/bank-account-collection";
 
 import { Group, Text } from "@mantine/core";
 import { IconBuildingBank, IconPlus } from "@tabler/icons-react";

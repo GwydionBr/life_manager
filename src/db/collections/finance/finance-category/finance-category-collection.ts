@@ -4,22 +4,22 @@ import { powerSyncCollectionOptions } from "@tanstack/powersync-db-collection";
 import { db } from "@/db/powersync/db";
 import { AppSchema } from "@/db/powersync/schema";
 import {
-  bankAccountSchema,
-  bankAccountDeserializationSchema,
-} from "./bank-account-schema";
+  financeCategorySchema,
+  financeCategoryDeserializationSchema,
+} from "@/db/collections/finance/finance-category/finance-category-schema";
 
 // Collection basierend auf der PowerSync-Tabelle 'bank_account'
-export const bankAccountsCollection = createCollection(
+export const financeCategoriesCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,
-    table: AppSchema.props.bank_account,
-    schema: bankAccountSchema,
-    deserializationSchema: bankAccountDeserializationSchema,
+    table: AppSchema.props.finance_category,
+    schema: financeCategorySchema,
+    deserializationSchema: financeCategoryDeserializationSchema,
     onDeserializationError: (error) => {
       console.error(error);
     },
   })
 );
 
-export const useBankAccounts = () =>
-  useLiveQuery((q) => q.from({ bankAccounts: bankAccountsCollection }));
+export const useFinanceCategories = () =>
+  useLiveQuery((q) => q.from({ financeCategories: financeCategoriesCollection }));

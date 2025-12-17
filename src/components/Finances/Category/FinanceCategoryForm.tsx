@@ -1,5 +1,6 @@
 import { useForm } from "@mantine/form";
 import { useIntl } from "@/hooks/useIntl";
+import { useProfileStore } from "@/stores/profileStore";
 
 import { TextInput, Stack, Textarea } from "@mantine/core";
 import { z } from "zod";
@@ -8,10 +9,7 @@ import CancelButton from "@/components/UI/Buttons/CancelButton";
 import CreateButton from "@/components/UI/Buttons/CreateButton";
 import UpdateButton from "@/components/UI/Buttons/UpdateButton";
 import { Tables } from "@/types/db.types";
-import {
-  useAddFinanceCategoryMutation,
-  useUpdateFinanceCategoryMutation,
-} from "@/db/queries/finances/use-finance-category";
+import { financeCategoriesCollection } from "@/db/collections/finance/finance-category/finance-category-collection";
 
 const schema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
@@ -30,19 +28,7 @@ export default function FinanceCategoryForm({
   category,
 }: FinanceCategoryFormProps) {
   const { getLocalizedText } = useIntl();
-  const {
-    mutate: addFinanceCategoryMutation,
-    isPending: isAddingFinanceCategory,
-  } = useAddFinanceCategoryMutation({
-    onSuccess: (category) => {
-      onSuccess?.(category);
-      handleClose();
-    },
-  });
-  const {
-    mutate: updateFinanceCategoryMutation,
-    isPending: isUpdatingFinanceCategory,
-  } = useUpdateFinanceCategoryMutation({ onSuccess: () => handleClose() });
+  const { id: userId } = useProfileStore();
 
   const form = useForm({
     initialValues: {
@@ -59,17 +45,25 @@ export default function FinanceCategoryForm({
 
   function handleFormSubmit(values: z.infer<typeof schema>) {
     if (category) {
-      updateFinanceCategoryMutation({
-        id: category.id,
-        title: values.title,
-        description: values.description,
-      });
+      const result = financeCategoriesCollection.update(
+        category.id,
+        (draft) => {
+          draft.title = values.title;
+          draft.description = values.description || null;
+        }
+      );
+      console.log(result);
     } else {
-      addFinanceCategoryMutation({
+      const result = financeCategoriesCollection.insert({
+        id: crypto.randomUUID(),
+        created_at: new Date().toISOString(),
+        user_id: userId,
         title: values.title,
-        description: values.description,
+        description: values.description || null,
       });
+      console.log(result);
     }
+    handleClose();
   }
 
   return (
@@ -94,13 +88,11 @@ export default function FinanceCategoryForm({
           <UpdateButton
             type="submit"
             onClick={form.onSubmit(handleFormSubmit)}
-            loading={isUpdatingFinanceCategory}
           />
         ) : (
           <CreateButton
             type="submit"
             onClick={form.onSubmit(handleFormSubmit)}
-            loading={isAddingFinanceCategory}
           />
         )}
         {onClose && <CancelButton onClick={handleClose} />}

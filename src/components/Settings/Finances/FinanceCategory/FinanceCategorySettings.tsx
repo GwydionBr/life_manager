@@ -1,8 +1,8 @@
 import { useIntl } from "@/hooks/useIntl";
 import {
-  useDeleteFinanceCategoryMutation,
-  useFinanceCategoriesQuery,
-} from "@/db/queries/finances/use-finance-category";
+  financeCategoriesCollection,
+  useFinanceCategories,
+} from "@/db/collections/finance/finance-category/finance-category-collection";
 
 import { Text } from "@mantine/core";
 import { IconCategoryPlus } from "@tabler/icons-react";
@@ -12,10 +12,7 @@ import { Tables } from "@/types/db.types";
 
 export default function FinanceCategorySettings() {
   const { getLocalizedText } = useIntl();
-  const { data: financeCategories = [], isPending: isFetchingCategories } =
-    useFinanceCategoriesQuery();
-  const { mutate: deleteFinanceCategoriesMutation } =
-    useDeleteFinanceCategoryMutation();
+  const { data: financeCategories } = useFinanceCategories();
 
   const renderRowContent = (category: Tables<"finance_category">) => (
     <>
@@ -40,14 +37,14 @@ export default function FinanceCategorySettings() {
   return (
     <FinanceSettingsList
       items={financeCategories}
-      isLoading={isFetchingCategories}
+      isLoading={false}
       getId={(item) => item.id}
       getTitle={(item) => item.title}
       getDescription={(item) => item.description || undefined}
       renderRowContent={renderRowContent}
       renderEditForm={renderEditForm}
       renderAddForm={renderAddForm}
-      onDelete={deleteFinanceCategoriesMutation}
+      onDelete={(ids) => financeCategoriesCollection.delete(ids)}
       titleText={getLocalizedText("Finanz Kategorien", "Finance Categories")}
       emptyText={getLocalizedText(
         "Keine Kategorien gefunden",

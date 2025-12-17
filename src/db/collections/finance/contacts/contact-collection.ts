@@ -1,0 +1,25 @@
+import { createCollection, useLiveQuery } from "@tanstack/react-db";
+import { powerSyncCollectionOptions } from "@tanstack/powersync-db-collection";
+// Importiere deine PowerSync-DB und das App-Schema
+import { db } from "@/db/powersync/db";
+import { AppSchema } from "@/db/powersync/schema";
+import {
+  contactSchema,
+  contactDeserializationSchema,
+} from "@/db/collections/finance/contacts/contact-schema";
+
+// Collection basierend auf der PowerSync-Tabelle 'finance_client'
+export const contactsCollection = createCollection(
+  powerSyncCollectionOptions({
+    database: db,
+    table: AppSchema.props.finance_client,
+    schema: contactSchema,
+    deserializationSchema: contactDeserializationSchema,
+    onDeserializationError: (error) => {
+      console.error(error);
+    },
+  })
+);
+
+export const useContacts = () =>
+  useLiveQuery((q) => q.from({ contacts: contactsCollection }));

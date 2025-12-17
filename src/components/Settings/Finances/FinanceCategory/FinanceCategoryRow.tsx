@@ -1,5 +1,3 @@
-"use client";
-
 import { useHover, useDisclosure } from "@mantine/hooks";
 import { useIntl } from "@/hooks/useIntl";
 

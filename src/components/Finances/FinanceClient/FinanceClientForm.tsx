@@ -1,5 +1,6 @@
 import { useForm } from "@mantine/form";
 import { useIntl } from "@/hooks/useIntl";
+import { useProfileStore } from "@/stores/profileStore";
 
 import { Fieldset, Select, Stack, TextInput } from "@mantine/core";
 
@@ -11,10 +12,7 @@ import UpdateButton from "@/components/UI/Buttons/UpdateButton";
 import { Tables } from "@/types/db.types";
 import { Currency } from "@/types/settings.types";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
-import {
-  useAddFinanceClientMutation,
-  useUpdateFinanceClientMutation,
-} from "@/db/queries/finances/use-finance-client";
+import { contactsCollection } from "@/db/collections/finance/contacts/contact-collection";
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -39,18 +37,8 @@ export default function FinanceClientForm({
   client,
 }: FinanceClientFormProps) {
   const { getLocalizedText } = useIntl();
+  const { id: userId } = useProfileStore();
 
-  const { mutate: addFinanceClientMutation, isPending: isAddingFinanceClient } =
-    useAddFinanceClientMutation({
-      onSuccess: (client: Tables<"finance_client">) => {
-        onSuccess?.(client);
-        handleClose();
-      },
-    });
-  const {
-    mutate: updateFinanceClientMutation,
-    isPending: isUpdatingFinanceClient,
-  } = useUpdateFinanceClientMutation({ onSuccess: () => handleClose() });
   const form = useForm({
     initialValues: {
       name: client?.name || "",
@@ -70,17 +58,30 @@ export default function FinanceClientForm({
 
   function handleSubmit(values: z.infer<typeof schema>) {
     if (client) {
-      updateFinanceClientMutation({
-        ...client,
-        ...values,
-        currency: values.currency as Currency,
+      const result = contactsCollection.update(client.id, (draft) => {
+        draft.name = values.name;
+        draft.description = values.description || null;
+        draft.email = values.email || null;
+        draft.phone = values.phone || null;
+        draft.address = values.address || null;
+        draft.currency = values.currency as Currency;
       });
+      console.log(result);
     } else {
-      addFinanceClientMutation({
-        ...values,
+      const result = contactsCollection.insert({
+        id: crypto.randomUUID(),
+        created_at: new Date().toISOString(),
+        user_id: userId,
+        name: values.name,
+        description: values.description || null,
+        email: values.email || null,
+        phone: values.phone || null,
+        address: values.address || null,
         currency: values.currency as Currency,
       });
+      console.log(result);
     }
+    handleClose();
   }
 
   return (
@@ -122,17 +123,9 @@ export default function FinanceClientForm({
           />
         </Fieldset>
         {client ? (
-          <UpdateButton
-            type="submit"
-            onClick={form.onSubmit(handleSubmit)}
-            loading={isUpdatingFinanceClient}
-          />
+          <UpdateButton type="submit" onClick={form.onSubmit(handleSubmit)} />
         ) : (
-          <CreateButton
-            type="submit"
-            onClick={form.onSubmit(handleSubmit)}
-            loading={isAddingFinanceClient}
-          />
+          <CreateButton type="submit" onClick={form.onSubmit(handleSubmit)} />
         )}
         {onClose && <CancelButton onClick={handleClose} />}
       </Stack>
