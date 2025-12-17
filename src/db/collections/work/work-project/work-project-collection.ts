@@ -6,7 +6,7 @@ import { AppSchema } from "@/db/powersync/schema";
 import {
   workProjectSchema,
   workProjectDeserializationSchema,
-} from "./work-project-schema";
+} from "@/db/collections/work/work-project/work-project-schema";
 
 // Collection basierend auf der PowerSync-Tabelle 'timer_project'
 export const workProjectsCollection = createCollection(

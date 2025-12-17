@@ -1,4 +1,4 @@
-import { workProjectsCollection } from "@/db/collections/work/work-project-collection";
+import { workProjectsCollection } from "@/db/collections/work/work-project/work-project-collection";
 import { connector } from "@/db/powersync/db";
 
 export async function addTestProject() {

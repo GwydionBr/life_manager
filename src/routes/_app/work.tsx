@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useWorkProjects } from "@/db/collections/work/work-project-collection";
+import { useWorkProjects } from "@/db/collections/work/work-project/work-project-collection";
 import { Group, Text, Stack } from "@mantine/core";
 import { AddTestProjectButton } from "@/components/Work/Test/AddTestProjectButton";
 import { UpdateTestProjectButton } from "@/components/Work/Test/UpdateTestProjectButton";

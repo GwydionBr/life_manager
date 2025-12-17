@@ -1,7 +1,7 @@
 import {
   useWorkProjects,
   workProjectsCollection,
-} from "@/db/collections/work/work-project-collection";
+} from "@/db/collections/work/work-project/work-project-collection";
 
 export async function updateTestProject() {
   try {

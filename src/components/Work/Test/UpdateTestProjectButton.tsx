@@ -4,7 +4,7 @@ import { IconRefresh } from "@tabler/icons-react";
 import {
   useWorkProjects,
   workProjectsCollection,
-} from "@/db/collections/work/work-project-collection";
+} from "@/db/collections/work/work-project/work-project-collection";
 import {
   showActionSuccessNotification,
   showActionErrorNotification,
