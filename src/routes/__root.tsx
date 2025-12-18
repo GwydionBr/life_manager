@@ -176,7 +176,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
           </DatesProvider>
         </MantineProvider>
         <ReactQueryDevtools />
-        <TanStackRouterDevtools />
+        <TanStackRouterDevtools position="bottom-right" />
         <Scripts />
       </body>
     </html>

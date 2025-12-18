@@ -24,6 +24,7 @@ import {
 } from "@tabler/icons-react";
 import SettingsModal from "@/components/Settings/SettingsModal";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
+import Aside from "./Aside";
 
 export function Shell() {
   const {
@@ -33,6 +34,8 @@ export function Shell() {
     financeColor,
     calendarColor,
     habitColor,
+    isAsideOpen,
+    toggleAside,
   } = useSettingsStore();
   const { getLocalizedText } = useIntl();
   const pathname = useLocation({
@@ -40,7 +43,15 @@ export function Shell() {
   });
   const theme = useMantineTheme();
   return (
-    <AppShell header={{ height: 45 }} padding="md">
+    <AppShell
+      header={{ height: 45 }}
+      aside={{
+        width: isAsideOpen ? 300 : 50,
+        breakpoint: "md",
+        collapsed: { desktop: false, mobile: true },
+      }}
+      padding="md"
+    >
       <AppShell.Header>
         <Group
           h="100%"
@@ -112,6 +123,12 @@ export function Shell() {
       <AppShell.Main>
         <Outlet />
       </AppShell.Main>
+      <AppShell.Aside
+        bg="var(--mantine-color-body)"
+        style={{ transition: "width 0.4s ease-in", overflow: "hidden" }}
+      >
+        <Aside toggleAside={toggleAside} isAsideOpen={isAsideOpen} />
+      </AppShell.Aside>
       <SettingsModal />
       <OfflineIndicator />
     </AppShell>

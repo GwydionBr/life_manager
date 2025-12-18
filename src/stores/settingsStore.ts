@@ -21,7 +21,7 @@ interface SettingsState extends Settings {
   financeColor: MantineColor;
   calendarColor: MantineColor;
   habitColor: MantineColor;
-
+  isAsideOpen: boolean;
 }
 
 interface SettingsActions {
@@ -35,6 +35,7 @@ interface SettingsActions {
   setCalendarColor: (color: MantineColor) => void;
   setHabitColor: (color: MantineColor) => void;
   setSettingState: (adjustment: Partial<SettingsState>) => void;
+  toggleAside: () => void;
 }
 
 const initialState: SettingsState = {
@@ -48,6 +49,7 @@ const initialState: SettingsState = {
   financeColor: "violet",
   calendarColor: "lime",
   habitColor: "red",
+  isAsideOpen: false,
 
   // Settings
   locale: "en-US",
@@ -105,6 +107,9 @@ export const useSettingsStore = create<SettingsState & SettingsActions>()(
       },
       setSettingState: (adjustment: Partial<SettingsState>) => {
         set({ ...get(), ...adjustment });
+      },
+      toggleAside: () => {
+        set({ isAsideOpen: !get().isAsideOpen });
       },
     }),
     {
