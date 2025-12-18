@@ -1,0 +1,152 @@
+.wrapper {
+  display: flex;
+  flex: 1;
+}
+
+.aside {
+  flex: 0 0 60px;
+  background-color: var(--mantine-color-body);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-right: 1px solid
+    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-7));
+}
+
+.main {
+  flex: 1;
+  height: 100vh;
+  background-color: light-dark(
+    var(--mantine-color-gray-0),
+    var(--mantine-color-dark-6)
+  );
+  position: fixed;
+  top: 35;
+  left: 0;
+  width: 250px;
+  border-right: 1px solid
+    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  transition: width 0.5s ease-in-out;
+}
+
+.mainLink {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--mantine-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-white));
+
+  &:hover {
+    background-color: light-dark(
+      var(--mantine-color-teal-2),
+      var(--mantine-color-teal-7)
+    );
+  }
+
+  &[data-active] {
+    &,
+    &:hover {
+      background-color: light-dark(
+        var(--mantine-color-teal-7),
+        var(--mantine-color-teal-4)
+      );
+      color: light-dark(var(--mantine-color-white), var(--mantine-color-black));
+    }
+  }
+}
+
+.title {
+  font-family:
+    Greycliff CF,
+    var(--mantine-font-family);
+  background-color: var(--mantine-color-body);
+  padding: var(--mantine-spacing-md);
+  height: 60px;
+  border-bottom: 1px solid
+    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-7));
+}
+
+.logo {
+  &:hover {
+    background-color: light-dark(
+      var(--mantine-color-gray-1),
+      var(--mantine-color-dark-5)
+    );
+    color: light-dark(var(--mantine-color-dark), var(--mantine-color-light));
+  }
+}
+
+.link {
+  display: block;
+  text-decoration: none;
+  border-top-right-radius: var(--mantine-radius-md);
+  border-bottom-right-radius: var(--mantine-radius-md);
+  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-0));
+  padding: 0 var(--mantine-spacing-md);
+  font-size: var(--mantine-font-size-sm);
+  margin-right: var(--mantine-spacing-md);
+  font-weight: 500;
+  height: 44px;
+  line-height: 44px;
+
+  &:hover {
+    background-color: light-dark(
+      var(--mantine-color-gray-1),
+      var(--mantine-color-dark-5)
+    );
+    color: light-dark(var(--mantine-color-dark), var(--mantine-color-light));
+  }
+
+  &[data-active] {
+    &,
+    &:hover {
+      border-left-color: var(--mantine-color-blue-filled);
+      background-color: var(--mantine-color-blue-filled);
+      color: var(--mantine-color-white);
+    }
+  }
+}
+
+.overviewLink {
+  display: block;
+  text-decoration: none;
+  border-radius: var(--mantine-radius-md);
+  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-0));
+  padding: 0 var(--mantine-spacing-md);
+  font-size: var(--mantine-font-size-sm);
+  margin-right: var(--mantine-spacing-md);
+  font-weight: 700;
+  height: 44px;
+  line-height: 44px;
+
+  &:hover {
+    background-color: light-dark(
+      var(--mantine-color-gray-2),
+      var(--mantine-color-dark-5)
+    );
+    color: light-dark(var(--mantine-color-dark), var(--mantine-color-light));
+  }
+
+  &[data-active] {
+    &,
+    &:hover {
+      border-left-color: var(--mantine-color-teal-filled);
+      background-color: var(--mantine-color-cyan-filled);
+      color: var(--mantine-color-white);
+    }
+  }
+}
+
+.financeSections {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 0;
+}
+
+.divider {
+  border-top: 1px solid
+    light-dark(var(--mantine-color-gray-5), var(--mantine-color-dark-2));
+}

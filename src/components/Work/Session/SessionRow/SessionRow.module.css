@@ -1,0 +1,77 @@
+.card {
+  background-color: light-dark(
+    var(--mantine-color-gray-0),
+    var(--mantine-color-dark-6)
+  );
+  box-shadow: var(--mantine-shadow-xs);
+  padding: var(--mantine-spacing-sm);
+  margin-top: var(--mantine-spacing-sm);
+  border-radius: 20px;
+
+  &[data-selected] {
+    background-color: light-dark(
+      var(--mantine-color-blue-0),
+      var(--mantine-color-dark-4)
+    );
+    border-width: 2px;
+  }
+
+  &[data-paid] {
+    opacity: 0.6;
+    border-color: var(--mantine-color-green-4);
+  }
+
+  &[data-selectable] {
+    cursor: pointer;
+  }
+}
+
+.checkboxContainer {
+  width: 0;
+}
+
+.checkboxIcon {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
+  pointer-events: none;
+
+  &[data-visible] {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+}
+
+.contentStack {
+  transition: margin 0.2s ease;
+  margin-left: 0;
+
+  &[data-withcheckbox] {
+    margin-left: 40px;
+  }
+}
+
+.actionIconsGroup {
+  opacity: 0;
+  transform: translateX(10px);
+  transition:
+    opacity 200ms ease 100ms,
+    transform 200ms ease 100ms;
+  pointer-events: none;
+
+  &[data-visible] {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+}
+
+.salaryText {
+  &[data-paid] {
+    text-decoration: line-through;
+    color: var(--mantine-color-green-6);
+  }
+}
