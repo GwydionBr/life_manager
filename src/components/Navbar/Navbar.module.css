@@ -15,14 +15,14 @@
 
 .main {
   flex: 1;
-  height: calc(100vh - 35px);
+  height: calc(100vh - 60px);
   background-color: light-dark(
     var(--mantine-color-gray-0),
     var(--mantine-color-dark-6)
   );
   position: fixed;
-  top: 35px;
-  left: 0;
+  top: 60px;
+  left: 60px;
   width: 250px;
   border-right: 1px solid
     light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));

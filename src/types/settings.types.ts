@@ -20,3 +20,10 @@ export type Currency = Database["public"]["Enums"]["currency"];
 
 export type CashFlowType = Database["public"]["Enums"]["cash_flow_type"];
 export type FinanceInterval = Database["public"]["Enums"]["finance_interval"];
+
+export enum AppOptions {
+  WORK = "work",
+  FINANCE = "finance",
+  CALENDAR = "calendar",
+  HABBIT_TRACKER = "habbit-tracker",
+}

@@ -1,4 +1,4 @@
-import { createCollection, useLiveQuery } from "@tanstack/react-db";
+import { createCollection, eq, useLiveQuery } from "@tanstack/react-db";
 import { powerSyncCollectionOptions } from "@tanstack/powersync-db-collection";
 // Importiere deine PowerSync-DB und das App-Schema
 import { db } from "@/db/powersync/db";
@@ -23,3 +23,10 @@ export const workTimeEntriesCollection = createCollection(
 
 export const useWorkTimeEntries = () =>
   useLiveQuery((q) => q.from({ workTimeEntries: workTimeEntriesCollection }));
+
+export const useWorkTimeEntriesByProjectId = (projectId: string) =>
+  useLiveQuery((q) =>
+    q
+      .from({ workTimeEntries: workTimeEntriesCollection })
+      .where(({ workTimeEntries }) => eq(workTimeEntries.project_id, projectId))
+  );

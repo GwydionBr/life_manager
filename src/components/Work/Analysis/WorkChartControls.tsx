@@ -298,7 +298,7 @@ export default function WorkChartControls({
         style={{ display: "flex", justifyContent: "flex-end" }}
         pr="xl"
       >
-        <ListActionIcon onClick={onClose} variant="subtle" />
+        {/* <ListActionIcon onClick={onClose} variant="subtle" /> */}
       </Grid.Col>
 
       <Grid.Col span={12}>

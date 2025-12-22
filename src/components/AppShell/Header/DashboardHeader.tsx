@@ -7,7 +7,7 @@ import {
   getThemeColor,
   useMantineTheme,
 } from "@mantine/core";
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useRouter } from "@tanstack/react-router";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useIntl } from "@/hooks/useIntl";
@@ -23,7 +23,7 @@ import {
 import SchemeToggle from "@/components/Scheme/SchemeToggle";
 import { UserMenu } from "@/components/User/UserMenu";
 
-export default function Header() {
+export default function DashboardHeader() {
   const {
     setIsModalOpen,
     primaryColor,
@@ -31,15 +31,10 @@ export default function Header() {
     financeColor,
     calendarColor,
     habitColor,
-    isAsideOpen,
-    toggleAside,
   } = useSettingsStore();
   const { getLocalizedText } = useIntl();
-  const pathname = useLocation({
-    select: (location) => location.pathname,
-  });
   const theme = useMantineTheme();
-  const { activeProjectId, lastActiveProjectId } = useWorkStore();
+  const { lastActiveProjectId } = useWorkStore();
   const router = useRouter();
 
   return (
@@ -47,7 +42,7 @@ export default function Header() {
       h="100%"
       px="md"
       justify="space-between"
-      bg={alpha(getThemeColor(primaryColor, theme), 0.1)}
+      bg={alpha(getThemeColor(primaryColor, theme), 0.5)}
     >
       <Group>
         <Button component={Link} to="/dashboard" variant="transparent">
@@ -65,7 +60,7 @@ export default function Header() {
               search: { projectId: lastActiveProjectId || "" },
             })
           }
-          variant={pathname.includes("/work") ? "light" : "subtle"}
+          variant="subtle"
           leftSection={<IconBriefcase />}
         >
           {getLocalizedText("Arbeit", "Work")}
@@ -74,7 +69,7 @@ export default function Header() {
           color={financeColor}
           component={Link}
           to="/finance"
-          variant={pathname.includes("/finance") ? "light" : "subtle"}
+          variant="subtle"
           leftSection={<IconCurrencyDollar />}
         >
           {getLocalizedText("Finanzen", "Finance")}
@@ -83,7 +78,7 @@ export default function Header() {
           color={calendarColor}
           component={Link}
           to="/calendar"
-          variant={pathname.includes("/calendar") ? "light" : "subtle"}
+          variant="subtle"
           leftSection={<IconCalendar />}
         >
           {getLocalizedText("Kalender", "Calendar")}
@@ -92,7 +87,7 @@ export default function Header() {
           color={habitColor}
           component={Link}
           to="/habbit-tracker"
-          variant={pathname.includes("/habbit-tracker") ? "light" : "subtle"}
+          variant="subtle"
           leftSection={<IconTarget />}
         >
           {getLocalizedText("Gewohnheiten", "Habbit Tracker")}

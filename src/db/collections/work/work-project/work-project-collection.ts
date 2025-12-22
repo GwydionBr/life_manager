@@ -83,3 +83,27 @@ export const useWorkProjects = () => {
     }));
   }, [projects, mappings]);
 };
+
+export const useWorkProjectById = (projectId: string) => {
+  const { data: project } = useLiveQuery((q) =>
+    q
+      .from({ workProjects: workProjectsCollection })
+      .where(({ workProjects }) => eq(workProjects.id, projectId))
+      .findOne()
+  );
+
+  const { data: mappings } = useLiveQuery((q) =>
+    q
+      .from({ mappings: projectCategoryMappingCollection })
+      .where(({ mappings }) => eq(mappings.projectId, projectId))
+  );
+
+  return useMemo((): WorkProject | undefined => {
+    if (!project) return undefined;
+
+    return {
+      ...project,
+      categories: mappings?.map(({ category }) => category) || [],
+    };
+  }, [project, mappings]);
+};

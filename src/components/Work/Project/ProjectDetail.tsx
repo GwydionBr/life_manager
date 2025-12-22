@@ -1,5 +1,4 @@
-import { useWorkProjects } from "@/db/collections/work/work-project/work-project-collection";
-
+import { useWorkProjectById } from "@/db/collections/work/work-project/work-project-collection";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useProjectFiltering } from "@/hooks/useProjectFiltering";
@@ -7,6 +6,7 @@ import { useIntl } from "@/hooks/useIntl";
 import { useWorkStore } from "@/stores/workManagerStore";
 import { useWorkTimeEntries } from "@/db/collections/work/work-time-entry/work-time-entry-collection";
 import { getRouteApi } from "@tanstack/react-router";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 import {
   Box,
@@ -18,19 +18,17 @@ import {
   Grid,
   ActionIcon,
   ScrollArea,
+  alpha,
+  getThemeColor,
+  useMantineTheme,
 } from "@mantine/core";
 import EditProjectDrawer from "@/components/Work/Project/EditProjectDrawer";
 import Header from "@/components/Header/Header";
 import WorkAnalysis from "@/components/Work/Analysis/WorkAnalysis";
-import AnalysisActionIcon from "@/components/UI/ActionIcons/AnalysisActionIcon";
-import EditActionIcon from "@/components/UI/ActionIcons/EditActionIcon";
 import FilterActionIcon from "@/components/UI/ActionIcons/FilterActionIcon";
 import PayoutActionIcon from "@/components/UI/ActionIcons/PayoutActionIcon";
 import SessionHierarchy from "@/components/Work/Session/SessionHirarchy/SessionHierarchy";
 import ProjectFilter from "@/components/Work/Project/ProjectFilter";
-
-import { formatDate, formatMoney } from "@/utils/intl";
-import { groupSessions } from "@/lib/sessionHelperFunctions";
 import HourlyPayoutCard from "@/components/Finance/Payout/HourlyPayout/HourlyPayoutCard";
 import ProjectPayoutCard from "@/components/Finance/Payout/ProjectPayout/ProjectPayoutCard";
 import PayoutConversionModal from "@/components/Finance/Payout/PayoutConversionModal";
@@ -40,6 +38,10 @@ import SessionSelector from "@/components/Work/Session/SessionSelector";
 import DelayedTooltip from "@/components/UI/DelayedTooltip";
 import { IconClockPlus } from "@tabler/icons-react";
 
+import { formatDate } from "@/utils/intl";
+import { groupSessions } from "@/lib/sessionHelperFunctions";
+import { getGradientForColor } from "@/constants/colors";
+
 import { WorkTimeEntry } from "@/types/work.types";
 import { Currency } from "@/types/settings.types";
 
@@ -47,14 +49,17 @@ const route = getRouteApi("/_app/work");
 
 export default function WorkProjectDetailsPage() {
   const { projectId } = route.useSearch();
-  const { setActiveProjectId } = useWorkStore();
+  const { workColor } = useSettingsStore();
+  const {
+    setActiveProjectId,
+    setAnalysisOpened,
+    setEditProjectOpened,
+    analysisOpened,
+    editProjectOpened,
+  } = useWorkStore();
 
-  const projectData = useWorkProjects();
+  const project = useWorkProjectById(projectId);
   const { data: timeEntriesData } = useWorkTimeEntries();
-
-  const project = useMemo(() => {
-    return projectData?.find((project) => project.id === projectId);
-  }, [projectData, projectId]);
 
   const projectTimeEntries = useMemo(() => {
     return timeEntriesData?.filter(
@@ -90,12 +95,6 @@ export default function WorkProjectDetailsPage() {
   const [selectedTimeEntryIds, setSelectedTimeEntryIds] = useState<string[]>(
     []
   );
-  const [analysisOpened, { open: openAnalysis, close: closeAnalysis }] =
-    useDisclosure(false);
-  const [
-    editProjectOpened,
-    { open: openEditProject, close: closeEditProject },
-  ] = useDisclosure(false);
   const [filterOpened, { open: openFilter, close: closeFilter }] =
     useDisclosure(false);
   const [payoutOpened, { open: openPayout, close: closePayout }] =
@@ -211,24 +210,6 @@ export default function WorkProjectDetailsPage() {
     );
   }
 
-  const salary = formatMoney(project.salary, project.currency, locale);
-
-  // Calculate total active seconds from all sessions
-  const totalActiveSeconds = projectTimeEntries.reduce(
-    (total, timeEntry) => total + timeEntry.active_seconds,
-    0
-  );
-
-  const hourlySalary = formatMoney(
-    project.hourly_payment
-      ? project.salary
-      : totalActiveSeconds > 0
-        ? (project.salary / totalActiveSeconds) * 3600
-        : 0,
-    project.currency,
-    locale
-  );
-
   const handlePayoutToggle = () => {
     if (!payoutOpened) {
       openPayout();
@@ -300,38 +281,9 @@ export default function WorkProjectDetailsPage() {
     : project.salary > project.total_payout;
 
   return (
-    <ScrollArea h="100vh" type="scroll">
+    <ScrollArea h="calc(100vh - 100px)" type="scroll">
       <Stack align="center" w="100%" px="xl">
         <Collapse in={!analysisOpened} transitionDuration={300} w="100%">
-          <Header
-            headerTitle={project.title}
-            leftSalary={
-              project.hourly_payment
-                ? undefined
-                : project.salary === 0
-                  ? "Hobby"
-                  : salary
-            }
-            rightSalary={project.salary === 0 ? undefined : hourlySalary}
-            description={project.description ?? undefined}
-            rightButton={
-              <Group>
-                {projectTimeEntries.length > 0 && (
-                  <AnalysisActionIcon
-                    onClick={openAnalysis}
-                    tooltipLabel={getLocalizedText("Analyse", "Analysis")}
-                  />
-                )}
-                <EditActionIcon
-                  onClick={openEditProject}
-                  tooltipLabel={getLocalizedText(
-                    "Projekt bearbeiten",
-                    "Edit Project"
-                  )}
-                />
-              </Group>
-            }
-          />
           <Stack
             style={{
               position: "sticky",
@@ -344,6 +296,9 @@ export default function WorkProjectDetailsPage() {
             w="100%"
             gap="xs"
           >
+            <Text size="sm" fw={500} ta="center">
+              {project.description}
+            </Text>
             <Group justify="space-between" p="xs" pb={5}>
               <Group>
                 <FilterActionIcon
@@ -499,7 +454,7 @@ export default function WorkProjectDetailsPage() {
           )}
           <EditProjectDrawer
             opened={editProjectOpened}
-            onClose={closeEditProject}
+            onClose={() => setEditProjectOpened(false)}
           />
         </Collapse>
         <Collapse in={analysisOpened} w="100%">
@@ -507,7 +462,7 @@ export default function WorkProjectDetailsPage() {
             sessions={projectTimeEntries}
             isOverview={false}
             project={project}
-            onClose={() => closeAnalysis()}
+            onClose={() => setAnalysisOpened(false)}
           />
         </Collapse>
       </Stack>
