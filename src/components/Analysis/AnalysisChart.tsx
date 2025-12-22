@@ -45,7 +45,6 @@ export default function AnalysisChart<T extends ChartMode>({
   const { locale } = useSettingsStore();
   const { data: settings } = useSettings();
 
-
   /**
    * Render the appropriate chart component based on selected type
    * Configures common props and series for all chart types

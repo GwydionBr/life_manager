@@ -12,7 +12,6 @@ import Navbar from "./Navbar";
 import { getGradientForColor } from "@/constants/colors";
 import { AppOptions } from "@/types/settings.types";
 
-
 export function Shell() {
   const {
     isAsideOpen,
@@ -24,6 +23,7 @@ export function Shell() {
     primaryColor,
   } = useSettingsStore();
   const location = useLocation();
+  const theme = useMantineTheme();
 
   // Determine the current app based on the location pathname
   const currentApp = useMemo(() => {
@@ -59,11 +59,10 @@ export function Shell() {
   }, [currentAppColor]);
 
   const mainBackgroundColor = useMemo(() => {
-      const theme = useMantineTheme();
-      const fromColor = getThemeColor(currentAppGradient.from, theme);
-      const toColor = getThemeColor(currentAppGradient.to, theme);
-      return `linear-gradient(135deg, ${alpha(fromColor, 0.1)} 0%, ${alpha(toColor, 0.1)} 100%)`;
-  }, [currentAppGradient]);
+    const fromColor = getThemeColor(currentAppGradient.from, theme);
+    const toColor = getThemeColor(currentAppGradient.to, theme);
+    return `linear-gradient(135deg, ${alpha(fromColor, 0.1)} 0%, ${alpha(toColor, 0.1)} 100%)`;
+  }, [currentAppGradient, theme]);
 
   return (
     <AppShell
@@ -79,7 +78,6 @@ export function Shell() {
         breakpoint: "md",
         collapsed: { desktop: !currentApp, mobile: true },
       }}
-      padding="md"
     >
       <AppShell.Header style={{ transition: "0.4s ease-in" }}>
         <Header currentApp={currentApp} />
@@ -92,7 +90,10 @@ export function Shell() {
         <Navbar currentApp={currentApp} />
       </AppShell.Navbar>
 
-      <AppShell.Main style={{ transition: "0.4s ease-in" }} bg={mainBackgroundColor}>
+      <AppShell.Main
+        style={{ transition: "0.4s ease-in" }}
+        bg={mainBackgroundColor}
+      >
         <Outlet />
       </AppShell.Main>
       <AppShell.Aside

@@ -16,7 +16,11 @@ export default defineConfig({
     tanstackStart(),
     nitro(),
     // react's vite plugin must come after start's vite plugin
-    viteReact(),
+    viteReact({
+      babel: {
+        plugins: ["babel-plugin-react-compiler"],
+      },
+    }),
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["favicon.svg", "favicon.ico", "apple-touch-icon.png"],

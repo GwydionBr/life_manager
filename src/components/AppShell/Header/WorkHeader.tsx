@@ -22,28 +22,27 @@ import AnalysisActionIcon from "@/components/UI/ActionIcons/AnalysisActionIcon";
 import ListActionIcon from "@/components/UI/ActionIcons/ListActionIcon";
 import EditActionIcon from "@/components/UI/ActionIcons/EditActionIcon";
 
-const route = getRouteApi("/_app/work");
-
 export default function WorkHeader() {
+  const {
+    setAnalysisOpened,
+    toggleEditProjectOpened,
+    analysisOpened,
+    activeProjectId,
+  } = useWorkStore();
   const { workColor, primaryColor } = useSettingsStore();
   const { getLocalizedText, formatMoney } = useIntl();
   const theme = useMantineTheme();
-  const { projectId } = route.useSearch();
-  const project = useWorkProjectById(projectId);
-  const { setAnalysisOpened, toggleEditProjectOpened, analysisOpened } =
-    useWorkStore();
-  const { data: timeEntries } = useWorkTimeEntriesByProjectId(projectId);
 
+  if (!activeProjectId) return <Loader />;
+
+  const project = useWorkProjectById(activeProjectId);
+  const { data: timeEntries } = useWorkTimeEntriesByProjectId(activeProjectId);
   if (!project) return <Loader />;
-
   const salary = formatMoney(project.salary, project.currency);
-
-  // Calculate total active seconds from all sessions
   const totalActiveSeconds = timeEntries.reduce(
     (total, timeEntry) => total + timeEntry.active_seconds,
     0
   );
-
   const hourlySalary = formatMoney(
     project.hourly_payment
       ? project.salary
@@ -114,14 +113,20 @@ export default function WorkHeader() {
               (!analysisOpened ? (
                 <AnalysisActionIcon
                   onClick={() => setAnalysisOpened(true)}
-                  tooltipLabel={getLocalizedText("Analyse öffnen", "Open Analysis")}
+                  tooltipLabel={getLocalizedText(
+                    "Analyse öffnen",
+                    "Open Analysis"
+                  )}
                   color="var(--mantine-color-text)"
                   variant="subtle"
                 />
               ) : (
                 <ListActionIcon
                   onClick={() => setAnalysisOpened(false)}
-                  tooltipLabel={getLocalizedText("Analyse schließen", "Close Analysis")}
+                  tooltipLabel={getLocalizedText(
+                    "Analyse schließen",
+                    "Close Analysis"
+                  )}
                   color="var(--mantine-color-text)"
                   variant="subtle"
                 />
