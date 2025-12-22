@@ -6,6 +6,7 @@ import { useIntl } from "@/hooks/useIntl";
 import {
   ActionIcon,
   Box,
+  Card,
   Divider,
   Group,
   ScrollArea,
@@ -50,7 +51,7 @@ export default function ProjectNavbar() {
   useHotkeys([["mod + J", () => toggleWorkNavbar()]]);
 
   return (
-    <Box className={classes.main} w={isWorkNavbarOpen ? 250 : 60}>
+    <Card miw={isWorkNavbarOpen ? 250 : 60} withBorder radius="lg" my="xs" ml="xs" p={0}>
       <Group className={classes.title} align="center" justify="space-between">
         <Transition
           mounted={!isWorkNavbarOpen}
@@ -311,6 +312,6 @@ export default function ProjectNavbar() {
         opened={isProjectModalOpen}
         onClose={closeProjectModal}
       />
-    </Box>
+    </Card>
   );
 }

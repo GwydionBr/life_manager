@@ -4,7 +4,7 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useWorkProjects } from "@/db/collections/work/work-project/work-project-collection";
 import { useSettingsStore } from "@/stores/settingsStore";
 
-import { Box } from "@mantine/core";
+import { Box, Group } from "@mantine/core";
 import WorkInitializer from "@/components/Work/WorkInitializer";
 import ProjectNavbar from "@/components/Navbar/ProjectNavbar";
 import ProjectDetail from "@/components/Work/Project/ProjectDetail";
@@ -53,14 +53,14 @@ function RouteComponent() {
   }
 
   return (
-    <Box>
+    <Group h="100%" wrap="nowrap">
       <ProjectNavbar />
       <Box
-        ml={isWorkNavbarOpen ? 250 : 60}
         style={{ transition: "margin 0.4s ease-in-out" }}
+        w="100%"
       >
         <ProjectDetail />
       </Box>
-    </Box>
+    </Group>
   );
 }

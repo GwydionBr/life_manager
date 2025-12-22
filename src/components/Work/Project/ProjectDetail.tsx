@@ -295,6 +295,7 @@ export default function WorkProjectDetailsPage() {
             }}
             w="100%"
             gap="xs"
+            pt="xs"
           >
             <Text size="sm" fw={500} ta="center">
               {project.description}

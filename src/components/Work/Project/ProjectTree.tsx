@@ -96,7 +96,7 @@ export default function ProjectTree({ search }: { search: string }) {
           {} as Record<string, boolean>
         )}
         width={rect.width}
-        height={height - 190}
+        height={height - 230}
         paddingTop={5}
         indent={24}
         rowHeight={30}
