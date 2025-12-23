@@ -42,7 +42,7 @@ export default function DashboardHeader() {
       h="100%"
       px="md"
       justify="space-between"
-      bg={alpha(getThemeColor(primaryColor, theme), 0.5)}
+      bg={alpha(getThemeColor(primaryColor, theme), 0.4)}
     >
       <Group>
         <Button component={Link} to="/dashboard" variant="transparent">
@@ -83,7 +83,7 @@ export default function DashboardHeader() {
         >
           {getLocalizedText("Kalender", "Calendar")}
         </Button>
-        <Button
+        {/* <Button
           color={habitColor}
           component={Link}
           to="/habbit-tracker"
@@ -91,9 +91,11 @@ export default function DashboardHeader() {
           leftSection={<IconTarget />}
         >
           {getLocalizedText("Gewohnheiten", "Habbit Tracker")}
-        </Button>
+        </Button> */}
       </Group>
       <Group gap="xs">
+        <UserMenu />
+        <SchemeToggle />
         <ActionIcon
           size="xl"
           variant="subtle"
@@ -101,8 +103,6 @@ export default function DashboardHeader() {
         >
           <IconSettings stroke={1.5} />
         </ActionIcon>
-        <SchemeToggle />
-        <UserMenu />
       </Group>
     </Group>
   );

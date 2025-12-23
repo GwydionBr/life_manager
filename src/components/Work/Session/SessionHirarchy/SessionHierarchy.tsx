@@ -72,8 +72,7 @@ export default function SessionHierarchy({
             value={String(yearData.totalEarnings)}
             style={{
               borderColor:
-                getBorderColor(yearData.sessionIds) ||
-                "light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-2))",
+                getBorderColor(yearData.sessionIds),
               backgroundColor: getBackgroundColor(yearData.sessionIds),
             }}
           >

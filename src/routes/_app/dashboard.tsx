@@ -109,7 +109,7 @@ function Dashboard() {
         "Baue nachhaltige Gewohnheiten auf und tracke deine Routinen",
       link: "/habbit-tracker",
       badge: getLocalizedText("Aktiv", "Active"),
-      active: true,
+      active: false,
       stats: [
         {
           label: getLocalizedText("Aktive Habits", "Active Habits"),

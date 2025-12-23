@@ -52,7 +52,7 @@ function RouteComponent() {
   }
 
   return (
-    <Group h="100%" wrap="nowrap" mx="xs" mt="xs" p={0}>
+    <Group h="100%" wrap="nowrap" mx="xs" align="flex-start">
       <ProjectNavbar />
       <Box
         style={{ transition: "margin 0.4s ease-in-out" }}

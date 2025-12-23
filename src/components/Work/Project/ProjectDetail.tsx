@@ -277,7 +277,7 @@ export default function WorkProjectDetailsPage() {
 
   return (
     <ScrollArea h="calc(100vh - 60px)" type="scroll">
-      <Stack align="center" w="100%" px="xl" pb="xl">
+      <Stack align="center" w="100%" px="xl" pb="xl" pt="xs">
         <Collapse in={!analysisOpened} transitionDuration={300} w="100%">
           <Text size="sm" fw={500} ta="center" mb="xs">
             {project.description}
@@ -285,7 +285,7 @@ export default function WorkProjectDetailsPage() {
           <Stack
             style={{
               position: "sticky",
-              top: 0,
+              top: 10,
               zIndex: 10,
               left: 0,
             }}

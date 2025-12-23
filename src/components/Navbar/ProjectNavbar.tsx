@@ -50,7 +50,7 @@ export default function ProjectNavbar() {
   useHotkeys([["mod + J", () => toggleWorkNavbar()]]);
 
   return (
-    <Card miw={isWorkNavbarOpen ? 250 : 60} withBorder radius="lg" p={0}>
+    <Card miw={isWorkNavbarOpen ? 250 : 60} withBorder radius="lg" p={0} mt="xs">
       <Group className={classes.title} align="center" justify="space-between">
         <Transition
           mounted={!isWorkNavbarOpen}
@@ -262,7 +262,7 @@ export default function ProjectNavbar() {
           </ScrollArea>
         )}
       </Transition>
-      <Group
+      {/* <Group
         justify="flex-end"
         p={5}
         pr={15}
@@ -306,7 +306,7 @@ export default function ProjectNavbar() {
             />
           </ActionIcon>
         </DelayedTooltip>
-      </Group>
+      </Group> */}
       <NewProjectModal
         opened={isProjectModalOpen}
         onClose={closeProjectModal}
