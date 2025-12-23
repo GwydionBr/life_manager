@@ -9,6 +9,7 @@ import {
   Text,
   Button,
   Collapse,
+  Box,
 } from "@mantine/core";
 import { TimerRoundingSettings, TimerState } from "@/types/timeTracker.types";
 import { IconPlayerPlay, IconPlayerStop, IconX } from "@tabler/icons-react";
@@ -91,70 +92,71 @@ export default function TimeTrackerComponentBigMax({
   };
 
   return (
-    <Card
-      shadow="sm"
-      padding="lg"
-      radius="md"
-      withBorder
-      w={270}
-      bg={backgroundColor}
-      style={{ border: `2px solid ${color ?? "teal"}` }}
-    >
-      <LoadingOverlay visible={isSubmitting} overlayProps={{ blur: 2 }} />
-      <Stack gap="md" align="center">
-        {/* State Badge */}
-        <Group justify="space-between" align="center" w="100%">
-          <Stack gap={0}>
-            <ModifyTimeTrackerModal
-              activeTime={activeTime}
-              pausedTime={pausedTime}
-              state={state}
-              timerRoundingSettings={timerRoundingSettings}
-              activeSeconds={activeSeconds}
-              storedActiveSeconds={storedActiveSeconds}
-              storedPausedSeconds={storedPausedSeconds}
-              modifyActiveSeconds={modifyActiveSeconds}
-              modifyPausedSeconds={modifyPausedSeconds}
-              setTempTimerRounding={setTempTimerRounding}
-            />
-            <TimeTrackerInfoHoverCard
-              currency={currency}
-              timerRoundingSettings={timerRoundingSettings}
-              projectTitle={projectTitle}
-              salary={salary}
-              hourlyPayment={hourlyPayment}
-            />
-          </Stack>
-          <Badge size="lg" color={getStatusColor(state)}>
-            {getLocaleState()}
-          </Badge>
-          <XActionIcon onClick={removeTimer} />
-        </Group>
-        {/* Project Title */}
-        <Group justify="space-between" align="center">
-          <Text size="xl" fw={700}>
-            {projectTitle}
-          </Text>
-        </Group>
+    <Box bg="var(--mantine-color-body)">
+      <Card
+        shadow="sm"
+        padding="lg"
+        radius="md"
+        withBorder
+        w={270}
+        bg={backgroundColor}
+        style={{ border: `2px solid ${color ?? "teal"}` }}
+      >
+        <LoadingOverlay visible={isSubmitting} overlayProps={{ blur: 2 }} />
+        <Stack gap="md" align="center">
+          {/* State Badge */}
+          <Group justify="space-between" align="center" w="100%">
+            <Stack gap={0}>
+              <ModifyTimeTrackerModal
+                activeTime={activeTime}
+                pausedTime={pausedTime}
+                state={state}
+                timerRoundingSettings={timerRoundingSettings}
+                activeSeconds={activeSeconds}
+                storedActiveSeconds={storedActiveSeconds}
+                storedPausedSeconds={storedPausedSeconds}
+                modifyActiveSeconds={modifyActiveSeconds}
+                modifyPausedSeconds={modifyPausedSeconds}
+                setTempTimerRounding={setTempTimerRounding}
+              />
+              <TimeTrackerInfoHoverCard
+                currency={currency}
+                timerRoundingSettings={timerRoundingSettings}
+                projectTitle={projectTitle}
+                salary={salary}
+                hourlyPayment={hourlyPayment}
+              />
+            </Stack>
+            <Badge size="lg" color={getStatusColor(state)}>
+              {getLocaleState()}
+            </Badge>
+            <XActionIcon onClick={removeTimer} />
+          </Group>
+          {/* Project Title */}
+          <Group justify="space-between" align="center">
+            <Text size="xl" fw={700}>
+              {projectTitle}
+            </Text>
+          </Group>
 
-        {/* Time Tracker Rows */}
-        <Stack gap="md">
-          <TimeTrackerMemoRow value={memo} setMemo={setMemo} />
-          {hourlyPayment && (
-            <TimeTrackerFinanceRow
-              currency={currency}
-              moneyEarned={moneyEarned}
+          {/* Time Tracker Rows */}
+          <Stack gap="md">
+            <TimeTrackerMemoRow value={memo} setMemo={setMemo} />
+            {hourlyPayment && (
+              <TimeTrackerFinanceRow
+                currency={currency}
+                moneyEarned={moneyEarned}
+                state={state}
+                color={color}
+              />
+            )}
+            <TimeTrackerTimeRow
+              activeTime={activeTime}
+              roundedActiveTime={roundedActiveTime}
               state={state}
               color={color}
             />
-          )}
-          <TimeTrackerTimeRow
-            activeTime={activeTime}
-            roundedActiveTime={roundedActiveTime}
-            state={state}
-            color={color}
-          />
-          {/* {!roundInTimeSections && (
+            {/* {!roundInTimeSections && (
             <TimeTrackerRow
               icon={
                 <IconPlayerPause
@@ -168,22 +170,22 @@ export default function TimeTrackerComponentBigMax({
               color="var(--mantine-color-orange-6)"
             />
           )} */}
-        </Stack>
+          </Stack>
 
-        {/* Buttons */}
-        <Stack gap="md" w="100%" align="center">
-          {state === "stopped" && (
-            <Button
-              w="60%"
-              onClick={startTimer}
-              color="lime"
-              leftSection={<IconPlayerPlay size={20} />}
-              size="md"
-            >
-              Start
-            </Button>
-          )}
-          {/* {state === "running" && !roundInTimeSections && (
+          {/* Buttons */}
+          <Stack gap="md" w="100%" align="center">
+            {state === "stopped" && (
+              <Button
+                w="60%"
+                onClick={startTimer}
+                color="lime"
+                leftSection={<IconPlayerPlay size={20} />}
+                size="md"
+              >
+                Start
+              </Button>
+            )}
+            {/* {state === "running" && !roundInTimeSections && (
             <Button
               w="60%"
               onClick={pauseTimer}
@@ -195,7 +197,7 @@ export default function TimeTrackerComponentBigMax({
               Pause
             </Button>
           )} */}
-          {/* {state === "paused" && (
+            {/* {state === "paused" && (
             <Button
               w="60%"
               onClick={resumeTimer}
@@ -208,32 +210,33 @@ export default function TimeTrackerComponentBigMax({
             </Button>
           )} */}
 
-          <Collapse in={state !== "stopped"} transitionDuration={400} w="60%">
-            <Stack gap="md" align="center">
-              <Button
-                fullWidth
-                onClick={submitTimer}
-                color="red"
-                leftSection={<IconPlayerStop size={20} />}
-                size="md"
-                disabled={isSubmitting}
-              >
-                Stop
-              </Button>
-              <Button
-                fullWidth
-                onClick={cancelTimer}
-                color="gray"
-                leftSection={<IconX size={20} />}
-                size="md"
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-            </Stack>
-          </Collapse>
+            <Collapse in={state !== "stopped"} transitionDuration={400} w="60%">
+              <Stack gap="md" align="center">
+                <Button
+                  fullWidth
+                  onClick={submitTimer}
+                  color="red"
+                  leftSection={<IconPlayerStop size={20} />}
+                  size="md"
+                  disabled={isSubmitting}
+                >
+                  Stop
+                </Button>
+                <Button
+                  fullWidth
+                  onClick={cancelTimer}
+                  color="gray"
+                  leftSection={<IconX size={20} />}
+                  size="md"
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </Button>
+              </Stack>
+            </Collapse>
+          </Stack>
         </Stack>
-      </Stack>
-    </Card>
+      </Card>
+    </Box>
   );
 }

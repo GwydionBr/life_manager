@@ -1,9 +1,8 @@
-"use client";
-
 import { useResizeObserver, useViewportSize } from "@mantine/hooks";
 import { useRouter } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useWorkTree } from "@/hooks/useWorkTree";
+import { useWorkStore } from "@/stores/workManagerStore";
 
 import { NodeRendererProps, Tree } from "react-arborist";
 import {
@@ -25,6 +24,7 @@ export default function ProjectTree({ search }: { search: string }) {
   const { height } = useViewportSize();
   const { projectId } = route.useSearch();
   const [ref, rect] = useResizeObserver();
+  const { setActiveProjectId } = useWorkStore();  
 
   const { projectTree, moveProject, moveFolder } = useWorkTree();
 
@@ -112,6 +112,7 @@ export default function ProjectTree({ search }: { search: string }) {
           if (nodes.length > 0) {
             const node = nodes[0];
             if (node.data.type === "project") {
+              setActiveProjectId(node.id);
               router.navigate({
                 to: "/work",
                 search: { projectId: node.id },

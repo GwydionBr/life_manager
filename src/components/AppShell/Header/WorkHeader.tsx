@@ -11,13 +11,11 @@ import {
   alpha,
   getThemeColor,
   useMantineTheme,
-  Box,
   Grid,
   Loader,
   Text,
 } from "@mantine/core";
 import { IconBriefcase } from "@tabler/icons-react";
-import { getRouteApi } from "@tanstack/react-router";
 import AnalysisActionIcon from "@/components/UI/ActionIcons/AnalysisActionIcon";
 import ListActionIcon from "@/components/UI/ActionIcons/ListActionIcon";
 import EditActionIcon from "@/components/UI/ActionIcons/EditActionIcon";

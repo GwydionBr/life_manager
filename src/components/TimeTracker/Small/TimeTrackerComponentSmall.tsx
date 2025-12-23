@@ -7,6 +7,7 @@ import {
   Divider,
   LoadingOverlay,
   Card,
+  Box,
 } from "@mantine/core";
 
 import StartActionIcon from "../TimeTrackerActionIcons/StartActionIcons";
@@ -76,69 +77,70 @@ export default function TimeTrackerComponentSmall({
   const { getLocalizedText } = useIntl();
 
   return (
-    <Stack
-      w={50}
-      align="center"
-      justify="center"
-      pb="xs"
-      gap="xs"
-      bg={backgroundColor}
-      style={{
-        borderTop: `2px solid ${color ?? "teal"}`,
-        borderBottom: `2px solid ${color ?? "teal"}`,
-      }}
-    >
-      <Collapse in={showSmall} transitionDuration={400}>
-        <Stack gap="xs" align="center" justify="center" pos="relative">
-          <LoadingOverlay visible={isSubmitting} overlayProps={{ blur: 2 }} />
-          <Stack gap={0}>
-            <ModifyTimeTrackerModal
-              modifyActiveSeconds={modifyActiveSeconds}
-              modifyPausedSeconds={modifyPausedSeconds}
-              setTempTimerRounding={setTempTimerRounding}
-              activeTime={activeTime}
-              pausedTime={pausedTime}
-              state={state}
-              activeSeconds={activeSeconds}
-              timerRoundingSettings={timerRoundingSettings}
-              storedActiveSeconds={storedActiveSeconds}
-              storedPausedSeconds={storedPausedSeconds}
-            />
-            <TimeTrackerInfoHoverCard
-              currency={currency}
-              timerRoundingSettings={timerRoundingSettings}
-              projectTitle={projectTitle}
-              salary={salary}
-              hourlyPayment={hourlyPayment}
-            />
-          </Stack>
-          <Divider />
-          <Card
-            w={47}
-            shadow="sm"
-            padding={0}
-            py={8}
-            mr={1}
-            radius="md"
-            withBorder
-            style={{
-              border:
-                state === TimerState.Running
-                  ? `2px solid var(--mantine-color-blue-6)`
-                  : "none",
-            }}
-          >
-            <Text fz={11} c="dimmed" ta="center">
-              {getLocalizedText("Aktiv", "Active")}
-            </Text>
-            <Text fz={11} fw={state === "running" ? 700 : 400} ta="center">
-              {activeTime}
-            </Text>
-            <Text fz={11} c="dimmed" ta="center">
-              {roundedActiveTime}
-            </Text>
-          </Card>
-          {/* {!roundInTimeSections && (
+    <Box bg="var(--mantine-color-body)">
+      <Stack
+        w={50}
+        align="center"
+        justify="center"
+        pb="xs"
+        gap="xs"
+        bg={backgroundColor}
+        style={{
+          borderTop: `2px solid ${color ?? "teal"}`,
+          borderBottom: `2px solid ${color ?? "teal"}`,
+        }}
+      >
+        <Collapse in={showSmall} transitionDuration={400}>
+          <Stack gap="xs" align="center" justify="center" pos="relative">
+            <LoadingOverlay visible={isSubmitting} overlayProps={{ blur: 2 }} />
+            <Stack gap={0}>
+              <ModifyTimeTrackerModal
+                modifyActiveSeconds={modifyActiveSeconds}
+                modifyPausedSeconds={modifyPausedSeconds}
+                setTempTimerRounding={setTempTimerRounding}
+                activeTime={activeTime}
+                pausedTime={pausedTime}
+                state={state}
+                activeSeconds={activeSeconds}
+                timerRoundingSettings={timerRoundingSettings}
+                storedActiveSeconds={storedActiveSeconds}
+                storedPausedSeconds={storedPausedSeconds}
+              />
+              <TimeTrackerInfoHoverCard
+                currency={currency}
+                timerRoundingSettings={timerRoundingSettings}
+                projectTitle={projectTitle}
+                salary={salary}
+                hourlyPayment={hourlyPayment}
+              />
+            </Stack>
+            <Divider />
+            <Card
+              w={47}
+              shadow="sm"
+              padding={0}
+              py={8}
+              mr={1}
+              radius="md"
+              withBorder
+              style={{
+                border:
+                  state === TimerState.Running
+                    ? `2px solid var(--mantine-color-blue-6)`
+                    : "none",
+              }}
+            >
+              <Text fz={11} c="dimmed" ta="center">
+                {getLocalizedText("Aktiv", "Active")}
+              </Text>
+              <Text fz={11} fw={state === "running" ? 700 : 400} ta="center">
+                {activeTime}
+              </Text>
+              <Text fz={11} c="dimmed" ta="center">
+                {roundedActiveTime}
+              </Text>
+            </Card>
+            {/* {!roundInTimeSections && (
             <Card
               w={47}
               shadow="sm"
@@ -162,8 +164,8 @@ export default function TimeTrackerComponentSmall({
               </Text>
             </Card>
           )} */}
-          {state === "stopped" && <StartActionIcon startTimer={startTimer} />}
-          {/* {state === "running" && !roundInTimeSections && (
+            {state === "stopped" && <StartActionIcon startTimer={startTimer} />}
+            {/* {state === "running" && !roundInTimeSections && (
             <PauseActionIcon pauseTimer={pauseTimer} disabled={isSubmitting} />
           )}
           {state === "paused" && (
@@ -172,20 +174,24 @@ export default function TimeTrackerComponentSmall({
               disabled={isSubmitting}
             />
           )} */}
-          <Collapse
-            in={state === "running" || state === "paused"}
-            transitionDuration={400}
-          >
-            <Stack gap="xs" align="center" justify="center">
-              <StopActionIcon stopTimer={submitTimer} disabled={isSubmitting} />
-              <CancelActionIcon
-                cancelTimer={cancelTimer}
-                disabled={isSubmitting}
-              />
-            </Stack>
-          </Collapse>
-        </Stack>
-      </Collapse>
-    </Stack>
+            <Collapse
+              in={state === "running" || state === "paused"}
+              transitionDuration={400}
+            >
+              <Stack gap="xs" align="center" justify="center">
+                <StopActionIcon
+                  stopTimer={submitTimer}
+                  disabled={isSubmitting}
+                />
+                <CancelActionIcon
+                  cancelTimer={cancelTimer}
+                  disabled={isSubmitting}
+                />
+              </Stack>
+            </Collapse>
+          </Stack>
+        </Collapse>
+      </Stack>
+    </Box>
   );
 }
