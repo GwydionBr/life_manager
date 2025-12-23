@@ -33,7 +33,6 @@ import PlusActionIcon from "../UI/ActionIcons/PlusActionIcon";
 import XActionIcon from "../UI/ActionIcons/XActionIcon";
 
 export default function ProjectNavbar() {
-
   const { setSelectedTab, setIsModalOpen, isWorkNavbarOpen, toggleWorkNavbar } =
     useSettingsStore();
   const { getLocalizedText } = useIntl();
@@ -51,7 +50,7 @@ export default function ProjectNavbar() {
   useHotkeys([["mod + J", () => toggleWorkNavbar()]]);
 
   return (
-    <Card miw={isWorkNavbarOpen ? 250 : 60} withBorder radius="lg" my="xs" ml="xs" p={0}>
+    <Card miw={isWorkNavbarOpen ? 250 : 60} withBorder radius="lg" p={0}>
       <Group className={classes.title} align="center" justify="space-between">
         <Transition
           mounted={!isWorkNavbarOpen}

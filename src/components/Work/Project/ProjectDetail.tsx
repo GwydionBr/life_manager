@@ -6,7 +6,6 @@ import { useIntl } from "@/hooks/useIntl";
 import { useWorkStore } from "@/stores/workManagerStore";
 import { useWorkTimeEntries } from "@/db/collections/work/work-time-entry/work-time-entry-collection";
 import { getRouteApi } from "@tanstack/react-router";
-import { useSettingsStore } from "@/stores/settingsStore";
 
 import {
   Box,
@@ -18,9 +17,7 @@ import {
   Grid,
   ActionIcon,
   ScrollArea,
-  alpha,
-  getThemeColor,
-  useMantineTheme,
+  Card,
 } from "@mantine/core";
 import EditProjectDrawer from "@/components/Work/Project/EditProjectDrawer";
 import Header from "@/components/Header/Header";
@@ -40,7 +37,6 @@ import { IconClockPlus } from "@tabler/icons-react";
 
 import { formatDate } from "@/utils/intl";
 import { groupSessions } from "@/lib/sessionHelperFunctions";
-import { getGradientForColor } from "@/constants/colors";
 
 import { WorkTimeEntry } from "@/types/work.types";
 import { Currency } from "@/types/settings.types";
@@ -49,7 +45,6 @@ const route = getRouteApi("/_app/work");
 
 export default function WorkProjectDetailsPage() {
   const { projectId } = route.useSearch();
-  const { workColor } = useSettingsStore();
   const {
     setActiveProjectId,
     setAnalysisOpened,
@@ -281,78 +276,77 @@ export default function WorkProjectDetailsPage() {
     : project.salary > project.total_payout;
 
   return (
-    <ScrollArea h="calc(100vh - 100px)" type="scroll">
-      <Stack align="center" w="100%" px="xl">
+    <ScrollArea h="calc(100vh - 60px)" type="scroll">
+      <Stack align="center" w="100%" px="xl" pb="xl">
         <Collapse in={!analysisOpened} transitionDuration={300} w="100%">
+          <Text size="sm" fw={500} ta="center" mb="xs">
+            {project.description}
+          </Text>
           <Stack
             style={{
               position: "sticky",
               top: 0,
               zIndex: 10,
               left: 0,
-              borderBottom:
-                "1px solid light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-2))",
             }}
             w="100%"
             gap="xs"
-            pt="xs"
           >
-            <Text size="sm" fw={500} ta="center">
-              {project.description}
-            </Text>
-            <Group justify="space-between" p="xs" pb={5}>
-              <Group>
-                <FilterActionIcon
-                  disabled={timeFilteredTimeEntries.length === 0}
-                  onClick={handleFilterToggle}
-                  tooltipLabel={getLocalizedText("Filter", "Filter")}
-                  activeFilter={
-                    filterTimeSpan[0] && filterTimeSpan[1] ? true : false
-                  }
-                  opened={filterOpened}
+            <Card withBorder radius="md" p={0}>
+              <Group justify="space-between" p={5}>
+                <Group>
+                  <FilterActionIcon
+                    disabled={timeFilteredTimeEntries.length === 0}
+                    onClick={handleFilterToggle}
+                    tooltipLabel={getLocalizedText("Filter", "Filter")}
+                    activeFilter={
+                      filterTimeSpan[0] && filterTimeSpan[1] ? true : false
+                    }
+                    opened={filterOpened}
+                  />
+                  <PayoutActionIcon
+                    onClick={handlePayoutToggle}
+                    tooltipLabel={getLocalizedText("Auszahlung", "Payout")}
+                    disabled={!isPayoutAvailable}
+                    opened={payoutOpened}
+                  />
+                </Group>
+                <DelayedTooltip
+                  label={getLocalizedText("Sitzung hinzufügen", "Add Session")}
+                >
+                  <ActionIcon
+                    onClick={openSessionForm}
+                    size="md"
+                    variant="subtle"
+                  >
+                    <IconClockPlus />
+                  </ActionIcon>
+                </DelayedTooltip>
+                <NewSessionModal
+                  opened={sessionFormOpened}
+                  onClose={closeSessionForm}
+                  project={project}
                 />
-                <PayoutActionIcon
-                  onClick={handlePayoutToggle}
-                  tooltipLabel={getLocalizedText("Auszahlung", "Payout")}
-                  disabled={!isPayoutAvailable}
-                  opened={payoutOpened}
+                <SelectActionIcon
+                  disabled={selectableSessions.length === 0}
+                  onClick={handleSelectionToggle}
+                  tooltipLabel={
+                    selectedModeActive
+                      ? getLocalizedText(
+                          "Auswahlmodus deaktivieren",
+                          "Deactivate selection mode"
+                        )
+                      : getLocalizedText(
+                          "Auswahlmodus aktivieren",
+                          "Activate selection mode"
+                        )
+                  }
+                  size="md"
+                  selected={selectedModeActive}
+                  mainControl={true}
                 />
               </Group>
-              <DelayedTooltip
-                label={getLocalizedText("Sitzung hinzufügen", "Add Session")}
-              >
-                <ActionIcon
-                  onClick={openSessionForm}
-                  size="md"
-                  variant="subtle"
-                >
-                  <IconClockPlus />
-                </ActionIcon>
-              </DelayedTooltip>
-              <NewSessionModal
-                opened={sessionFormOpened}
-                onClose={closeSessionForm}
-                project={project}
-              />
-              <SelectActionIcon
-                disabled={selectableSessions.length === 0}
-                onClick={handleSelectionToggle}
-                tooltipLabel={
-                  selectedModeActive
-                    ? getLocalizedText(
-                        "Auswahlmodus deaktivieren",
-                        "Deactivate selection mode"
-                      )
-                    : getLocalizedText(
-                        "Auswahlmodus aktivieren",
-                        "Activate selection mode"
-                      )
-                }
-                size="md"
-                selected={selectedModeActive}
-                mainControl={true}
-              />
-            </Group>
+            </Card>
             <Grid>
               <Grid.Col span={6}>
                 <Collapse in={filterOpened}>
@@ -410,7 +404,7 @@ export default function WorkProjectDetailsPage() {
             </Grid>
           </Stack>
           {projectTimeEntries.length > 0 ? (
-            <Box w="100%">
+            <Box w="100%" style={{ overflow: "hidden" }}>
               {/* Session Hierarchy */}
               {timeFilteredTimeEntries.length > 0 ? (
                 <SessionHierarchy

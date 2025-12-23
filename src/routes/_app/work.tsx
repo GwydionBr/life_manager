@@ -26,8 +26,7 @@ function RouteComponent() {
   // Führe eine Live-Query aus: alle Projekte abrufen
   const workProjects = useWorkProjects();
 
-  const { isWorkNavbarOpen } = useSettingsStore();
-  const { setActiveProjectId, activeProjectId, lastActiveProjectId } =
+  const { activeProjectId, lastActiveProjectId } =
     useWorkStore();
 
   const router = useRouter();
@@ -53,7 +52,7 @@ function RouteComponent() {
   }
 
   return (
-    <Group h="100%" wrap="nowrap">
+    <Group h="100%" wrap="nowrap" mx="xs" mt="xs" p={0}>
       <ProjectNavbar />
       <Box
         style={{ transition: "margin 0.4s ease-in-out" }}

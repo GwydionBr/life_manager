@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { SettingsSync } from "@/components/Settings/SettingsSync";
 import { settingsQueryOptions } from "@/db/queries/settings/use-settings";
 import { profileQueryOptions } from "@/db/queries/profile/use-profile";
@@ -32,7 +32,9 @@ function AppLayout() {
       <PowerSyncInitializer />
       <SettingsSync />
       <RoutePrefetcher />
-      <Shell />
+      <Shell>
+        <Outlet />
+      </Shell>
     </>
   );
 }

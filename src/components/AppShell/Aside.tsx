@@ -1,12 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useGroupStore } from "@/stores/groupStore";
 
 import {
   ActionIcon,
+  alpha,
+  getThemeColor,
   Group,
+  MantineColor,
   ScrollArea,
   Stack,
   Text,
+  useMantineTheme,
 } from "@mantine/core";
 import { IconArrowBarLeft } from "@tabler/icons-react";
 import NotificationAside from "@/components/Notification/NotificationAside";
@@ -19,9 +23,10 @@ import Shortcut from "@/components/UI/Shortcut";
 interface AsideProps {
   toggleAside: () => void;
   isAsideOpen: boolean;
+  currentAppColor: MantineColor;
 }
 
-export default function Aside({ toggleAside, isAsideOpen }: AsideProps) {
+export default function Aside({ toggleAside, isAsideOpen, currentAppColor }: AsideProps) {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isTimeTrackerMinimized, setIsTimeTrackerMinimized] = useState(false);
   const [currentSelectedDate, setCurrentSelectedDate] = useState<Date | null>(
@@ -29,6 +34,11 @@ export default function Aside({ toggleAside, isAsideOpen }: AsideProps) {
   );
 
   const { selectedDate, isDateChanged } = useGroupStore();
+
+  const theme = useMantineTheme();
+  const backgroundColor = useMemo(() => {
+    return alpha(getThemeColor(currentAppColor, theme), 0.4);
+  }, [currentAppColor, theme]);
 
   useEffect(() => {
     if (isDateChanged && selectedDate !== currentSelectedDate) {
@@ -39,7 +49,7 @@ export default function Aside({ toggleAside, isAsideOpen }: AsideProps) {
   }, [selectedDate, isDateChanged]);
 
   return (
-    <Stack py="md" h="100%" align="center">
+    <Stack py="md" h="100%" align="center" bg={backgroundColor}>
       <Stack align="flex-start" w="100%" gap="lg">
         <Group pl="xs" justify="flex-start">
           <DelayedTooltip

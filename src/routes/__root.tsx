@@ -73,8 +73,8 @@ export const Route = createRootRouteWithContext<{
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Habbit Ruler",
-        description: "Track your habits and achieve your goals",
+        title: "Life Manager",
+        description: "Manage your life and achieve your goals",
       },
     ],
     links: [

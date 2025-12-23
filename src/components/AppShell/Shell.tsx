@@ -3,7 +3,6 @@ import { useLocation } from "@tanstack/react-router";
 import { useMemo } from "react";
 
 import { AppShell, alpha, getThemeColor, useMantineTheme } from "@mantine/core";
-import { Outlet } from "@tanstack/react-router";
 import SettingsModal from "@/components/Settings/SettingsModal";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import Aside from "./Aside";
@@ -12,7 +11,7 @@ import Navbar from "./Navbar";
 import { getGradientForColor } from "@/constants/colors";
 import { AppOptions } from "@/types/settings.types";
 
-export function Shell() {
+export function Shell({children}: {children: React.ReactNode}) {
   const {
     isAsideOpen,
     toggleAside,
@@ -94,13 +93,14 @@ export function Shell() {
         style={{ transition: "0.4s ease-in" }}
         bg={mainBackgroundColor}
       >
-        <Outlet />
+        {children}
       </AppShell.Main>
       <AppShell.Aside
         bg="var(--mantine-color-body)"
         style={{ transition: "width 0.4s ease-in", overflow: "hidden" }}
+        withBorder={false}
       >
-        <Aside toggleAside={toggleAside} isAsideOpen={isAsideOpen} />
+        <Aside toggleAside={toggleAside} isAsideOpen={isAsideOpen} currentAppColor={currentAppColor}/>
       </AppShell.Aside>
       <SettingsModal />
       <OfflineIndicator />
