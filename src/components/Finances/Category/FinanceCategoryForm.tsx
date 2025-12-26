@@ -18,7 +18,7 @@ const schema = z.object({
 
 interface FinanceCategoryFormProps {
   onClose?: () => void;
-  onSuccess?: (categoryId: string) => void;
+  onSuccess?: (category: Tables<"finance_category">) => void;
   category?: Tables<"finance_category"> | null;
 }
 
@@ -53,18 +53,19 @@ export default function FinanceCategoryForm({
         }
       );
       await newTX.isPersisted.promise
-      onSuccess?.(category.id);
+      onSuccess?.(category);
     } else {
       const newId = crypto.randomUUID();
-      const newTX = financeCategoriesCollection.insert({
+      const newCategory: Tables<"finance_category"> = {
         id: newId,
         created_at: new Date().toISOString(),
         user_id: userId,
         title: values.title,
         description: values.description || null,
-      });
+      };
+      const newTX = financeCategoriesCollection.insert(newCategory);
       await newTX.isPersisted.promise
-      onSuccess?.(newId);
+      onSuccess?.(newCategory);
     }
     handleClose();
   }

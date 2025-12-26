@@ -3,11 +3,11 @@ import { useForm } from "@mantine/form";
 import { useEffect, useState, useMemo } from "react";
 import { useDisclosure, useClickOutside } from "@mantine/hooks";
 import { useFinanceCategories } from "@/db/collections/finance/finance-category/finance-category-collection";
+import { workProjectsCollection } from "@/db/collections/work/work-project/work-project-collection";
 import {
-  workProjectsCollection,
   syncProjectCategories,
   getWorkProjectWithCategories,
-} from "@/db/collections/work/work-project/work-project-collection";
+} from "@/db/collections/work/work-project/work-project-mutations";
 import { useSettings } from "@/db/collections/settings/settings-collection";
 import { useProfileStore } from "@/stores/profileStore";
 import { useIntl } from "@/hooks/useIntl";
@@ -47,13 +47,9 @@ import {
 } from "@tabler/icons-react";
 import { Currency, RoundingDirection } from "@/types/settings.types";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
-import {
-  WorkProject,
-  UpdateWorkProject,
-  InsertWorkProject,
-} from "@/types/work.types";
+import { WorkProject } from "@/types/work.types";
 import CustomNumberInput from "@/components/UI/CustomNumberInput";
-import { Tables, TablesInsert, TablesUpdate } from "@/types/db.types";
+import { Constants, Tables, TablesUpdate } from "@/types/db.types";
 
 interface ProjectFormProps {
   project?: WorkProject;
@@ -71,10 +67,10 @@ const schema = z.object({
   description: z.string().optional(),
   salary: z.number().min(0, { message: "Salary must be positive" }),
   hourly_payment: z.boolean(),
-  currency: z.string().min(1, { message: "Currency is required" }),
+  currency: z.enum(Constants.public.Enums.currency),
   cash_flow_category_ids: z.array(z.string()),
   rounding_interval: z.number(),
-  rounding_direction: z.string(),
+  rounding_direction: z.enum(Constants.public.Enums.roundingDirection),
   round_in_time_fragments: z.boolean(),
   time_fragment_interval: z.number(),
 });

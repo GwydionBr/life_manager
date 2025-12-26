@@ -6,6 +6,8 @@ import { Modal, useModalsStack } from "@mantine/core";
 import ProjectForm from "./ProjectForm";
 import FinanceCategoryForm from "@/components/Finances/Category/FinanceCategoryForm";
 
+import { WorkProject } from "@/types/work.types";
+
 interface NewProjectModalProps {
   opened: boolean;
   onClose: () => void;
@@ -28,10 +30,10 @@ export default function NewProjectModal({
     }
   }, [opened]);
 
-  const handleSuccess = (projectId: string) => {
+  const handleSuccess = (project: WorkProject) => {
     router.navigate({
       to: "/work",
-      search: { projectId },
+      search: { projectId: project.id },
     });
     onClose();
     setCategoryIds([]);
@@ -61,8 +63,8 @@ export default function NewProjectModal({
       >
         <FinanceCategoryForm
           onClose={() => stack.close("category-form")}
-          onSuccess={(categoryId) =>
-            setCategoryIds([...categoryIds, categoryId])
+          onSuccess={(category) =>
+            setCategoryIds([...categoryIds, category.id])
           }
         />
       </Modal>

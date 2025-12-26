@@ -155,8 +155,8 @@ export default function EditProjectDrawer({
         >
           <FinanceCategoryForm
             onClose={() => drawersStack.close("category-form")}
-            onSuccess={(categoryId) =>
-              setCategoryIds([...categoryIds, categoryId])
+            onSuccess={(category) =>
+              setCategoryIds([...categoryIds, category.id])
             }
           />
         </Drawer>

@@ -193,8 +193,8 @@ export default function NewSessionModal({
       >
         <FinanceCategoryForm
           onClose={() => stack.close("category-form")}
-          onSuccess={(categoryId: string) =>
-            setCategoryIds([...categoryIds, categoryId])
+          onSuccess={(category) =>
+            setCategoryIds([...categoryIds, category.id])
           }
         />
       </Modal>

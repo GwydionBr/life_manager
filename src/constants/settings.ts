@@ -19,7 +19,10 @@ export const locales: Language[] = [
   },
 ];
 
-export const currencies: { value: Currency; label: string }[] = [
+export const currencies: {
+  value: Currency;
+  label: string;
+}[] = [
   { value: "USD", label: "$ (US Dollar)" },
   { value: "EUR", label: "€ (Euro)" },
   { value: "GBP", label: "£ (British Pound)" },

@@ -173,9 +173,9 @@ export default function EditSessionDrawer({
             onCancel={() => drawerStack.close("add-project")}
             categoryIds={categoryIds}
             setCategoryIds={setCategoryIds}
-            onSuccess={(projectId) =>
+            onSuccess={(project) =>
               setCurrentProject(
-                workProjects.find((p) => p.id === projectId) ?? project
+                workProjects.find((p) => p.id === project.id) ?? project
               )
             }
             onOpenCategoryForm={() => drawerStack.open("category-form")}
@@ -188,8 +188,8 @@ export default function EditSessionDrawer({
         >
           <FinanceCategoryForm
             onClose={() => drawerStack.close("category-form")}
-            onSuccess={(categoryId: string) =>
-              setCategoryIds([...categoryIds, categoryId])
+            onSuccess={(category) =>
+              setCategoryIds([...categoryIds, category.id])
             }
           />
         </Drawer>
