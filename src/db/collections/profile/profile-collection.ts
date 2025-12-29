@@ -20,5 +20,6 @@ export const profileCollection = createCollection(
   })
 );
 
-export const useProfile = () =>
-  useLiveQuery((q) => q.from({ profile: profileCollection }).findOne());
+export const useProfile = () => {
+  return useLiveQuery((q) => q.from({ profile: profileCollection }).findOne());
+}

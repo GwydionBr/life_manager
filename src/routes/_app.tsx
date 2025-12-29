@@ -1,5 +1,4 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { SettingsSync } from "@/components/Settings/SettingsSync";
 import { Shell } from "@/components/AppShell/Shell";
 import { PowerSyncInitializer } from "@/components/PowerSyncInitializer";
 import { RoutePrefetcher } from "@/components/RoutePrefetcher";
@@ -18,7 +17,6 @@ function AppLayout() {
   return (
     <>
       <PowerSyncInitializer />
-      <SettingsSync />
       <RoutePrefetcher />
       <Shell>
         <Outlet />

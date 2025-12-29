@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useWorkStore } from "@/stores/workManagerStore";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
-import { useSettingsStore } from "@/stores/settingsStore";
 
 import { Box, Group } from "@mantine/core";
 import WorkInitializer from "@/components/Work/WorkInitializer";
@@ -16,9 +15,9 @@ const workSearchSchema = z.object({
 });
 
 export const Route = createFileRoute("/_app/work")({
+  ssr: false,
   component: RouteComponent,
   validateSearch: zodValidator(workSearchSchema),
-  ssr: false,
 });
 
 function RouteComponent() {
@@ -44,7 +43,7 @@ function RouteComponent() {
         });
       }
     }
-  }, [projectId]);
+  }, [projectId, activeProjectId, lastActiveProjectId, router]);
 
   if (workProjects && workProjects.length === 0) {
     return <WorkInitializer />;

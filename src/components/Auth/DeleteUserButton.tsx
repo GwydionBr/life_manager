@@ -1,5 +1,4 @@
 // TODO: Implement delete user mutation
-
 import { useIntl } from "@/hooks/useIntl";
 // import { useDeleteUserMutation } from "@/utils/queries/auth/use-auth";
 
@@ -7,9 +6,8 @@ import { Button, ButtonProps } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import { showDeleteConfirmationModal } from "@/lib/notificationFunctions";
 
-interface DeleteUserButtonProps extends ButtonProps {}
 
-export default function DeleteUserButton({ ...props }: DeleteUserButtonProps) {
+export default function DeleteUserButton({ ...props }: ButtonProps) {
   // const { mutate: deleteUser, isPending } = useDeleteUserMutation();
   const { getLocalizedText } = useIntl();
 

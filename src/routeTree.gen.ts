@@ -14,7 +14,6 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as AppWorkRouteImport } from './routes/_app/work'
-import { Route as AppTestRouteImport } from './routes/_app/test'
 import { Route as AppHabbitTrackerRouteImport } from './routes/_app/habbit-tracker'
 import { Route as AppFinanceRouteImport } from './routes/_app/finance'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
@@ -42,11 +41,6 @@ const AuthIndexRoute = AuthIndexRouteImport.update({
 const AppWorkRoute = AppWorkRouteImport.update({
   id: '/work',
   path: '/work',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppTestRoute = AppTestRouteImport.update({
-  id: '/test',
-  path: '/test',
   getParentRoute: () => AppRoute,
 } as any)
 const AppHabbitTrackerRoute = AppHabbitTrackerRouteImport.update({
@@ -77,7 +71,6 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AppDashboardRoute
   '/finance': typeof AppFinanceRoute
   '/habbit-tracker': typeof AppHabbitTrackerRoute
-  '/test': typeof AppTestRoute
   '/work': typeof AppWorkRoute
   '/auth': typeof AuthIndexRoute
 }
@@ -88,7 +81,6 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AppDashboardRoute
   '/finance': typeof AppFinanceRoute
   '/habbit-tracker': typeof AppHabbitTrackerRoute
-  '/test': typeof AppTestRoute
   '/work': typeof AppWorkRoute
   '/auth': typeof AuthIndexRoute
 }
@@ -101,7 +93,6 @@ export interface FileRoutesById {
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/finance': typeof AppFinanceRoute
   '/_app/habbit-tracker': typeof AppHabbitTrackerRoute
-  '/_app/test': typeof AppTestRoute
   '/_app/work': typeof AppWorkRoute
   '/auth/': typeof AuthIndexRoute
 }
@@ -114,7 +105,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/finance'
     | '/habbit-tracker'
-    | '/test'
     | '/work'
     | '/auth'
   fileRoutesByTo: FileRoutesByTo
@@ -125,7 +115,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/finance'
     | '/habbit-tracker'
-    | '/test'
     | '/work'
     | '/auth'
   id:
@@ -137,7 +126,6 @@ export interface FileRouteTypes {
     | '/_app/dashboard'
     | '/_app/finance'
     | '/_app/habbit-tracker'
-    | '/_app/test'
     | '/_app/work'
     | '/auth/'
   fileRoutesById: FileRoutesById
@@ -186,13 +174,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWorkRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/test': {
-      id: '/_app/test'
-      path: '/test'
-      fullPath: '/test'
-      preLoaderRoute: typeof AppTestRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/habbit-tracker': {
       id: '/_app/habbit-tracker'
       path: '/habbit-tracker'
@@ -229,7 +210,6 @@ interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppFinanceRoute: typeof AppFinanceRoute
   AppHabbitTrackerRoute: typeof AppHabbitTrackerRoute
-  AppTestRoute: typeof AppTestRoute
   AppWorkRoute: typeof AppWorkRoute
 }
 
@@ -238,7 +218,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppFinanceRoute: AppFinanceRoute,
   AppHabbitTrackerRoute: AppHabbitTrackerRoute,
-  AppTestRoute: AppTestRoute,
   AppWorkRoute: AppWorkRoute,
 }
 

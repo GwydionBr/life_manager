@@ -3,6 +3,7 @@ import { Stack, Card } from "@mantine/core";
 import AuthForm from "@/components/Auth/AuthForm";
 
 export const Route = createFileRoute("/auth/")({
+  ssr: false,
   beforeLoad: ({ context }) => {
     if (context.user) {
       throw redirect({ to: "/dashboard" });

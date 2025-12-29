@@ -18,7 +18,6 @@ import {
   IconCalendar,
   IconCurrencyDollar,
   IconSettings,
-  IconTarget,
 } from "@tabler/icons-react";
 import SchemeToggle from "@/components/Scheme/SchemeToggle";
 import { UserMenu } from "@/components/User/UserMenu";
@@ -30,7 +29,6 @@ export default function DashboardHeader() {
     workColor,
     financeColor,
     calendarColor,
-    habitColor,
   } = useSettingsStore();
   const { getLocalizedText } = useIntl();
   const theme = useMantineTheme();
