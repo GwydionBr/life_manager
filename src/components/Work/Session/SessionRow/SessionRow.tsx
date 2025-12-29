@@ -13,10 +13,11 @@ import SelectActionIcon from "@/components/UI/ActionIcons/SelectActionIcon";
 import { showDeleteConfirmationModal } from "@/lib/notificationFunctions";
 
 import classes from "./SessionRow.module.css";
+import { WorkProject } from "@/types/work.types";
 
 interface SessionRowProps {
   session: Tables<"timer_session"> & { index: number };
-  project?: Tables<"timer_project">;
+  project?: WorkProject;
   isSelected?: boolean;
   onToggleSelected?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   isOverview?: boolean;

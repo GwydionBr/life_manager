@@ -13,7 +13,7 @@ import PlusActionIcon from "@/components/UI/ActionIcons/PlusActionIcon";
 import TimeTrackerActionIcon from "./TimeTrackerActionIcons/TimeTrackerActionIcon";
 import { getStatusColor } from "@/lib/workHelperFunctions";
 import { Tables } from "@/types/db.types";
-import { useSettings } from "@/db/queries/settings/use-settings";
+import { useSettings } from "@/db/collections/settings/settings-collection";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 
 interface TimerManagerProps {

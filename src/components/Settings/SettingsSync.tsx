@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { useSettings } from "@/db/queries/settings/use-settings";
+import { useSettings } from "@/db/collections/settings/settings-collection";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { useProfile } from "@/db/queries/profile/use-profile";
+import { useProfile } from "@/db/collections/profile/profile-collection";
 import { useProfileStore } from "@/stores/profileStore";
 
 /**

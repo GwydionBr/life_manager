@@ -6,7 +6,7 @@ import { useProfileStore } from "@/stores/profileStore";
 import { Stack, Select, TextInput } from "@mantine/core";
 
 import { z } from "zod";
-import { zod4Resolver } from "mantine-form-zod-resolver";
+import { zodResolver } from "mantine-form-zod-resolver";
 import { currencies } from "@/constants/settings";
 import { Currency } from "@/types/settings.types";
 import { Database, Tables } from "@/types/db.types";
@@ -14,7 +14,7 @@ import CustomNumberInput from "@/components/UI/CustomNumberInput";
 import UpdateButton from "@/components/UI/Buttons/UpdateButton";
 import CreateButton from "@/components/UI/Buttons/CreateButton";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
-import { useSettings } from "@/db/queries/settings/use-settings";
+import { useSettings } from "@/db/collections/settings/settings-collection";
 
 const schema = z.object({
   title: z.string().min(1, "Name is required"),
@@ -48,7 +48,7 @@ export default function BankAccountForm({
         bankAccount?.currency || settings?.default_finance_currency || "USD",
       saldo: bankAccount?.saldo || 0,
     },
-    validate: zod4Resolver(schema),
+    validate: zodResolver(schema),
   });
 
   const handleClose = () => {

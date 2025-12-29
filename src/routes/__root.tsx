@@ -23,7 +23,6 @@ import { QueryClient } from "@tanstack/react-query";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/NotFound";
 import useSettingsStore from "@/stores/settingsStore";
-import { fetchSupabaseAuth } from "@/actions/auth/fetchSupabaseAuth";
 import { createIsomorphicFn } from "@tanstack/react-start";
 
 /**
@@ -31,7 +30,7 @@ import { createIsomorphicFn } from "@tanstack/react-start";
  */
 const getClientAuth = createIsomorphicFn()
   .server(async () => {
-    return { user: null };
+    return undefined;
   })
   .client(async () => {
     try {
@@ -39,12 +38,10 @@ const getClientAuth = createIsomorphicFn()
       const {
         data: { session },
       } = await connector.client.auth.getSession();
-      return {
-        user: session?.user ?? null,
-      };
+      return session?.user;
     } catch (error) {
       console.error("Error getting client auth:", error);
-      return { user: null };
+      return undefined;
     }
   });
 
@@ -52,16 +49,9 @@ export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
   beforeLoad: async () => {
-    // Versuche zuerst Server-Auth (für SSR), fallback auf Client-Auth (für Offline)
-    try {
-      const user = await fetchSupabaseAuth();
-      return { user };
-    } catch (error) {
-      // Server nicht erreichbar (Offline) → nutze Client-Auth
-      console.log("Server auth unavailable, using client auth (offline mode)");
-      const user = await getClientAuth();
-      return { user };
-    }
+    const user = await getClientAuth();
+    console.log("user", user);
+    return { user };
   },
   head: () => ({
     meta: [

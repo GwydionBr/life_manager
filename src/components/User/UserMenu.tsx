@@ -30,7 +30,6 @@ import { Link } from "@tanstack/react-router";
 import { DarkSchemeIcon } from "@/components/Scheme/DarkScheme";
 import { LightSchemeIcon } from "@/components/Scheme/LightScheme";
 
-import { signOut } from "@/actions/auth/signOut";
 import { connector } from "@/db/powersync/db";
 import { cleanupOnLogout } from "@/lib/cleanupOnLogout";
 

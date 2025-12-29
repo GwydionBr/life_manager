@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTimeTracker } from "@/hooks/useTimeTracker";
-import { useSettings } from "@/db/queries/settings/use-settings";
+import { useSettings } from "@/db/collections/settings/settings-collection";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { workTimeEntriesCollection } from "@/db/collections/work/work-time-entry/work-time-entry-collection";
 import {
