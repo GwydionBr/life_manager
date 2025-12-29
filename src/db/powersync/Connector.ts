@@ -118,6 +118,28 @@ export class SupabaseConnector
     this.updateSession(session);
   }
 
+  async logout() {
+    const { error } = await this.client.auth.signOut();
+    if (error) {
+      throw error;
+    }
+    this.currentSession = null;
+    
+  }
+
+  async register(email: string, password: string) {
+    const { data, error } = await this.client.auth.signUp({
+      email: email,
+      password: password,
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    this.updateSession(data.session);
+  }
+
   async fetchCredentials() {
     const {
       data: { session },

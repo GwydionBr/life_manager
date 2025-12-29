@@ -27,7 +27,7 @@ interface SettingsState extends Settings {
 interface SettingsActions {
   setSelectedTab: (tab: SettingsTab) => void;
   setIsModalOpen: (isModalOpen: boolean) => void;
-  toggleWorkNavbar: () => void;
+  toggleWorkNavbar: () => void; 
   toggleFinanceNavbar: () => void;
   setPrimaryColor: (color: MantineColor) => void;
   setWorkColor: (color: MantineColor) => void;
@@ -36,6 +36,7 @@ interface SettingsActions {
   setHabitColor: (color: MantineColor) => void;
   setSettingState: (adjustment: Partial<SettingsState>) => void;
   toggleAside: () => void;
+  resetStore: () => void;
 }
 
 const initialState: SettingsState = {
@@ -110,6 +111,9 @@ export const useSettingsStore = create<SettingsState & SettingsActions>()(
       },
       toggleAside: () => {
         set({ isAsideOpen: !get().isAsideOpen });
+      },
+      resetStore: () => {
+        set(initialState);
       },
     }),
     {

@@ -31,6 +31,8 @@ import { DarkSchemeIcon } from "@/components/Scheme/DarkScheme";
 import { LightSchemeIcon } from "@/components/Scheme/LightScheme";
 
 import { signOut } from "@/actions/auth/signOut";
+import { connector } from "@/db/powersync/db";
+import { cleanupOnLogout } from "@/lib/cleanupOnLogout";
 
 export function UserMenu() {
   const router = useRouter();
@@ -43,7 +45,8 @@ export function UserMenu() {
 
   const handleSignOut = async () => {
     try {
-      await signOut();
+      await connector.logout();
+      await cleanupOnLogout();
       router.navigate({ to: "/" });
       router.invalidate();
     } catch (error) {

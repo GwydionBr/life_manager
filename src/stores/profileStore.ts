@@ -6,6 +6,7 @@ interface ProfileState extends Profile {}
 
 interface ProfileActions {
   setProfileState: (adjustment: Partial<ProfileState>) => void;
+  resetStore: () => void;
 }
 
 const initialState: ProfileState = {
@@ -26,6 +27,9 @@ export const useProfileStore = create<ProfileState & ProfileActions>()(
       ...initialState,
       setProfileState: (adjustment: Partial<ProfileState>) => {
         set({ ...get(), ...adjustment });
+      },
+      resetStore: () => {
+        set(initialState);
       },
     }),
     {

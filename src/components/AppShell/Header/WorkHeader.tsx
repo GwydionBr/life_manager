@@ -32,8 +32,6 @@ export default function WorkHeader() {
   const { getLocalizedText, formatMoney } = useIntl();
   const theme = useMantineTheme();
 
-  if (!activeProjectId) return <Loader />;
-
   const projects = useWorkProjects();
   const project = projects?.find((project) => project.id === activeProjectId);
 
