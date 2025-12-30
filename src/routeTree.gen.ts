@@ -13,6 +13,7 @@ import { Route as NewUserRouteImport } from './routes/new-user'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
+import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as AppWorkRouteImport } from './routes/_app/work'
 import { Route as AppHabbitTrackerRouteImport } from './routes/_app/habbit-tracker'
 import { Route as AppFinanceRouteImport } from './routes/_app/finance'
@@ -36,6 +37,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthIndexRoute = AuthIndexRouteImport.update({
   id: '/auth/',
   path: '/auth/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppWorkRoute = AppWorkRouteImport.update({
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/finance': typeof AppFinanceRoute
   '/habbit-tracker': typeof AppHabbitTrackerRoute
   '/work': typeof AppWorkRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/auth': typeof AuthIndexRoute
 }
 export interface FileRoutesByTo {
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/finance': typeof AppFinanceRoute
   '/habbit-tracker': typeof AppHabbitTrackerRoute
   '/work': typeof AppWorkRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/auth': typeof AuthIndexRoute
 }
 export interface FileRoutesById {
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/_app/finance': typeof AppFinanceRoute
   '/_app/habbit-tracker': typeof AppHabbitTrackerRoute
   '/_app/work': typeof AppWorkRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/auth/': typeof AuthIndexRoute
 }
 export interface FileRouteTypes {
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/finance'
     | '/habbit-tracker'
     | '/work'
+    | '/auth/callback'
     | '/auth'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/finance'
     | '/habbit-tracker'
     | '/work'
+    | '/auth/callback'
     | '/auth'
   id:
     | '__root__'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/_app/finance'
     | '/_app/habbit-tracker'
     | '/_app/work'
+    | '/auth/callback'
     | '/auth/'
   fileRoutesById: FileRoutesById
 }
@@ -134,6 +146,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   NewUserRoute: typeof NewUserRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   AuthIndexRoute: typeof AuthIndexRoute
 }
 
@@ -165,6 +178,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/work': {
@@ -227,6 +247,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   NewUserRoute: NewUserRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   AuthIndexRoute: AuthIndexRoute,
 }
 export const routeTree = rootRouteImport

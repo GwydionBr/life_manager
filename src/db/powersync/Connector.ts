@@ -146,6 +146,23 @@ export class SupabaseConnector
     this.updateSession(data.session);
   }
 
+  async signInWithGithub(redirectTo?: string) {
+    const { data, error } = await this.client.auth.signInWithOAuth({
+      provider: "github",
+      options: {
+        redirectTo: redirectTo || `${window.location.origin}/auth/callback`,
+      },
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    // OAuth redirects to GitHub, so we don't update session here
+    // The session will be updated in the callback route
+    return data;
+  }
+
   async fetchCredentials() {
     const {
       data: { session },

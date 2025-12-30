@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForm } from "@mantine/form";
+import { useForm, isEmail } from "@mantine/form";
 import { upperFirst, useToggle } from "@mantine/hooks";
 import { useIntl } from "@/hooks/useIntl";
 import { useRouter } from "@tanstack/react-router";
@@ -68,9 +68,24 @@ export default function AuthenticationForm({
   }
 
   async function handleGithub() {
-    // TODO: Implement Github login
-    // await signInWithGithub();
-    console.log("signInWithGithub");
+    setIsLoading(true);
+    try {
+      const callbackUrl = `${window.location.origin}/auth/callback`;
+      await connector.signInWithGithub(callbackUrl);
+      // Note: The user will be redirected to GitHub, so we don't need to
+      // navigate here. The callback route will handle the redirect back.
+    } catch (error) {
+      console.error(error);
+      showNotification({
+        title: getLocalizedText("Fehler", "Error"),
+        message: getLocalizedText(
+          "Fehler bei der GitHub-Anmeldung",
+          "Error during GitHub login"
+        ),
+        color: "red",
+      });
+      setIsLoading(false);
+    }
   }
 
   const form = useForm({
@@ -81,12 +96,9 @@ export default function AuthenticationForm({
       terms: false,
     },
     validate: {
-      email: (value) =>
-        /^(?!\.)(?!.*\.\.)([a-z0-9_'+\-\.]*)[a-z0-9_+-]@([a-z0-9][a-z0-9\-]*\.)+[a-z]{2,}$/i.test(
-          value
-        )
-          ? null
-          : getLocalizedText("Ungültige E-Mail Adresse", "Invalid email"),
+      email: isEmail(
+        getLocalizedText("Ungültige E-Mail Adresse", "Invalid email")
+      ),
       password: (value) =>
         value.length <= 6
           ? getLocalizedText(
