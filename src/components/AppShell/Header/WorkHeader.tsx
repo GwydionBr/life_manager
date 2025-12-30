@@ -32,134 +32,175 @@ export default function WorkHeader() {
   const { getLocalizedText, formatMoney } = useIntl();
   const theme = useMantineTheme();
 
-  const { data: projects, isLoading: isProjectsLoading } = useWorkProjects();
+  const {
+    data: projects,
+    isLoading: isProjectsLoading,
+    isReady: isProjectsReady,
+  } = useWorkProjects();
   const project = useMemo(() => {
     return projects?.find((project) => project.id === activeProjectId);
   }, [projects, activeProjectId]);
 
-  const { data: timeEntriesData, isLoading: isTimeEntriesLoading } =
-    useWorkTimeEntries();
+  const {
+    data: timeEntriesData,
+    isLoading: isTimeEntriesLoading,
+    isReady: isTimeEntriesReady,
+  } = useWorkTimeEntries();
   const timeEntries = useMemo(() => {
     return timeEntriesData?.filter(
       (timeEntry) => timeEntry.project_id === activeProjectId
     );
   }, [timeEntriesData, activeProjectId]);
 
-  // Loading state
-  if (isProjectsLoading || isTimeEntriesLoading) return <Loader />;
-
-  // Project not found
-  if (!project)
-    return (
-      <Text>
-        {getLocalizedText("Projekt nicht gefunden", "Project not found")}
-      </Text>
-    );
-
-  // Project found
-  const salary = formatMoney(project.salary, project.currency);
-  const totalActiveSeconds = timeEntries.reduce(
-    (total, timeEntry) => total + timeEntry.active_seconds,
-    0
-  );
-  const hourlySalary = formatMoney(
-    project.hourly_payment
-      ? project.salary
-      : totalActiveSeconds > 0
-        ? (project.salary / totalActiveSeconds) * 3600
-        : 0,
-    project.currency
-  );
-
-  const rightSalary = project.salary === 0 ? undefined : hourlySalary;
-
-  const leftSalary = project.hourly_payment
-    ? undefined
-    : project.salary === 0
-      ? "Hobby"
-      : salary;
-
   const fromColor = getThemeColor(primaryColor, theme);
   const toColor = getThemeColor(workColor, theme);
 
+  // Loading state
+  const isLoading = isProjectsLoading || isTimeEntriesLoading;
+  const isReady = isProjectsReady && isTimeEntriesReady;
+
+  // Project found calculations
+  const salary = project
+    ? formatMoney(project.salary, project.currency)
+    : undefined;
+  const totalActiveSeconds = project
+    ? timeEntries.reduce(
+        (total, timeEntry) => total + timeEntry.active_seconds,
+        0
+      )
+    : 0;
+  const hourlySalary = project
+    ? formatMoney(
+        project.hourly_payment
+          ? project.salary
+          : totalActiveSeconds > 0
+            ? (project.salary / totalActiveSeconds) * 3600
+            : 0,
+        project.currency
+      )
+    : undefined;
+
+  const rightSalary =
+    project && project.salary === 0 ? undefined : hourlySalary;
+
+  const leftSalary = project
+    ? project.hourly_payment
+      ? undefined
+      : project.salary === 0
+        ? "Hobby"
+        : salary
+    : undefined;
+
+  const backgroundColor = useMemo(() => {
+    return `linear-gradient(135deg, ${alpha(fromColor, 0.4)} 0%, ${alpha(toColor, 0.4)} 100%)`;
+  }, [fromColor, toColor]);
+
   return (
-    <Group
-      h="100%"
-      style={{
-        background: `linear-gradient(135deg, ${alpha(fromColor, 0.4)} 0%, ${alpha(toColor, 0.4)} 100%)`,
-      }}
-      w="100%"
-      wrap="nowrap"
-    >
-      <Group align="center" gap={0} w={250} justify="center">
-        <ThemeIcon
-          color="var(--mantine-color-text)"
-          size="xl"
-          variant="transparent"
-        >
-          <IconBriefcase />
-        </ThemeIcon>
-        <Title order={2} c="var(--mantine-color-text)">
-          {getLocalizedText("Arbeit", "Work")}
-        </Title>
-      </Group>
+    <Group h="100%" bg={backgroundColor} w="100%" wrap="nowrap">
+      {isReady && !project ? null : (
+        <Group align="center" gap={0} w={250} justify="center">
+          <ThemeIcon
+            color="var(--mantine-color-text)"
+            size="xl"
+            variant="transparent"
+          >
+            <IconBriefcase />
+          </ThemeIcon>
+          <Title order={2} c="var(--mantine-color-text)">
+            {getLocalizedText("Arbeit", "Work")}
+          </Title>
+        </Group>
+      )}
       <Grid w="100%" align="center">
         <Grid.Col span={2}></Grid.Col>
         <Grid.Col span={8}>
-          <Group
-            align="center"
-            justify="center"
-            style={{ flex: 1, minWidth: 0 }}
-          >
-            {leftSalary && (
-              <Text c="red" fw={700}>
-                {leftSalary}
+          {isLoading ? (
+            <Group
+              align="center"
+              justify="center"
+              style={{ flex: 1, minWidth: 0 }}
+            >
+              <Loader />
+            </Group>
+          ) : !project ? (
+            <Group
+              align="center"
+              justify="center"
+              style={{ flex: 1, minWidth: 0 }}
+            >
+              <ThemeIcon
+                size="xl"
+                variant="light"
+                bg={backgroundColor}
+                radius="lg"
+              >
+                <IconBriefcase />
+              </ThemeIcon>
+              <Text fz={35} fw={700}>
+                {getLocalizedText("Projekt-Management", "Project Management")}
               </Text>
-            )}
-            <Title order={1} style={{ textAlign: "center" }}>
-              {project.title}
-            </Title>
-            {rightSalary && (
-              <Text c={leftSalary ? "blue" : "red"} fw={leftSalary ? 400 : 700}>
-                {rightSalary} / {getLocalizedText("Stunde", "Hour")}
-              </Text>
-            )}
-          </Group>
+            </Group>
+          ) : (
+            <Group
+              align="center"
+              justify="center"
+              style={{ flex: 1, minWidth: 0 }}
+            >
+              {leftSalary && (
+                <Text c="red" fw={700}>
+                  {leftSalary}
+                </Text>
+              )}
+              <Title order={1} style={{ textAlign: "center" }}>
+                {project.title}
+              </Title>
+              {rightSalary && (
+                <Text
+                  c={leftSalary ? "blue" : "red"}
+                  fw={leftSalary ? 400 : 700}
+                >
+                  {rightSalary} / {getLocalizedText("Stunde", "Hour")}
+                </Text>
+              )}
+            </Group>
+          )}
         </Grid.Col>
         <Grid.Col span={2}>
-          <Group>
-            {timeEntries.length > 0 &&
-              (!analysisOpened ? (
-                <AnalysisActionIcon
-                  onClick={() => setAnalysisOpened(true)}
-                  tooltipLabel={getLocalizedText(
-                    "Analyse öffnen",
-                    "Open Analysis"
-                  )}
-                  color="var(--mantine-color-text)"
-                  variant="subtle"
-                />
-              ) : (
-                <ListActionIcon
-                  onClick={() => setAnalysisOpened(false)}
-                  tooltipLabel={getLocalizedText(
-                    "Analyse schließen",
-                    "Close Analysis"
-                  )}
-                  color="var(--mantine-color-text)"
-                  variant="subtle"
-                />
-              ))}
-            <EditActionIcon
-              onClick={toggleEditProjectOpened}
-              tooltipLabel={getLocalizedText(
-                "Projekt bearbeiten",
-                "Edit Project"
-              )}
-              color="var(--mantine-color-text)"
-              variant="subtle"
-            />
-          </Group>
+          {project && (
+            <Group>
+              {timeEntries.length > 0 &&
+                (!analysisOpened ? (
+                  <AnalysisActionIcon
+                    onClick={() => setAnalysisOpened(true)}
+                    tooltipLabel={getLocalizedText(
+                      "Analyse öffnen",
+                      "Open Analysis"
+                    )}
+                    color="var(--mantine-color-text)"
+                    variant="subtle"
+                  />
+                ) : (
+                  <ListActionIcon
+                    onClick={() => setAnalysisOpened(false)}
+                    tooltipLabel={getLocalizedText(
+                      "Analyse schließen",
+                      "Close Analysis"
+                    )}
+                    color="var(--mantine-color-text)"
+                    variant="subtle"
+                  />
+                ))}
+              <EditActionIcon
+                onClick={toggleEditProjectOpened}
+                tooltipLabel={getLocalizedText(
+                  "Projekt bearbeiten",
+                  "Edit Project"
+                )}
+                color="var(--mantine-color-text)"
+                variant="subtle"
+              />
+            </Group>
+          )}
         </Grid.Col>
       </Grid>
     </Group>
