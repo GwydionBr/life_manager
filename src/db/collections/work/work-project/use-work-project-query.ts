@@ -31,16 +31,27 @@ const projectCategoryMappingCollection = createLiveQueryCollection((q) =>
 
 export const useWorkProjects = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { data: projects, isLoading: isProjectsLoading } = useLiveQuery((q) =>
-    q.from({ workProjects: workProjectsCollection })
-  );
-  const { data: mappings, isLoading: isMappingsLoading } = useLiveQuery((q) =>
+  const [isReady, setIsReady] = useState(false);
+  const {
+    data: projects,
+    isLoading: isProjectsLoading,
+    isReady: isProjectsReady,
+  } = useLiveQuery((q) => q.from({ workProjects: workProjectsCollection }));
+  const {
+    data: mappings,
+    isLoading: isMappingsLoading,
+    isReady: isMappingsReady,
+  } = useLiveQuery((q) =>
     q.from({ mappings: projectCategoryMappingCollection })
   );
 
   useEffect(() => {
     setIsLoading(isProjectsLoading || isMappingsLoading);
   }, [isProjectsLoading, isMappingsLoading]);
+
+  useEffect(() => {
+    setIsReady(isProjectsReady && isMappingsReady);
+  }, [isProjectsReady, isMappingsReady]);
 
   const projectsWithCategories = useMemo((): WorkProject[] => {
     if (!projects) return [];
@@ -59,5 +70,5 @@ export const useWorkProjects = () => {
     }));
   }, [projects, mappings]);
 
-  return { isLoading, data: projectsWithCategories };
+  return { data: projectsWithCategories, isLoading, isReady };
 };

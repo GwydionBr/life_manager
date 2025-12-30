@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   TimerData,
   useTimeTrackerManager,
@@ -12,9 +12,9 @@ import TimeTrackerInstance from "./TimeTrackerInstance";
 import PlusActionIcon from "@/components/UI/ActionIcons/PlusActionIcon";
 import TimeTrackerActionIcon from "./TimeTrackerActionIcons/TimeTrackerActionIcon";
 import { getStatusColor } from "@/lib/workHelperFunctions";
-import { Tables } from "@/types/db.types";
 import { useSettings } from "@/db/collections/settings/settings-collection";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
+import { WorkProject } from "@/types/work.types";
 
 interface TimerManagerProps {
   isBig: boolean;
@@ -38,7 +38,7 @@ export default function TimerManager({
   const { activeProjectId } = useWorkStore();
   const { data: settings } = useSettings();
   const { getLocalizedText } = useIntl();
-  const { data: projects, isLoading: isProjectsLoading } = useWorkProjects();
+  const { data: projects, isReady: isProjectsReady } = useWorkProjects();
 
   const activeProject = useMemo(
     () => projects.find((p) => p.id === activeProjectId),
@@ -81,35 +81,39 @@ export default function TimerManager({
     setIsClient(true);
   }, []);
 
-  const handleAddTimer = (project: Tables<"timer_project">) => {
-    const result = addTimer(project, {
-      roundingInterval: settings?.rounding_interval ?? 0,
-      roundingDirection: settings?.rounding_direction ?? "up",
-      roundInTimeFragments: settings?.round_in_time_sections ?? false,
-      timeFragmentInterval: settings?.time_section_interval ?? 0,
-    });
+  const handleAddTimer = useCallback(
+    (project: WorkProject) => {
+      const result = addTimer(project, {
+        roundingInterval: settings?.rounding_interval ?? 0,
+        roundingDirection: settings?.rounding_direction ?? "up",
+        roundInTimeFragments: settings?.round_in_time_sections ?? false,
+        timeFragmentInterval: settings?.time_section_interval ?? 0,
+      });
 
-    if (!result.success) {
-      setErrorMessage(
-        result.error
-          ? getLocalizedText(result.error.german, result.error.english)
-          : getLocalizedText(
-              "Timer konnte nicht hinzugefügt werden",
-              "Failed to add timer"
-            )
-      );
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
-    }
-  };
+      if (!result.success) {
+        setErrorMessage(
+          result.error
+            ? getLocalizedText(result.error.german, result.error.english)
+            : getLocalizedText(
+                "Timer konnte nicht hinzugefügt werden",
+                "Failed to add timer"
+              )
+        );
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      }
+    },
+    [addTimer, settings, getLocalizedText]
+  );
 
   useEffect(() => {
-    if (timers.length === 0) {
-      if (!activeProject) return;
-      handleAddTimer(activeProject);
+    if (timers.length === 0 && isProjectsReady) {
+      if (activeProject) {
+        handleAddTimer(activeProject);
+      }
     }
-  }, [timers, activeProject]);
+  }, [timers, activeProject, handleAddTimer, isProjectsReady]);
 
   const isOneTimerRunning = timers.some(
     (timer) => timer.state === TimerState.Running
