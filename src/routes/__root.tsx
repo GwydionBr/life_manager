@@ -24,13 +24,28 @@ import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/NotFound";
 import useSettingsStore from "@/stores/settingsStore";
 import { createIsomorphicFn } from "@tanstack/react-start";
+import { getSupabaseServerClient } from "@/lib/supabase/supabaseServerClient";
 
 /**
  * Client-seitiger Fallback für Auth-Prüfung (funktioniert offline)
  */
 const getAuth = createIsomorphicFn()
   .server(async () => {
-    return undefined;
+    try {
+      const client = getSupabaseServerClient();
+      const {
+        data: { user },
+        error,
+      } = await client.auth.getUser();
+      if (error) {
+        console.error("Error getting server auth:", error);
+        return undefined;
+      }
+      return user;
+    } catch (error) {
+      console.error("Error getting client auth:", error);
+      return undefined;
+    }
   })
   .client(async () => {
     try {
