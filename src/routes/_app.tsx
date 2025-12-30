@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Shell } from "@/components/AppShell/Shell";
 import { PowerSyncInitializer } from "@/components/PowerSyncInitializer";
 import { RoutePrefetcher } from "@/components/RoutePrefetcher";
+import { Loader } from "@/components/Loader";
 
 export const Route = createFileRoute("/_app")({
   ssr: false,
@@ -10,6 +11,8 @@ export const Route = createFileRoute("/_app")({
       throw redirect({ to: "/auth" });
     }
   },
+  pendingComponent: () => <Loader />,
+
   component: AppLayout,
 });
 

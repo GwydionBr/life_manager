@@ -5,8 +5,10 @@ import "@mantine/notifications/styles.css";
 import "@mantine/dates/styles.css";
 import "@mantine/charts/styles.css";
 
-import type { ReactNode } from "react";
+import useSettingsStore from "@/stores/settingsStore";
 import { useEffect } from "react";
+
+import type { ReactNode } from "react";
 import {
   Outlet,
   HeadContent,
@@ -22,50 +24,13 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient } from "@tanstack/react-query";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/NotFound";
-import useSettingsStore from "@/stores/settingsStore";
-import { createIsomorphicFn } from "@tanstack/react-start";
-import { getSupabaseServerClient } from "@/lib/supabase/supabaseServerClient";
-
-/**
- * Client-seitiger Fallback für Auth-Prüfung (funktioniert offline)
- */
-const getAuth = createIsomorphicFn()
-  .server(async () => {
-    try {
-      const client = getSupabaseServerClient();
-      const {
-        data: { user },
-        error,
-      } = await client.auth.getUser();
-      if (error) {
-        console.error("Error getting server auth:", error);
-        return undefined;
-      }
-      return user;
-    } catch (error) {
-      console.error("Error getting client auth:", error);
-      return undefined;
-    }
-  })
-  .client(async () => {
-    try {
-      const { connector } = await import("@/db/powersync/db");
-      const session = await connector.getCurrentSession();
-      if (!session?.user) {
-        return undefined;
-      }
-      return session.user;
-    } catch (error) {
-      console.error("Error getting client auth:", error);
-      return undefined;
-    }
-  });
+import { getAuthUser } from "@/actions/auth/getAuth";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
   beforeLoad: async () => {
-    const user = await getAuth();
+    const user = await getAuthUser();
     return { user };
   },
   head: () => ({
