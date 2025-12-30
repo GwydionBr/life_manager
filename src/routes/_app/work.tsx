@@ -3,7 +3,7 @@ import { useWorkStore } from "@/stores/workManagerStore";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 
-import { Box, Center, Group, Loader } from "@mantine/core";
+import { Box, Center, Group, Loader, ScrollArea } from "@mantine/core";
 import WorkInitializer from "@/components/Work/WorkInitializer";
 import ProjectNavbar from "@/components/Navbar/ProjectNavbar";
 import ProjectDetail from "@/components/Work/Project/ProjectDetail";
@@ -58,16 +58,18 @@ function RouteComponent() {
     );
   }
 
-  if (workProjects && workProjects.length === 0 && !isLoading) {
-    return <WorkInitializer />;
-  }
-
   return (
     <Group h="100%" wrap="nowrap" mx="xs" align="flex-start">
       <ProjectNavbar />
-      <Box style={{ transition: "margin 0.4s ease-in-out" }} w="100%">
-        <ProjectDetail />
-      </Box>
+      <ScrollArea h="calc(100vh - 60px)" type="scroll">
+        <Box style={{ transition: "margin 0.4s ease-in-out" }} w="100%">
+          {workProjects && workProjects.length === 0 && !isLoading ? (
+            <WorkInitializer />
+          ) : (
+            <ProjectDetail />
+          )}
+        </Box>
+      </ScrollArea>
     </Group>
   );
 }

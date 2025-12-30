@@ -274,191 +274,189 @@ export default function WorkProjectDetailsPage() {
     : project.salary > project.total_payout;
 
   return (
-    <ScrollArea h="calc(100vh - 60px)" type="scroll">
-      <Stack align="center" w="100%" px="xl" pb="xl" pt="xs">
-        <Collapse in={!analysisOpened} transitionDuration={300} w="100%">
-          <Text size="sm" fw={500} ta="center" mb="xs">
-            {project.description}
-          </Text>
-          <Stack
-            style={{
-              position: "sticky",
-              top: 10,
-              zIndex: 10,
-              left: 0,
-            }}
-            w="100%"
-            gap="xs"
-          >
-            <Card withBorder radius="md" p={0}>
-              <Group justify="space-between" p={5}>
-                <Group>
-                  <FilterActionIcon
-                    disabled={timeFilteredTimeEntries.length === 0}
-                    onClick={handleFilterToggle}
-                    tooltipLabel={getLocalizedText("Filter", "Filter")}
-                    activeFilter={
-                      filterTimeSpan[0] && filterTimeSpan[1] ? true : false
-                    }
-                    opened={filterOpened}
-                  />
-                  <PayoutActionIcon
-                    onClick={handlePayoutToggle}
-                    tooltipLabel={getLocalizedText("Auszahlung", "Payout")}
-                    disabled={!isPayoutAvailable}
-                    opened={payoutOpened}
-                  />
-                </Group>
-                <DelayedTooltip
-                  label={getLocalizedText("Sitzung hinzufügen", "Add Session")}
-                >
-                  <ActionIcon
-                    onClick={openSessionForm}
-                    size="md"
-                    variant="subtle"
-                  >
-                    <IconClockPlus />
-                  </ActionIcon>
-                </DelayedTooltip>
-                <NewSessionModal
-                  opened={sessionFormOpened}
-                  onClose={closeSessionForm}
-                  project={project}
-                />
-                <SelectActionIcon
-                  disabled={selectableSessions.length === 0}
-                  onClick={handleSelectionToggle}
-                  tooltipLabel={
-                    selectedModeActive
-                      ? getLocalizedText(
-                          "Auswahlmodus deaktivieren",
-                          "Deactivate selection mode"
-                        )
-                      : getLocalizedText(
-                          "Auswahlmodus aktivieren",
-                          "Activate selection mode"
-                        )
+    <Stack align="center" w="100%" px="xl" pb="xl" pt="xs">
+      <Collapse in={!analysisOpened} transitionDuration={300} w="100%">
+        <Text size="sm" fw={500} ta="center" mb="xs">
+          {project.description}
+        </Text>
+        <Stack
+          style={{
+            position: "sticky",
+            top: 10,
+            zIndex: 10,
+            left: 0,
+          }}
+          w="100%"
+          gap="xs"
+        >
+          <Card withBorder radius="md" p={0}>
+            <Group justify="space-between" p={5}>
+              <Group>
+                <FilterActionIcon
+                  disabled={timeFilteredTimeEntries.length === 0}
+                  onClick={handleFilterToggle}
+                  tooltipLabel={getLocalizedText("Filter", "Filter")}
+                  activeFilter={
+                    filterTimeSpan[0] && filterTimeSpan[1] ? true : false
                   }
-                  size="md"
-                  selected={selectedModeActive}
-                  mainControl={true}
+                  opened={filterOpened}
+                />
+                <PayoutActionIcon
+                  onClick={handlePayoutToggle}
+                  tooltipLabel={getLocalizedText("Auszahlung", "Payout")}
+                  disabled={!isPayoutAvailable}
+                  opened={payoutOpened}
                 />
               </Group>
-            </Card>
-            <Grid>
-              <Grid.Col span={6}>
-                <Collapse in={filterOpened}>
-                  <ProjectFilter
-                    timeSpan={filterTimeSpan}
-                    onTimeSpanChange={setFilterTimeSpan}
-                    sessions={timeFilteredTimeEntries}
-                    project={project}
-                    isProcessingPayout={false}
-                    onSelectAll={selectAllTimeEntries}
-                    handleSessionPayoutClick={handleSessionPayoutClick}
-                  />
-                </Collapse>
-                <Collapse in={payoutOpened}>
-                  <Group>
-                    {project.hourly_payment ? (
-                      <HourlyPayoutCard
-                        project={{
-                          ...project,
-                          timeEntries: projectTimeEntries,
-                        }}
-                        handlePayoutClick={handleSessionPayoutClick}
-                        isProcessing={false}
-                      />
-                    ) : (
-                      <ProjectPayoutCard project={project} />
-                    )}
-                  </Group>
-                </Collapse>
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <Collapse in={selectedModeActive}>
-                  <SessionSelector
-                    selectedSessions={selectedTimeEntryIds}
-                    timeFilteredSessions={timeFilteredTimeEntries}
-                    toggleAllSessions={toggleAllTimeEntries}
-                    handleSessionPayoutClick={handleSessionPayoutClick}
-                  />
-                </Collapse>
-              </Grid.Col>
-              <PayoutConversionModal
-                opened={payoutConversionOpened}
-                handleClose={closePayoutConversion}
-                startValue={payoutConvertionStartValues.value}
-                startCurrency={project.currency}
-                onSubmit={(values) =>
-                  handleSessionPayout(
-                    payoutConvertionStartValues.timeEntries,
-                    values.endCurrency,
-                    values.endValue
+              <DelayedTooltip
+                label={getLocalizedText("Sitzung hinzufügen", "Add Session")}
+              >
+                <ActionIcon
+                  onClick={openSessionForm}
+                  size="md"
+                  variant="subtle"
+                >
+                  <IconClockPlus />
+                </ActionIcon>
+              </DelayedTooltip>
+              <NewSessionModal
+                opened={sessionFormOpened}
+                onClose={closeSessionForm}
+                project={project}
+              />
+              <SelectActionIcon
+                disabled={selectableSessions.length === 0}
+                onClick={handleSelectionToggle}
+                tooltipLabel={
+                  selectedModeActive
+                    ? getLocalizedText(
+                        "Auswahlmodus deaktivieren",
+                        "Deactivate selection mode"
+                      )
+                    : getLocalizedText(
+                        "Auswahlmodus aktivieren",
+                        "Activate selection mode"
+                      )
+                }
+                size="md"
+                selected={selectedModeActive}
+                mainControl={true}
+              />
+            </Group>
+          </Card>
+          <Grid>
+            <Grid.Col span={6}>
+              <Collapse in={filterOpened}>
+                <ProjectFilter
+                  timeSpan={filterTimeSpan}
+                  onTimeSpanChange={setFilterTimeSpan}
+                  sessions={timeFilteredTimeEntries}
+                  project={project}
+                  isProcessingPayout={false}
+                  onSelectAll={selectAllTimeEntries}
+                  handleSessionPayoutClick={handleSessionPayoutClick}
+                />
+              </Collapse>
+              <Collapse in={payoutOpened}>
+                <Group>
+                  {project.hourly_payment ? (
+                    <HourlyPayoutCard
+                      project={{
+                        ...project,
+                        timeEntries: projectTimeEntries,
+                      }}
+                      handlePayoutClick={handleSessionPayoutClick}
+                      isProcessing={false}
+                    />
+                  ) : (
+                    <ProjectPayoutCard project={project} />
+                  )}
+                </Group>
+              </Collapse>
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <Collapse in={selectedModeActive}>
+                <SessionSelector
+                  selectedSessions={selectedTimeEntryIds}
+                  timeFilteredSessions={timeFilteredTimeEntries}
+                  toggleAllSessions={toggleAllTimeEntries}
+                  handleSessionPayoutClick={handleSessionPayoutClick}
+                />
+              </Collapse>
+            </Grid.Col>
+            <PayoutConversionModal
+              opened={payoutConversionOpened}
+              handleClose={closePayoutConversion}
+              startValue={payoutConvertionStartValues.value}
+              startCurrency={project.currency}
+              onSubmit={(values) =>
+                handleSessionPayout(
+                  payoutConvertionStartValues.timeEntries,
+                  values.endCurrency,
+                  values.endValue
+                )
+              }
+              isProcessing={false}
+            />
+          </Grid>
+        </Stack>
+        {projectTimeEntries.length > 0 ? (
+          <Box w="100%" style={{ overflow: "hidden" }}>
+            {/* Session Hierarchy */}
+            {timeFilteredTimeEntries.length > 0 ? (
+              <SessionHierarchy
+                selectedModeActive={selectedModeActive}
+                groupedSessions={groupSessions(
+                  timeFilteredTimeEntries.sort(
+                    (a, b) =>
+                      new Date(b.start_time).getTime() -
+                      new Date(a.start_time).getTime()
+                  ),
+                  locale
+                )}
+                selectedSessions={selectedTimeEntryIds}
+                onSessionToggle={toggleTimeEntrySelection}
+                onGroupToggle={toggleGroupSelection}
+                selectableIdSet={
+                  new Set(
+                    timeFilteredTimeEntries
+                      .filter((timeEntry) => !timeEntry.single_cash_flow_id)
+                      .map((timeEntry) => timeEntry.id)
                   )
                 }
-                isProcessing={false}
+                project={project}
+                isOverview={false}
               />
-            </Grid>
-          </Stack>
-          {projectTimeEntries.length > 0 ? (
-            <Box w="100%" style={{ overflow: "hidden" }}>
-              {/* Session Hierarchy */}
-              {timeFilteredTimeEntries.length > 0 ? (
-                <SessionHierarchy
-                  selectedModeActive={selectedModeActive}
-                  groupedSessions={groupSessions(
-                    timeFilteredTimeEntries.sort(
-                      (a, b) =>
-                        new Date(b.start_time).getTime() -
-                        new Date(a.start_time).getTime()
-                    ),
-                    locale
-                  )}
-                  selectedSessions={selectedTimeEntryIds}
-                  onSessionToggle={toggleTimeEntrySelection}
-                  onGroupToggle={toggleGroupSelection}
-                  selectableIdSet={
-                    new Set(
-                      timeFilteredTimeEntries
-                        .filter((timeEntry) => !timeEntry.single_cash_flow_id)
-                        .map((timeEntry) => timeEntry.id)
-                    )
-                  }
-                  project={project}
-                  isOverview={false}
-                />
-              ) : (
-                <Text size="lg" c="gray" ta="center">
-                  {getLocalizedText(
-                    "Keine Sitzungen im ausgewählten Zeitraum",
-                    "No time entries in the time period"
-                  )}
-                </Text>
-              )}
-            </Box>
-          ) : (
-            <Text size="lg" c="gray" ta="center" mt="xl">
-              {getLocalizedText(
-                "Füge eine Sitzung hinzu, um sie hier zu sehen",
-                "Add a time entry to see it here"
-              )}
-            </Text>
-          )}
-          <EditProjectDrawer
-            opened={editProjectOpened}
-            onClose={() => setEditProjectOpened(false)}
-          />
-        </Collapse>
-        <Collapse in={analysisOpened} w="100%">
-          <WorkAnalysis
-            sessions={projectTimeEntries}
-            isOverview={false}
-            project={project}
-            onClose={() => setAnalysisOpened(false)}
-          />
-        </Collapse>
-      </Stack>
-    </ScrollArea>
+            ) : (
+              <Text size="lg" c="gray" ta="center">
+                {getLocalizedText(
+                  "Keine Sitzungen im ausgewählten Zeitraum",
+                  "No time entries in the time period"
+                )}
+              </Text>
+            )}
+          </Box>
+        ) : (
+          <Text size="lg" c="gray" ta="center" mt="xl">
+            {getLocalizedText(
+              "Füge eine Sitzung hinzu, um sie hier zu sehen",
+              "Add a time entry to see it here"
+            )}
+          </Text>
+        )}
+        <EditProjectDrawer
+          opened={editProjectOpened}
+          onClose={() => setEditProjectOpened(false)}
+        />
+      </Collapse>
+      <Collapse in={analysisOpened} w="100%">
+        <WorkAnalysis
+          sessions={projectTimeEntries}
+          isOverview={false}
+          project={project}
+          onClose={() => setAnalysisOpened(false)}
+        />
+      </Collapse>
+    </Stack>
   );
 }

@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -30,20 +28,6 @@ export default function WorkInitializer() {
     <Container size="md" py="xl">
       <Paper shadow="md" p="xl" radius="lg" withBorder>
         <Stack gap="xl">
-          <Stack align="center" gap="md">
-            <ThemeIcon
-              size={80}
-              radius="xl"
-              variant="gradient"
-              gradient={{ from: "blue", to: "cyan" }}
-            >
-              <IconBriefcase size={40} />
-            </ThemeIcon>
-            <Title order={2} ta="center" fw={700}>
-              {getLocalizedText("Projekt-Management", "Project Management")}
-            </Title>
-          </Stack>
-
           <Stack gap="md">
             <Text size="lg" ta="center" c="dimmed" fw={500}>
               {getLocalizedText(
@@ -91,9 +75,7 @@ export default function WorkInitializer() {
           <Modal
             opened={opened}
             onClose={close}
-            title={
-              getLocalizedText("Arbeits-Einstellungen", "Work Settings")
-            }
+            title={getLocalizedText("Arbeits-Einstellungen", "Work Settings")}
           >
             <FinanceCategoryForm
               onClose={close}

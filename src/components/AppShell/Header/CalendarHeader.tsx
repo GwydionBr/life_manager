@@ -30,7 +30,7 @@ import { useMemo } from "react";
 const zoomLabels = ["1 h", "30 min", "15 min", "10 min", "5 min"];
 
 export default function CalendarHeader() {
-  const { locale, getLocalizedText } = useIntl();
+  const { getLocalizedText } = useIntl();
   const { calendarColor, primaryColor } = useSettingsStore();
   const {
     viewMode,
