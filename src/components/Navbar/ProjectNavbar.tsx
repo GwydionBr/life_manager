@@ -50,7 +50,13 @@ export default function ProjectNavbar() {
   useHotkeys([["mod + J", () => toggleWorkNavbar()]]);
 
   return (
-    <Card miw={isWorkNavbarOpen ? 250 : 60} withBorder radius="lg" p={0} mt="xs">
+    <Card
+      miw={isWorkNavbarOpen ? 250 : 60}
+      withBorder
+      radius="lg"
+      p={0}
+      mt="sm"
+    >
       <Group className={classes.title} align="center" justify="space-between">
         <Transition
           mounted={!isWorkNavbarOpen}

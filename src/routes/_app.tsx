@@ -22,7 +22,8 @@ export const Route = createFileRoute("/_app")({
 
 function AppLayout() {
   const { data: profile, isReady } = useProfile();
-  if (isReady && (!profile || !profile.initialized)) {
+
+  if (isReady && profile && !profile.initialized) {
     return <Navigate to="/new-user" />;
   }
 

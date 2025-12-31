@@ -1,6 +1,8 @@
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useIntl } from "@/hooks/useIntl";
 import { useRouter } from "@tanstack/react-router";
+import { useMemo } from "react";
+import { useForm } from "@mantine/form";
 import {
   profileCollection,
   useOtherProfiles,
@@ -33,28 +35,26 @@ import {
   IconClock,
   IconSparkles,
 } from "@tabler/icons-react";
-import { useForm } from "@mantine/form";
-import { Locale } from "@/types/settings.types";
 import ReactCountryFlag from "react-country-flag";
+
 import { locales } from "@/constants/settings";
 import { getGradientForColor, mantineColors } from "@/constants/colors";
+
+import { Locale } from "@/types/settings.types";
 
 export default function InitializeProfile() {
   const router = useRouter();
   const { data: otherProfiles } = useOtherProfiles();
   const { data: profile } = useProfile();
-  // const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile({
-  //   onSuccess: () => {
-  //     router.invalidate();
-  //     router.navigate({ to: "/dashboard" });
-  //   },
-  // });
 
   const { locale, format_24h, setSettingState, primaryColor, setPrimaryColor } =
     useSettingsStore();
   const { getLocalizedText } = useIntl();
 
-  const currentLocale = locales.find((l) => l.value === locale);
+  const currentLocale = useMemo(
+    () => locales.find((l) => l.value === locale),
+    [locale]
+  );
 
   const form = useForm({
     initialValues: {
@@ -180,6 +180,7 @@ export default function InitializeProfile() {
             </Group>
             <Progress
               value={progressPercentage}
+              transitionDuration={500}
               color={primaryColor}
               size="md"
               radius="xl"

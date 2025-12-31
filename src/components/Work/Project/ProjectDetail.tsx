@@ -1,6 +1,6 @@
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { useWorkTimeEntries } from "@/db/collections/work/work-time-entry/use-work-time-entry-query";
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useProjectFiltering } from "@/hooks/useProjectFiltering";
 import { useIntl } from "@/hooks/useIntl";
@@ -16,7 +16,6 @@ import {
   Text,
   Grid,
   ActionIcon,
-  ScrollArea,
   Card,
 } from "@mantine/core";
 import EditProjectDrawer from "@/components/Work/Project/EditProjectDrawer";
@@ -44,6 +43,8 @@ import { Currency } from "@/types/settings.types";
 const route = getRouteApi("/_app/work");
 
 export default function WorkProjectDetailsPage() {
+  const { locale, getLocalizedText } = useIntl();
+
   const { projectId } = route.useSearch();
   const {
     setAnalysisOpened,
@@ -57,6 +58,8 @@ export default function WorkProjectDetailsPage() {
   const { data: timeEntriesData, isLoading: isTimeEntriesLoading } =
     useWorkTimeEntries();
 
+  const isLoading = isProjectsLoading || isTimeEntriesLoading;
+    
   const projectTimeEntries = useMemo(() => {
     return timeEntriesData?.filter(
       (timeEntry) => timeEntry.project_id === projectId
@@ -79,7 +82,6 @@ export default function WorkProjectDetailsPage() {
   //   },
   // });
 
-  const { locale, getLocalizedText } = useIntl();
 
   // State for filter time span
   const [filterTimeSpan, setFilterTimeSpan] = useState<

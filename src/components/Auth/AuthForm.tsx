@@ -47,12 +47,14 @@ export default function AuthenticationForm({
     try {
       if (type === "login") {
         await connector.login(values.email, values.password);
-        router.invalidate();
-        router.navigate({ to: "/dashboard" });
+        router.invalidate().then(() => {
+          router.navigate({ to: "/dashboard" });
+        });
       } else {
         await connector.register(values.email, values.password);
-        router.invalidate();
-        router.navigate({ to: "/new-user" });
+        router.invalidate().then(() => {
+          router.navigate({ to: "/new-user" });
+        });
       }
     } catch (error) {
       console.error(error);

@@ -61,7 +61,7 @@ function RouteComponent() {
   return (
     <Group h="100%" wrap="nowrap" mx="xs" align="flex-start">
       <ProjectNavbar />
-      <ScrollArea h="calc(100vh - 60px)" type="scroll">
+      <ScrollArea h="calc(100vh - 60px)" type="scroll" w="100%">
         <Box style={{ transition: "margin 0.4s ease-in-out" }} w="100%">
           {workProjects && workProjects.length === 0 && !isLoading ? (
             <WorkInitializer />

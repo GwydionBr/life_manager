@@ -128,13 +128,8 @@ export default function WorkHeader() {
               justify="center"
               style={{ flex: 1, minWidth: 0 }}
             >
-              <ThemeIcon
-                size="xl"
-                variant="light"
-                bg={backgroundColor}
-                radius="lg"
-              >
-                <IconBriefcase />
+              <ThemeIcon size="xl" bg={backgroundColor} radius="lg">
+                <IconBriefcase color="var(--mantine-color-text)" />
               </ThemeIcon>
               <Text fz={35} fw={700}>
                 {getLocalizedText("Projekt-Management", "Project Management")}
