@@ -17,6 +17,7 @@ import {
   Grid,
   ActionIcon,
   Card,
+  Popover,
 } from "@mantine/core";
 import EditProjectDrawer from "@/components/Work/Project/EditProjectDrawer";
 import Header from "@/components/Header/Header";
@@ -59,7 +60,7 @@ export default function WorkProjectDetailsPage() {
     useWorkTimeEntries();
 
   const isLoading = isProjectsLoading || isTimeEntriesLoading;
-    
+
   const projectTimeEntries = useMemo(() => {
     return timeEntriesData?.filter(
       (timeEntry) => timeEntry.project_id === projectId
@@ -81,7 +82,6 @@ export default function WorkProjectDetailsPage() {
   //     deactivateSelectedMode();
   //   },
   // });
-
 
   // State for filter time span
   const [filterTimeSpan, setFilterTimeSpan] = useState<
@@ -294,21 +294,70 @@ export default function WorkProjectDetailsPage() {
           <Card withBorder radius="md" p={0}>
             <Group justify="space-between" p={5}>
               <Group>
-                <FilterActionIcon
-                  disabled={timeFilteredTimeEntries.length === 0}
-                  onClick={handleFilterToggle}
-                  tooltipLabel={getLocalizedText("Filter", "Filter")}
-                  activeFilter={
-                    filterTimeSpan[0] && filterTimeSpan[1] ? true : false
-                  }
+                <Popover
                   opened={filterOpened}
-                />
-                <PayoutActionIcon
-                  onClick={handlePayoutToggle}
-                  tooltipLabel={getLocalizedText("Auszahlung", "Payout")}
-                  disabled={!isPayoutAvailable}
+                  onClose={closeFilter}
+                  onOpen={openFilter}
+                  transitionProps={{ transition: "fade-down", duration: 300 }}
+                  position="bottom-start"
+                  trapFocus 
+                  returnFocus
+                >
+                  <Popover.Target>
+                    <FilterActionIcon
+                      disabled={timeFilteredTimeEntries.length === 0}
+                      onClick={handleFilterToggle}
+                      tooltipLabel={getLocalizedText("Filter", "Filter")}
+                      activeFilter={
+                        filterTimeSpan[0] && filterTimeSpan[1] ? true : false
+                      }
+                      opened={filterOpened}
+                    />
+                  </Popover.Target>
+                  <Popover.Dropdown p={0}>
+                    <ProjectFilter
+                      timeSpan={filterTimeSpan}
+                      onTimeSpanChange={setFilterTimeSpan}
+                      sessions={timeFilteredTimeEntries}
+                      project={project}
+                      isProcessingPayout={false}
+                      onSelectAll={selectAllTimeEntries}
+                      handleSessionPayoutClick={handleSessionPayoutClick}
+                    />
+                  </Popover.Dropdown>
+                </Popover>
+                <Popover
                   opened={payoutOpened}
-                />
+                  onClose={closePayout}
+                  onOpen={openPayout}
+                  transitionProps={{ transition: "fade-down", duration: 300 }}
+                  position="bottom-start"
+                  trapFocus
+                  returnFocus
+                >
+                  <Popover.Target>
+                    <PayoutActionIcon
+                      onClick={handlePayoutToggle}
+                      tooltipLabel={getLocalizedText("Auszahlung", "Payout")}
+                      disabled={!isPayoutAvailable}
+                      opened={payoutOpened}
+                    />
+                  </Popover.Target>
+                  <Popover.Dropdown p={0}>
+                    {project.hourly_payment ? (
+                      <HourlyPayoutCard
+                        project={{
+                          ...project,
+                          timeEntries: projectTimeEntries,
+                        }}
+                        handlePayoutClick={handleSessionPayoutClick}
+                        isProcessing={false}
+                      />
+                    ) : (
+                      <ProjectPayoutCard project={project} />
+                    )}
+                  </Popover.Dropdown>
+                </Popover>
               </Group>
               <DelayedTooltip
                 label={getLocalizedText("Sitzung hinzufügen", "Add Session")}
@@ -326,81 +375,63 @@ export default function WorkProjectDetailsPage() {
                 onClose={closeSessionForm}
                 project={project}
               />
-              <SelectActionIcon
-                disabled={selectableSessions.length === 0}
-                onClick={handleSelectionToggle}
-                tooltipLabel={
-                  selectedModeActive
-                    ? getLocalizedText(
-                        "Auswahlmodus deaktivieren",
-                        "Deactivate selection mode"
-                      )
-                    : getLocalizedText(
-                        "Auswahlmodus aktivieren",
-                        "Activate selection mode"
-                      )
-                }
-                size="md"
-                selected={selectedModeActive}
-                mainControl={true}
-              />
+              <Popover
+                opened={selectedModeActive}
+                onClose={deactivateSelectedMode}
+                onOpen={activateSelectedMode}
+                transitionProps={{ transition: "fade-down", duration: 300 }}
+                position="bottom-end"
+                trapFocus
+                returnFocus
+              >
+                <Popover.Target>
+                  <SelectActionIcon
+                    disabled={selectableSessions.length === 0}
+                    onClick={handleSelectionToggle}
+                    tooltipLabel={
+                      selectedModeActive
+                        ? getLocalizedText(
+                            "Auswahlmodus deaktivieren",
+                            "Deactivate selection mode"
+                          )
+                        : getLocalizedText(
+                            "Auswahlmodus aktivieren",
+                            "Activate selection mode"
+                          )
+                    }
+                    size="md"
+                    selected={selectedModeActive}
+                    mainControl={true}
+                  />
+                </Popover.Target>
+                <Popover.Dropdown p={0}>
+                  <Collapse in={selectedModeActive}>
+                    <SessionSelector
+                      selectedSessions={selectedTimeEntryIds}
+                      timeFilteredSessions={timeFilteredTimeEntries}
+                      toggleAllSessions={toggleAllTimeEntries}
+                      handleSessionPayoutClick={handleSessionPayoutClick}
+                    />
+                  </Collapse>
+                </Popover.Dropdown>
+              </Popover>
             </Group>
           </Card>
-          <Grid>
-            <Grid.Col span={6}>
-              <Collapse in={filterOpened}>
-                <ProjectFilter
-                  timeSpan={filterTimeSpan}
-                  onTimeSpanChange={setFilterTimeSpan}
-                  sessions={timeFilteredTimeEntries}
-                  project={project}
-                  isProcessingPayout={false}
-                  onSelectAll={selectAllTimeEntries}
-                  handleSessionPayoutClick={handleSessionPayoutClick}
-                />
-              </Collapse>
-              <Collapse in={payoutOpened}>
-                <Group>
-                  {project.hourly_payment ? (
-                    <HourlyPayoutCard
-                      project={{
-                        ...project,
-                        timeEntries: projectTimeEntries,
-                      }}
-                      handlePayoutClick={handleSessionPayoutClick}
-                      isProcessing={false}
-                    />
-                  ) : (
-                    <ProjectPayoutCard project={project} />
-                  )}
-                </Group>
-              </Collapse>
-            </Grid.Col>
-            <Grid.Col span={6}>
-              <Collapse in={selectedModeActive}>
-                <SessionSelector
-                  selectedSessions={selectedTimeEntryIds}
-                  timeFilteredSessions={timeFilteredTimeEntries}
-                  toggleAllSessions={toggleAllTimeEntries}
-                  handleSessionPayoutClick={handleSessionPayoutClick}
-                />
-              </Collapse>
-            </Grid.Col>
-            <PayoutConversionModal
-              opened={payoutConversionOpened}
-              handleClose={closePayoutConversion}
-              startValue={payoutConvertionStartValues.value}
-              startCurrency={project.currency}
-              onSubmit={(values) =>
-                handleSessionPayout(
-                  payoutConvertionStartValues.timeEntries,
-                  values.endCurrency,
-                  values.endValue
-                )
-              }
-              isProcessing={false}
-            />
-          </Grid>
+
+          <PayoutConversionModal
+            opened={payoutConversionOpened}
+            handleClose={closePayoutConversion}
+            startValue={payoutConvertionStartValues.value}
+            startCurrency={project.currency}
+            onSubmit={(values) =>
+              handleSessionPayout(
+                payoutConvertionStartValues.timeEntries,
+                values.endCurrency,
+                values.endValue
+              )
+            }
+            isProcessing={false}
+          />
         </Stack>
         {projectTimeEntries.length > 0 ? (
           <Box w="100%" style={{ overflow: "hidden" }}>

@@ -51,7 +51,7 @@ export default function ProjectNavbar() {
 
   return (
     <Card
-      miw={isWorkNavbarOpen ? 250 : 60}
+      miw={isWorkNavbarOpen ? 270 : 60}
       withBorder
       radius="lg"
       p={0}

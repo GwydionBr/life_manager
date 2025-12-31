@@ -34,7 +34,7 @@ export default function HourlyPayoutCard({
   const allTimeTimeEntries = project.timeEntries;
 
   return (
-    <Card withBorder radius="md" mb="md" p="md" shadow="md" w="100%" maw={400}>
+    <Card withBorder radius="md" p="md" shadow="md" w="100%" maw={400}>
       <Card.Section>
         <Group p="md" gap="md">
           <IconCashBanknotePlus />
