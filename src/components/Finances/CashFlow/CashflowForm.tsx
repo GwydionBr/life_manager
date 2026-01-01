@@ -62,34 +62,32 @@ export default function FinanceForm({
   //   useFinanceCategoriesQuery();
   // const { mutate: addSingleCashFlow, isPending: isAddingSingleCashFlow } =
   //   useAddSingleCashflowMutation({ onSuccess: () => onClose() });
+  const { addSingleCashflow } = useSingleCashflowMutations();
+  const { addRecurringCashflow } = useRecurringCashflowMutations();
 
   async function handleSingleFinanceSubmit(values: SingleFinanceFormValues) {
-    // TODO: Implement add single cashflow
-    // addSingleCashFlow({
-    //   cashflow: {
-    //     ...values,
-    //     date: values.date.toISOString(),
-    //     categories: categories.map((category) => ({
-    //       finance_category: category,
-    //     })),
-    //   },
-    // });
+    addSingleCashflow({
+      ...values,
+      date: values.date.toISOString(),
+      categories: categories.map((category) => ({
+        finance_category: category,
+      })),
+    });
+    onClose();
   }
 
   async function handleRecurringFinanceSubmit(
     values: RecurringFinanceFormValues
   ) {
-    // TODO: Implement add recurring cashflow
-    // addRecurringCashFlow({
-    //   cashflow: {
-    //     ...values,
-    //     end_date: values.end_date?.toISOString(),
-    //     start_date: values.start_date.toISOString(),
-    //     categories: categories.map((category) => ({
-    //       finance_category: category,
-    //     })),
-    //   },
-    // });
+    addRecurringCashflow({
+      ...values,
+      end_date: values.end_date?.toISOString(),
+      start_date: values.start_date.toISOString(),
+      categories: categories.map((category) => ({
+        finance_category: category,
+      })),
+    });
+    onClose();
   }
 
   return (
@@ -190,7 +188,7 @@ export default function FinanceForm({
           financeCurrency={settings?.default_finance_currency || "USD"}
           handleSubmit={handleSingleFinanceSubmit}
           isLoading={false}
-        />  
+        />
       )}
       <CancelButton onClick={onClose} />
     </Stack>

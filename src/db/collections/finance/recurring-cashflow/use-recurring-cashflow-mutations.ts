@@ -12,8 +12,11 @@ import {
   syncRecurringCashflowCategories,
   getRecurringCashflowWithCategories,
 } from "./recurring-cashflow-mutations";
-import { RecurringCashFlow } from "@/types/finance.types";
-import { Tables, TablesUpdate } from "@/types/db.types";
+import {
+  InsertRecurringCashFlow,
+  RecurringCashFlow,
+} from "@/types/finance.types";
+import { TablesUpdate } from "@/types/db.types";
 
 /**
  * Hook for Recurring Cashflow operations with automatic notifications.
@@ -32,11 +35,7 @@ export const useRecurringCashflowMutations = () => {
    */
   const handleAddRecurringCashflow = useCallback(
     async (
-      newRecurringCashflow: Omit<
-        Tables<"recurring_cash_flow">,
-        "id" | "created_at" | "user_id"
-      > & { id?: string },
-      categoryIds?: string[]
+      newRecurringCashflow: InsertRecurringCashFlow
     ): Promise<RecurringCashFlow | undefined> => {
       if (!profile?.id) {
         showActionErrorNotification(
@@ -62,10 +61,15 @@ export const useRecurringCashflowMutations = () => {
         }
 
         // Sync categories if provided
-        if (categoryIds && categoryIds.length > 0) {
+        if (
+          newRecurringCashflow.categories &&
+          newRecurringCashflow.categories.length > 0
+        ) {
           await syncRecurringCashflowCategories(
             cashflowId,
-            categoryIds,
+            newRecurringCashflow.categories.map(
+              (category) => category.finance_category.id
+            ),
             profile.id
           );
         }

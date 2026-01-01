@@ -12,7 +12,7 @@ import {
   syncSingleCashflowCategories,
   getSingleCashflowWithCategories,
 } from "./single-cashflow-mutations";
-import { SingleCashFlow } from "@/types/finance.types";
+import { InsertSingleCashFlow, SingleCashFlow } from "@/types/finance.types";
 import { Tables, TablesUpdate } from "@/types/db.types";
 
 /**
@@ -32,11 +32,7 @@ export const useSingleCashflowMutations = () => {
    */
   const handleAddSingleCashflow = useCallback(
     async (
-      newSingleCashflow: Omit<
-        Tables<"single_cash_flow">,
-        "id" | "created_at" | "user_id"
-      > & { id?: string },
-      categoryIds?: string[]
+      newSingleCashflow: InsertSingleCashFlow
     ): Promise<SingleCashFlow | undefined> => {
       if (!profile?.id) {
         showActionErrorNotification(
@@ -62,10 +58,15 @@ export const useSingleCashflowMutations = () => {
         }
 
         // Sync categories if provided
-        if (categoryIds && categoryIds.length > 0) {
+        if (
+          newSingleCashflow.categories &&
+          newSingleCashflow.categories.length > 0
+        ) {
           await syncSingleCashflowCategories(
             cashflowId,
-            categoryIds,
+            newSingleCashflow.categories.map(
+              (category) => category.finance_category.id
+            ),
             profile.id
           );
         }

@@ -4,7 +4,7 @@ import {
   recurringCashflowCategoriesCollection,
 } from "./recurring-cashflow-collection";
 import { RecurringCashFlow } from "@/types/finance.types";
-import { Tables, TablesUpdate } from "@/types/db.types";
+import { Tables, TablesInsert, TablesUpdate } from "@/types/db.types";
 
 /**
  * Adds a new Recurring Cashflow.
@@ -15,14 +15,18 @@ import { Tables, TablesUpdate } from "@/types/db.types";
  * @returns Transaction object with isPersisted promise
  */
 export const addRecurringCashflow = (
-  newRecurringCashflow: Omit<
-    Tables<"recurring_cash_flow">,
-    "id" | "created_at" | "user_id"
-  > & { id?: string },
+  newRecurringCashflow: Omit<TablesInsert<"recurring_cash_flow">, "categories">,
   userId: string
 ) => {
   const transaction = recurringCashflowsCollection.insert({
     ...newRecurringCashflow,
+    currency: newRecurringCashflow.currency || "EUR",
+    start_date: newRecurringCashflow.start_date || new Date().toISOString(),
+    end_date: newRecurringCashflow.end_date || null,
+    finance_client_id: newRecurringCashflow.finance_client_id || null,
+    interval: newRecurringCashflow.interval || "month",
+    title: newRecurringCashflow.title || "",
+    description: newRecurringCashflow.description || "",
     id: newRecurringCashflow.id || crypto.randomUUID(),
     created_at: new Date().toISOString(),
     user_id: userId,

@@ -4,7 +4,7 @@ import {
   singleCashflowCategoriesCollection,
 } from "./single-cashflow-collection";
 import { SingleCashFlow } from "@/types/finance.types";
-import { Tables, TablesUpdate } from "@/types/db.types";
+import { Tables, TablesInsert, TablesUpdate } from "@/types/db.types";
 
 /**
  * Adds a new Single Cashflow.
@@ -15,16 +15,22 @@ import { Tables, TablesUpdate } from "@/types/db.types";
  * @returns Transaction object with isPersisted promise
  */
 export const addSingleCashflow = (
-  newSingleCashflow: Omit<
-    Tables<"single_cash_flow">,
-    "id" | "created_at" | "user_id"
-  > & { id?: string },
+  newSingleCashflow: Omit<TablesInsert<"single_cash_flow">, "categories">,
   userId: string
 ) => {
   const transaction = singleCashflowsCollection.insert({
     ...newSingleCashflow,
     id: newSingleCashflow.id || crypto.randomUUID(),
     created_at: new Date().toISOString(),
+    title: newSingleCashflow.title || "",
+    currency: newSingleCashflow.currency || "EUR",
+    date: newSingleCashflow.date || new Date().toISOString(),
+    finance_client_id: newSingleCashflow.finance_client_id || null,
+    finance_project_id: newSingleCashflow.finance_project_id || null,
+    recurring_cash_flow_id: newSingleCashflow.recurring_cash_flow_id || null,
+    is_active: newSingleCashflow.is_active || true,
+    payout_id: newSingleCashflow.payout_id || null,
+    changed_date: newSingleCashflow.changed_date || null,
     user_id: userId,
   });
 
