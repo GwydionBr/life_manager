@@ -5,6 +5,7 @@ import FinanceProjectTab from "@/components/Finances/Project/FinanceProjectsTab"
 import { FinanceTab } from "@/types/finance.types";
 import FinanceSingleTab from "./CashFlow/Single/FinanceSingleTab";
 import FinanceRecurringTab from "./CashFlow/Recurring/FinanceRecurringTab";
+import FinancePayoutTab from "./Payout/PayoutTab/PayoutTab";
 
 export default function FinanceTabs() {
   const { activeTab } = useFinanceStore();
@@ -18,6 +19,7 @@ export default function FinanceTabs() {
       return <FinanceSingleTab />;
     case FinanceTab.Recurring:
       return <FinanceRecurringTab />;
-
+    case FinanceTab.Payout:
+      return <FinancePayoutTab />;
   }
 }
