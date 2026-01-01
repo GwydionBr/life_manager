@@ -1,0 +1,42 @@
+.financeSection {
+  display: flex;
+  flex-direction: column;
+  height: 47vh;
+  width: 100%;
+  /* border: 1px solid red; */
+}
+
+.financeSectionContent {
+  display: flex;
+  padding: 1rem 0.5rem;
+  width: 100%;
+  flex-direction: column;
+}
+
+.cashFlowBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: 1px solid var(--mantine-color-dark-5);
+  border-radius: var(--mantine-radius-md);
+  box-shadow: var(--mantine-shadow-sm);
+
+  @mixin dark {
+    border: 1px solid var(--mantine-color-gray-5);
+  }
+
+  @mixin light {
+    border: 1px solid var(--mantine-color-dark-5);
+  }
+}
+
+.financeTab {
+  @mixin dark {
+    color: var(--mantine-color-gray-5);
+  }
+
+  @mixin light {
+    color: var(--mantine-color-dark-5);
+  }
+}
