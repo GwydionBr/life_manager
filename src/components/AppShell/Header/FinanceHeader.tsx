@@ -49,6 +49,7 @@ export default function FinanceHeader() {
         </Title>
       </Group>
       <Tabs
+        h="100%"
         defaultValue={activeTab}
         w="100%"
         value={activeTab}
@@ -56,11 +57,7 @@ export default function FinanceHeader() {
       >
         <Tabs.List
           grow
-          mb="xl"
-          pos="sticky"
-          top={0}
-          bg="light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-8))"
-          style={{ zIndex: 100 }}
+          h="100%"
         >
           <Tabs.Tab
             leftSection={<IconCashBanknote color="light-dark(blue, cyan)" />}
