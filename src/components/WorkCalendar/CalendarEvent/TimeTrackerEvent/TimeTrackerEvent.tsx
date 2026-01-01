@@ -22,6 +22,7 @@ export default function TimeTrackerEvent({
   const timer = getRunningTimer();
   const { locale, format_24h } = useIntl();
   const { data: projects, isLoading: isProjectsLoading } = useWorkProjects();
+  
   const project = useMemo(
     () => projects.find((p) => p.id === timer?.projectId),
     [projects, timer?.projectId]

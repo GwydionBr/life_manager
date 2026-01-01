@@ -8,14 +8,15 @@ import { Grid, Stack, Group, Box, Text } from "@mantine/core";
 import { DayColumn } from "@/components/WorkCalendar/DayColumn";
 import { TimeColumn } from "@/components/WorkCalendar/TimeColumn";
 import ColumnHeader from "@/components/WorkCalendar/Calendar/ColumnHeader";
-// import NewSessionModal from "@/components/Work/Session/NewSessionModal";
+import PrevActionIcon from "@/components/UI/ActionIcons/PrevActionIcon";
+import NextActionIcon from "@/components/UI/ActionIcons/NextActionIcon";
+import NewSessionModal from "@/components/Work/Session/NewSessionModal";
+
 import { clamp } from "@/components/WorkCalendar/calendarUtils";
 
 import { getStartOfDay } from "@/components/WorkCalendar/calendarUtils";
 
 import { CalendarDay } from "@/types/workCalendar.types";
-import PrevActionIcon from "@/components/UI/ActionIcons/PrevActionIcon";
-import NextActionIcon from "@/components/UI/ActionIcons/NextActionIcon";
 import { WorkProject } from "@/types/work.types";
 
 interface CalendarGridProps {
@@ -270,7 +271,7 @@ export default function CalendarGrid({
         </Group>
       </Stack>
 
-      {/* <NewSessionModal
+      <NewSessionModal
         opened={sessionFormModalOpened}
         onClose={() => {
           closeSessionFormModal();
@@ -309,7 +310,7 @@ export default function CalendarGrid({
               }
             : undefined
         }
-      /> */}
+      />
     </Box>
   );
 }
