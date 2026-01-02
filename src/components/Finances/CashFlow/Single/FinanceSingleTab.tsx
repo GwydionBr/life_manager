@@ -363,7 +363,7 @@ export default function FinanceSingleTab() {
           </FinancesNavbarDefaultCard>,
         ]}
       />
-      <ScrollArea mb="md" w="100%">
+      <ScrollArea mb="md" w="100%" h={`calc(100vh - 100px)`}>
         <Collapse
           transitionDuration={400}
           in={bulkSelectionActive && filteredSingleCashFlows.length > 0}
