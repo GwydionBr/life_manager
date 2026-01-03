@@ -60,6 +60,11 @@ export default function ProjectNavbar() {
       pos="fixed"
       top={60}
       left={75}
+      shadow="xl"
+      style={{
+        borderColor:
+          "light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-3))",
+      }}
     >
       <Group align="center" justify="space-between" p="md">
         <Transition

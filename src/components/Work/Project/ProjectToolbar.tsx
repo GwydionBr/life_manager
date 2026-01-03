@@ -166,7 +166,16 @@ export default function ProjectToolbar({
       maw={900}
       gap="xs"
     >
-      <Card withBorder radius="md" p={0}>
+      <Card
+        withBorder
+        radius="md"
+        p={0}
+        shadow="xl"
+        style={{
+          borderColor:
+            "light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-2))",
+        }}
+      >
         <Group justify="space-between" p={5}>
           <Group>
             <Popover
