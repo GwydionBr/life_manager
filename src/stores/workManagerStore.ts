@@ -44,7 +44,7 @@ const initialState: WorkStoreState = {
   lastActiveProjectId: null,
   analysisOpened: false,
   editProjectOpened: false,
-  isWorkNavbarOpen: false,
+  isWorkNavbarOpen: true,
   filterOpened: false,
   payoutOpened: false,
   payoutConversionOpened: false,
