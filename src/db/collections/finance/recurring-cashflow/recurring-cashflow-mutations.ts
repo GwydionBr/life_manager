@@ -10,7 +10,6 @@ import {
   RecurringCashFlow,
   UpdateRecurringCashFlow,
 } from "@/types/finance.types";
-import { Tables, TablesUpdate } from "@/types/db.types";
 
 /**
  * Adds a new Recurring Cashflow.

@@ -5,6 +5,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { useProjectFiltering } from "@/hooks/useProjectFiltering";
 import { useIntl } from "@/hooks/useIntl";
 import { useWorkStore } from "@/stores/workManagerStore";
+import { usePayoutMutations } from "@/db/collections/finance/payout/use-payout-mutations";
 import { getRouteApi } from "@tanstack/react-router";
 
 import {
@@ -44,7 +45,7 @@ const route = getRouteApi("/_app/work");
 
 export default function WorkProjectDetailsPage() {
   const { locale, getLocalizedText } = useIntl();
-
+  const { addHourlyPayout } = usePayoutMutations();
   const { projectId } = route.useSearch();
   const {
     setAnalysisOpened,
@@ -53,12 +54,8 @@ export default function WorkProjectDetailsPage() {
     editProjectOpened,
   } = useWorkStore();
 
-  const { data: projects, isLoading: isProjectsLoading } = useWorkProjects();
-
-  const { data: timeEntriesData, isLoading: isTimeEntriesLoading } =
-    useWorkTimeEntries();
-
-  const isLoading = isProjectsLoading || isTimeEntriesLoading;
+  const { data: projects } = useWorkProjects();
+  const { data: timeEntriesData } = useWorkTimeEntries();
 
   const projectTimeEntries = useMemo(() => {
     return timeEntriesData?.filter(
@@ -251,15 +248,8 @@ export default function WorkProjectDetailsPage() {
   ) => {
     if (!project) return;
     const title = `${getLocalizedText("Auszahlung", "Payout")} (${project.title}) ${formatDate(new Date(), locale)}`;
-    // TODO: Implement payout
-    // payoutHourlyTimerProjectMutation({
-    //   project,
-    //   title,
-    //   timeEntries,
-    //   endCurrency,
-    //   endValue,
-    // });
-    console.log("creating payout");
+
+    addHourlyPayout(project, title, timeEntries, endCurrency, endValue);
   };
 
   const selectableSessions = timeFilteredTimeEntries.filter(
@@ -299,7 +289,7 @@ export default function WorkProjectDetailsPage() {
                   onOpen={openFilter}
                   transitionProps={{ transition: "fade-down", duration: 300 }}
                   position="bottom-start"
-                  trapFocus 
+                  trapFocus
                   returnFocus
                 >
                   <Popover.Target>
@@ -422,13 +412,14 @@ export default function WorkProjectDetailsPage() {
             handleClose={closePayoutConversion}
             startValue={payoutConvertionStartValues.value}
             startCurrency={project.currency}
-            onSubmit={(values) =>
+            onSubmit={(values) => {
               handleSessionPayout(
                 payoutConvertionStartValues.timeEntries,
                 values.endCurrency,
                 values.endValue
-              )
-            }
+              );
+              closePayoutConversion();
+            }}
             isProcessing={false}
           />
         </Stack>

@@ -1,5 +1,8 @@
 import { workTimeEntriesCollection } from "@/db/collections/work/work-time-entry/work-time-entry-collection";
+import { db } from "@/db/powersync/db";
 import { UpdateWorkTimeEntry, WorkTimeEntry } from "@/types/work.types";
+import { PowerSyncTransactor } from "@tanstack/powersync-db-collection";
+import { createTransaction } from "@tanstack/react-db";
 
 /**
  * Adds a new Work Time Entry.
@@ -23,13 +26,30 @@ export const addWorkTimeEntry = (
  * @param item - The item to update
  * @returns Transaction object with isPersisted promise
  */
-export const updateWorkTimeEntry = (
+export const updateWorkTimeEntry = async (
   id: string | string[],
   item: UpdateWorkTimeEntry
 ) => {
-  return workTimeEntriesCollection.update(id, (draft) => {
-    Object.assign(draft, item);
+  const ids = Array.isArray(id) ? id : [id];
+  const transaction = createTransaction({
+    autoCommit: false,
+    mutationFn: async ({ transaction }) => {
+      // Use PowerSyncTransactor to apply the transaction to PowerSync
+      await new PowerSyncTransactor({ database: db }).applyTransaction(
+        transaction
+      );
+    },
   });
+  transaction.mutate(() =>
+    ids.forEach((id) => {
+      workTimeEntriesCollection.update(id, (draft) => {
+        Object.assign(draft, item);
+      });
+    })
+  );
+  await transaction.commit();
+  const promise = await transaction.isPersisted.promise;
+  return promise;
 };
 
 /**
