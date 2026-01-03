@@ -1,5 +1,9 @@
 .card {
   cursor: pointer;
+  padding: var(--mantine-spacing-xs);
+  box-shadow: var(--mantine-shadow-xs);
+  border-radius: var(--mantine-radius-md);
+  max-width: 900px;
   background-color: light-dark(
     var(--mantine-color-white),
     var(--mantine-color-dark-6)

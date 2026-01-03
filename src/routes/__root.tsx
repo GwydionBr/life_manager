@@ -20,7 +20,6 @@ import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
 import { DatesProvider } from "@mantine/dates";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient } from "@tanstack/react-query";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/NotFound";
@@ -145,7 +144,6 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
             {children}
           </DatesProvider>
         </MantineProvider>
-        <ReactQueryDevtools />
         <TanStackRouterDevtools position="bottom-right" />
         <Scripts />
       </body>

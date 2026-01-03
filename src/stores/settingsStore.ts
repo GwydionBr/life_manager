@@ -14,7 +14,6 @@ export enum SettingsTab {
 interface SettingsState extends Settings {
   isModalOpen: boolean;
   selectedTab: SettingsTab;
-  isWorkNavbarOpen: boolean;
   isFinanceNavbarOpen: boolean;
   primaryColor: MantineColor;
   workColor: MantineColor;
@@ -27,7 +26,6 @@ interface SettingsState extends Settings {
 interface SettingsActions {
   setSelectedTab: (tab: SettingsTab) => void;
   setIsModalOpen: (isModalOpen: boolean) => void;
-  toggleWorkNavbar: () => void; 
   toggleFinanceNavbar: () => void;
   setPrimaryColor: (color: MantineColor) => void;
   setWorkColor: (color: MantineColor) => void;
@@ -43,7 +41,6 @@ const initialState: SettingsState = {
   id: "",
   isModalOpen: false,
   selectedTab: SettingsTab.GENERAL,
-  isWorkNavbarOpen: true,
   isFinanceNavbarOpen: true,
   primaryColor: "teal",
   workColor: "blue",
@@ -84,9 +81,6 @@ export const useSettingsStore = create<SettingsState & SettingsActions>()(
       },
       setIsModalOpen: (isModalOpen: boolean) => {
         set({ isModalOpen: isModalOpen });
-      },
-      toggleWorkNavbar: () => {
-        set({ isWorkNavbarOpen: !get().isWorkNavbarOpen });
       },
       toggleFinanceNavbar: () => {
         set({ isFinanceNavbarOpen: !get().isFinanceNavbarOpen });

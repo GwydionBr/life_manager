@@ -4,8 +4,8 @@ import { Accordion, Box } from "@mantine/core";
 import { IconCalendar, IconClock, IconFolder } from "@tabler/icons-react";
 import SessionRow from "@/components/Work/Session/SessionRow/SessionRow";
 
-import type { Tables } from "@/types/db.types";
 import type { Year } from "@/types/timerSession.types";
+import type { WorkProject } from "@/types/work.types";
 import CustomAccordionControl from "./CustomAccordionControl";
 
 const Radius = 20;
@@ -16,8 +16,8 @@ interface SessionHierarchyProps {
   onSessionToggle: (sessionId: string, index: number, range: boolean) => void;
   onGroupToggle: (sessionIds: string[]) => void;
   selectableIdSet: Set<string>;
-  project?: Tables<"timer_project">;
-  projects?: Tables<"timer_project">[];
+  project?: WorkProject;
+  projects?: WorkProject[];
   isOverview: boolean;
   selectedModeActive: boolean;
 }
@@ -63,6 +63,7 @@ export default function SessionHierarchy({
         <Accordion
           key={year}
           variant="separated"
+          maw={900}
           pt={20}
           multiple
           defaultValue={index === 0 ? [String(yearData.totalEarnings)] : []}
@@ -71,8 +72,7 @@ export default function SessionHierarchy({
           <Accordion.Item
             value={String(yearData.totalEarnings)}
             style={{
-              borderColor:
-                getBorderColor(yearData.sessionIds),
+              borderColor: getBorderColor(yearData.sessionIds),
               backgroundColor: getBackgroundColor(yearData.sessionIds),
             }}
           >

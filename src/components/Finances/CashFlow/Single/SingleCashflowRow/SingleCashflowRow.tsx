@@ -80,9 +80,6 @@ export default function SingleCashflowRow({
         selected: isSelected,
       }}
       withBorder
-      shadow="sm"
-      radius="md"
-      p="xs"
       onClick={(e) => {
         if (!isCategoryPopoverOpen) {
           if (selectedModeActive) {

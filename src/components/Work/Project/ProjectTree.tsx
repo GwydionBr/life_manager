@@ -188,27 +188,32 @@ function Node({ node, style, dragHandle }: NodeRendererProps<ProjectTreeItem>) {
             <IconClipboardListFilled
               color="light-dark(var(--mantine-color-green-8), var(--mantine-color-green-6))"
               size={22}
+              stroke={1.5}
             />
           ) : (
             <IconClipboardList
               color="light-dark(var(--mantine-color-gray-6), var(--mantine-color-gray-5))"
               size={22}
+              stroke={1.5}
             />
           )
         ) : node.isOpen ? (
           <IconFolderOpen
             color="light-dark(var(--mantine-color-orange-7), var(--mantine-color-orange-5))"
             size={22}
+            stroke={1.5}
           />
         ) : node.children && node.children.length === 0 ? (
           <IconFolder
             color="light-dark(var(--mantine-color-orange-6), var(--mantine-color-orange-5))"
             size={22}
+            stroke={1.5}
           />
         ) : (
           <IconFolderFilled
             color="light-dark(var(--mantine-color-orange-6), var(--mantine-color-orange-5))"
             size={22}
+            stroke={1.5}
           />
         )}
         <Group>

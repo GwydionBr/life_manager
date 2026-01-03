@@ -56,6 +56,7 @@ export default function PayoutRowCard({ payout }: PayoutRowCardProps) {
       p="lg"
       shadow="sm"
       w="100%"
+      maw={900}
       bg="light-dark(var(--mantine-color-white), var(--mantine-color-dark-6))"
       style={{ transition: "all 0.2s ease" }}
     >

@@ -25,7 +25,7 @@ function RouteComponent() {
   // Führe eine Live-Query aus: alle Projekte abrufen
   const { data: workProjects, isLoading } = useWorkProjects();
 
-  const { activeProjectId, lastActiveProjectId } = useWorkStore();
+  const { activeProjectId, lastActiveProjectId, isWorkNavbarOpen } = useWorkStore();
 
   const router = useRouter();
 
@@ -59,17 +59,15 @@ function RouteComponent() {
   }
 
   return (
-    <Group h="100%" wrap="nowrap" mx="xs" align="flex-start">
+    <Box w="100%">
       <ProjectNavbar />
-      <ScrollArea h="calc(100vh - 60px)" type="scroll" w="100%">
-        <Box style={{ transition: "margin 0.4s ease-in-out" }} w="100%">
-          {workProjects && workProjects.length === 0 && !isLoading ? (
-            <WorkInitializer />
-          ) : (
-            <ProjectDetail />
-          )}
-        </Box>
-      </ScrollArea>
-    </Group>
+      <Box pl={isWorkNavbarOpen ? 290 : 60} w="100%">
+        {workProjects && workProjects.length === 0 && !isLoading ? (
+          <WorkInitializer />
+        ) : (
+          <ProjectDetail />
+        )}
+      </Box>
+    </Box>
   );
 }

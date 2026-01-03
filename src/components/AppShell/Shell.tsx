@@ -1,7 +1,6 @@
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useLocation } from "@tanstack/react-router";
 import { useProcessRecurringCashflows } from "@/hooks/useProcessRecurringCashflows";
-import { useAppUpdateNotification } from "@/hooks/useAppUpdateNotification";
 import { useMemo } from "react";
 
 import { AppShell, alpha, getThemeColor, useMantineTheme } from "@mantine/core";
@@ -14,7 +13,7 @@ import { getGradientForColor } from "@/constants/colors";
 import { AppOptions } from "@/types/settings.types";
 
 export function Shell({ children }: { children: React.ReactNode }) {
-  const { 
+  const {
     isAsideOpen,
     toggleAside,
     workColor,
@@ -26,7 +25,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const theme = useMantineTheme();
   useProcessRecurringCashflows();
-  useAppUpdateNotification();
 
   // Determine the current app based on the location pathname
   const currentApp = useMemo(() => {
@@ -55,7 +53,14 @@ export function Shell({ children }: { children: React.ReactNode }) {
     } else {
       return primaryColor;
     }
-  }, [currentApp]);
+  }, [
+    currentApp,
+    workColor,
+    financeColor,
+    calendarColor,
+    habitColor,
+    primaryColor,
+  ]);
 
   const currentAppGradient = useMemo(() => {
     return getGradientForColor(currentAppColor);
@@ -77,7 +82,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         collapsed: { desktop: false, mobile: true },
       }}
       navbar={{
-        width: 60,
+        width: 50,
         breakpoint: "md",
         collapsed: { desktop: !currentApp, mobile: true },
       }}

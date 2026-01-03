@@ -7,6 +7,7 @@ interface WorkStoreState {
   lastActiveProjectId: string | null;
   analysisOpened: boolean;
   editProjectOpened: boolean;
+  isWorkNavbarOpen: boolean;
 }
 
 interface WorkStoreActions {
@@ -15,6 +16,8 @@ interface WorkStoreActions {
   toggleAnalysisOpened: () => void;
   setEditProjectOpened: (opened: boolean) => void;
   toggleEditProjectOpened: () => void;
+  setIsWorkNavbarOpen: (opened: boolean) => void;
+  toggleWorkNavbar: () => void;
   resetStore: () => void;
 }
 
@@ -23,6 +26,7 @@ const initialState: WorkStoreState = {
   lastActiveProjectId: null,
   analysisOpened: false,
   editProjectOpened: false,
+  isWorkNavbarOpen: false,
 };
 
 export const useWorkStore = create<WorkStoreState & WorkStoreActions>()(
@@ -47,6 +51,12 @@ export const useWorkStore = create<WorkStoreState & WorkStoreActions>()(
       },
       toggleEditProjectOpened() {
         set({ editProjectOpened: !get().editProjectOpened });
+      },
+      setIsWorkNavbarOpen(opened) {
+        set({ isWorkNavbarOpen: opened });
+      },
+      toggleWorkNavbar() {
+        set({ isWorkNavbarOpen: !get().isWorkNavbarOpen });
       },
       resetStore: () =>
         set({

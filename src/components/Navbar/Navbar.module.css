@@ -57,17 +57,6 @@
   }
 }
 
-.title {
-  font-family:
-    Greycliff CF,
-    var(--mantine-font-family);
-  background-color: var(--mantine-color-body);
-  padding: var(--mantine-spacing-md);
-  height: 60px;
-  border-bottom: 1px solid
-    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-7));
-}
-
 .logo {
   &:hover {
     background-color: light-dark(

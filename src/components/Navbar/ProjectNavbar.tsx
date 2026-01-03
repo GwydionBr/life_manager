@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useHotkeys, useDisclosure } from "@mantine/hooks";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { useWorkStore } from "@/stores/workManagerStore";
 import { useIntl } from "@/hooks/useIntl";
 
 import {
   ActionIcon,
-  Box,
   Card,
   Divider,
   Group,
@@ -22,19 +22,20 @@ import AdjustmentActionIcon from "@/components/UI/ActionIcons/AdjustmentActionIc
 import { SettingsTab } from "@/stores/settingsStore";
 import {
   IconArrowBarRight,
+  IconClipboardList,
   IconFilePlus,
   IconSearch,
 } from "@tabler/icons-react";
 import DelayedTooltip from "@/components/UI/DelayedTooltip";
 
-import classes from "./Navbar.module.css";
 import Shortcut from "../UI/Shortcut";
 import PlusActionIcon from "../UI/ActionIcons/PlusActionIcon";
 import XActionIcon from "../UI/ActionIcons/XActionIcon";
 
 export default function ProjectNavbar() {
-  const { setSelectedTab, setIsModalOpen, isWorkNavbarOpen, toggleWorkNavbar } =
+  const { setSelectedTab, setIsModalOpen } =
     useSettingsStore();
+  const { isWorkNavbarOpen, toggleWorkNavbar } = useWorkStore();
   const { getLocalizedText } = useIntl();
   const [isOverview, setIsOverview] = useState<boolean>(false);
   const [seachTree, setSeachTree] = useState<string>("");
@@ -51,13 +52,16 @@ export default function ProjectNavbar() {
 
   return (
     <Card
-      miw={isWorkNavbarOpen ? 270 : 60}
+      w={isWorkNavbarOpen ? 260 : 60}
       withBorder
       radius="lg"
       p={0}
       mt="sm"
+      pos="fixed"
+      top={75}
+      left={75}
     >
-      <Group className={classes.title} align="center" justify="space-between">
+      <Group align="center" justify="space-between" p="md">
         <Transition
           mounted={!isWorkNavbarOpen}
           transition="fade"
@@ -92,9 +96,12 @@ export default function ProjectNavbar() {
           enterDelay={200}
         >
           {(styles) => (
-            <Text style={styles}>
-              {getLocalizedText("Projekte", "Projects")}
-            </Text>
+            <Group style={styles} align="center" gap={5}>
+              <IconClipboardList size={25} stroke={1.5} />
+              <Text fw={600} fz="lg">
+                {getLocalizedText("Projekte", "Projects")}
+              </Text>
+            </Group>
           )}
         </Transition>
         <>
@@ -161,7 +168,7 @@ export default function ProjectNavbar() {
         </>
       </Group>
 
-      <Transition
+      {/* <Transition
         mounted={isWorkNavbarOpen}
         transition="fade"
         duration={200}
@@ -184,7 +191,7 @@ export default function ProjectNavbar() {
             {getLocalizedText("Übersicht", "Overview")}
           </Box>
         )}
-      </Transition>
+      </Transition> */}
       <Transition
         mounted={isWorkNavbarOpen}
         transition="fade"

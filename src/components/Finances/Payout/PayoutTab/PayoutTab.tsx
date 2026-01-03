@@ -68,7 +68,7 @@ export default function PayoutTab() {
           />,
         ]}
       />
-      <Stack w="100%" mb="xl" ml={230}>
+      <Stack w="100%" mb="xl" align="center">
         {isPayoutsPending ||
         isSingleCashFlowsPending ||
         isProjectPending ||

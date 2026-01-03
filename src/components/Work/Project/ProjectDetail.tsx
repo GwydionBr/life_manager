@@ -250,6 +250,8 @@ export default function WorkProjectDetailsPage() {
     const title = `${getLocalizedText("Auszahlung", "Payout")} (${project.title}) ${formatDate(new Date(), locale)}`;
 
     addHourlyPayout(project, title, timeEntries, endCurrency, endValue);
+    setSelectedTimeEntryIds([]);
+    deactivateSelectedMode();
   };
 
   const selectableSessions = timeFilteredTimeEntries.filter(

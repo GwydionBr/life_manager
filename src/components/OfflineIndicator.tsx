@@ -1,72 +1,44 @@
-import { useEffect, useState } from "react";
-import { Notification } from "@mantine/core";
+import { useEffect, useRef } from "react";
+import { useNetwork } from "@mantine/hooks";
+import { useIntl } from "@/hooks/useIntl";
+
 import { IconWifiOff, IconWifi } from "@tabler/icons-react";
+import { notifications } from "@mantine/notifications";
 
 /**
- * Zeigt dem User an, wenn die App offline ist
- * Nützlich, um zu verstehen warum bestimmte Features evtl. nicht funktionieren
+ * Displays a notification to the user when the app is offline.
+ * Useful to inform the user why certain features may not work.
  */
 export function OfflineIndicator() {
-  const [isOnline, setIsOnline] = useState(
-    typeof navigator !== "undefined" ? navigator.onLine : true
-  );
-  const [showNotification, setShowNotification] = useState(false);
-
+  const { getLocalizedText } = useIntl();
+  const { online } = useNetwork();
+  const wasOfflineRef = useRef(false);
   useEffect(() => {
-    const handleOnline = () => {
-      setIsOnline(true);
-      setShowNotification(true);
-      // Nach 3 Sekunden ausblenden
-      setTimeout(() => setShowNotification(false), 3000);
-    };
+    if (online && wasOfflineRef.current) {
+      notifications.show({
+        icon: <IconWifi size="1.2rem" />,
+        title: getLocalizedText("Wieder online", "Back online"),
+        message: getLocalizedText(
+          "Die Verbindung wurde wiederhergestellt.",
+          "The connection has been restored."
+        ),
+        color: "teal",
+        autoClose: 3000,
+      });
+    } else if (!online) {
+      wasOfflineRef.current = true;
+      notifications.show({
+        icon: <IconWifiOff size="1.2rem" />,
+        title: getLocalizedText("Offline-Modus", "Offline mode"),
+        message: getLocalizedText(
+          "Du bist offline. Die App funktioniert weiterhin mit lokalen Daten.",
+          "You are offline. The app will continue to work with local data."
+        ),
+        color: "orange",
+        autoClose: 3000,
+      });
+    }
+  }, [online, getLocalizedText]);
 
-    const handleOffline = () => {
-      setIsOnline(false);
-      setShowNotification(true);
-    };
-
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
-  }, []);
-
-  if (!showNotification) {
-    return null;
-  }
-
-  return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: 20,
-        right: 20,
-        zIndex: 10000,
-        maxWidth: 400,
-      }}
-    >
-      {isOnline ? (
-        <Notification
-          icon={<IconWifi size="1.2rem" />}
-          color="teal"
-          title="Wieder online"
-          onClose={() => setShowNotification(false)}
-        >
-          Die Verbindung wurde wiederhergestellt.
-        </Notification>
-      ) : (
-        <Notification
-          icon={<IconWifiOff size="1.2rem" />}
-          color="orange"
-          title="Offline-Modus"
-          withCloseButton={false}
-        >
-          Du bist offline. Die App funktioniert weiterhin mit lokalen Daten.
-        </Notification>
-      )}
-    </div>
-  );
+  return null;
 }
