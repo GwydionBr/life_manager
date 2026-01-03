@@ -1,7 +1,7 @@
+import { useMemo, useEffect } from "react";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useLocation } from "@tanstack/react-router";
 import { useProcessRecurringCashflows } from "@/hooks/useProcessRecurringCashflows";
-import { useMemo } from "react";
 
 import { AppShell, alpha, getThemeColor, useMantineTheme } from "@mantine/core";
 import SettingsModal from "@/components/Settings/SettingsModal";
@@ -15,12 +15,14 @@ import { AppOptions } from "@/types/settings.types";
 export function Shell({ children }: { children: React.ReactNode }) {
   const {
     isAsideOpen,
-    toggleAside,
     workColor,
     financeColor,
     calendarColor,
     habitColor,
     primaryColor,
+    mainBackgroundColor,
+    toggleAside,
+    setMainBackgroundColor,
   } = useSettingsStore();
   const location = useLocation();
   const theme = useMantineTheme();
@@ -66,16 +68,17 @@ export function Shell({ children }: { children: React.ReactNode }) {
     return getGradientForColor(currentAppColor);
   }, [currentAppColor]);
 
-  const mainBackgroundColor = useMemo(() => {
-    const fromColor = getThemeColor(currentAppGradient.from, theme);
-    const toColor = getThemeColor(currentAppGradient.to, theme);
-    return `linear-gradient(135deg, ${alpha(fromColor, 0.1)} 0%, ${alpha(toColor, 0.1)} 100%)`;
-  }, [currentAppGradient, theme]);
+  useEffect(() => {
+    const mainBackgroundColor = `linear-gradient(135deg, 
+      ${alpha(getThemeColor(currentAppGradient.from, theme), 0.1)} 0%, 
+      ${alpha(getThemeColor(currentAppGradient.to, theme), 0.1)} 100%)`;
+    setMainBackgroundColor(mainBackgroundColor);
+  }, [currentAppGradient, theme, setMainBackgroundColor]);
 
   return (
     <AppShell
       layout="alt"
-      header={{ height: 60 }}
+      header={{ height: 50 }}
       aside={{
         width: isAsideOpen ? 300 : 50,
         breakpoint: "md",

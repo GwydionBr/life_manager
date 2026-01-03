@@ -21,9 +21,11 @@ interface SettingsState extends Settings {
   calendarColor: MantineColor;
   habitColor: MantineColor;
   isAsideOpen: boolean;
+  mainBackgroundColor: string;
 }
 
 interface SettingsActions {
+  setMainBackgroundColor: (backgroundColor: string) => void;
   setSelectedTab: (tab: SettingsTab) => void;
   setIsModalOpen: (isModalOpen: boolean) => void;
   toggleFinanceNavbar: () => void;
@@ -48,6 +50,7 @@ const initialState: SettingsState = {
   calendarColor: "lime",
   habitColor: "red",
   isAsideOpen: false,
+  mainBackgroundColor: "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%)",
 
   // Settings
   locale: "en-US",
@@ -78,6 +81,9 @@ export const useSettingsStore = create<SettingsState & SettingsActions>()(
 
       setSelectedTab: (tab: SettingsTab) => {
         set({ selectedTab: tab });
+      },
+      setMainBackgroundColor: (backgroundColor: string) => {
+        set({ mainBackgroundColor: backgroundColor });
       },
       setIsModalOpen: (isModalOpen: boolean) => {
         set({ isModalOpen: isModalOpen });
