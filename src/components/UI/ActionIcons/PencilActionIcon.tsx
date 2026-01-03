@@ -21,7 +21,12 @@ export default function PencilActionIcon({
   return (
     <DelayedTooltip label={tooltipLabel}>
       <ActionIcon variant="transparent" onClick={onClick} size="md" {...props}>
-        <IconPencil size={iconSize} color={iconColor} fill={filled ? "currentColor" : "none"} />
+        <IconPencil
+          size={iconSize}
+          color={iconColor}
+          fill={filled ? "currentColor" : "none"}
+          strokeWidth={1.5}
+        />
       </ActionIcon>
     </DelayedTooltip>
   );

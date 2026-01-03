@@ -120,62 +120,64 @@ export default function WorkProjectDetailsPage() {
   return (
     <Stack align="center" w="100%" px="xl" pb="xl" pt="xs">
       <Collapse in={!analysisOpened} transitionDuration={300} w="100%">
-        <Text size="sm" fw={500} ta="center">
-          {project.description}
-        </Text>
-        <ProjectToolbar
-          projectTimeEntries={projectTimeEntries}
-          timeFilteredTimeEntries={timeFilteredTimeEntries}
-          project={project}
-        />
-        {projectTimeEntries.length > 0 ? (
-          <Box w="100%" style={{ overflow: "hidden" }}>
-            {/* Session Hierarchy */}
-            {timeFilteredTimeEntries.length > 0 ? (
-              <SessionHierarchy
-                selectedModeActive={selectedModeActive}
-                groupedSessions={groupSessions(
-                  timeFilteredTimeEntries.sort(
-                    (a, b) =>
-                      new Date(b.start_time).getTime() -
-                      new Date(a.start_time).getTime()
-                  ),
-                  locale
-                )}
-                selectedSessions={selectedTimeEntryIds}
-                onSessionToggle={toggleTimeEntrySelection}
-                onGroupToggle={toggleGroupSelection}
-                selectableIdSet={
-                  new Set(
-                    timeFilteredTimeEntries
-                      .filter((timeEntry) => !timeEntry.single_cash_flow_id)
-                      .map((timeEntry) => timeEntry.id)
-                  )
-                }
-                project={project}
-                isOverview={false}
-              />
-            ) : (
-              <Text size="lg" c="gray" ta="center">
-                {getLocalizedText(
-                  "Keine Sitzungen im ausgewählten Zeitraum",
-                  "No time entries in the time period"
-                )}
-              </Text>
-            )}
-          </Box>
-        ) : (
-          <Text size="lg" c="gray" ta="center" mt="xl">
-            {getLocalizedText(
-              "Füge eine Sitzung hinzu, um sie hier zu sehen",
-              "Add a time entry to see it here"
-            )}
+        <Stack w="100%" align="center">
+          <Text size="sm" fw={500} ta="center">
+            {project.description}
           </Text>
-        )}
-        <EditProjectDrawer
-          opened={editProjectOpened}
-          onClose={() => setEditProjectOpened(false)}
-        />
+          <ProjectToolbar
+            projectTimeEntries={projectTimeEntries}
+            timeFilteredTimeEntries={timeFilteredTimeEntries}
+            project={project}
+          />
+          {projectTimeEntries.length > 0 ? (
+            <Stack w="100%" align="center">
+              {/* Session Hierarchy */}
+              {timeFilteredTimeEntries.length > 0 ? (
+                <SessionHierarchy
+                  selectedModeActive={selectedModeActive}
+                  groupedSessions={groupSessions(
+                    timeFilteredTimeEntries.sort(
+                      (a, b) =>
+                        new Date(b.start_time).getTime() -
+                        new Date(a.start_time).getTime()
+                    ),
+                    locale
+                  )}
+                  selectedSessions={selectedTimeEntryIds}
+                  onSessionToggle={toggleTimeEntrySelection}
+                  onGroupToggle={toggleGroupSelection}
+                  selectableIdSet={
+                    new Set(
+                      timeFilteredTimeEntries
+                        .filter((timeEntry) => !timeEntry.single_cash_flow_id)
+                        .map((timeEntry) => timeEntry.id)
+                    )
+                  }
+                  project={project}
+                  isOverview={false}
+                />
+              ) : (
+                <Text size="lg" c="gray" ta="center">
+                  {getLocalizedText(
+                    "Keine Sitzungen im ausgewählten Zeitraum",
+                    "No time entries in the time period"
+                  )}
+                </Text>
+              )}
+            </Stack>
+          ) : (
+            <Text size="lg" c="gray" ta="center" mt="xl">
+              {getLocalizedText(
+                "Füge eine Sitzung hinzu, um sie hier zu sehen",
+                "Add a time entry to see it here"
+              )}
+            </Text>
+          )}
+          <EditProjectDrawer
+            opened={editProjectOpened}
+            onClose={() => setEditProjectOpened(false)}
+          />
+        </Stack>
       </Collapse>
       <Collapse in={analysisOpened} w="100%">
         <WorkAnalysis

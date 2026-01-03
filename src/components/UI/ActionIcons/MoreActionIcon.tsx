@@ -19,7 +19,7 @@ export default function MoreActionIcon({
   return (
     <DelayedTooltip label={tooltipLabel}>
       <ActionIcon variant="transparent" onClick={onClick} size="md" {...props}>
-        <IconDots size={iconSize} color={iconColor} />
+        <IconDots size={iconSize} color={iconColor} strokeWidth={1.5}/>
       </ActionIcon>
     </DelayedTooltip>
   );

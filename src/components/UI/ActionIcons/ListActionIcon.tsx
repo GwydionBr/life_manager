@@ -19,7 +19,7 @@ export default function ListActionIcon({
   return (
     <DelayedTooltip label={tooltipLabel}>
       <ActionIcon variant="light" onClick={onClick} size="md" {...props}>
-          <IconList size={iconSize} color={iconColor} />
+          <IconList size={iconSize} color={iconColor} strokeWidth={1.5}/>
       </ActionIcon>
     </DelayedTooltip>
   );

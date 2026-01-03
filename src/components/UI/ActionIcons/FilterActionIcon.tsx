@@ -37,12 +37,14 @@ export default function FilterActionIcon({
             size={iconSize}
             color={iconColor}
             fill={opened ? "currentColor" : "none"}
+            strokeWidth={1.5}
           />
         ) : (
           <IconFilterCheck
             size={iconSize}
             color={iconColor}
             fill={opened ? "currentColor" : "none"}
+            strokeWidth={1.5}
           />
         )}
       </ActionIcon>

@@ -25,6 +25,7 @@ export default function XActionIcon({
             "light-dark(var(--mantine-color-red-9), var(--mantine-color-red-4))"
           }
           size={iconSize ?? 20}
+          strokeWidth={1.5}
         />
       </ActionIcon>
     </DelayedTooltip>

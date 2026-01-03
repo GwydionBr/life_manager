@@ -57,13 +57,12 @@ export default function SessionHierarchy({
   };
 
   return (
-    <Box>
+    <Box w="100%" maw={900}>
       {groupedSessions.reverse().map(({ year, data: yearData }, index) => (
         // Year Section
         <Accordion
           key={year}
           variant="separated"
-          maw={900}
           pt={20}
           multiple
           defaultValue={index === 0 ? [String(yearData.totalEarnings)] : []}

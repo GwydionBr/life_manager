@@ -19,7 +19,7 @@ export default function AdjustmentActionIcon({
   return (
     <DelayedTooltip label={tooltipLabel}>
       <ActionIcon onClick={onClick} size="md" variant="subtle" {...props}>
-        <IconAdjustments size={iconSize} color={iconColor} />
+        <IconAdjustments size={iconSize} color={iconColor} strokeWidth={1.5}/>
       </ActionIcon>
     </DelayedTooltip>
   );

@@ -31,6 +31,7 @@ export default function PayoutActionIcon({
           size={iconSize}
           color={iconColor}
           fill={opened ? "currentColor" : "none"}
+          strokeWidth={1.5}
         />
       </ActionIcon>
     </DelayedTooltip>

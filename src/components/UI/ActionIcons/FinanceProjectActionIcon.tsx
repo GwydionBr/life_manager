@@ -19,7 +19,7 @@ export default function FinanceProjectActionIcon({
   return (
     <DelayedTooltip label={tooltipLabel}>
       <ActionIcon onClick={onClick} size="md" variant="subtle" {...props}>
-        <IconMoneybagPlus size={iconSize} color={iconColor} />
+        <IconMoneybagPlus size={iconSize} color={iconColor} strokeWidth={1.5}/>
       </ActionIcon>
     </DelayedTooltip>
   );

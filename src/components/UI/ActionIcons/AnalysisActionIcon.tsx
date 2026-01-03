@@ -19,7 +19,7 @@ export default function AnalysisActionIcon({
   return (
     <DelayedTooltip label={tooltipLabel}>
       <ActionIcon onClick={onClick} size="md" variant="light" {...props}>
-        <IconPresentationAnalytics size={iconSize} color={iconColor} />
+        <IconPresentationAnalytics size={iconSize} color={iconColor} strokeWidth={1.5}/>
       </ActionIcon>
     </DelayedTooltip>
   );

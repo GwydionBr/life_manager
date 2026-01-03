@@ -19,7 +19,7 @@ export default function EditActionIcon({
   return (
     <DelayedTooltip label={tooltipLabel}>
       <ActionIcon variant="light" onClick={onClick} size="md" {...props}>
-        <IconEdit size={iconSize} color={iconColor} />
+        <IconEdit size={iconSize} color={iconColor} strokeWidth={1.5}/>
       </ActionIcon>
     </DelayedTooltip>
   );

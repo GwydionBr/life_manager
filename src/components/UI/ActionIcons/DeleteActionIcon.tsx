@@ -25,7 +25,7 @@ export default function DeleteActionIcon({
         variant="transparent"
         {...props}
       >
-        <IconTrash size={iconSize} color={iconColor} />
+        <IconTrash size={iconSize} color={iconColor} strokeWidth={1.5}/>
       </ActionIcon>
     </DelayedTooltip>
   );

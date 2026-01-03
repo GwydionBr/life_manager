@@ -40,14 +40,27 @@ export default function SelectActionIcon({
           <IconListDetails
             size={iconSize}
             color={iconColor}
+            strokeWidth={1.5}
             fill={selected ? "currentColor" : "none"}
           />
         ) : selected ? (
-          <IconSquareRoundedCheck size={iconSize} color={iconColor} />
+          <IconSquareRoundedCheck
+            size={iconSize}
+            color={iconColor}
+            strokeWidth={1.5}
+          />
         ) : partiallySelected ? (
-          <IconSquareRoundedMinusFilled size={iconSize} color={iconColor} />
+          <IconSquareRoundedMinusFilled
+            size={iconSize}
+            color={iconColor}
+            strokeWidth={1.5}
+          />
         ) : (
-          <IconSquareRounded size={iconSize} color={iconColor} />
+          <IconSquareRounded
+            size={iconSize}
+            color={iconColor}
+            strokeWidth={1.5}
+          />
         )}
       </ActionIcon>
     </DelayedTooltip>

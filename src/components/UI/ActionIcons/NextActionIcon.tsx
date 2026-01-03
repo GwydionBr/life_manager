@@ -19,7 +19,7 @@ export default function NextActionIcon({
   return (
     <DelayedTooltip label={tooltipLabel}>
       <ActionIcon variant="transparent" onClick={onClick} size="md" {...props}>
-        <IconChevronRight size={iconSize} color={iconColor} />
+        <IconChevronRight size={iconSize} color={iconColor} strokeWidth={1.5}/>
       </ActionIcon>
     </DelayedTooltip>
   );

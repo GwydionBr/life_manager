@@ -58,7 +58,7 @@ export default function ProjectNavbar() {
       p={0}
       mt="sm"
       pos="fixed"
-      top={70}
+      top={60}
       left={75}
     >
       <Group align="center" justify="space-between" p="md">

@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
 import { useWorkStore } from "@/stores/workManagerStore";
-import { useSettingsStore } from "@/stores/settingsStore";
 import { useIntl } from "@/hooks/useIntl";
 import { usePayoutMutations } from "@/db/collections/finance/payout/use-payout-mutations";
 
@@ -11,7 +10,6 @@ import {
   Group,
   Popover,
   ActionIcon,
-  Space,
 } from "@mantine/core";
 import { IconClockPlus } from "@tabler/icons-react";
 import FilterActionIcon from "@/components/UI/ActionIcons/FilterActionIcon";
@@ -59,7 +57,6 @@ export default function ProjectToolbar({
     toggleSelectedModeActive,
   } = useWorkStore();
   const { addHourlyPayout } = usePayoutMutations();
-  const { mainBackgroundColor } = useSettingsStore();
   const [payoutConvertionStartValues, setPayoutConvertionStartValues] =
     useState<{
       value: number;
@@ -164,9 +161,9 @@ export default function ProjectToolbar({
         position: "sticky",
         top: 20,
         zIndex: 10,
-        left: 0,
       }}
       w="100%"
+      maw={900}
       gap="xs"
     >
       <Card withBorder radius="md" p={0}>
@@ -184,6 +181,7 @@ export default function ProjectToolbar({
               <Popover.Target>
                 <FilterActionIcon
                   disabled={timeFilteredTimeEntries.length === 0}
+                  variant="transparent"
                   onClick={toggleFilterOpened}
                   tooltipLabel={getLocalizedText("Filter", "Filter")}
                   activeFilter={
@@ -245,7 +243,7 @@ export default function ProjectToolbar({
               size="md"
               variant="subtle"
             >
-              <IconClockPlus />
+              <IconClockPlus strokeWidth={1.5} />
             </ActionIcon>
           </DelayedTooltip>
           <NewSessionModal

@@ -25,6 +25,7 @@ export default function CheckActionIcon({
             "light-dark(var(--mantine-color-green-9), var(--mantine-color-green-4))"
           }
           size={iconSize ?? 20}
+          strokeWidth={1.5}
         />
       </ActionIcon>
     </DelayedTooltip>

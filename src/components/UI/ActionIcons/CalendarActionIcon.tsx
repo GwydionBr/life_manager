@@ -19,7 +19,7 @@ export default function CalendarActionIcon({
   return (
     <DelayedTooltip label={tooltipLabel}>
       <ActionIcon onClick={onClick} size="md" variant="light" {...props}>
-        <IconCalendarTime size={iconSize} color={iconColor} />
+        <IconCalendarTime size={iconSize} color={iconColor} strokeWidth={1.5}/>
       </ActionIcon>
     </DelayedTooltip>
   );

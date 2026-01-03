@@ -19,7 +19,7 @@ export default function PlusActionIcon({
   return (
     <DelayedTooltip label={tooltipLabel}>
       <ActionIcon onClick={onClick} size="md" variant="subtle" {...props}>
-        <IconPlus size={iconSize} color={iconColor} />
+        <IconPlus size={iconSize} color={iconColor} strokeWidth={1.5} />
       </ActionIcon>
     </DelayedTooltip>
   );

@@ -19,7 +19,7 @@ export default function InfoActionIcon({
   return (
     <DelayedTooltip label={tooltipLabel}>
       <ActionIcon variant="transparent" onClick={onClick} size="md" {...props}>
-          <IconInfoCircle size={iconSize} color={iconColor} />
+          <IconInfoCircle size={iconSize} color={iconColor} strokeWidth={1.5}/>  
       </ActionIcon>
     </DelayedTooltip>
   );

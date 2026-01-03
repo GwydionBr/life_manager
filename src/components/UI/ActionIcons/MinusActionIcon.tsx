@@ -19,7 +19,7 @@ export default function MinusActionIcon({
   return (
     <DelayedTooltip label={tooltipLabel}>
       <ActionIcon onClick={onClick} size="md" variant="subtle" {...props}>
-        <IconMinus size={iconSize} color={iconColor} />
+        <IconMinus size={iconSize} color={iconColor} strokeWidth={1.5}/>
       </ActionIcon>
     </DelayedTooltip>
   );
