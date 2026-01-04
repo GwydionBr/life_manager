@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useHotkeys } from "@mantine/hooks";
 import { useGroupStore } from "@/stores/groupStore";
 
 import {
@@ -26,12 +27,18 @@ interface AsideProps {
   currentAppColor: MantineColor;
 }
 
-export default function Aside({ toggleAside, isAsideOpen, currentAppColor }: AsideProps) {
+export default function Aside({
+  toggleAside,
+  isAsideOpen,
+  currentAppColor,
+}: AsideProps) {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isTimeTrackerMinimized, setIsTimeTrackerMinimized] = useState(false);
   const [currentSelectedDate, setCurrentSelectedDate] = useState<Date | null>(
     null
   );
+
+  useHotkeys([["mod + B", () => toggleAside()]]);
 
   const { selectedDate, isDateChanged } = useGroupStore();
 
@@ -66,7 +73,10 @@ export default function Aside({ toggleAside, isAsideOpen, currentAppColor }: Asi
               variant="transparent"
             >
               <IconArrowBarLeft
-                style={{ transform: isAsideOpen ? "rotate(180deg)" : "none", transition: "transform 0.4s linear" }}
+                style={{
+                  transform: isAsideOpen ? "rotate(180deg)" : "none",
+                  transition: "transform 0.4s linear",
+                }}
               />
             </ActionIcon>
           </DelayedTooltip>

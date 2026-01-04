@@ -359,6 +359,7 @@ export default function FinanceSingleTab() {
           transitionDuration={400}
           in={bulkSelectionActive && filteredSingleCashFlows.length > 0}
           w="100%"
+          maw={950}
         >
           <Card
             p="md"
@@ -366,7 +367,6 @@ export default function FinanceSingleTab() {
             withBorder
             shadow="sm"
             radius="md"
-            maw={950}
             style={{
               borderColor:
                 "light-dark(var(--mantine-color-blue-3), var(--mantine-color-blue-8))",
@@ -403,9 +403,9 @@ export default function FinanceSingleTab() {
             </Group>
           </Card>
         </Collapse>
-        <Stack gap={0} w="100%">
+        <Stack gap={0} w="100%" maw={950}>
           {isSingleCashFlowsLoading ? (
-            <Stack ml="xl" mt="lg">
+            <Stack ml="xl" mt="lg" maw={950}>
               {Array.from({ length: 5 }, (_, i) => (
                 <Skeleton height={45} w="100%" key={i} />
               ))}
@@ -421,7 +421,7 @@ export default function FinanceSingleTab() {
                   0
                 ) !== new Date(cashFlow.date).setHours(0, 0, 0, 0);
               return (
-                <Stack key={cashFlow.id} gap={5} maw={950}>
+                <Stack key={cashFlow.id} gap={5}>
                   {isNewDate && (
                     <Divider
                       mt={5}
