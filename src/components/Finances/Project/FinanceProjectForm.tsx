@@ -82,7 +82,7 @@ export default function FinanceProjectForm({
           currency: financeProject.currency,
           start_amount: financeProject.start_amount,
           finance_category_ids: financeProject.categories.map(
-            (category) => category.finance_category.id
+            (category) => category.id
           ),
           finance_client_id: financeProject.finance_client_id,
           due_date: financeProject.due_date || undefined,
@@ -142,12 +142,8 @@ export default function FinanceProjectForm({
           contacts.find((c) => c.id === values.finance_client_id) || null,
         categories: financeCategories
           .filter((c) => values.finance_category_ids.includes(c.id))
-          .map((c) => ({
-            finance_category: c,
-          })),
       };
-      // TODO: add addFinanceProject mutation
-      // addFinanceProject();
+      addFinanceProject(insertProject);
     }
     handleClose();
   };

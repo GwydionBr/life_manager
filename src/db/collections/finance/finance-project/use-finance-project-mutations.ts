@@ -12,8 +12,8 @@ import {
   syncFinanceProjectCategories,
   getFinanceProjectWithCategories,
 } from "./finance-project-mutations";
-import { FinanceProject } from "@/types/finance.types";
-import { Tables, TablesUpdate } from "@/types/db.types";
+import { FinanceProject, InsertFinanceProject } from "@/types/finance.types";
+import { TablesUpdate } from "@/types/db.types";
 
 /**
  * Hook for Finance Project operations with automatic notifications.
@@ -32,11 +32,7 @@ export const useFinanceProjectMutations = () => {
    */
   const handleAddFinanceProject = useCallback(
     async (
-      newFinanceProject: Omit<
-        Tables<"finance_project">,
-        "id" | "created_at" | "user_id"
-      > & { id?: string },
-      categoryIds?: string[]
+      newFinanceProject: InsertFinanceProject
     ): Promise<FinanceProject | undefined> => {
       if (!profile?.id) {
         showActionErrorNotification(
@@ -49,30 +45,15 @@ export const useFinanceProjectMutations = () => {
       }
 
       try {
-        const projectId = newFinanceProject.id || crypto.randomUUID();
-        const transaction = addFinanceProject(
-          { ...newFinanceProject, id: projectId },
+        const { promise, data } = await addFinanceProject(
+          newFinanceProject,
           profile.id
         );
-        const result = await transaction.isPersisted.promise;
 
-        if (result.error) {
-          showActionErrorNotification(result.error.message);
+        if (promise.error) {
+          showActionErrorNotification(promise.error.message);
           return;
         }
-
-        // Sync categories if provided
-        if (categoryIds && categoryIds.length > 0) {
-          await syncFinanceProjectCategories(
-            projectId,
-            categoryIds,
-            profile.id
-          );
-        }
-
-        // Get complete project with categories
-        const completeProject =
-          await getFinanceProjectWithCategories(projectId);
 
         showActionSuccessNotification(
           getLocalizedText(
@@ -81,7 +62,7 @@ export const useFinanceProjectMutations = () => {
           )
         );
 
-        return completeProject;
+        return data;
       } catch (error) {
         showActionErrorNotification(
           getLocalizedText(

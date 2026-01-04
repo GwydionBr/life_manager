@@ -102,15 +102,13 @@ export default function FinanceProjectTab() {
       const { categories, ...rest } = project;
       return {
         ...rest,
-        finance_client:
+        client:
           financeClients.find(
             (client) => client.id === project.finance_client_id
           ) || null,
-        categories: financeCategories
-          .filter((category) =>
-            categories.map((c) => c.finance_category.id).includes(category.id)
-          )
-          .map((category) => ({ finance_category: category })),
+        categories: financeCategories.filter((category) =>
+          categories.map((c) => c.id).includes(category.id)
+        ),
       };
     });
   }, [financeProjects, financeClients, financeCategories]);
@@ -398,7 +396,7 @@ export default function FinanceProjectTab() {
         },
       ],
     ];
-  }, [navbarItems, filteredFinanceProjects, tab]);
+  }, [navbarItems, tab, formatMoney, getLocalizedText]);
 
   return (
     <Box w="100%">

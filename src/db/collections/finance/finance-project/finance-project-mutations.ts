@@ -3,8 +3,10 @@ import {
   financeProjectsCollection,
   financeProjectCategoriesCollection,
 } from "./finance-project-collection";
-import { FinanceProject } from "@/types/finance.types";
+import { FinanceProject, InsertFinanceProject } from "@/types/finance.types";
 import { Tables, TablesUpdate } from "@/types/db.types";
+import { PowerSyncTransactor } from "@tanstack/powersync-db-collection";
+import { createTransaction } from "@tanstack/react-db";
 
 /**
  * Adds a new Finance Project.
@@ -14,21 +16,49 @@ import { Tables, TablesUpdate } from "@/types/db.types";
  * @param userId - The user ID
  * @returns Transaction object with isPersisted promise
  */
-export const addFinanceProject = (
-  newFinanceProject: Omit<
-    Tables<"finance_project">,
-    "id" | "created_at" | "user_id"
-  > & { id?: string },
+export const addFinanceProject = async (
+  newFinanceProject: InsertFinanceProject,
   userId: string
 ) => {
-  const transaction = financeProjectsCollection.insert({
-    ...newFinanceProject,
+  const customTransaction = createTransaction({
+    autoCommit: false,
+    mutationFn: async ({ transaction }) => {
+      // Use PowerSyncTransactor to apply the transaction to PowerSync
+      await new PowerSyncTransactor({ database: db }).applyTransaction(
+        transaction
+      );
+    },
+  });
+  const { categories, client, ...projectData } = newFinanceProject;
+  const newFinanceProjectData = {
+    ...projectData,
     id: newFinanceProject.id || crypto.randomUUID(),
     created_at: new Date().toISOString(),
     user_id: userId,
+    description: projectData.description || null,
+    due_date: projectData.due_date || null,
+    finance_client_id: projectData.finance_client_id || null,
+    single_cash_flow_id: projectData.single_cash_flow_id || null,
+    client_id: client?.id || null,
+  };
+  customTransaction.mutate(() => {
+    financeProjectsCollection.insert(newFinanceProjectData);
+    categories.forEach((category) => {
+      financeProjectCategoriesCollection.insert({
+        id: crypto.randomUUID(),
+        finance_project_id: newFinanceProjectData.id,
+        finance_category_id: category.id,
+        user_id: userId,
+        created_at: new Date().toISOString(),
+      });
+    });
   });
-
-  return transaction;
+  await customTransaction.commit();
+  const promise = await customTransaction.isPersisted.promise;
+  return {
+    promise,
+    data: { ...newFinanceProjectData, categories, client, adjustments: [] },
+  };
 };
 
 /**
@@ -144,11 +174,10 @@ export async function getFinanceProjectWithCategories(
   // Get the complete category data
   const categories =
     categoryIds.length > 0
-      ? await db
-          .getAll<
-            Tables<"finance_category">
-          >(`SELECT * FROM finance_category WHERE id IN (${categoryIds.map(() => "?").join(",")})`, categoryIds)
-          .then((cats) => cats.map((cat) => ({ finance_category: cat })))
+      ? await db.getAll<Tables<"finance_category">>(
+          `SELECT * FROM finance_category WHERE id IN (${categoryIds.map(() => "?").join(",")})`,
+          categoryIds
+        )
       : [];
 
   return {

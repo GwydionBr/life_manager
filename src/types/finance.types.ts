@@ -37,16 +37,16 @@ export interface UpdateRecurringCashFlow extends TablesUpdate<"recurring_cash_fl
 // Finance Project Types
 export interface FinanceProject extends Tables<"finance_project"> {
   adjustments: Tables<"finance_project_adjustment">[];
-  finance_client: Tables<"finance_client"> | null;
-  categories: { finance_category: Tables<"finance_category"> }[];
+  client: Tables<"finance_client"> | null;
+  categories: Tables<"finance_category">[];
 }
 export interface UpdateFinanceProject extends TablesUpdate<"finance_project"> {
-  categories: { finance_category: Tables<"finance_category"> }[];
-  finance_client: Tables<"finance_client"> | null;
+  categories: Tables<"finance_category">[];
+  client: Tables<"finance_client"> | null;
   adjustments: Tables<"finance_project_adjustment">[];
 }
 export interface InsertFinanceProject extends TablesInsert<"finance_project"> {
-  categories: { finance_category: Tables<"finance_category"> }[];
+  categories: Tables<"finance_category">[];
   client: Tables<"finance_client"> | null;
 }
 
