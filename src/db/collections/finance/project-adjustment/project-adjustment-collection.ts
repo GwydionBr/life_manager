@@ -20,6 +20,3 @@ export const projectAdjustmentsCollection = createCollection(
     },
   })
 );
-
-export const useProjectAdjustments = () =>
-  useLiveQuery((q) => q.from({ projectAdjustments: projectAdjustmentsCollection }));

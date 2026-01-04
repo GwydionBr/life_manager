@@ -50,6 +50,10 @@ export interface InsertFinanceProject extends TablesInsert<"finance_project"> {
   client: Tables<"finance_client"> | null;
 }
 
+export type ProjectAdjustment = Tables<"finance_project_adjustment">;
+export type InsertProjectAdjustment = TablesInsert<"finance_project_adjustment">;
+export type UpdateProjectAdjustment = TablesUpdate<"finance_project_adjustment">;
+
 // Delete Recurring Cash Flow Mode
 export enum DeleteRecurringCashFlowMode {
   delete_all = "delete_all",

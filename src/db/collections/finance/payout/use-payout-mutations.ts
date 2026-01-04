@@ -6,12 +6,17 @@ import {
 } from "@/lib/notificationFunctions";
 import { useIntl } from "@/hooks/useIntl";
 import { addPayout, updatePayout, deletePayout } from "./payout-mutations";
-import { Payout } from "@/types/finance.types";
+import {
+  FinanceProject,
+  Payout,
+  ProjectAdjustment,
+} from "@/types/finance.types";
 import { Tables, TablesUpdate } from "@/types/db.types";
 import { WorkProject, WorkTimeEntry } from "@/types/work.types";
 import { Currency } from "@/types/settings.types";
 import { addSingleCashflowMutation } from "../single-cashflow/single-cashflow-mutations";
 import { updateWorkTimeEntry } from "../../work/work-time-entry/work-time-entry-mutations";
+import { updateProjectAdjustment } from "../project-adjustment/project-adjustment-mutations";
 
 /**
  * Hook for Payout operations with automatic notifications.
@@ -24,6 +29,64 @@ import { updateWorkTimeEntry } from "../../work/work-time-entry/work-time-entry-
 export const usePayoutMutations = () => {
   const { data: profile } = useProfile();
   const { getLocalizedText } = useIntl();
+
+  const handleFinanceProjectAdjustmentPayout = useCallback(
+    async (
+      projectAdjustment: ProjectAdjustment,
+      financeProject: FinanceProject
+    ) => {
+      if (!profile?.id) {
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
+        return;
+      }
+
+      try {
+        const { promise, data } = await addSingleCashflowMutation(
+          {
+            title: projectAdjustment.description ?? "Auszahlung",
+            amount: projectAdjustment.amount,
+            currency: financeProject.currency,
+            categories: financeProject.categories,
+          },
+          profile.id
+        );
+
+        const adjustmentResult = await updateProjectAdjustment(
+          projectAdjustment.id,
+          {
+            single_cash_flow_id: data[0].id,
+          }
+        );
+        if (promise.error) {
+          showActionErrorNotification(promise.error.message);
+          return;
+        }
+        if (adjustmentResult.error) {
+          showActionErrorNotification(adjustmentResult.error.message);
+          return;
+        }
+        showActionSuccessNotification(
+          getLocalizedText(
+            "Auszahlung erfolgreich erstellt",
+            "Payout successfully created"
+          )
+        );
+      } catch (error) {
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+      }
+    },
+    [profile?.id, getLocalizedText]
+  );
 
   /**
    * Adds a new Payout with automatic notification and side effects.
@@ -188,5 +251,6 @@ export const usePayoutMutations = () => {
     addHourlyPayout: handleAddHourlyPayout,
     updatePayout: handleUpdatePayout,
     deletePayout: handleDeletePayout,
+    financeProjectAdjustmentPayout: handleFinanceProjectAdjustmentPayout,
   };
 };

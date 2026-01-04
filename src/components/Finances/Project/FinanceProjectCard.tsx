@@ -7,6 +7,7 @@ import {
 } from "@mantine/hooks";
 import { useIntl } from "@/hooks/useIntl";
 import { useFinanceProjectMutations } from "@/db/collections/finance/finance-project/use-finance-project-mutations";
+import { usePayoutMutations } from "@/db/collections/finance/payout/use-payout-mutations";    
 // import {
 //   usePayoutFinanceProjectMutation,
 //   usePayoutFinanceAdjustmentMutation,
@@ -70,6 +71,7 @@ export default function FinanceProjectCard({
 }: FinanceProjectCardProps) {
   const { getLocalizedText, formatMoney } = useIntl();
   const [isUpdating, setIsUpdating] = useState(false);
+  const { financeProjectAdjustmentPayout } = usePayoutMutations();
   // const {
   //   mutate: updateFinanceProjectMutation,
   //   isPending: isUpdatingFinanceProject,
@@ -139,7 +141,6 @@ export default function FinanceProjectCard({
     setIsUpdating(true);
     closeBadgePopover();
     if (updatedCategories) {
-      // TODO: add categories to updateFinanceProject
       updateFinanceProject(project.id, {
         categories: updatedCategories,
         client: project.client,
@@ -171,31 +172,26 @@ export default function FinanceProjectCard({
     adjustmentId?: string;
     isStartValue?: boolean;
   }) => {
-    // if (adjustmentId) {
-    //   const adjustment = project.adjustments.find(
-    //     (adj) => adj.id === adjustmentId
-    //   );
-    //   if (adjustment) {
-    //     payoutFinanceAdjustmentMutation({
-    //       adjustment,
-    //       financeProject: project,
-    //     });
-    //   }
-    // } else if (isStartValue) {
-    //   //  handle start value payout
-    //   payoutFinanceProjectMutation({
-    //     financeProject: project,
-    //     payoutWholeProject: false,
-    //   });
-    // } else {
-    //   //  handle all payout
-    //   payoutFinanceProjectMutation({
-    //     financeProject: project,
-    //     payoutWholeProject: true,
-    //   });
-    // }
-    // TODO: add payout mutations
-    console.log("payout", adjustmentId, isStartValue);
+    if (adjustmentId) {
+      const adjustment = project.adjustments.find(
+        (adj) => adj.id === adjustmentId
+      );
+      if (adjustment) {
+        financeProjectAdjustmentPayout(adjustment, project);
+      }
+    } else if (isStartValue) {
+      //  handle start value payout
+      // payoutFinanceProjectMutation({
+      //   financeProject: project,
+      //   payoutWholeProject: false,
+      // });
+    } else {
+      //  handle all payout
+      // payoutFinanceProjectMutation({
+      //   financeProject: project,
+      //   payoutWholeProject: true,
+      // });
+    }
   };
 
   return (
