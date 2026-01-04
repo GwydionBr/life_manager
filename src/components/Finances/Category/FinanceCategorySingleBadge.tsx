@@ -38,11 +38,13 @@ export default function FinanceCategorySingleBadge({
       color="grape"
       variant="light"
       leftSection={<IconTag size={12} />}
+      {...props}
       style={{
         cursor: "pointer",
         border: hovered
           ? "1px solid var(--mantine-color-grape-5)"
           : "1px solid transparent",
+        ...props.style,
       }}
     >
       {category.title}

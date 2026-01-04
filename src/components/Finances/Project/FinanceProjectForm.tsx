@@ -35,7 +35,7 @@ const projectSchema = z.object({
     currencies.map((currency) => currency.value) as [Currency, ...Currency[]]
   ),
   start_amount: z.number().min(0, "Start amount is required"),
-  due_date: z.string().optional(),
+  due_date: z.string().nullable(),
   finance_category_ids: z.array(z.string()),
   finance_client_id: z.string().nullable(),
 });
@@ -63,7 +63,8 @@ export default function FinanceProjectForm({
 }: FinanceProjectFormProps) {
   const { data: settings } = useSettings();
   const { getLocalizedText } = useIntl();
-  const { addFinanceProject, updateFinanceProject } = useFinanceProjectMutations();
+  const { addFinanceProject, updateFinanceProject } =
+    useFinanceProjectMutations();
   // const {
   //   mutate: addFinanceProjectMutation,
   //   isPending: isAddingFinanceProject,
@@ -85,7 +86,7 @@ export default function FinanceProjectForm({
             (category) => category.id
           ),
           finance_client_id: financeProject.finance_client_id,
-          due_date: financeProject.due_date || undefined,
+          due_date: financeProject.due_date || null,
         }
       : {
           title: "",
@@ -94,7 +95,7 @@ export default function FinanceProjectForm({
           start_amount: 0,
           finance_category_ids: [],
           finance_client_id: null,
-          due_date: undefined,
+          due_date: null,
         },
     validate: zodResolver(projectSchema),
   });
@@ -121,13 +122,10 @@ export default function FinanceProjectForm({
         start_amount: values.start_amount,
         due_date: values.due_date || null,
         finance_client_id: values.finance_client_id,
-        categories: financeCategories
-          .filter((c) => values.finance_category_ids.includes(c.id))
-          .map((c) => ({
-            finance_category: c,
-          })),
-        finance_client:
-          contacts.find((c) => c.id === values.finance_client_id) || null,
+        categories: financeCategories.filter((c) =>
+          values.finance_category_ids.includes(c.id)
+        ),
+        client: contacts.find((c) => c.id === values.finance_client_id) || null,
       };
       updateFinanceProject(financeProject.id, updateProject);
     } else {
@@ -138,10 +136,10 @@ export default function FinanceProjectForm({
         start_amount: values.start_amount,
         due_date: values.due_date || null,
         finance_client_id: values.finance_client_id,
-        client:
-          contacts.find((c) => c.id === values.finance_client_id) || null,
-        categories: financeCategories
-          .filter((c) => values.finance_category_ids.includes(c.id))
+        client: contacts.find((c) => c.id === values.finance_client_id) || null,
+        categories: financeCategories.filter((c) =>
+          values.finance_category_ids.includes(c.id)
+        ),
       };
       addFinanceProject(insertProject);
     }
@@ -278,15 +276,9 @@ export default function FinanceProjectForm({
         </Group>
         <Stack mt="md">
           {financeProject ? (
-            <UpdateButton
-              type="submit"
-              onClick={form.onSubmit(handleSubmit)}
-            />
+            <UpdateButton type="submit" onClick={form.onSubmit(handleSubmit)} />
           ) : (
-            <CreateButton
-              type="submit"
-              onClick={form.onSubmit(handleSubmit)}
-            />
+            <CreateButton type="submit" onClick={form.onSubmit(handleSubmit)} />
           )}
           <CancelButton
             onClick={() => {

@@ -148,12 +148,11 @@ export const deleteSingleCashflowMutation = (id: string | string[]) => {
  * @param userId - The user ID
  */
 export async function syncSingleCashflowCategories(
-  cashflowId: string | string[],
+  cashflowIds: string[],
   categoryIds: string[],
   userId: string
 ): Promise<void> {
   // Normalize to array
-  const cashflowIds = Array.isArray(cashflowId) ? cashflowId : [cashflowId];
   const newCategoryIds = categoryIds || [];
 
   // 1. Get all existing relations for all cashflows

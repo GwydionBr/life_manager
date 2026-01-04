@@ -29,9 +29,9 @@ export default function EditFinanceProjectDrawer({
   const { deleteFinanceProject } = useFinanceProjectMutations();
   const [isLoading, setIsLoading] = useState(false);
   const [financeClient, setFinanceClient] =
-    useState<Tables<"finance_client"> | null>(financeProject.finance_client);
+    useState<Tables<"finance_client"> | null>(financeProject.client);
   const [categories, setCategories] = useState<Tables<"finance_category">[]>(
-    financeProject.categories.map((category) => category.finance_category)
+    financeProject.categories
   );
 
   const drawerStack = useDrawersStack([
@@ -45,7 +45,7 @@ export default function EditFinanceProjectDrawer({
     if (opened) {
       drawerStack.open("edit-finance-project");
       setCategories(
-        financeProject.categories.map((category) => category.finance_category)
+        financeProject.categories
       );
     } else {
       drawerStack.closeAll();

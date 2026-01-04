@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useDisclosure, useHover } from "@mantine/hooks";
 import { useIntl } from "@/hooks/useIntl";
+import { useRecurringCashflowMutations } from "@/db/collections/finance/recurring-cashflow/use-recurring-cashflow-mutations";
 
 import { Badge, Card, CardProps, Group, Text, ThemeIcon } from "@mantine/core";
 import {
@@ -8,7 +9,7 @@ import {
   IconCalendarOff,
   IconCalendarTime,
 } from "@tabler/icons-react";
-import FinanceCategoryBadges from "../../Category/FinanceCategoryBadges";
+import FinanceCategoryBadges from "@/components/Finances/Category/FinanceCategoryBadges";
 
 import { getNextDate } from "@/lib/financeHelperFunction";
 import { isToday } from "date-fns";
@@ -17,7 +18,6 @@ import { RecurringCashFlow } from "@/types/finance.types";
 import { FinanceInterval } from "@/types/settings.types";
 import { Tables } from "@/types/db.types";
 import { useFinanceCategories } from "@/db/collections/finance/finance-category/finance-category-collection";
-// import { useUpdateRecurringCashflowMutation } from "@/utils/queries/finances/use-recurring-cashflow";
 interface RecurringCashFlowRowProps extends CardProps {
   cashflow: RecurringCashFlow;
   showEndDate?: boolean;
@@ -37,12 +37,10 @@ export default function RecurringCashFlowRow({
   ...props
 }: RecurringCashFlowRowProps) {
   const { formatMoney, formatDate } = useIntl();
-  // const {
-  //   mutate: updateRecurringCashFlow,
-  //   isPending: isUpdatingRecurringCashFlow,
-  // } = useUpdateRecurringCashflowMutation({ showNotification: false });
   const { data: financeCategories } = useFinanceCategories();
+  const { updateRecurringCashflow } = useRecurringCashflowMutations();
   const { hovered, ref } = useHover();
+  const [isUpdating, setIsUpdating] = useState(false);
   const [
     isCategoryPopoverOpen,
     { open: openCategoryPopover, close: closeCategoryPopover },
@@ -50,9 +48,7 @@ export default function RecurringCashFlowRow({
 
   const currentCategories = useMemo(() => {
     return financeCategories.filter((category) =>
-      cashflow.categories
-        .map((category) => category.id)
-        .includes(category.id)
+      cashflow.categories.map((category) => category.id).includes(category.id)
     );
   }, [financeCategories, cashflow.categories]);
 
@@ -64,20 +60,21 @@ export default function RecurringCashFlowRow({
   const handleCategoryClose = async (
     updatedCategories: Tables<"finance_category">[] | null
   ) => {
+    if (isUpdating) return;
+    setIsUpdating(true);
     closeCategoryPopover();
-    // TODO: Implement update recurring cash flow
+    // TODO: Ask user if they want to update the single cash flows
     if (updatedCategories) {
-      // updateRecurringCashFlow({
-      //   recurringCashFlow: {
-      //     ...cashflow,
-      //     categories: updatedCategories.map((c) => ({
-      //       finance_category: c,
-      //     })),
-      //   },
-      //   // TODO: Ask user if they want to update the single cash flows
-      //   shouldUpdateSingleCashFlows: true,
-      // });
+      updateRecurringCashflow(
+        cashflow.id,
+        {
+          ...cashflow,
+          categories: updatedCategories,
+        },
+        true
+      );
     }
+    setTimeout(() => setIsUpdating(false), 500);
   };
 
   return (

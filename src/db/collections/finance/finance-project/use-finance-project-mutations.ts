@@ -10,10 +10,12 @@ import {
   updateFinanceProject,
   deleteFinanceProject,
   syncFinanceProjectCategories,
-  getFinanceProjectWithCategories,
 } from "./finance-project-mutations";
-import { FinanceProject, InsertFinanceProject } from "@/types/finance.types";
-import { TablesUpdate } from "@/types/db.types";
+import {
+  FinanceProject,
+  InsertFinanceProject,
+  UpdateFinanceProject,
+} from "@/types/finance.types";
 
 /**
  * Hook for Finance Project operations with automatic notifications.
@@ -79,11 +81,7 @@ export const useFinanceProjectMutations = () => {
    * Updates a Finance Project with automatic notification.
    */
   const handleUpdateFinanceProject = useCallback(
-    async (
-      id: string | string[],
-      item: TablesUpdate<"finance_project">,
-      categoryIds?: string[]
-    ): Promise<FinanceProject | undefined> => {
+    async (id: string | string[], item: UpdateFinanceProject) => {
       if (!profile?.id) {
         showActionErrorNotification(
           getLocalizedText(
@@ -91,31 +89,17 @@ export const useFinanceProjectMutations = () => {
             "No user profile found"
           )
         );
+
         return;
       }
 
       try {
-        const transaction = updateFinanceProject(id, item);
-        const result = await transaction.isPersisted.promise;
+        const promise = await updateFinanceProject(id, item, profile.id);
 
-        if (result.error) {
-          showActionErrorNotification(result.error.message);
+        if (promise.error) {
+          showActionErrorNotification(promise.error.message);
           return;
         }
-
-        // Sync categories if provided
-        const projectId = typeof id === "string" ? id : id[0];
-        if (categoryIds !== undefined) {
-          await syncFinanceProjectCategories(
-            projectId,
-            categoryIds,
-            profile.id
-          );
-        }
-
-        // Get complete project with categories
-        const completeProject =
-          await getFinanceProjectWithCategories(projectId);
 
         showActionSuccessNotification(
           getLocalizedText(
@@ -123,9 +107,8 @@ export const useFinanceProjectMutations = () => {
             "Finance project successfully updated"
           )
         );
-
-        return completeProject;
       } catch (error) {
+        console.log(error);
         showActionErrorNotification(
           getLocalizedText(
             `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
@@ -177,6 +160,5 @@ export const useFinanceProjectMutations = () => {
     deleteFinanceProject: handleDeleteFinanceProject,
     // Helper functions
     syncFinanceProjectCategories,
-    getFinanceProjectWithCategories,
   };
 };

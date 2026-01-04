@@ -90,9 +90,7 @@ export const useFinanceProjects = () => {
       if (!categoriesByProject.has(projectId)) {
         categoriesByProject.set(projectId, []);
       }
-      categoriesByProject.get(projectId)!.push({
-        finance_category: category,
-      });
+      categoriesByProject.get(projectId)!.push(category);
     });
 
     // Group adjustments by project
@@ -109,7 +107,7 @@ export const useFinanceProjects = () => {
     });
 
     // Create a map of clients by id for quick lookup
-    const clientsById = new Map<string, FinanceProject["finance_client"]>();
+    const clientsById = new Map<string, FinanceProject["client"]>();
     clients?.forEach((client) => {
       clientsById.set(client.id, client);
     });
@@ -118,7 +116,7 @@ export const useFinanceProjects = () => {
       ...project,
       categories: categoriesByProject.get(project.id) || [],
       adjustments: adjustmentsByProject.get(project.id) || [],
-      finance_client: project.finance_client_id
+      client: project.finance_client_id
         ? clientsById.get(project.finance_client_id) || null
         : null,
     }));

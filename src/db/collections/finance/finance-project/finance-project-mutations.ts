@@ -3,8 +3,10 @@ import {
   financeProjectsCollection,
   financeProjectCategoriesCollection,
 } from "./finance-project-collection";
-import { FinanceProject, InsertFinanceProject } from "@/types/finance.types";
-import { Tables, TablesUpdate } from "@/types/db.types";
+import {
+  InsertFinanceProject,
+  UpdateFinanceProject,
+} from "@/types/finance.types";
 import { PowerSyncTransactor } from "@tanstack/powersync-db-collection";
 import { createTransaction } from "@tanstack/react-db";
 
@@ -68,13 +70,45 @@ export const addFinanceProject = async (
  * @param item - The item to update
  * @returns Transaction object with isPersisted promise
  */
-export const updateFinanceProject = (
+export const updateFinanceProject = async (
   id: string | string[],
-  item: TablesUpdate<"finance_project">
+  item: UpdateFinanceProject,
+  userId: string
 ) => {
-  return financeProjectsCollection.update(id, (draft) => {
-    Object.assign(draft, item);
+  const ids = Array.isArray(id) ? id : [id];
+  const {
+    categories,
+    client: _client,
+    adjustments: _adjustments,
+    ...projectData
+  } = item;
+
+  const customTransaction = createTransaction({
+    autoCommit: false,
+    mutationFn: async ({ transaction }) => {
+      // Use PowerSyncTransactor to apply the transaction to PowerSync
+      await new PowerSyncTransactor({ database: db }).applyTransaction(
+        transaction
+      );
+    },
   });
+
+  customTransaction.mutate(() =>
+    ids.forEach((projectId) => {
+      financeProjectsCollection.update(projectId, (draft) => {
+        Object.assign(draft, projectData);
+      });
+    })
+  );
+
+  // Wait for all updates to complete
+  await customTransaction.commit();
+  const promise = await customTransaction.isPersisted.promise;
+
+  const categoryIds = categories.map((category) => category.id);
+  await syncFinanceProjectCategories(ids, categoryIds, userId);
+
+  return promise;
 };
 
 /**
@@ -90,100 +124,80 @@ export const deleteFinanceProject = (id: string | string[]) => {
 /**
  * Synchronizes the Many-to-Many relations between Finance Project and Finance Categories.
  * Deletes old relations and creates new ones based on categoryIds.
+ * Can handle a single project ID or an array of project IDs.
  *
- * @param projectId - The project ID
+ * @param projectIds - The project ID or array of project IDs
  * @param categoryIds - Array of category IDs to associate
  * @param userId - The user ID
  */
 export async function syncFinanceProjectCategories(
-  projectId: string,
+  projectIds: string[],
   categoryIds: string[],
   userId: string
 ): Promise<void> {
-  // 1. Get all existing relations for this project
-  const existingRelations = await db.getAll<{
-    id: string;
-    finance_category_id: string;
-  }>(
-    "SELECT id, finance_category_id FROM finance_project_category WHERE finance_project_id = ?",
-    [projectId]
-  );
-
-  const existingCategoryIds = existingRelations.map(
-    (r) => r.finance_category_id
-  );
+  // Normalize to array
   const newCategoryIds = categoryIds || [];
 
-  // 2. Find relations to delete (in existing but not in new)
-  const relationsToDelete = existingRelations.filter(
-    (relation) => !newCategoryIds.includes(relation.finance_category_id)
-  );
-
-  // 3. Find categories to add (in new but not in existing)
-  const categoriesToAdd = newCategoryIds.filter(
-    (categoryId) => !existingCategoryIds.includes(categoryId)
-  );
-
-  // 4. Delete old relations
-  const deletePromises = relationsToDelete.map((relation) =>
-    financeProjectCategoriesCollection.delete(relation.id)
-  );
-
-  // 5. Create new relations
-  const insertPromises = categoriesToAdd.map((categoryId) =>
-    financeProjectCategoriesCollection.insert({
-      id: crypto.randomUUID(),
-      finance_project_id: projectId,
-      finance_category_id: categoryId,
-      user_id: userId,
-      created_at: new Date().toISOString(),
-    })
-  );
-
-  // 6. Wait for all transactions
-  const allTransactions = [...deletePromises, ...insertPromises];
-  await Promise.all(allTransactions.map((tx) => tx.isPersisted.promise));
-}
-
-/**
- * Loads a complete FinanceProject with all Categories.
- *
- * @param projectId - The project ID
- * @returns Complete FinanceProject or undefined if not found
- */
-export async function getFinanceProjectWithCategories(
-  projectId: string
-): Promise<FinanceProject | undefined> {
-  // Get the project
-  const project = await db.getOptional<
-    Omit<FinanceProject, "categories" | "adjustments" | "finance_client">
-  >("SELECT * FROM finance_project WHERE id = ?", [projectId]);
-
-  if (!project) return undefined;
-
-  // Get the associated categories
-  const categoryRelations = await db.getAll<{
+  // 1. Get all existing relations for all projects
+  const placeholders = projectIds.map(() => "?").join(",");
+  const existingRelations = await db.getAll<{
+    id: string;
+    finance_project_id: string;
     finance_category_id: string;
   }>(
-    "SELECT finance_category_id FROM finance_project_category WHERE finance_project_id = ?",
-    [projectId]
+    `SELECT id, finance_project_id, finance_category_id FROM finance_project_category WHERE finance_project_id IN (${placeholders})`,
+    projectIds
   );
 
-  const categoryIds = categoryRelations.map((r) => r.finance_category_id);
+  // 2. Process each project separately
+  const allDeletePromises: ReturnType<
+    typeof financeProjectCategoriesCollection.delete
+  >[] = [];
+  const allInsertPromises: ReturnType<
+    typeof financeProjectCategoriesCollection.insert
+  >[] = [];
 
-  // Get the complete category data
-  const categories =
-    categoryIds.length > 0
-      ? await db.getAll<Tables<"finance_category">>(
-          `SELECT * FROM finance_category WHERE id IN (${categoryIds.map(() => "?").join(",")})`,
-          categoryIds
-        )
-      : [];
+  for (const currentProjectId of projectIds) {
+    // Get existing relations for this specific project
+    const projectRelations = existingRelations.filter(
+      (r) => r.finance_project_id === currentProjectId
+    );
+    const existingCategoryIds = projectRelations.map(
+      (r) => r.finance_category_id
+    );
 
-  return {
-    ...project,
-    categories: categories || [],
-    adjustments: [],
-    finance_client: null,
-  } as FinanceProject;
+    // Find relations to delete (in existing but not in new)
+    const relationsToDelete = projectRelations.filter(
+      (relation) => !newCategoryIds.includes(relation.finance_category_id)
+    );
+
+    // Find categories to add (in new but not in existing)
+    const categoriesToAdd = newCategoryIds.filter(
+      (categoryId) => !existingCategoryIds.includes(categoryId)
+    );
+
+    // Delete old relations
+    relationsToDelete.forEach((relation) => {
+      allDeletePromises.push(
+        financeProjectCategoriesCollection.delete(relation.id)
+      );
+    });
+
+    // Create new relations
+    categoriesToAdd.forEach((categoryId) => {
+      allInsertPromises.push(
+        financeProjectCategoriesCollection.insert({
+          id: crypto.randomUUID(),
+          finance_project_id: currentProjectId,
+          finance_category_id: categoryId,
+          user_id: userId,
+          created_at: new Date().toISOString(),
+        })
+      );
+    });
+  }
+
+  // 3. Wait for all transactions
+  const allTransactions = [...allDeletePromises, ...allInsertPromises];
+  await Promise.all(allTransactions.map((tx) => tx.isPersisted.promise));
 }

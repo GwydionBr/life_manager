@@ -15,11 +15,13 @@ import {
   Grid,
   Loader,
   Text,
+  Badge,
 } from "@mantine/core";
 import { IconBriefcase } from "@tabler/icons-react";
 import AnalysisActionIcon from "@/components/UI/ActionIcons/AnalysisActionIcon";
 import ListActionIcon from "@/components/UI/ActionIcons/ListActionIcon";
 import EditActionIcon from "@/components/UI/ActionIcons/EditActionIcon";
+import FinanceCategorySingleBadge from "@/components/Finances/Category/FinanceCategorySingleBadge";
 
 export default function WorkHeader() {
   const {
@@ -112,7 +114,11 @@ export default function WorkHeader() {
         </Group>
       )}
       <Grid w="100%" align="center">
-        <Grid.Col span={2}></Grid.Col>
+        <Grid.Col span={2}>
+          {project?.categories.map((category) => (
+            <FinanceCategorySingleBadge variant="filled" category={category} key={category.id} />
+          ))}
+        </Grid.Col>
         <Grid.Col span={8}>
           {isLoading ? (
             <Group

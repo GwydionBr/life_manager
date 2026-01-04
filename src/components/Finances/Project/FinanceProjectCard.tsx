@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   useDisclosure,
   useClickOutside,
@@ -69,6 +69,7 @@ export default function FinanceProjectCard({
   ...props
 }: FinanceProjectCardProps) {
   const { getLocalizedText, formatMoney } = useIntl();
+  const [isUpdating, setIsUpdating] = useState(false);
   // const {
   //   mutate: updateFinanceProjectMutation,
   //   isPending: isUpdatingFinanceProject,
@@ -103,10 +104,6 @@ export default function FinanceProjectCard({
   const [isDropdownOpen, { open: openDropdown, close: closeDropdown }] =
     useDisclosure(false);
 
-  const initialCategories = useMemo(() => {
-    return project.categories.map((category) => category.finance_category);
-  }, [project.categories]);
-
   const ref = useClickOutside(() => {
     if (
       !isMoreActionOpen &&
@@ -138,16 +135,18 @@ export default function FinanceProjectCard({
   const handleCategoryClose = (
     updatedCategories: Tables<"finance_category">[] | null
   ) => {
+    if (isUpdating) return;
+    setIsUpdating(true);
     closeBadgePopover();
     if (updatedCategories) {
       // TODO: add categories to updateFinanceProject
       updateFinanceProject(project.id, {
-        ...project,
-        // categories: updatedCategories.map((category) => ({
-        //   finance_category: category,
-        // })),
+        categories: updatedCategories,
+        client: project.client,
+        adjustments: project.adjustments,
       });
     }
+    setTimeout(() => setIsUpdating(false), 500);
   };
 
   const hasAdjustments = project.adjustments.length > 0;
@@ -271,11 +270,9 @@ export default function FinanceProjectCard({
           </Group>
 
           <Group gap="md" wrap="wrap" flex={2}>
-            {project.finance_client && (
-              <FinanceClientBadge client={project.finance_client} />
-            )}
+            {project.client && <FinanceClientBadge client={project.client} />}
             <FinanceCategoryBadges
-              initialCategories={initialCategories}
+              initialCategories={project.categories}
               onPopoverOpen={openBadgePopover}
               onPopoverClose={handleCategoryClose}
               showAddCategory={hovered || isEditing}
