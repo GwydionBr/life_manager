@@ -56,7 +56,7 @@ export default function Aside({
   }, [selectedDate, isDateChanged]);
 
   return (
-    <Stack py="md" h="100%" align="center" bg={backgroundColor}>
+    <Stack py="md" h="100%" gap={0} align="center" bg={backgroundColor}>
       <Stack align="flex-start" w="100%" gap="lg">
         <Group pl="xs" justify="flex-start">
           <DelayedTooltip

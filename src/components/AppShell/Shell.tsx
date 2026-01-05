@@ -21,8 +21,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
     habitColor,
     primaryColor,
     mainBackgroundColor,
+    currentAppColor,
     toggleAside,
     setMainBackgroundColor,
+    setCurrentAppColor,
   } = useSettingsStore();
   const location = useLocation();
   const theme = useMantineTheme();
@@ -43,17 +45,17 @@ export function Shell({ children }: { children: React.ReactNode }) {
     }
   }, [location.pathname]);
 
-  const currentAppColor = useMemo(() => {
+  useEffect(() => {
     if (currentApp === AppOptions.WORK) {
-      return workColor;
+      setCurrentAppColor(workColor);
     } else if (currentApp === AppOptions.FINANCE) {
-      return financeColor;
+      setCurrentAppColor(financeColor);
     } else if (currentApp === AppOptions.CALENDAR) {
-      return calendarColor;
+      setCurrentAppColor(calendarColor);
     } else if (currentApp === AppOptions.HABBIT_TRACKER) {
-      return habitColor;
+      setCurrentAppColor(habitColor);
     } else {
-      return primaryColor;
+      setCurrentAppColor(primaryColor);
     }
   }, [
     currentApp,
@@ -62,6 +64,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     calendarColor,
     habitColor,
     primaryColor,
+    setCurrentAppColor,
   ]);
 
   const currentAppGradient = useMemo(() => {

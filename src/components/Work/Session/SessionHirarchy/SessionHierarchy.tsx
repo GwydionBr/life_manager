@@ -53,7 +53,7 @@ export default function SessionHierarchy({
     ).length;
     if (selectedCount === groupIds.length)
       return "light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-6))";
-    if (selectedCount === 0) return "light-dark(var(--mantine-color-white), var(--mantine-color-gray-9))";
+    if (selectedCount === 0) return undefined;
   };
 
   return (

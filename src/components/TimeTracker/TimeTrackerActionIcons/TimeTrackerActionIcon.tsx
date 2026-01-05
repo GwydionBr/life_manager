@@ -1,5 +1,5 @@
-import { ActionIcon, ActionIconProps, Indicator, Tooltip } from "@mantine/core";
-import { IconStopwatch } from "@tabler/icons-react";
+import { ActionIcon, ActionIconProps, Indicator } from "@mantine/core";
+import { IconMaximize, IconMinimize } from "@tabler/icons-react";
 import { TimerState } from "@/types/timeTracker.types";
 import DelayedTooltip from "@/components/UI/DelayedTooltip";
 
@@ -9,6 +9,7 @@ interface TimeTrackerActionIconProps extends ActionIconProps {
   label: string;
   state: TimerState;
   getStatusColor: () => string;
+  minimized?: boolean;
 }
 
 export default function TimeTrackerActionIcon({
@@ -17,6 +18,7 @@ export default function TimeTrackerActionIcon({
   label,
   state,
   getStatusColor,
+  minimized = false,
   ...props
 }: TimeTrackerActionIconProps) {
   return (
@@ -28,8 +30,13 @@ export default function TimeTrackerActionIcon({
         processing={state === "running"}
         disabled={state === "stopped"}
       >
-        <ActionIcon onClick={action} size="md" color={getStatusColor()}>
-          <IconStopwatch />
+        <ActionIcon
+          onClick={action}
+          size="md"
+          color={getStatusColor()}
+          {...props}
+        >
+          {minimized ? <IconMaximize size={22} /> : <IconMinimize size={22} />}
         </ActionIcon>
       </Indicator>
     </DelayedTooltip>

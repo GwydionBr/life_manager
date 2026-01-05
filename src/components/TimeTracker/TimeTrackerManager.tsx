@@ -3,10 +3,21 @@ import {
   TimerData,
   useTimeTrackerManager,
 } from "@/stores/timeTrackerManagerStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 import { useWorkStore } from "@/stores/workManagerStore";
 import { useIntl } from "@/hooks/useIntl";
 
-import { Alert, alpha, Select, Stack, Text } from "@mantine/core";
+import {
+  Alert,
+  alpha,
+  Group,
+  Select,
+  Stack,
+  Text,
+  Box,
+  getThemeColor,
+  useMantineTheme,
+} from "@mantine/core";
 import { TimerState } from "@/types/timeTracker.types";
 import TimeTrackerInstance from "./TimeTrackerInstance";
 import PlusActionIcon from "@/components/UI/ActionIcons/PlusActionIcon";
@@ -15,7 +26,7 @@ import { getStatusColor } from "@/lib/workHelperFunctions";
 import { useSettings } from "@/db/collections/settings/settings-collection";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { WorkProject } from "@/types/work.types";
-import { IconClipboardList } from "@tabler/icons-react";
+import classes from "./TimeTracker.module.css";
 
 /**
  * Props for the TimeTrackerManager component.
@@ -48,8 +59,11 @@ export default function TimerManager({
   isTimeTrackerMinimized,
   setIsTimeTrackerMinimized,
 }: TimerManagerProps) {
+  const theme = useMantineTheme();
   // Error message state for displaying validation errors
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const { currentAppColor } = useSettingsStore();
 
   // Client-side hydration flag (prevents SSR mismatches)
   const [isClient, setIsClient] = useState(false);
@@ -82,6 +96,10 @@ export default function TimerManager({
     () => projects.find((p) => p.id === activeProjectId),
     [projects, activeProjectId]
   );
+
+  const backgroundColor = useMemo(() => {
+    return alpha(getThemeColor(currentAppColor, theme), 0.4);
+  }, [currentAppColor, theme]);
 
   // Local state for processed timers (with ensured rounding settings)
   const [timers, setTimers] = useState<TimerData[]>([]);
@@ -279,56 +297,74 @@ export default function TimerManager({
    */
   return (
     <Stack align="center" gap="md" mb="md">
-      <Select
-      placeholder={getLocalizedText("Projekt auswählen", "Select project")}
-        data={projects
-          .filter(
-            (p) => p.id !== timers.find((t) => t.projectId === p.id)?.projectId
-          )
-          .map((p) => ({
-            label: p.title,
-            value: p.id,
-          }))}
-        value={selectedProjectId}
-        onChange={setSelectedProjectId}
-        searchable
-        leftSection={<IconClipboardList stroke={1.5} />}
-        rightSectionPointerEvents="auto"
-        rightSection={
-          <PlusActionIcon
-            onClick={() => {
-              if (!selectedProjectId) return;
-              const selectedProject = projects.find(
-                (p) => p.id === selectedProjectId
-              )!;
-              if (!selectedProject) return;
-              handleAddTimer(selectedProject);
+      <Box className={classes.toolbar}>
+        <Group
+          p="xs"
+          align="center"
+          justify="space-between"
+          bg={backgroundColor}
+        >
+          {/* Summary icon showing timer count and aggregate status */}
+          <TimeTrackerActionIcon
+            action={() => setIsTimeTrackerMinimized(!isTimeTrackerMinimized)}
+            minimized={isTimeTrackerMinimized}
+            label={
+              isTimeTrackerMinimized
+                ? getLocalizedText("Timer vergrößern", "Expand Timer")
+                : getLocalizedText("Timer verkleinern", "Minimize Timer")
+            }
+            indicatorLabel={activeTimerCount.toString()}
+            state={mainTimerStatus}
+            getStatusColor={() => getStatusColor(mainTimerStatus)}
+          />
+          <Select
+            w={210}
+            placeholder={getLocalizedText(
+              "Projekt auswählen",
+              "Select project"
+            )}
+            data={projects
+              .filter(
+                (p) =>
+                  p.id !== timers.find((t) => t.projectId === p.id)?.projectId
+              )
+              .map((p) => ({
+                label: p.title,
+                value: p.id,
+              }))}
+            value={selectedProjectId}
+            onChange={setSelectedProjectId}
+            searchable
+            leftSection={
+              <Text fz="xs" c="dimmed">
+                {timers.length}/10
+              </Text>
+            }
+            rightSectionPointerEvents="auto"
+            rightSection={
+              <PlusActionIcon
+                onClick={() => {
+                  if (!selectedProjectId) return;
+                  const selectedProject = projects.find(
+                    (p) => p.id === selectedProjectId
+                  )!;
+                  if (!selectedProject) return;
+                  handleAddTimer(selectedProject);
+                }}
+              />
+            }
+            styles={{
+              input: {
+                textAlign: "center",
+                textOverflow: "ellipsis",
+                fontSize: "var(--mantine-font-size-md)",
+                backgroundColor: alpha("var(--mantine-color-body)", 0.5),
+                border: "none",
+              },
             }}
           />
-        }
-        styles={{
-          input: {
-            textAlign: "center",
-            textOverflow: "ellipsis",
-            fontSize: "var(--mantine-font-size-md)",
-            backgroundColor: alpha("var(--mantine-color-body)", 0.5),
-            border: "none",
-          },
-        }}
-      />
-
-      {/* Summary icon showing timer count and aggregate status */}
-      <TimeTrackerActionIcon
-        action={() => setIsTimeTrackerMinimized(!isTimeTrackerMinimized)}
-        label={
-          isTimeTrackerMinimized
-            ? getLocalizedText("Timer vergrößern", "Expand Timer")
-            : getLocalizedText("Timer verkleinern", "Minimize Timer")
-        }
-        indicatorLabel={activeTimerCount.toString()}
-        state={mainTimerStatus}
-        getStatusColor={() => getStatusColor(mainTimerStatus)}
-      />
+        </Group>
+      </Box>
 
       {/* Error alert - shown when timer creation fails */}
       {errorMessage && (
