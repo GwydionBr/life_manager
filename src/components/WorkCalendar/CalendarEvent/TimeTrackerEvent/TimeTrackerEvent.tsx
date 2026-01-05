@@ -6,6 +6,7 @@ import { useWorkProjects } from "@/db/collections/work/work-project/use-work-pro
 import { alpha, Stack, Text } from "@mantine/core";
 import { endOfDay, isToday, isYesterday, startOfDay } from "date-fns";
 import ActiveTimeTracker from "./ActiveTimeTracker";
+import { TimerState } from "@/types/timeTracker.types";
 
 interface TimeTrackerEventProps {
   toY: (date: Date) => number;
@@ -17,12 +18,16 @@ export default function TimeTrackerEvent({
   currentTime,
   day,
 }: TimeTrackerEventProps) {
-  const { isTimerRunning, getRunningTimer } = useTimeTrackerManager();
+  const { isTimerRunning, timers } = useTimeTrackerManager();
 
-  const timer = getRunningTimer();
+  const timer = useMemo(
+    () => Object.values(timers).find((t) => t.state === TimerState.Running),
+    [timers]
+  );
+
   const { locale, format_24h } = useIntl();
-  const { data: projects, isLoading: isProjectsLoading } = useWorkProjects();
-  
+  const { data: projects } = useWorkProjects();
+
   const project = useMemo(
     () => projects.find((p) => p.id === timer?.projectId),
     [projects, timer?.projectId]

@@ -63,7 +63,7 @@ export default function TimeTrackerInstance({
     useTimeTrackerManager();
 
   // Fetch projects to get project details (color, etc.)
-  const { data: projects, isLoading: isProjectsLoading } = useWorkProjects();
+  const { data: projects } = useWorkProjects();
 
   // Find the project associated with this timer
   const project = useMemo(

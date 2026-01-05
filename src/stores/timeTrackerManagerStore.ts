@@ -137,7 +137,7 @@ export const useTimeTrackerManager = create(
         // Build timer data structure from project and settings
         // Project-specific rounding settings override defaults
         const timerData = {
-          projecwtId: project.id,
+          projectId: project.id,
           projectTitle: project.title,
           currency: project.currency,
           salary: project.salary,
