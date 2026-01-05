@@ -7,7 +7,7 @@ import {
 } from "@mantine/hooks";
 import { useIntl } from "@/hooks/useIntl";
 import { useFinanceProjectMutations } from "@/db/collections/finance/finance-project/use-finance-project-mutations";
-import { usePayoutMutations } from "@/db/collections/finance/payout/use-payout-mutations";    
+import { usePayoutMutations } from "@/db/collections/finance/payout/use-payout-mutations";
 // import {
 //   usePayoutFinanceProjectMutation,
 //   usePayoutFinanceAdjustmentMutation,
@@ -71,25 +71,9 @@ export default function FinanceProjectCard({
 }: FinanceProjectCardProps) {
   const { getLocalizedText, formatMoney } = useIntl();
   const [isUpdating, setIsUpdating] = useState(false);
-  const { financeProjectAdjustmentPayout } = usePayoutMutations();
-  // const {
-  //   mutate: updateFinanceProjectMutation,
-  //   isPending: isUpdatingFinanceProject,
-  // } = useUpdateFinanceProjectMutation({ showNotification: false });
-  // const {
-  //   mutate: payoutFinanceAdjustmentMutation,
-  //   isPending: isPayingOutAdjustment,
-  // } = usePayoutFinanceAdjustmentMutation();
-  // const {
-  //   mutate: payoutFinanceProjectMutation,
-  //   isPending: isPayingOutProject,
-  // } = usePayoutFinanceProjectMutation();
-  const {
-    updateFinanceProject,
-    // TODO: add payout mutations
-    // payoutFinanceAdjustment,
-    // payoutFinanceProject,
-  } = useFinanceProjectMutations();
+  const { financeProjectAdjustmentPayout, financeProjectPayout } =
+    usePayoutMutations();
+  const { updateFinanceProject } = useFinanceProjectMutations();
   const [isEditing, { open: openEditing, close: closeEditing }] =
     useDisclosure(false);
   const { hovered, ref: hoverRef } = useHover();
@@ -180,17 +164,9 @@ export default function FinanceProjectCard({
         financeProjectAdjustmentPayout(adjustment, project);
       }
     } else if (isStartValue) {
-      //  handle start value payout
-      // payoutFinanceProjectMutation({
-      //   financeProject: project,
-      //   payoutWholeProject: false,
-      // });
+      financeProjectPayout(project, false);
     } else {
-      //  handle all payout
-      // payoutFinanceProjectMutation({
-      //   financeProject: project,
-      //   payoutWholeProject: true,
-      // });
+      financeProjectPayout(project, true);
     }
   };
 

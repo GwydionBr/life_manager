@@ -1,11 +1,17 @@
 import { useCallback } from "react";
 import { useProfile } from "@/db/collections/profile/profile-collection";
+import { useIntl } from "@/hooks/useIntl";
+import { useProjectAdjustmentsQuery } from "../project-adjustment/use-project-adjustment-query";
+
 import {
   showActionSuccessNotification,
   showActionErrorNotification,
 } from "@/lib/notificationFunctions";
-import { useIntl } from "@/hooks/useIntl";
-import { addPayout, updatePayout, deletePayout } from "./payout-mutations";
+import {
+  addPayout,
+  updatePayout,
+  deletePayout,
+} from "@/db/collections/finance/payout/payout-mutations";
 import {
   FinanceProject,
   Payout,
@@ -14,9 +20,10 @@ import {
 import { Tables, TablesUpdate } from "@/types/db.types";
 import { WorkProject, WorkTimeEntry } from "@/types/work.types";
 import { Currency } from "@/types/settings.types";
-import { addSingleCashflowMutation } from "../single-cashflow/single-cashflow-mutations";
-import { updateWorkTimeEntry } from "../../work/work-time-entry/work-time-entry-mutations";
-import { updateProjectAdjustment } from "../project-adjustment/project-adjustment-mutations";
+import { addSingleCashflowMutation } from "@/db/collections/finance/single-cashflow/single-cashflow-mutations";
+import { updateWorkTimeEntry } from "@/db/collections/work/work-time-entry/work-time-entry-mutations";
+import { updateProjectAdjustment } from "@/db/collections/finance/project-adjustment/project-adjustment-mutations";
+import { updateFinanceProject } from "@/db/collections/finance/finance-project/finance-project-mutations";
 
 /**
  * Hook for Payout operations with automatic notifications.
@@ -29,6 +36,79 @@ import { updateProjectAdjustment } from "../project-adjustment/project-adjustmen
 export const usePayoutMutations = () => {
   const { data: profile } = useProfile();
   const { getLocalizedText } = useIntl();
+
+  const handleFinanceProjectPayout = useCallback(
+    async (financeProject: FinanceProject, payoutWholeProject: boolean) => {
+      if (!profile?.id) {
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
+        return;
+      }
+
+      try {
+        const { promise, data } = await addSingleCashflowMutation(
+          {
+            title: financeProject.title,
+            amount: financeProject.start_amount,
+            currency: financeProject.currency,
+            categories: financeProject.categories,
+          },
+          profile.id
+        );
+
+        const result = await updateFinanceProject(
+          financeProject.id,
+          {
+            single_cash_flow_id: data[0].id,
+            categories: financeProject.categories,
+            client: financeProject.client,
+            adjustments: financeProject.adjustments,
+          },
+          profile.id
+        );
+
+        if (payoutWholeProject) {
+          financeProject.adjustments
+            .filter((adjustment) => !adjustment.single_cash_flow_id)
+            .forEach(async (adjustment) => {
+              await handleFinanceProjectAdjustmentPayout(
+                adjustment,
+                financeProject
+              );
+            });
+        }
+
+        if (result.error) {
+          showActionErrorNotification(result.error.message);
+          return;
+        }
+
+        if (promise.error) {
+          showActionErrorNotification(promise.error.message);
+          return;
+        }
+
+        showActionSuccessNotification(
+          getLocalizedText(
+            "Auszahlung erfolgreich erstellt",
+            "Payout successfully created"
+          )
+        );
+      } catch (error) {
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+      }
+    },
+    [profile?.id, getLocalizedText]
+  );
 
   const handleFinanceProjectAdjustmentPayout = useCallback(
     async (
@@ -252,5 +332,6 @@ export const usePayoutMutations = () => {
     updatePayout: handleUpdatePayout,
     deletePayout: handleDeletePayout,
     financeProjectAdjustmentPayout: handleFinanceProjectAdjustmentPayout,
+    financeProjectPayout: handleFinanceProjectPayout,
   };
 };
