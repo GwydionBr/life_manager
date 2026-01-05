@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { useForm } from "@mantine/form";
 import { useIntl } from "@/hooks/useIntl";
 import { bankAccountsCollection } from "@/db/collections/finance/bank-account/bank-account-collection";
-import { useProfile } from "@/db/collections/profile/profile-collection"; 
+import { useProfile } from "@/db/collections/profile/profile-collection";
+import { useBankAccounts } from "@/db/collections/finance/bank-account/bank-account-collection";
 
-import { Stack, Select, TextInput } from "@mantine/core";
+import { Stack, Select, TextInput, Checkbox } from "@mantine/core";
 
 import { z } from "zod";
 import { zodResolver } from "mantine-form-zod-resolver";
@@ -15,6 +17,7 @@ import UpdateButton from "@/components/UI/Buttons/UpdateButton";
 import CreateButton from "@/components/UI/Buttons/CreateButton";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
 import { useSettings } from "@/db/collections/settings/settings-collection";
+import { BankAccount } from "@/types/finance.types";
 
 const schema = z.object({
   title: z.string().min(1, "Name is required"),
@@ -22,13 +25,14 @@ const schema = z.object({
   currency: z.enum(
     currencies.map((currency) => currency.value) as [Currency, ...Currency[]]
   ),
+  is_default: z.boolean(),
   saldo: z.number().min(0, "Saldo is required"),
 });
 
 interface BankAccountFormProps {
   onClose?: () => void;
-  onSuccess?: (bankAccount: Tables<"bank_account">) => void;
-  bankAccount?: Tables<"bank_account"> | null;
+  onSuccess?: (bankAccount: BankAccount) => void;
+  bankAccount?: BankAccount;
 }
 
 export default function BankAccountForm({
@@ -37,6 +41,7 @@ export default function BankAccountForm({
   bankAccount,
 }: BankAccountFormProps) {
   const { getLocalizedText } = useIntl();
+  const { data: bankAccounts } = useBankAccounts();
   const { data: settings } = useSettings();
   const { data: profile } = useProfile();
 
@@ -46,10 +51,23 @@ export default function BankAccountForm({
       description: bankAccount?.description || "",
       currency:
         bankAccount?.currency || settings?.default_finance_currency || "USD",
+      is_default: bankAccount?.is_default || false,
       saldo: bankAccount?.saldo || 0,
     },
     validate: zodResolver(schema),
   });
+
+  useEffect(() => {
+    if (bankAccounts) {
+      form.setFieldValue(
+        "is_default",
+        bankAccounts.some(
+          (b) =>
+            b.is_default && b.currency === settings?.default_finance_currency
+        )
+      );
+    }
+  }, [bankAccounts, settings]);
 
   const handleClose = () => {
     form.reset();
@@ -64,6 +82,7 @@ export default function BankAccountForm({
         draft.currency =
           values.currency as Database["public"]["Enums"]["currency"];
         draft.saldo = values.saldo;
+        draft.is_default = values.is_default;
       });
     } else {
       bankAccountsCollection.insert({
@@ -75,6 +94,7 @@ export default function BankAccountForm({
         description: values.description || null,
         currency: values.currency as Database["public"]["Enums"]["currency"],
         saldo: values.saldo,
+        is_default: values.is_default,
       });
     }
     handleClose();
@@ -97,6 +117,13 @@ export default function BankAccountForm({
           label={getLocalizedText("Währung", "Currency")}
           data={currencies}
           {...form.getInputProps("currency")}
+        />
+        <Checkbox
+          label={getLocalizedText(
+            "Standardkonto für die ausgewählte Währung",
+            "Default account for the selected currency"
+          )}
+          {...form.getInputProps("is_default")}
         />
         <CustomNumberInput
           withAsterisk

@@ -42,7 +42,7 @@ import {
 } from "@tabler/icons-react";
 import MoreActionIcon from "@/components/UI/ActionIcons/MoreActionIcon";
 import PlusActionIcon from "@/components/UI/ActionIcons/PlusActionIcon";
-import FinanceClientBadge from "@/components/Finances/Contact/FinanceClientBadge";
+import FinanceClientBadge from "@/components/Finances/Contact/ContactBadge";
 import FinanceCategoryBadges from "@/components/Finances/Category/FinanceCategoryBadges";
 import { Tables } from "@/types/db.types";
 import PayoutActionIcon from "@/components/UI/ActionIcons/PayoutActionIcon";

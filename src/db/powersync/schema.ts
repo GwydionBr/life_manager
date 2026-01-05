@@ -41,6 +41,7 @@ const bank_account = new Table(
     saldo: column.real,
     saldo_set_at: column.text,
     user_id: column.text,
+    is_default: column.integer,
   },
   { indexes: {} }
 );

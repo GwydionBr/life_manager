@@ -64,6 +64,7 @@ export type Database = {
           currency: Database["public"]["Enums"]["currency"]
           description: string | null
           id: string
+          is_default: boolean
           saldo: number
           saldo_set_at: string
           title: string
@@ -74,6 +75,7 @@ export type Database = {
           currency: Database["public"]["Enums"]["currency"]
           description?: string | null
           id?: string
+          is_default?: boolean
           saldo?: number
           saldo_set_at?: string
           title: string
@@ -84,6 +86,7 @@ export type Database = {
           currency?: Database["public"]["Enums"]["currency"]
           description?: string | null
           id?: string
+          is_default?: boolean
           saldo?: number
           saldo_set_at?: string
           title?: string
@@ -682,27 +685,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      lists: {
-        Row: {
-          created_at: string
-          id: string
-          name: string
-          owner_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          name: string
-          owner_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          name?: string
-          owner_id?: string
-        }
-        Relationships: []
       }
       old_payout_data: {
         Row: {
@@ -1466,47 +1448,6 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "timer_project"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      todos: {
-        Row: {
-          completed: boolean
-          completed_at: string | null
-          completed_by: string | null
-          created_at: string
-          created_by: string | null
-          description: string
-          id: string
-          list_id: string
-        }
-        Insert: {
-          completed?: boolean
-          completed_at?: string | null
-          completed_by?: string | null
-          created_at?: string
-          created_by?: string | null
-          description: string
-          id?: string
-          list_id: string
-        }
-        Update: {
-          completed?: boolean
-          completed_at?: string | null
-          completed_by?: string | null
-          created_at?: string
-          created_by?: string | null
-          description?: string
-          id?: string
-          list_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "todos_list_id_fkey"
-            columns: ["list_id"]
-            isOneToOne: false
-            referencedRelation: "lists"
             referencedColumns: ["id"]
           },
         ]

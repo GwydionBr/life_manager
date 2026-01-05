@@ -6,6 +6,7 @@ export const bankAccountSchema = z.object({
   currency: z.enum(Constants.public.Enums.currency),
   description: z.string().nullable(),
   id: z.string(),
+  is_default: z.boolean(),
   saldo: z.number(),
   saldo_set_at: z.string(),
   title: z.string(),
@@ -19,6 +20,10 @@ export const bankAccountDeserializationSchema = z.object({
     .transform((value) => value as Database["public"]["Enums"]["currency"]),
   description: z.string().nullable(),
   id: z.string(),
+  is_default: z
+    .number()
+    .nullable()
+    .transform((value) => (value === null ? false : value === 1)),
   saldo: z.number(),
   saldo_set_at: z.string(),
   title: z.string(),

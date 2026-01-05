@@ -29,11 +29,9 @@ export default function RoundingSettings() {
 
   const [roundingIntervalState, setRoundingIntervalState] = useState(0);
 
-  if (!settings) return null;
-
   useEffect(() => {
-    setRoundingIntervalState(settings.rounding_interval);
-  }, [settings.rounding_interval]);
+    setRoundingIntervalState(settings?.rounding_interval || 0);
+  }, [settings?.rounding_interval]);
 
   function handleCustomSubmit() {
     if (!settings) return;
@@ -44,6 +42,8 @@ export default function RoundingSettings() {
 
   const roundingInTimeSections = getRoundingInTimeFragments(locale);
   const roundingModes = getRoundingModes(locale);
+
+  if (!settings) return null;
 
   return (
     <Stack>

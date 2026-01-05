@@ -1,6 +1,7 @@
 import { useForm } from "@mantine/form";
 import { useIntl } from "@/hooks/useIntl";
 import { useProfile } from "@/db/collections/profile/profile-collection";
+import { useSettings } from "@/db/collections/settings/settings-collection";
 
 import { Fieldset, Select, Stack, TextInput } from "@mantine/core";
 
@@ -39,6 +40,7 @@ export default function FinanceClientForm({
 }: FinanceClientFormProps) {
   const { getLocalizedText } = useIntl();
   const { data: profile } = useProfile();
+  const { data: settings } = useSettings();
 
   const form = useForm({
     initialValues: {
@@ -47,7 +49,7 @@ export default function FinanceClientForm({
       email: client?.email || "",
       phone: client?.phone || "",
       address: client?.address || "",
-      currency: client?.currency || "USD",
+      currency: client?.currency || settings?.default_finance_currency || "USD",
     },
     validate: zodResolver(schema),
   });

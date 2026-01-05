@@ -2,7 +2,7 @@ import { useDisclosure, useHover } from "@mantine/hooks";
 
 import { Badge, Popover } from "@mantine/core";
 import { IconUser } from "@tabler/icons-react";
-import FinanceClientCard from "@/components/Finances/Contact/FinanceClientCard";
+import FinanceClientCard from "@/components/Finances/Contact/ContactCard";
 
 import { Tables } from "@/types/db.types";
 

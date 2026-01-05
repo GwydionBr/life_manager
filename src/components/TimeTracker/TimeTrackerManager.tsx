@@ -359,6 +359,7 @@ export default function TimerManager({
                 textOverflow: "ellipsis",
                 fontSize: "var(--mantine-font-size-md)",
                 backgroundColor: alpha("var(--mantine-color-body)", 0.5),
+                borderRadius: "var(--mantine-radius-lg)",
                 border: "none",
               },
             }}

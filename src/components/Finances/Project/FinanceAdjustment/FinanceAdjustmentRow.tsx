@@ -14,7 +14,7 @@ import {
 import { Currency } from "@/types/settings.types";
 import { Tables } from "@/types/db.types";
 import PayoutActionIcon from "@/components/UI/ActionIcons/PayoutActionIcon";
-import FinanceClientBadge from "@/components/Finances/Contact/FinanceClientBadge";
+import FinanceClientBadge from "@/components/Finances/Contact/ContactBadge";
 import { FinanceProject } from "@/types/finance.types";
 
 interface FinanceAdjustmentRowProps {

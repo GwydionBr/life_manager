@@ -16,11 +16,9 @@ export default function WorkDefaultSettings() {
 
   const [salaryAmount, setSalaryAmount] = useState(0);
 
-  if (!settings) return null;
-
   useEffect(() => {
-    setSalaryAmount(settings.default_salary_amount);
-  }, [settings.default_salary_amount]);
+    setSalaryAmount(settings?.default_salary_amount || 0);
+  }, [settings?.default_salary_amount]);
 
   function handleCustomSubmit() {
     if (!settings) return;
@@ -28,6 +26,8 @@ export default function WorkDefaultSettings() {
       draft.default_salary_amount = salaryAmount;
     });
   }
+
+  if (!settings) return null;
 
   const {
     default_salary_amount,
