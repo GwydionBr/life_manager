@@ -2,8 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useIntl } from "@/hooks/useIntl";
+import { useFinanceStore } from "@/stores/financeStore";
 import { useSingleCashflowsQuery } from "@/db/collections/finance/single-cashflow/use-single-cashflow-query";
 import { useSingleCashflowMutations } from "@/db/collections/finance/single-cashflow/use-single-cashflow-mutations";
+import { useBankAccounts } from "@/db/collections/finance/bank-account/bank-account-collection";
+
 
 import {
   Group,
@@ -48,12 +51,18 @@ import SelectBankAccount from "@/components/Finances/BankAccount/SelectBankAccou
 export default function FinanceSingleTab() {
   const { data: singleCashFlows = [], isLoading: isSingleCashFlowsLoading } =
     useSingleCashflowsQuery();
+  const { data: bankAccounts } = useBankAccounts();
   const { deleteSingleCashflow } = useSingleCashflowMutations();
-  const { setIsModalOpen, setSelectedTab } = useSettingsStore();
+  const { setIsModalOpen, setSelectedTab, financeColor } = useSettingsStore();
   const { getLocalizedText, formatMoney, formatDate } = useIntl();
   const [typeFilter, setTypeFilter] = useState<"all" | "expense" | "income">(
     "all"
   );
+  const { selectedBankAccountId } = useFinanceStore();
+
+  const selectedBankAccount = useMemo(() => {
+    return bankAccounts.find((bankAccount) => bankAccount.id === selectedBankAccountId) ?? null;
+  }, [bankAccounts, selectedBankAccountId]);
 
   // Single Add
   const [
@@ -327,11 +336,22 @@ export default function FinanceSingleTab() {
             key="finance-single-bank-account-card"
             p={0}
             style={{
-              border:
-                "1px solid light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-2))",
+              border: `1px solid light-dark(var(--mantine-color-${financeColor}-6), var(--mantine-color-${financeColor}-2))`,
             }}
           >
             <SelectBankAccount />
+            <Divider />
+            <Group justify="space-between" p="xs">
+              <Text fz="sm" fw={500}>
+                {getLocalizedText("Kontostand", "Balance")}:
+              </Text>
+              <Text fz="sm" fw={500}>
+                {formatMoney(
+                  selectedBankAccount?.saldo ?? 0,
+                  selectedBankAccount?.currency ?? "USD"
+                )}
+              </Text>
+            </Group>
           </FinancesNavbarDefaultCard>,
           <FinancesNavbarNavList
             key="finance-single-navbar-list"

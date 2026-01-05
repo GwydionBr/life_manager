@@ -3,7 +3,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useFinanceProjects } from "@/db/collections/finance/finance-project/use-finance-project-query";
 import { useFinanceProjectMutations } from "@/db/collections/finance/finance-project/use-finance-project-mutations";
-import { useFinanceCategories } from "@/db/collections/finance/finance-category/finance-category-collection";
+import { useTags } from "@/db/collections/finance/tags/tags-collection";
 import { useContacts } from "@/db/collections/finance/contacts/contact-collection";
 import { useIntl } from "@/hooks/useIntl";
 
@@ -62,7 +62,7 @@ export default function FinanceProjectTab() {
   const { data: financeClients = [] } = useContacts();
   const { data: financeProjects = [], isLoading: isLoadingFinanceProjects } =
     useFinanceProjects();
-  const { data: financeCategories = [] } = useFinanceCategories();
+  const { data: financeCategories = [] } = useTags();
   const { deleteFinanceProject } = useFinanceProjectMutations();
 
   const { setIsModalOpen, setSelectedTab } = useSettingsStore();

@@ -1,6 +1,5 @@
-
 import { useIntl } from "@/hooks/useIntl";
-import { useFinanceCategories } from "@/db/collections/finance/finance-category/finance-category-collection";
+import { useTags } from "@/db/collections/finance/tags/tags-collection";
 
 import {
   Group,
@@ -74,7 +73,7 @@ export default function SessionFilter({
   onClearAllFilters,
 }: SessionFilterProps) {
   const { getLocalizedText } = useIntl();
-  const { data: financeCategories } = useFinanceCategories();
+  const { data: financeCategories } = useTags();
 
   // Toggle between selecting all sessions or none
   const handleSelectAll = () => {

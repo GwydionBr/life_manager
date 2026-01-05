@@ -9,7 +9,7 @@ import CancelButton from "@/components/UI/Buttons/CancelButton";
 import CreateButton from "@/components/UI/Buttons/CreateButton";
 import UpdateButton from "@/components/UI/Buttons/UpdateButton";
 import { Tables } from "@/types/db.types";
-import { financeCategoriesCollection } from "@/db/collections/finance/finance-category/finance-category-collection";
+import { tagsCollection } from "@/db/collections/finance/tags/tags-collection";
 
 const schema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
@@ -45,14 +45,11 @@ export default function FinanceCategoryForm({
 
   async function handleFormSubmit(values: z.infer<typeof schema>) {
     if (category) {
-      const newTX = financeCategoriesCollection.update(
-        category.id,
-        (draft) => {
-          draft.title = values.title;
-          draft.description = values.description || null;
-        }
-      );
-      await newTX.isPersisted.promise
+      const newTX = tagsCollection.update(category.id, (draft) => {
+        draft.title = values.title;
+        draft.description = values.description || null;
+      });
+      await newTX.isPersisted.promise;
       onSuccess?.(category);
     } else {
       const newId = crypto.randomUUID();
@@ -63,8 +60,8 @@ export default function FinanceCategoryForm({
         title: values.title,
         description: values.description || null,
       };
-      const newTX = financeCategoriesCollection.insert(newCategory);
-      await newTX.isPersisted.promise
+      const newTX = tagsCollection.insert(newCategory);
+      await newTX.isPersisted.promise;
       onSuccess?.(newCategory);
     }
     handleClose();

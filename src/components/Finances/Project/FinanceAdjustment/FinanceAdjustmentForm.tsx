@@ -11,7 +11,7 @@ import { z } from "zod";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { projectAdjustmentsCollection } from "@/db/collections/finance/project-adjustment/project-adjustment-collection";
 import { useContacts } from "@/db/collections/finance/contacts/contact-collection";
-import { useFinanceCategories } from "@/db/collections/finance/finance-category/finance-category-collection";
+import { useTags } from "@/db/collections/finance/tags/tags-collection";
 
 const schema = z.object({
   amount: z.number(),
@@ -37,7 +37,7 @@ export default function FinanceAdjustmentForm({
   // const { mutate: addFinanceAdjustment, isPending: isAdding } =
   //   useCreateFinanceAdjustmentMutation({ onSuccess: () => handleClose() });
   const { data: contacts } = useContacts();
-  const { data: financeCategories } = useFinanceCategories();
+  const { data: financeCategories } = useTags();
   const form = useForm({
     initialValues: {
       amount: "",

@@ -72,7 +72,7 @@ export default function FinanceSettingsHeader({
             "1px solid light-dark(var(--mantine-color-gray-5), var(--mantine-color-dark-3))",
         }}
       >
-        <Group>
+        <Group align="center" gap="xs">
           {titleIcon}
           <Text fw={500} fz="lg">
             {titleText}

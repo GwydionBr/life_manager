@@ -10,7 +10,7 @@ import {
   workProjectsCollection,
   workProjectCategoriesCollection,
 } from "./work-project-collection";
-import { financeCategoriesCollection } from "@/db/collections/finance/finance-category/finance-category-collection";
+import { tagsCollection } from "@/db/collections/finance/tags/tags-collection";
 
 import { WorkProject } from "@/types/work.types";
 
@@ -18,10 +18,8 @@ import { WorkProject } from "@/types/work.types";
 const projectCategoryMappingCollection = createLiveQueryCollection((q) =>
   q
     .from({ relations: workProjectCategoriesCollection })
-    .innerJoin(
-      { category: financeCategoriesCollection },
-      ({ relations, category }) =>
-        eq(relations.finance_category_id, category.id)
+    .innerJoin({ category: tagsCollection }, ({ relations, category }) =>
+      eq(relations.finance_category_id, category.id)
     )
     .select(({ relations, category }) => ({
       projectId: relations.timer_project_id,

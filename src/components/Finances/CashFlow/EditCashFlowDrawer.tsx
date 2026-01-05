@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useIntl } from "@/hooks/useIntl";
-import { useFinanceCategories } from "@/db/collections/finance/finance-category/finance-category-collection";
+import { useTags } from "@/db/collections/finance/tags/tags-collection";
 import { useSingleCashflowMutations } from "@/db/collections/finance/single-cashflow/use-single-cashflow-mutations";
 import { useRecurringCashflowMutations } from "@/db/collections/finance/recurring-cashflow/use-recurring-cashflow-mutations";
 
@@ -80,7 +80,7 @@ export default function EditCashFlowDrawer({
     "update-cash-flow",
     "add-category",
   ]);
-  const { data: financeCategories } = useFinanceCategories();
+  const { data: financeCategories } = useTags();
 
   useEffect(() => {
     if (cashFlow) {
@@ -102,7 +102,7 @@ export default function EditCashFlowDrawer({
     }
   }, [cashFlow]);
 
-  // TODO: Handle Type Safety 
+  // TODO: Handle Type Safety
   async function handleSubmit(values: any) {
     if (isSingleCashFlow(cashFlow)) {
       await updateSingleCashflow(cashFlow.id, {

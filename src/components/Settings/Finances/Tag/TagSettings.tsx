@@ -1,18 +1,18 @@
 import { useIntl } from "@/hooks/useIntl";
 import {
-  financeCategoriesCollection,
-  useFinanceCategories,
-} from "@/db/collections/finance/finance-category/finance-category-collection";
+  tagsCollection,
+  useTags,
+} from "@/db/collections/finance/tags/tags-collection";
 
 import { Text } from "@mantine/core";
-import { IconCategoryPlus } from "@tabler/icons-react";
+import { IconCategoryPlus, IconTagPlus, IconTags } from "@tabler/icons-react";
 import FinanceSettingsList from "@/components/Settings/Finances/FinanceSettingsList";
 import FinanceCategoryForm from "@/components/Finances/Category/FinanceCategoryForm";
 import { Tables } from "@/types/db.types";
 
-export default function FinanceCategorySettings() {
+export default function TagSettings() {
   const { getLocalizedText } = useIntl();
-  const { data: financeCategories } = useFinanceCategories();
+  const { data: financeCategories } = useTags();
 
   const renderRowContent = (category: Tables<"finance_category">) => (
     <>
@@ -44,22 +44,19 @@ export default function FinanceCategorySettings() {
       renderRowContent={renderRowContent}
       renderEditForm={renderEditForm}
       renderAddForm={renderAddForm}
-      onDelete={(ids) => financeCategoriesCollection.delete(ids)}
-      titleText={getLocalizedText("Finanz Kategorien", "Finance Categories")}
-      emptyText={getLocalizedText(
-        "Keine Kategorien gefunden",
-        "No categories found"
-      )}
-      deleteTitle={getLocalizedText("Kategorie löschen", "Delete Category")}
+      onDelete={(ids) => tagsCollection.delete(ids)}
+      titleText={getLocalizedText("Tags", "Tags")}
+      emptyText={getLocalizedText("Keine Tags gefunden", "No tags found")}
+      deleteTitle={getLocalizedText("Tag löschen", "Delete Tag")}
       deleteMessage={getLocalizedText(
-        "Sind Sie sicher, dass Sie diese Kategorien löschen möchten",
-        "Are you sure you want to delete these categories?"
+        "Sind Sie sicher, dass Sie diese Tags löschen möchten",
+        "Are you sure you want to delete these tags?"
       )}
-      addText={getLocalizedText("Kategorie hinzufügen", "Add Category")}
-      editText={getLocalizedText("Kategorie bearbeiten", "Edit category")}
-      selectTooltip={getLocalizedText("Kategorie auswählen", "Select category")}
-      titleIcon={<IconCategoryPlus />}
-      addIcon={<IconCategoryPlus />}
+      addText={getLocalizedText("Tag hinzufügen", "Add Tag")}
+      editText={getLocalizedText("Tag bearbeiten", "Edit Tag")}
+      selectTooltip={getLocalizedText("Tag auswählen", "Select Tag")}
+      titleIcon={<IconTags />}
+      addIcon={<IconTagPlus />}  
     />
   );
 }

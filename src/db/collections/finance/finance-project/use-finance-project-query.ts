@@ -10,7 +10,7 @@ import {
   financeProjectsCollection,
   financeProjectCategoriesCollection,
 } from "./finance-project-collection";
-import { financeCategoriesCollection } from "@/db/collections/finance/finance-category/finance-category-collection";
+import { tagsCollection } from "@/db/collections/finance/tags/tags-collection";
 import { projectAdjustmentsCollection } from "@/db/collections/finance/project-adjustment/project-adjustment-collection";
 import { contactsCollection } from "@/db/collections/finance/contacts/contact-collection";
 
@@ -20,10 +20,8 @@ import { FinanceProject } from "@/types/finance.types";
 const financeProjectCategoryMappingCollection = createLiveQueryCollection((q) =>
   q
     .from({ relations: financeProjectCategoriesCollection })
-    .innerJoin(
-      { category: financeCategoriesCollection },
-      ({ relations, category }) =>
-        eq(relations.finance_category_id, category.id)
+    .innerJoin({ category: tagsCollection }, ({ relations, category }) =>
+      eq(relations.finance_category_id, category.id)
     )
     .select(({ relations, category }) => ({
       projectId: relations.finance_project_id,

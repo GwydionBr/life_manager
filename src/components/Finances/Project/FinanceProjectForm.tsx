@@ -2,7 +2,7 @@ import { useForm } from "@mantine/form";
 import { useEffect } from "react";
 import { useFinanceProjectMutations } from "@/db/collections/finance/finance-project/use-finance-project-mutations";
 import { useContacts } from "@/db/collections/finance/contacts/contact-collection";
-import { useFinanceCategories } from "@/db/collections/finance/finance-category/finance-category-collection";
+import { useTags } from "@/db/collections/finance/tags/tags-collection";
 
 import { z } from "zod";
 import { zodResolver } from "mantine-form-zod-resolver";
@@ -73,7 +73,7 @@ export default function FinanceProjectForm({
   //   mutate: updateFinanceProjectMutation,
   //   isPending: isUpdatingFinanceProject,
   // } = useUpdateFinanceProjectMutation({ onSuccess: () => handleClose() });
-  const { data: financeCategories } = useFinanceCategories();
+  const { data: financeCategories } = useTags();
   const { data: contacts } = useContacts();
   const form = useForm<z.infer<typeof projectSchema>>({
     initialValues: financeProject

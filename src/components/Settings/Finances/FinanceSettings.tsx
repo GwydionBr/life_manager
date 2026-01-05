@@ -1,28 +1,20 @@
-import { useState } from "react";
 import { useIntl } from "@/hooks/useIntl";
+import { useFinanceStore } from "@/stores/financeStore";
 
 import { Grid } from "@mantine/core";
 import SettingsNavbar from "@/components/Navbar/SettingsNavbar";
-import FinanceCategorySettings from "./FinanceCategory/FinanceCategorySettings";
+import TagSettings from "./Tag/TagSettings";
 import FinanceRuleSettings from "./FinanceRuleSettings/FinanceRuleSettings";
 import FinanceDefaultSettings from "./FinanceDefaultSettings/FinanceDefaultSettings";
 import FinanceClientSettings from "./Contact/ContactSettings";
-import { IconCategory, IconUsers, IconBuildingBank } from "@tabler/icons-react";
+import { IconTags, IconUsers, IconBuildingBank } from "@tabler/icons-react";
 import FinanceBankAccountSettings from "./FinanceBankAccount/FinanceBankAccountSettings";
 
-enum FinanceSettingType {
-  DEFAULT = "default",
-  CATEGORIES = "categories",
-  RULES = "rules",
-  CLIENTS = "clients",
-  BANK_ACCOUNTS = "bank-accounts",
-}
+import { FinanceSettingType } from "@/stores/financeStore";
 
 export default function FinanceSettings() {
   const { getLocalizedText } = useIntl();
-  const [activeSetting, setActiveSetting] = useState<FinanceSettingType>(
-    FinanceSettingType.DEFAULT
-  );
+  const { activeSetting, setActiveSetting } = useFinanceStore();
 
   return (
     <Grid align="flex-start" h="100%" w="100%">
@@ -39,16 +31,16 @@ export default function FinanceSettings() {
               active: activeSetting === FinanceSettingType.DEFAULT,
             },
             {
-              title: getLocalizedText("Kategorien", "Categories"),
-              icon: <IconCategory size={20} />,
-              onClick: () => setActiveSetting(FinanceSettingType.CATEGORIES),
-              active: activeSetting === FinanceSettingType.CATEGORIES,
+              title: getLocalizedText("Tags", "Tags"),
+              icon: <IconTags size={20} />,
+              onClick: () => setActiveSetting(FinanceSettingType.TAGS),
+              active: activeSetting === FinanceSettingType.TAGS,
             },
             {
-              title: getLocalizedText("Kunden", "Clients"),
+              title: getLocalizedText("Kontakte", "Contacts"),
               icon: <IconUsers size={20} />,
-              onClick: () => setActiveSetting(FinanceSettingType.CLIENTS),
-              active: activeSetting === FinanceSettingType.CLIENTS,
+              onClick: () => setActiveSetting(FinanceSettingType.CONTACTS),
+              active: activeSetting === FinanceSettingType.CONTACTS,
             },
             {
               title: getLocalizedText("Bankkonten", "Bank Accounts"),
@@ -63,10 +55,8 @@ export default function FinanceSettings() {
         {activeSetting === FinanceSettingType.DEFAULT && (
           <FinanceDefaultSettings />
         )}
-        {activeSetting === FinanceSettingType.CATEGORIES && (
-          <FinanceCategorySettings />
-        )}
-        {activeSetting === FinanceSettingType.CLIENTS && (
+        {activeSetting === FinanceSettingType.TAGS && <TagSettings />}
+        {activeSetting === FinanceSettingType.CONTACTS && (
           <FinanceClientSettings />
         )}
         {activeSetting === FinanceSettingType.RULES && <FinanceRuleSettings />}

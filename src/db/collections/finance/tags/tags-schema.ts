@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const financeCategorySchema = z.object({
+export const tagsSchema = z.object({
   created_at: z.string(),
   description: z.string().nullable(),
   id: z.string(),
@@ -8,7 +8,7 @@ export const financeCategorySchema = z.object({
   user_id: z.string(),
 });
 
-export const financeCategoryDeserializationSchema = z.object({
+export const tagsDeserializationSchema = z.object({
   created_at: z.string(),
   description: z.string().nullable(),
   id: z.string(),

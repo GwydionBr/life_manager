@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useIntl } from "@/hooks/useIntl";
 import { useSingleCashflowMutations } from "@/db/collections/finance/single-cashflow/use-single-cashflow-mutations";
-import { useFinanceCategories } from "@/db/collections/finance/finance-category/finance-category-collection";
+import { useTags } from "@/db/collections/finance/tags/tags-collection";
 import { useRecurringCashflowMutations } from "@/db/collections/finance/recurring-cashflow/use-recurring-cashflow-mutations";
 import { useSettings } from "@/db/collections/settings/settings-collection";
 
@@ -54,7 +54,7 @@ export default function FinanceForm({
   const [isRecurring, setIsRecurring] = useState<boolean>(!isSingle);
   const { data: settings } = useSettings();
   useSettingsStore();
-  const { data: financeCategories } = useFinanceCategories();
+  const { data: financeCategories } = useTags();
   const { getLocalizedText } = useIntl();
   const { addSingleCashflow } = useSingleCashflowMutations();
   const { addRecurringCashflow } = useRecurringCashflowMutations();

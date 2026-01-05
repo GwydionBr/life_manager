@@ -17,7 +17,7 @@ import { isToday } from "date-fns";
 import { RecurringCashFlow } from "@/types/finance.types";
 import { FinanceInterval } from "@/types/settings.types";
 import { Tables } from "@/types/db.types";
-import { useFinanceCategories } from "@/db/collections/finance/finance-category/finance-category-collection";
+import { useTags } from "@/db/collections/finance/tags/tags-collection";
 interface RecurringCashFlowRowProps extends CardProps {
   cashflow: RecurringCashFlow;
   showEndDate?: boolean;
@@ -37,7 +37,7 @@ export default function RecurringCashFlowRow({
   ...props
 }: RecurringCashFlowRowProps) {
   const { formatMoney, formatDate } = useIntl();
-  const { data: financeCategories } = useFinanceCategories();
+  const { data: financeCategories } = useTags();
   const { updateRecurringCashflow } = useRecurringCashflowMutations();
   const { hovered, ref } = useHover();
   const [isUpdating, setIsUpdating] = useState(false);

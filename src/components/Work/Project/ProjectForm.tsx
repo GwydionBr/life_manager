@@ -2,7 +2,7 @@ import { useForm } from "@mantine/form";
 
 import { useEffect, useState, useMemo } from "react";
 import { useDisclosure, useClickOutside } from "@mantine/hooks";
-import { useFinanceCategories } from "@/db/collections/finance/finance-category/finance-category-collection";
+import { useTags } from "@/db/collections/finance/tags/tags-collection";
 import { useWorkProjectMutations } from "@/db/collections/work/work-project/use-work-project-mutations";
 import { useSettings } from "@/db/collections/settings/settings-collection";
 import { useProfile } from "@/db/collections/profile/profile-collection";
@@ -83,7 +83,7 @@ export default function ProjectForm({
 }: ProjectFormProps) {
   const { data: settings } = useSettings();
   const { getLocalizedText, locale } = useIntl();
-  const { data: financeCategories } = useFinanceCategories();
+  const { data: financeCategories } = useTags();
   const { data: profile } = useProfile();
   const { addWorkProject, updateWorkProject } = useWorkProjectMutations();
   const [isColorPickerOpen, { open, close }] = useDisclosure(false);

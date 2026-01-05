@@ -19,7 +19,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { Tables } from "@/types/db.types";
 import FinanceCategorySingleBadge from "./FinanceCategorySingleBadge";
 import FinanceCategoryForm from "./FinanceCategoryForm";
-import { useFinanceCategories } from "@/db/collections/finance/finance-category/finance-category-collection";
+import { useTags } from "@/db/collections/finance/tags/tags-collection";
 
 interface FinanceCategoryBadgesProps {
   initialCategories: Tables<"finance_category">[];
@@ -37,8 +37,8 @@ export default function FinanceCategoryBadges({
   const { getLocalizedText } = useIntl();
   const {
     data: financeCategories = [],
-    isLoading: isFinanceCategoriesLoading,  
-  } = useFinanceCategories();
+    isLoading: isFinanceCategoriesLoading,
+  } = useTags();
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     initialCategories.map((c) => c.id)
