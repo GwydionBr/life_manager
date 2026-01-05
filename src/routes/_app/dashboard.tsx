@@ -128,14 +128,14 @@ function Dashboard() {
   ];
 
   return (
-    <Container size="xl" py="xl">
-      <Stack gap="xl">
+    <Container size="xl" py="md">
+      <Stack gap="md">
         {/* Header Section */}
         <Box>
-          <Title order={1} size="2.5rem" fw={700} mb="xs">
+          <Title order={1} size="2rem" fw={700} mb={4}>
             {getLocalizedText("Dashboard", "Dashboard")}
           </Title>
-          <Text size="lg" c="dimmed">
+          <Text size="md" c="dimmed">
             {getLocalizedText(
               "Willkommen bei deinem Life Manager! Wähle eine App aus, um loszulegen.",
               "Welcome to your Life Manager! Choose an app to get started."
@@ -144,12 +144,12 @@ function Dashboard() {
         </Box>
 
         {/* Apps Grid */}
-        <SimpleGrid cols={{ base: 1, sm: 2, lg: 2 }} spacing="xl">
+        <SimpleGrid cols={{ base: 1, sm: 2, lg: 2 }} spacing="md">
           {apps.map((app) => (
             <Card
               key={app.title}
               shadow="md"
-              padding="xl"
+              padding="md"
               radius="lg"
               withBorder
               style={{
@@ -174,20 +174,20 @@ function Dashboard() {
                 }
               }}
             >
-              <Stack gap="lg">
+              <Stack gap="md">
                 {/* Header */}
                 <Group justify="space-between" align="flex-start">
-                  <Group gap="md">
+                  <Group gap="sm">
                     <ThemeIcon
-                      size={60}
-                      radius="lg"
+                      size={48}
+                      radius="md"
                       variant="gradient"
                       gradient={app.color.gradient}
                     >
-                      <app.icon size={32} />
+                      <app.icon size={24} />
                     </ThemeIcon>
                     <Box>
-                      <Title order={3} size="1.5rem" fw={600}>
+                      <Title order={3} size="1.25rem" fw={600}>
                         {getLocalizedText(app.titleDe, app.title)}
                       </Title>
                       <Badge
@@ -195,7 +195,7 @@ function Dashboard() {
                         variant={app.active ? "gradient" : "light"}
                         gradient={app.active ? app.color.gradient : undefined}
                         color={app.active ? undefined : "gray"}
-                        mt={4}
+                        mt={2}
                       >
                         {app.active
                           ? getLocalizedText("Aktiv", "Active")
@@ -206,29 +206,29 @@ function Dashboard() {
 
                   {app.active && (
                     <ActionIcon
-                      size="lg"
+                      size="md"
                       variant="subtle"
                       color={app.color.base}
                       radius="xl"
                     >
-                      <IconArrowRight size={20} />
+                      <IconArrowRight size={18} />
                     </ActionIcon>
                   )}
                 </Group>
 
                 {/* Description */}
-                <Text size="sm" c="dimmed">
+                <Text size="xs" c="dimmed" lineClamp={2}>
                   {getLocalizedText(app.descriptionDe, app.description)}
                 </Text>
 
                 {/* Stats */}
-                <Group gap="xl" mt="xs">
+                <Group gap="md" mt={0}>
                   {app.stats.map((stat, index) => (
                     <Box key={index}>
                       <Text size="xs" c="dimmed" tt="uppercase" fw={500}>
                         {stat.label}
                       </Text>
-                      <Text size="lg" fw={600} mt={4}>
+                      <Text size="md" fw={600} mt={2}>
                         {stat.value}
                       </Text>
                     </Box>
@@ -237,17 +237,17 @@ function Dashboard() {
 
                 {/* Quick Actions */}
                 {app.active && (
-                  <Group gap="xs" mt="xs">
+                  <Group gap="xs" mt={0}>
                     <Tooltip
                       label={getLocalizedText("Neuer Eintrag", "New Entry")}
                     >
                       <ActionIcon
                         variant="light"
                         color={app.color.base}
-                        size="lg"
+                        size="md"
                         radius="md"
                       >
-                        <IconPlus size={18} />
+                        <IconPlus size={16} />
                       </ActionIcon>
                     </Tooltip>
                     <Tooltip
@@ -256,10 +256,10 @@ function Dashboard() {
                       <ActionIcon
                         variant="light"
                         color={app.color.base}
-                        size="lg"
+                        size="md"
                         radius="md"
                       >
-                        <IconChartBar size={18} />
+                        <IconChartBar size={16} />
                       </ActionIcon>
                     </Tooltip>
                   </Group>
@@ -271,7 +271,7 @@ function Dashboard() {
 
         {/* Info Box */}
         <Card
-          padding="lg"
+          padding="sm"
           radius="md"
           style={{
             background:
@@ -279,12 +279,12 @@ function Dashboard() {
             border: "1px solid rgba(190, 75, 219, 0.2)",
           }}
         >
-          <Group gap="md">
-            <ThemeIcon size={40} radius="md" variant="light" color="grape">
-              <IconTarget size={24} />
+          <Group gap="sm">
+            <ThemeIcon size={32} radius="md" variant="light" color="grape">
+              <IconTarget size={18} />
             </ThemeIcon>
             <Box style={{ flex: 1 }}>
-              <Text fw={600} size="sm">
+              <Text fw={600} size="xs">
                 {getLocalizedText(
                   "Weitere Apps folgen in Kürze!",
                   "More apps coming soon!"
