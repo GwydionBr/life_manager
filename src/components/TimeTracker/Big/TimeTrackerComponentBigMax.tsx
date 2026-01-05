@@ -1,4 +1,5 @@
 import { useIntl } from "@/hooks/useIntl";
+import { useNavigate } from "@tanstack/react-router";
 
 import {
   Badge,
@@ -13,7 +14,6 @@ import {
 } from "@mantine/core";
 import { TimerRoundingSettings, TimerState } from "@/types/timeTracker.types";
 import { IconPlayerPlay, IconPlayerStop, IconX } from "@tabler/icons-react";
-import { Currency } from "@/types/settings.types";
 import { getStatusColor } from "@/lib/workHelperFunctions";
 import ModifyTimeTrackerModal from "../ModifyTimeTracker/ModifyTimeTrackerModal";
 import TimeTrackerInfoHoverCard from "../TimeTrackerInfoHoverCard";
@@ -21,9 +21,11 @@ import XActionIcon from "@/components/UI/ActionIcons/XActionIcon";
 import TimeTrackerMemoRow from "../TimeTrackerRow/TimeTrackerMemoRow";
 import TimeTrackerFinanceRow from "../TimeTrackerRow/TimeTrackerFinanceRow";
 import TimeTrackerTimeRow from "../TimeTrackerRow/TimeTrackerTimeRow";
+import ExternalLinkActionIcon from "@/components/UI/ActionIcons/ExternalLinkActionIcon";
+import { TimerData } from "@/stores/timeTrackerManagerStore";
 
 interface TimeTrackerComponentBigMaxProps {
-  projectTitle: string;
+  timer: TimerData;
   state: TimerState;
   activeSeconds: number;
   activeTime: string;
@@ -34,9 +36,6 @@ interface TimeTrackerComponentBigMaxProps {
   storedActiveSeconds: number;
   storedPausedSeconds: number;
   timerRoundingSettings: TimerRoundingSettings;
-  currency: Currency;
-  salary: number;
-  hourlyPayment: boolean;
   memo: string;
   color: string | null;
   backgroundColor: string;
@@ -53,7 +52,7 @@ interface TimeTrackerComponentBigMaxProps {
 }
 
 export default function TimeTrackerComponentBigMax({
-  projectTitle,
+  timer,
   state,
   activeSeconds,
   activeTime,
@@ -64,9 +63,6 @@ export default function TimeTrackerComponentBigMax({
   storedActiveSeconds,
   storedPausedSeconds,
   timerRoundingSettings,
-  currency,
-  salary,
-  hourlyPayment,
   memo,
   color,
   backgroundColor,
@@ -80,6 +76,7 @@ export default function TimeTrackerComponentBigMax({
   setMemo,
 }: TimeTrackerComponentBigMaxProps) {
   const { getLocalizedText } = useIntl();
+  const navigate = useNavigate();
 
   const getLocaleState = () => {
     if (state === TimerState.Running) {
@@ -123,31 +120,47 @@ export default function TimeTrackerComponentBigMax({
                 setTempTimerRounding={setTempTimerRounding}
               />
               <TimeTrackerInfoHoverCard
-                currency={currency}
+                currency={timer.currency}
                 timerRoundingSettings={timerRoundingSettings}
-                projectTitle={projectTitle}
-                salary={salary}
-                hourlyPayment={hourlyPayment}
+                projectTitle={timer.projectTitle}
+                salary={timer.salary}
+                hourlyPayment={timer.hourlyPayment}
               />
             </Stack>
             <Badge size="lg" color={getStatusColor(state)}>
               {getLocaleState()}
             </Badge>
-            <XActionIcon onClick={removeTimer} />
+            <Stack>
+              <XActionIcon onClick={removeTimer} />
+              <ExternalLinkActionIcon
+                onClick={() => {
+                  navigate({
+                    to: "/work",
+                    search: { projectId: timer.projectId },
+                  });
+                }}
+                tooltipLabel={getLocalizedText(
+                  "Projekt-Details",
+                  "Project Details"
+                )}
+                iconSize={20}
+                iconColor="var(--mantine-color-blue-6)"
+              />
+            </Stack>
           </Group>
           {/* Project Title */}
           <Group justify="space-between" align="center">
             <Text size="xl" fw={700}>
-              {projectTitle}
+              {timer.projectTitle}
             </Text>
           </Group>
 
           {/* Time Tracker Rows */}
           <Stack gap="md">
             <TimeTrackerMemoRow value={memo} setMemo={setMemo} />
-            {hourlyPayment && (
+            {timer.hourlyPayment && (
               <TimeTrackerFinanceRow
-                currency={currency}
+                currency={timer.currency}
                 moneyEarned={moneyEarned}
                 state={state}
                 color={color}

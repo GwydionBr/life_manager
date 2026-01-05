@@ -16,20 +16,17 @@ import CancelActionIcon from "@/components/TimeTracker/TimeTrackerActionIcons/Ca
 import XActionIcon from "@/components/UI/ActionIcons/XActionIcon";
 import ModifyTimeTrackerModal from "@/components/TimeTracker/ModifyTimeTracker/ModifyTimeTrackerModal";
 import TimeTrackerInfoHoverCard from "@/components/TimeTracker/TimeTrackerInfoHoverCard";
-import { Currency } from "@/types/settings.types";
+import { TimerData } from "@/stores/timeTrackerManagerStore";
 
 interface TimeTrackerComponentBigMinProps {
-  projectTitle: string;
+  timer: TimerData;
   state: TimerState;
   activeSeconds: number;
   activeTime: string;
   pausedTime: string;
   roundedActiveTime: string;
   isSubmitting: boolean;
-  timerRoundingSettings: TimerRoundingSettings;
-  currency: Currency;
-  salary: number;
-  hourlyPayment: boolean;
+  timerRoundingSettings: TimerRoundingSettings; 
   storedActiveSeconds: number;
   storedPausedSeconds: number;
   color: string | null;
@@ -46,7 +43,7 @@ interface TimeTrackerComponentBigMinProps {
 }
 
 export default function TimeTrackerComponentBigMin({
-  projectTitle,
+  timer,
   state,
   activeSeconds,
   activeTime,
@@ -56,9 +53,6 @@ export default function TimeTrackerComponentBigMin({
   storedActiveSeconds,
   storedPausedSeconds,
   timerRoundingSettings,
-  currency,
-  salary,
-  hourlyPayment,
   modifyActiveSeconds,
   modifyPausedSeconds,
   setTempTimerRounding,
@@ -100,14 +94,14 @@ export default function TimeTrackerComponentBigMin({
             setTempTimerRounding={setTempTimerRounding}
           />
           <TimeTrackerInfoHoverCard
-            currency={currency}
+            currency={timer.currency}
             timerRoundingSettings={timerRoundingSettings}
-            projectTitle={projectTitle}
-            salary={salary}
-            hourlyPayment={hourlyPayment}
+            projectTitle={timer.projectTitle}
+            salary={timer.salary}
+            hourlyPayment={timer.hourlyPayment}
           />
           <Text size="xs" c="dimmed" ta="center">
-            {projectTitle}
+            {timer.projectTitle}
           </Text>
           <XActionIcon onClick={removeTimer} size="xs" />
         </Group>

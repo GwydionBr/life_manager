@@ -344,7 +344,7 @@ export default function TimeTrackerInstance({
       ...getCurrentSession(),
       memo: memo === "" ? null : memo,
     };
-    
+
     await addWorkTimeEntry(
       newSession,
       tempTimerRoundingSettings ?? timerRoundingSettings
@@ -382,7 +382,7 @@ export default function TimeTrackerInstance({
         {(styles) => (
           <div style={styles}>
             <TimeTrackerComponentBig
-              projectTitle={timer.projectTitle}
+              timer={timer}
               color={project?.color ?? null}
               backgroundColor={
                 project?.color
@@ -391,8 +391,6 @@ export default function TimeTrackerInstance({
               }
               removeTimer={() => removeTimer(timer.id)}
               moneyEarned={moneyEarned}
-              currency={timer.currency}
-              hourlyPayment={timer.hourlyPayment}
               roundedActiveTime={roundedActiveTime}
               state={state}
               memo={memo}
@@ -402,7 +400,6 @@ export default function TimeTrackerInstance({
               timerRoundingSettings={
                 tempTimerRoundingSettings ?? timerRoundingSettings
               }
-              salary={timer.salary}
               storedActiveSeconds={storedActiveSeconds}
               storedPausedSeconds={storedPausedSeconds}
               startTimer={startTimerWithStopOthers}

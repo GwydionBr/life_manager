@@ -1,18 +1,15 @@
 import { TimerRoundingSettings, TimerState } from "@/types/timeTracker.types";
 
 import { Stack, Collapse } from "@mantine/core";
-import { Currency } from "@/types/settings.types";
 import TimeTrackerComponentBigMin from "./TimeTrackerComponentBigMin";
 import TimeTrackerComponentBigMax from "./TimeTrackerComponentBigMax";
+import { TimerData } from "@/stores/timeTrackerManagerStore";
 
 interface TimeTrackerComponentBigProps {
-  projectTitle: string;
+  timer: TimerData;
   isTimeTrackerMinimized: boolean;
   isSubmitting: boolean;
   moneyEarned: string;
-  currency: Currency;
-  salary: number;
-  hourlyPayment: boolean;
   roundedActiveTime: string;
   state: TimerState;
   activeTime: string;
@@ -38,7 +35,7 @@ interface TimeTrackerComponentBigProps {
 }
 
 export default function TimeTrackerComponentBig({
-  projectTitle,
+  timer,
   state,
   activeTime,
   pausedTime,
@@ -49,10 +46,7 @@ export default function TimeTrackerComponentBig({
   storedActiveSeconds,
   storedPausedSeconds,
   timerRoundingSettings,
-  salary,
   moneyEarned,
-  currency,
-  hourlyPayment,
   memo,
   color,
   backgroundColor,
@@ -71,7 +65,7 @@ export default function TimeTrackerComponentBig({
     <Stack align="center" w="100%">
       <Collapse in={isTimeTrackerMinimized} transitionDuration={400}>
         <TimeTrackerComponentBigMin
-          projectTitle={projectTitle}
+          timer={timer}
           state={state}
           activeTime={activeTime}
           pausedTime={pausedTime}
@@ -81,9 +75,6 @@ export default function TimeTrackerComponentBig({
           storedActiveSeconds={storedActiveSeconds}
           storedPausedSeconds={storedPausedSeconds}
           timerRoundingSettings={timerRoundingSettings}
-          currency={currency}
-          salary={salary}
-          hourlyPayment={hourlyPayment}
           startTimer={startTimer}
           pauseTimer={pauseTimer}
           resumeTimer={resumeTimer}
@@ -99,7 +90,7 @@ export default function TimeTrackerComponentBig({
       </Collapse>
       <Collapse in={!isTimeTrackerMinimized} transitionDuration={400}>
         <TimeTrackerComponentBigMax
-          projectTitle={projectTitle}
+          timer={timer}
           state={state}
           memo={memo}
           activeSeconds={activeSeconds}
@@ -111,9 +102,6 @@ export default function TimeTrackerComponentBig({
           storedActiveSeconds={storedActiveSeconds}
           storedPausedSeconds={storedPausedSeconds}
           timerRoundingSettings={timerRoundingSettings}
-          currency={currency}
-          salary={salary}
-          hourlyPayment={hourlyPayment}
           color={color}
           backgroundColor={backgroundColor}
           startTimer={startTimer}
