@@ -323,7 +323,14 @@ export default function FinanceSingleTab() {
               />,
             ]}
           />,
-          <FinancesNavbarDefaultCard key="finance-single-bank-account-card">
+          <FinancesNavbarDefaultCard
+            key="finance-single-bank-account-card"
+            p={0}
+            style={{
+              border:
+                "1px solid light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-2))",
+            }}
+          >
             <SelectBankAccount />
           </FinancesNavbarDefaultCard>,
           <FinancesNavbarNavList

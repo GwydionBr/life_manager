@@ -301,6 +301,7 @@ export default function FinanceProjectTab() {
   }, [filteredFinanceProjects, selectedFinanceProjects]);
 
   const onDelete = (ids: string[]) => {
+    // TODO: ASk if related single cash flows should be deleted
     const isSingle = ids.length === 1;
     showDeleteConfirmationModal(
       isSingle
@@ -475,7 +476,6 @@ export default function FinanceProjectTab() {
                 </Text>
               </Group>
             </Stack>
-            ,
           </FinancesNavbarDefaultCard>,
         ]}
       />
