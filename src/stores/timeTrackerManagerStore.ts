@@ -65,7 +65,7 @@ interface TimeTrackerManagerState {
    * Adds a new timer for a project.
    *
    * Validates:
-   * - Maximum 5 timers allowed
+   * - Maximum 10 timers allowed
    * - One timer per project (no duplicates)
    *
    * @param project - Project data from database
@@ -179,14 +179,14 @@ export const useTimeTrackerManager = create(
         const timerCount = Object.keys(currentTimers).length;
 
         // Validation: Check if maximum 5 time trackers reached
-        if (timerCount >= 5) {
+        if (timerCount >= 10) {
           return {
             success: false,
             error: {
               german:
-                "Es können maximal 5 Timer gleichzeitig laufen. Bitte stoppen oder entfernen Sie einen bestehenden Timer.",
+                "Es können maximal 10 Timer gleichzeitig laufen. Bitte stoppen oder entfernen Sie einen bestehenden Timer.",
               english:
-                "Maximum 5 time trackers allowed. Please stop or remove an existing timer first.",
+                "Maximum 10 time trackers allowed. Please stop or remove an existing timer first.",
             },
           };
         }

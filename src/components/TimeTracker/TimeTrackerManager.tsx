@@ -6,7 +6,7 @@ import {
 import { useWorkStore } from "@/stores/workManagerStore";
 import { useIntl } from "@/hooks/useIntl";
 
-import { Alert, Stack, Text } from "@mantine/core";
+import { Alert, alpha, Select, Stack, Text } from "@mantine/core";
 import { TimerState } from "@/types/timeTracker.types";
 import TimeTrackerInstance from "./TimeTrackerInstance";
 import PlusActionIcon from "@/components/UI/ActionIcons/PlusActionIcon";
@@ -15,6 +15,7 @@ import { getStatusColor } from "@/lib/workHelperFunctions";
 import { useSettings } from "@/db/collections/settings/settings-collection";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { WorkProject } from "@/types/work.types";
+import { IconClipboardList } from "@tabler/icons-react";
 
 /**
  * Props for the TimeTrackerManager component.
@@ -52,6 +53,9 @@ export default function TimerManager({
 
   // Client-side hydration flag (prevents SSR mismatches)
   const [isClient, setIsClient] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
+    null
+  );
 
   // Store functions and data
   const {
@@ -179,6 +183,7 @@ export default function TimerManager({
           setErrorMessage(null);
         }, 5000);
       }
+      setSelectedProjectId(null);
     },
     [addTimer, settings, getLocalizedText]
   );
@@ -201,7 +206,13 @@ export default function TimerManager({
         handleAddTimer(activeProject);
       }
     }
-  }, [timers, activeProject, handleAddTimer, isProjectsReady]);
+  }, [timers, activeProject, isProjectsReady, handleAddTimer]);
+
+  useEffect(() => {
+    if (activeProject) {
+      setSelectedProjectId(activeProject.id);
+    }
+  }, [activeProject]);
 
   /**
    * Calculate aggregate timer states for the summary icon.
@@ -268,11 +279,41 @@ export default function TimerManager({
    */
   return (
     <Stack align="center" gap="md" mb="md">
-      {/* Add new timer button - only works if active project exists */}
-      <PlusActionIcon
-        onClick={() => {
-          if (!activeProject) return;
-          handleAddTimer(activeProject);
+      <Select
+      placeholder={getLocalizedText("Projekt auswählen", "Select project")}
+        data={projects
+          .filter(
+            (p) => p.id !== timers.find((t) => t.projectId === p.id)?.projectId
+          )
+          .map((p) => ({
+            label: p.title,
+            value: p.id,
+          }))}
+        value={selectedProjectId}
+        onChange={setSelectedProjectId}
+        searchable
+        leftSection={<IconClipboardList stroke={1.5} />}
+        rightSectionPointerEvents="auto"
+        rightSection={
+          <PlusActionIcon
+            onClick={() => {
+              if (!selectedProjectId) return;
+              const selectedProject = projects.find(
+                (p) => p.id === selectedProjectId
+              )!;
+              if (!selectedProject) return;
+              handleAddTimer(selectedProject);
+            }}
+          />
+        }
+        styles={{
+          input: {
+            textAlign: "center",
+            textOverflow: "ellipsis",
+            fontSize: "var(--mantine-font-size-md)",
+            backgroundColor: alpha("var(--mantine-color-body)", 0.5),
+            border: "none",
+          },
         }}
       />
 
