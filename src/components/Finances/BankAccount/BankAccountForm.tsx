@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "@mantine/form";
 import { useIntl } from "@/hooks/useIntl";
 import { bankAccountsCollection } from "@/db/collections/finance/bank-account/bank-account-collection";
@@ -11,7 +11,7 @@ import { z } from "zod";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { currencies } from "@/constants/settings";
 import { Currency } from "@/types/settings.types";
-import { Database, Tables } from "@/types/db.types";
+import { Database } from "@/types/db.types";
 import CustomNumberInput from "@/components/UI/CustomNumberInput";
 import UpdateButton from "@/components/UI/Buttons/UpdateButton";
 import CreateButton from "@/components/UI/Buttons/CreateButton";
@@ -45,29 +45,37 @@ export default function BankAccountForm({
   const { data: settings } = useSettings();
   const { data: profile } = useProfile();
 
+  const isDefaultSetRef = useRef(false);
+
   const form = useForm({
     initialValues: {
       title: bankAccount?.title || "",
       description: bankAccount?.description || "",
       currency:
         bankAccount?.currency || settings?.default_finance_currency || "USD",
-      is_default: bankAccount?.is_default || false,
+      is_default:
+        bankAccount?.is_default ||
+        !bankAccounts?.some(
+          (b) =>
+            b.is_default && b.currency === settings?.default_finance_currency
+        ),
       saldo: bankAccount?.saldo || 0,
     },
     validate: zodResolver(schema),
   });
 
   useEffect(() => {
-    if (bankAccounts) {
+    if (!isDefaultSetRef.current && !bankAccount && bankAccounts) {
       form.setFieldValue(
         "is_default",
-        bankAccounts.some(
+        !bankAccounts.some(
           (b) =>
             b.is_default && b.currency === settings?.default_finance_currency
         )
       );
+      isDefaultSetRef.current = true;
     }
-  }, [bankAccounts, settings]);
+  }, [bankAccounts, settings, form, bankAccount]);
 
   const handleClose = () => {
     form.reset();

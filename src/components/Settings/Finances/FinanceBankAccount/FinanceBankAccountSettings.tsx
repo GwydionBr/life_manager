@@ -1,11 +1,12 @@
 import { useIntl } from "@/hooks/useIntl";
+import { useSettingsStore } from "@/stores/settingsStore";
 import {
   bankAccountsCollection,
   useBankAccounts,
 } from "@/db/collections/finance/bank-account/bank-account-collection";
 
-import { Group, Text } from "@mantine/core";
-import { IconBuildingBank, IconPlus } from "@tabler/icons-react";
+import { Group, Stack, Text, Badge } from "@mantine/core";
+import { IconBuildingBank, IconPlus, IconStar } from "@tabler/icons-react";
 import FinanceSettingsList from "@/components/Settings/Finances/FinanceSettingsList";
 import BankAccountForm from "@/components/Finances/BankAccount/BankAccountForm";
 import { BankAccount } from "@/types/finance.types";
@@ -13,9 +14,23 @@ import { BankAccount } from "@/types/finance.types";
 export default function FinanceBankAccountSettings() {
   const { getLocalizedText, getCurrencySymbol } = useIntl();
   const { data: bankAccounts } = useBankAccounts();
+  const { primaryColor } = useSettingsStore();
 
   const renderRowContent = (bankAccount: BankAccount) => (
-    <>
+    <Stack gap="xs">
+      <Group>
+        <Badge color={primaryColor} variant="light" size="lg">
+          {getCurrencySymbol(bankAccount.currency)}
+        </Badge>
+        <Badge
+          color="orange"
+          variant="light"
+          size="xs"
+          leftSection={<IconStar size={12} />}
+        >
+          {getLocalizedText("Standardkonto", "Default account")}
+        </Badge>
+      </Group>
       <Text fz="sm" fw={500}>
         {bankAccount.title}
       </Text>
@@ -29,7 +44,7 @@ export default function FinanceBankAccountSettings() {
           {getCurrencySymbol(bankAccount.currency)} {bankAccount.saldo}
         </Text>
       </Group>
-    </>
+    </Stack>
   );
 
   const renderEditForm = (bankAccount: BankAccount, onClose: () => void) => (
