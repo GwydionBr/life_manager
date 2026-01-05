@@ -52,7 +52,9 @@ interface FinanceProjectCardProps extends CardProps {
   selectedModeActive: boolean;
   isSelected: boolean;
   editProjectModalOpened: boolean;
-  onToggleSelected: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onToggleSelected: (
+    e: React.MouseEvent<HTMLDivElement> | React.MouseEvent<HTMLButtonElement>
+  ) => void;
   onDelete: () => void;
   setEditProject: (project: FinanceProject) => void;
   onOpenEditProject: () => void;
@@ -190,7 +192,7 @@ export default function FinanceProjectCard({
       }}
       onClick={(e) => {
         if (selectedModeActive) {
-          onToggleSelected(e as any);
+          onToggleSelected(e);
         } else {
           if (!isBadgePopoverOpen) {
             openEditing();

@@ -56,6 +56,7 @@ export const usePayoutMutations = () => {
             amount: financeProject.start_amount,
             currency: financeProject.currency,
             categories: financeProject.categories,
+            finance_project_id: financeProject.id,
           },
           profile.id
         );
@@ -132,6 +133,7 @@ export const usePayoutMutations = () => {
             amount: projectAdjustment.amount,
             currency: financeProject.currency,
             categories: financeProject.categories,
+            finance_project_id: financeProject.id,
           },
           profile.id
         );
