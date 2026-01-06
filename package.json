@@ -4,9 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "vite build && cp instrument.server.mjs .output/server",
+    "build": "vite build && cp instrument.server.mjs /dist",
      "dev": "NODE_OPTIONS='--import ./instrument.server.mjs' vite dev --port 3000",
-     "start": "node --import ./.output/server/instrument.server.mjs .output/server/index.mjs",
+     "start": "node --import ./.output/server/instrument.server.mjs /dist/index.mjs",
     "test": "bun test",
     "test:watch": "bun test --watch",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
