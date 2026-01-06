@@ -150,6 +150,6 @@ export async function getWorkProjectWithCategories(
 
   return {
     ...project,
-    categories: categories || [],
+    tags: categories || [],
   } as WorkProject;
 }

@@ -2,12 +2,12 @@ import type { Tables } from "@/types/db.types";
 import { Currency } from "@/types/settings.types";
 
 export interface WorkTimeEntryListProps {
-  sessions: Tables<"timer_session">[];
-  projects?: Tables<"timer_project">[];
-  folders?: Tables<"timer_project_folder">[];
-  selectedSessions: string[];
-  onSessionsChange: (sessions: string[]) => void;
-  project?: Tables<"timer_project">;
+  timeEntries: Tables<"work_time_entry">[];
+  projects?: Tables<"work_project">[];
+  folders?: Tables<"work_folder">[];
+  selectedTimeEntries: string[];
+  onTimeEntryChange: (timeEntries: string[]) => void;
+  project?: Tables<"work_project">;
   isOverview?: boolean;
 }
 
@@ -35,27 +35,27 @@ export interface EarningsBreakdown {
 
 export type Year = {
   totalEarnings: EarningsBreakdown;
-  sessionIds: string[];
+  timeEntryIds: string[];
   totalTime: number;
   months: Record<
     number,
     {
       totalEarnings: EarningsBreakdown;
-      sessionIds: string[];
+      timeEntryIds: string[];
       totalTime: number;
       weeks: Record<
         number,
         {
           totalEarnings: EarningsBreakdown;
-          sessionIds: string[];
+          timeEntryIds: string[];
           totalTime: number;
           days: Record<
             string,
             {
               totalEarnings: EarningsBreakdown;
-              sessionIds: string[];
+              timeEntryIds: string[];
               totalTime: number;
-              sessions: (Tables<"timer_session"> & { index: number })[];
+              timeEntries: (Tables<"work_time_entry"> & { index: number })[];
             }
           >;
         }

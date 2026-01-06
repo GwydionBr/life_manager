@@ -31,7 +31,7 @@ export const addFinanceProject = async (
       );
     },
   });
-  const { categories, client, ...projectData } = newFinanceProject;
+  const { tags: categories, client, ...projectData } = newFinanceProject;
   const newFinanceProjectData = {
     ...projectData,
     id: newFinanceProject.id || crypto.randomUUID(),
@@ -77,7 +77,7 @@ export const updateFinanceProject = async (
 ) => {
   const ids = Array.isArray(id) ? id : [id];
   const {
-    categories,
+    tags: categories,
     client: _client,
     adjustments: _adjustments,
     ...projectData

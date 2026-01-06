@@ -106,9 +106,7 @@ export function useTimeEntryFiltering(
         if (filterState.selectedCategories.length > 0) {
           conditions.push(
             filterState.selectedCategories.some((categoryId) =>
-              sessionProject.categories.some(
-                (category) => category.id === categoryId
-              )
+              sessionProject.tags.some((category) => category.id === categoryId)
             )
           );
         }
@@ -159,9 +157,7 @@ export function useTimeEntryFiltering(
       if (filterState.selectedCategories.length > 0) {
         projectConditions.push(
           filterState.selectedCategories.some((categoryId) =>
-            sessionProject.categories.some(
-              (category) => category.id === categoryId
-            )
+            sessionProject.tags.some((category) => category.id === categoryId)
           )
         );
       }

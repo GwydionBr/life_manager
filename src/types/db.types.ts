@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
+    PostgrestVersion: "12.2.3 (519615d)"
   }
   public: {
     Tables: {
@@ -53,7 +53,7 @@ export type Database = {
             foreignKeyName: "appointment_timer_project_id_fkey"
             columns: ["timer_project_id"]
             isOneToOne: false
-            referencedRelation: "timer_project"
+            referencedRelation: "work_project"
             referencedColumns: ["id"]
           },
         ]
@@ -94,31 +94,7 @@ export type Database = {
         }
         Relationships: []
       }
-      finance_category: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          title: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          title: string
-          user_id?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          title?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      finance_client: {
+      contact: {
         Row: {
           address: string | null
           created_at: string
@@ -196,14 +172,14 @@ export type Database = {
             foreignKeyName: "finance_project_finance_client_id_fkey"
             columns: ["finance_client_id"]
             isOneToOne: false
-            referencedRelation: "finance_client"
+            referencedRelation: "contact"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "finance_project_single_cash_flow_id_fkey"
             columns: ["single_cash_flow_id"]
             isOneToOne: false
-            referencedRelation: "single_cash_flow"
+            referencedRelation: "single_cashflow"
             referencedColumns: ["id"]
           },
         ]
@@ -247,14 +223,14 @@ export type Database = {
             foreignKeyName: "finance_project_adjustment_finance_category_id_fkey"
             columns: ["finance_category_id"]
             isOneToOne: false
-            referencedRelation: "finance_category"
+            referencedRelation: "tag"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "finance_project_adjustment_finance_client_id_fkey"
             columns: ["finance_client_id"]
             isOneToOne: false
-            referencedRelation: "finance_client"
+            referencedRelation: "contact"
             referencedColumns: ["id"]
           },
           {
@@ -268,51 +244,12 @@ export type Database = {
             foreignKeyName: "finance_project_adjustment_single_cash_flow_id_fkey"
             columns: ["single_cash_flow_id"]
             isOneToOne: false
-            referencedRelation: "single_cash_flow"
+            referencedRelation: "single_cashflow"
             referencedColumns: ["id"]
           },
         ]
       }
-      finance_project_category: {
-        Row: {
-          created_at: string
-          finance_category_id: string
-          finance_project_id: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          finance_category_id: string
-          finance_project_id: string
-          id?: string
-          user_id?: string
-        }
-        Update: {
-          created_at?: string
-          finance_category_id?: string
-          finance_project_id?: string
-          id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "finance_project_category_finance_category_id_fkey"
-            columns: ["finance_category_id"]
-            isOneToOne: false
-            referencedRelation: "finance_category"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "finance_project_category_finance_project_id_fkey"
-            columns: ["finance_project_id"]
-            isOneToOne: false
-            referencedRelation: "finance_project"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      finance_project_client: {
+      finance_project_contact: {
         Row: {
           created_at: string
           finance_client_id: string
@@ -339,7 +276,7 @@ export type Database = {
             foreignKeyName: "finance_project_client_finance_client_id_fkey"
             columns: ["finance_client_id"]
             isOneToOne: false
-            referencedRelation: "finance_client"
+            referencedRelation: "contact"
             referencedColumns: ["id"]
           },
           {
@@ -351,113 +288,41 @@ export type Database = {
           },
         ]
       }
-      finance_rule: {
-        Row: {
-          created_at: string
-          description: string | null
-          end_value: number | null
-          id: string
-          percentage: number
-          start_value: number
-          title: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          end_value?: number | null
-          id?: string
-          percentage?: number
-          start_value?: number
-          title: string
-          user_id?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          end_value?: number | null
-          id?: string
-          percentage?: number
-          start_value?: number
-          title?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      finance_rule_category: {
+      finance_project_tag: {
         Row: {
           created_at: string
           finance_category_id: string
-          finance_rule_id: string
+          finance_project_id: string
           id: string
           user_id: string
         }
         Insert: {
           created_at?: string
-          finance_category_id?: string
-          finance_rule_id?: string
+          finance_category_id: string
+          finance_project_id: string
           id?: string
           user_id?: string
         }
         Update: {
           created_at?: string
           finance_category_id?: string
-          finance_rule_id?: string
+          finance_project_id?: string
           id?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "finance_rule_category_finance_category_id_fkey"
+            foreignKeyName: "finance_project_category_finance_category_id_fkey"
             columns: ["finance_category_id"]
             isOneToOne: false
-            referencedRelation: "finance_category"
+            referencedRelation: "tag"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "finance_rule_category_finance_rule_id_fkey"
-            columns: ["finance_rule_id"]
+            foreignKeyName: "finance_project_category_finance_project_id_fkey"
+            columns: ["finance_project_id"]
             isOneToOne: false
-            referencedRelation: "finance_rule"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      finance_rule_timer_project: {
-        Row: {
-          created_at: string
-          finance_rule_id: string
-          id: string
-          timer_project_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          finance_rule_id: string
-          id?: string
-          timer_project_id: string
-          user_id?: string
-        }
-        Update: {
-          created_at?: string
-          finance_rule_id?: string
-          id?: string
-          timer_project_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "finance_rule_timer_project_finance_rule_id_fkey"
-            columns: ["finance_rule_id"]
-            isOneToOne: false
-            referencedRelation: "finance_rule"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "finance_rule_timer_project_timer_project_id_fkey"
-            columns: ["timer_project_id"]
-            isOneToOne: false
-            referencedRelation: "timer_project"
+            referencedRelation: "finance_project"
             referencedColumns: ["id"]
           },
         ]
@@ -497,47 +362,6 @@ export type Database = {
             columns: ["requester_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      grocery_item: {
-        Row: {
-          active: boolean
-          amount: number
-          checked: boolean
-          created_at: string
-          group_id: string
-          id: string
-          title: string
-          unit: Database["public"]["Enums"]["amountUnits"]
-        }
-        Insert: {
-          active?: boolean
-          amount?: number
-          checked?: boolean
-          created_at?: string
-          group_id: string
-          id?: string
-          title: string
-          unit?: Database["public"]["Enums"]["amountUnits"]
-        }
-        Update: {
-          active?: boolean
-          amount?: number
-          checked?: boolean
-          created_at?: string
-          group_id?: string
-          id?: string
-          title?: string
-          unit?: Database["public"]["Enums"]["amountUnits"]
-        }
-        Relationships: [
-          {
-            foreignKeyName: "grocery_item_group_id_fkey"
-            columns: ["group_id"]
-            isOneToOne: false
-            referencedRelation: "group"
             referencedColumns: ["id"]
           },
         ]
@@ -686,80 +510,6 @@ export type Database = {
           },
         ]
       }
-      old_payout_data: {
-        Row: {
-          cashflow_id: string
-          created_at: string
-          end_currency: Database["public"]["Enums"]["currency"] | null
-          end_value: number | null
-          finance_project_id: string | null
-          id: string
-          start_currency: Database["public"]["Enums"]["currency"]
-          start_value: number
-          timer_project_id: string | null
-          timer_session_project_id: string | null
-          title: string
-          user_id: string
-        }
-        Insert: {
-          cashflow_id: string
-          created_at?: string
-          end_currency?: Database["public"]["Enums"]["currency"] | null
-          end_value?: number | null
-          finance_project_id?: string | null
-          id?: string
-          start_currency: Database["public"]["Enums"]["currency"]
-          start_value: number
-          timer_project_id?: string | null
-          timer_session_project_id?: string | null
-          title: string
-          user_id?: string
-        }
-        Update: {
-          cashflow_id?: string
-          created_at?: string
-          end_currency?: Database["public"]["Enums"]["currency"] | null
-          end_value?: number | null
-          finance_project_id?: string | null
-          id?: string
-          start_currency?: Database["public"]["Enums"]["currency"]
-          start_value?: number
-          timer_project_id?: string | null
-          timer_session_project_id?: string | null
-          title?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "old_payou_data_cashflow_id_fkey"
-            columns: ["cashflow_id"]
-            isOneToOne: false
-            referencedRelation: "single_cash_flow"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "old_payou_data_finance_project_id_fkey"
-            columns: ["finance_project_id"]
-            isOneToOne: false
-            referencedRelation: "finance_project"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "old_payou_data_timer_project_id_fkey"
-            columns: ["timer_project_id"]
-            isOneToOne: false
-            referencedRelation: "timer_project"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "old_payou_data_timer_session_project_id_fkey"
-            columns: ["timer_session_project_id"]
-            isOneToOne: false
-            referencedRelation: "timer_project"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       payout: {
         Row: {
           created_at: string
@@ -799,7 +549,7 @@ export type Database = {
             foreignKeyName: "payout_timer_project_id_fkey"
             columns: ["timer_project_id"]
             isOneToOne: false
-            referencedRelation: "timer_project"
+            referencedRelation: "work_project"
             referencedColumns: ["id"]
           },
         ]
@@ -840,7 +590,7 @@ export type Database = {
         }
         Relationships: []
       }
-      recurring_cash_flow: {
+      recurring_cashflow: {
         Row: {
           amount: number
           created_at: string
@@ -885,12 +635,12 @@ export type Database = {
             foreignKeyName: "recurring_cash_flow_finance_client_id_fkey"
             columns: ["finance_client_id"]
             isOneToOne: false
-            referencedRelation: "finance_client"
+            referencedRelation: "contact"
             referencedColumns: ["id"]
           },
         ]
       }
-      recurring_cash_flow_category: {
+      recurring_cashflow_tag: {
         Row: {
           created_at: string
           finance_category_id: string
@@ -917,14 +667,14 @@ export type Database = {
             foreignKeyName: "recurring_cash_flow_category_finance_category_id_fkey"
             columns: ["finance_category_id"]
             isOneToOne: false
-            referencedRelation: "finance_category"
+            referencedRelation: "tag"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "recurring_cash_flow_category_recurring_cash_flow_id_fkey"
             columns: ["recurring_cash_flow_id"]
             isOneToOne: false
-            referencedRelation: "recurring_cash_flow"
+            referencedRelation: "recurring_cashflow"
             referencedColumns: ["id"]
           },
         ]
@@ -1042,7 +792,7 @@ export type Database = {
         }
         Relationships: []
       }
-      single_cash_flow: {
+      single_cashflow: {
         Row: {
           amount: number
           changed_date: string | null
@@ -1093,7 +843,7 @@ export type Database = {
             foreignKeyName: "single_cash_flow_finance_client_id_fkey"
             columns: ["finance_client_id"]
             isOneToOne: false
-            referencedRelation: "finance_client"
+            referencedRelation: "contact"
             referencedColumns: ["id"]
           },
           {
@@ -1114,12 +864,12 @@ export type Database = {
             foreignKeyName: "single_cash_flow_recurring_cash_flow_id_fkey"
             columns: ["recurring_cash_flow_id"]
             isOneToOne: false
-            referencedRelation: "recurring_cash_flow"
+            referencedRelation: "recurring_cashflow"
             referencedColumns: ["id"]
           },
         ]
       }
-      single_cash_flow_category: {
+      single_cashflow_tag: {
         Row: {
           created_at: string
           finance_category_id: string
@@ -1146,17 +896,41 @@ export type Database = {
             foreignKeyName: "single_cash_flow_category_finance_category_id_fkey"
             columns: ["finance_category_id"]
             isOneToOne: false
-            referencedRelation: "finance_category"
+            referencedRelation: "tag"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "single_cash_flow_category_single_cash_flow_id_fkey"
             columns: ["single_cash_flow_id"]
             isOneToOne: false
-            referencedRelation: "single_cash_flow"
+            referencedRelation: "single_cashflow"
             referencedColumns: ["id"]
           },
         ]
+      }
+      tag: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          title: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       task: {
         Row: {
@@ -1191,12 +965,50 @@ export type Database = {
             foreignKeyName: "task_timer_project_id_fkey"
             columns: ["timer_project_id"]
             isOneToOne: false
-            referencedRelation: "timer_project"
+            referencedRelation: "work_project"
             referencedColumns: ["id"]
           },
         ]
       }
-      timer_project: {
+      work_folder: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          order_index: number
+          parent_folder: string | null
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_index?: number
+          parent_folder?: string | null
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_index?: number
+          parent_folder?: string | null
+          title?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "timer_project_folder_parent_folder_fkey"
+            columns: ["parent_folder"]
+            isOneToOne: false
+            referencedRelation: "work_folder"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      work_project: {
         Row: {
           cash_flow_category_id: string | null
           color: string | null
@@ -1278,19 +1090,19 @@ export type Database = {
             foreignKeyName: "timerProject_cash_flow_category_id_fkey"
             columns: ["cash_flow_category_id"]
             isOneToOne: false
-            referencedRelation: "finance_category"
+            referencedRelation: "tag"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "timerProject_folder_id_fkey"
             columns: ["folder_id"]
             isOneToOne: false
-            referencedRelation: "timer_project_folder"
+            referencedRelation: "work_folder"
             referencedColumns: ["id"]
           },
         ]
       }
-      timer_project_category: {
+      work_project_tag: {
         Row: {
           created_at: string
           finance_category_id: string
@@ -1317,57 +1129,19 @@ export type Database = {
             foreignKeyName: "timer_project_category_finance_category_id_fkey"
             columns: ["finance_category_id"]
             isOneToOne: false
-            referencedRelation: "finance_category"
+            referencedRelation: "tag"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "timer_project_category_timer_project_id_fkey"
             columns: ["timer_project_id"]
             isOneToOne: false
-            referencedRelation: "timer_project"
+            referencedRelation: "work_project"
             referencedColumns: ["id"]
           },
         ]
       }
-      timer_project_folder: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          order_index: number
-          parent_folder: string | null
-          title: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          order_index?: number
-          parent_folder?: string | null
-          title: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          order_index?: number
-          parent_folder?: string | null
-          title?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "timer_project_folder_parent_folder_fkey"
-            columns: ["parent_folder"]
-            isOneToOne: false
-            referencedRelation: "timer_project_folder"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      timer_session: {
+      work_time_entry: {
         Row: {
           active_seconds: number
           created_at: string
@@ -1433,7 +1207,7 @@ export type Database = {
             foreignKeyName: "timer_session_single_cash_flow_id_fkey"
             columns: ["single_cash_flow_id"]
             isOneToOne: false
-            referencedRelation: "single_cash_flow"
+            referencedRelation: "single_cashflow"
             referencedColumns: ["id"]
           },
           {
@@ -1447,7 +1221,7 @@ export type Database = {
             foreignKeyName: "timerSession_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
-            referencedRelation: "timer_project"
+            referencedRelation: "work_project"
             referencedColumns: ["id"]
           },
         ]

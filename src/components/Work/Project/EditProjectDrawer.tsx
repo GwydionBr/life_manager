@@ -47,8 +47,8 @@ export default function EditProjectDrawer({
 
   useEffect(() => {
     if (activeProject) {
-      if (activeProject.categories) {
-        setCategoryIds(activeProject.categories.map((c) => c.id));
+      if (activeProject.tags) {
+        setCategoryIds(activeProject.tags.map((c) => c.id));
       }
     }
   }, [activeProject]);
@@ -139,7 +139,10 @@ export default function EditProjectDrawer({
             <DeleteButton
               onClick={handleDelete}
               color="red"
-              tooltipLabel={getLocalizedText("Projekt löschen", "Delete Project")}
+              tooltipLabel={getLocalizedText(
+                "Projekt löschen",
+                "Delete Project"
+              )}
             />
           </Group>
         </Drawer>

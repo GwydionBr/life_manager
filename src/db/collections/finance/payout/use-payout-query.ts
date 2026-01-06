@@ -72,12 +72,15 @@ export const usePayouts = () => {
       }
     });
 
-    const timerProjectById = new Map<string, Payout["timer_project"]>();
+    const timerProjectById = new Map<string, Payout["work_project"]>();
     timerProjects?.forEach((project) => {
       timerProjectById.set(project.id, project);
     });
 
-    const timerSessionsByPayoutId = new Map<string, Payout["timer_sessions"]>();
+    const timerSessionsByPayoutId = new Map<
+      string,
+      Payout["work_time_entry"]
+    >();
     timerSessions?.forEach((session) => {
       if (session.payout_id) {
         const existing = timerSessionsByPayoutId.get(session.payout_id) || [];

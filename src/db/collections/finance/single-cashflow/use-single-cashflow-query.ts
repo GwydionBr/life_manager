@@ -61,10 +61,7 @@ export const useSingleCashflowsQuery = () => {
   const cashflowsWithCategories = useMemo((): SingleCashFlow[] => {
     if (!cashflows) return [];
 
-    const categoriesByCashflow = new Map<
-      string,
-      SingleCashFlow["categories"]
-    >();
+    const categoriesByCashflow = new Map<string, SingleCashFlow["tags"]>();
     // Map categories to cashflows
     mappings?.forEach(({ cashflowId, category }) => {
       if (!categoriesByCashflow.has(cashflowId)) {

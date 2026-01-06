@@ -48,9 +48,9 @@ export default function RecurringCashFlowRow({
 
   const currentCategories = useMemo(() => {
     return financeCategories.filter((category) =>
-      cashflow.categories.map((category) => category.id).includes(category.id)
+      cashflow.tags.map((category) => category.id).includes(category.id)
     );
-  }, [financeCategories, cashflow.categories]);
+  }, [financeCategories, cashflow.tags]);
 
   const nextDate = useMemo(() => {
     if (!showNextDate) return null;
@@ -69,7 +69,7 @@ export default function RecurringCashFlowRow({
         cashflow.id,
         {
           ...cashflow,
-          categories: updatedCategories,
+          tags: updatedCategories,
         },
         true
       );

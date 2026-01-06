@@ -57,10 +57,7 @@ export const useRecurringCashflows = () => {
   const cashflowsWithCategories = useMemo((): RecurringCashFlow[] => {
     if (!cashflows) return [];
 
-    const categoriesByCashflow = new Map<
-      string,
-      RecurringCashFlow["categories"]
-    >();
+    const categoriesByCashflow = new Map<string, RecurringCashFlow["tags"]>();
     mappings?.forEach(({ cashflowId, category }) => {
       if (!categoriesByCashflow.has(cashflowId)) {
         categoriesByCashflow.set(cashflowId, []);

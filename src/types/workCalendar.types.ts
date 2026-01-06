@@ -18,7 +18,7 @@ export type VisibleProject = {
 };
 
 export type CalendarSession = Pick<
-  Tables<"timer_session">, 
+  Tables<"work_time_entry">, 
   | "id"
   | "start_time"
   | "end_time"

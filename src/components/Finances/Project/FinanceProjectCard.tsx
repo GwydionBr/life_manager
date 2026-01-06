@@ -128,7 +128,7 @@ export default function FinanceProjectCard({
     closeBadgePopover();
     if (updatedCategories) {
       updateFinanceProject(project.id, {
-        categories: updatedCategories,
+        tags: updatedCategories,
         client: project.client,
         adjustments: project.adjustments,
       });
@@ -246,7 +246,7 @@ export default function FinanceProjectCard({
           <Group gap="md" wrap="wrap" flex={2}>
             {project.client && <FinanceClientBadge client={project.client} />}
             <FinanceCategoryBadges
-              initialCategories={project.categories}
+              initialCategories={project.tags}
               onPopoverOpen={openBadgePopover}
               onPopoverClose={handleCategoryClose}
               showAddCategory={hovered || isEditing}

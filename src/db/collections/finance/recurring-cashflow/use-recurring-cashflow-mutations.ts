@@ -126,7 +126,7 @@ export const useRecurringCashflowMutations = () => {
               title: item.title,
               amount: item.amount,
               currency: item.currency,
-              categories: item.categories,
+              tags: item.tags,
             },
             profile.id
           );

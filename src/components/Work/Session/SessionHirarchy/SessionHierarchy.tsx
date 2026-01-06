@@ -71,8 +71,8 @@ export default function SessionHierarchy({
           <Accordion.Item
             value={String(yearData.totalEarnings)}
             style={{
-              borderColor: getBorderColor(yearData.sessionIds),
-              backgroundColor: getBackgroundColor(yearData.sessionIds),
+              borderColor: getBorderColor(yearData.timeEntryIds),
+              backgroundColor: getBackgroundColor(yearData.timeEntryIds),
             }}
           >
             <CustomAccordionControl
@@ -81,7 +81,7 @@ export default function SessionHierarchy({
               earnings={yearData.totalEarnings}
               time={yearData.totalTime}
               selectedSessionIds={selectedSessions}
-              sessionIds={yearData.sessionIds}
+              sessionIds={yearData.timeEntryIds}
               selectionModeActive={selectedModeActive}
               onGroupToggle={onGroupToggle}
               selectableIdSet={selectableIdSet}
@@ -104,9 +104,9 @@ export default function SessionHierarchy({
                     <Accordion.Item
                       value={String(monthData.totalEarnings)}
                       style={{
-                        borderColor: getBorderColor(monthData.sessionIds),
+                        borderColor: getBorderColor(monthData.timeEntryIds),
                         backgroundColor: getBackgroundColor(
-                          monthData.sessionIds
+                          monthData.timeEntryIds
                         ),
                       }}
                     >
@@ -116,7 +116,7 @@ export default function SessionHierarchy({
                         earnings={monthData.totalEarnings}
                         time={monthData.totalTime}
                         selectedSessionIds={selectedSessions}
-                        sessionIds={monthData.sessionIds}
+                        sessionIds={monthData.timeEntryIds}
                         selectionModeActive={selectedModeActive}
                         onGroupToggle={onGroupToggle}
                         selectableIdSet={selectableIdSet}
@@ -142,10 +142,10 @@ export default function SessionHierarchy({
                                 value={String(weekData.totalEarnings)}
                                 style={{
                                   borderColor: getBorderColor(
-                                    weekData.sessionIds
+                                    weekData.timeEntryIds
                                   ),
                                   backgroundColor: getBackgroundColor(
-                                    weekData.sessionIds
+                                    weekData.timeEntryIds
                                   ),
                                 }}
                               >
@@ -160,7 +160,7 @@ export default function SessionHierarchy({
                                   earnings={weekData.totalEarnings}
                                   time={weekData.totalTime}
                                   selectedSessionIds={selectedSessions}
-                                  sessionIds={weekData.sessionIds}
+                                  sessionIds={weekData.timeEntryIds}
                                   selectionModeActive={selectedModeActive}
                                   onGroupToggle={onGroupToggle}
                                   selectableIdSet={selectableIdSet}
@@ -189,10 +189,10 @@ export default function SessionHierarchy({
                                           value={day}
                                           style={{
                                             borderColor: getBorderColor(
-                                              dayData.sessionIds
+                                              dayData.timeEntryIds
                                             ),
                                             backgroundColor: getBackgroundColor(
-                                              dayData.sessionIds
+                                              dayData.timeEntryIds
                                             ),
                                           }}
                                         >
@@ -209,7 +209,7 @@ export default function SessionHierarchy({
                                             selectedSessionIds={
                                               selectedSessions
                                             }
-                                            sessionIds={dayData.sessionIds}
+                                            sessionIds={dayData.timeEntryIds}
                                             selectionModeActive={
                                               selectedModeActive
                                             }
@@ -217,7 +217,7 @@ export default function SessionHierarchy({
                                             selectableIdSet={selectableIdSet}
                                           />
                                           <Accordion.Panel>
-                                            {dayData.sessions
+                                            {dayData.timeEntries
                                               .sort(
                                                 (a, b) =>
                                                   new Date(

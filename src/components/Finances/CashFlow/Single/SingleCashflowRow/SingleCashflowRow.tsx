@@ -66,7 +66,7 @@ export default function SingleCashflowRow({
     if (updatedCategories) {
       await updateSingleCashflow(cashflow.id, {
         ...cashflow,
-        categories: updatedCategories,
+        tags: updatedCategories,
       });
     }
     setTimeout(() => setIsUpdating(false), 500);
@@ -121,7 +121,7 @@ export default function SingleCashflowRow({
         <Grid.Col span={3}>
           <Stack>
             <FinanceCategoryBadges
-              initialCategories={cashflow.categories}
+              initialCategories={cashflow.tags}
               onPopoverOpen={openCategoryPopover}
               onPopoverClose={handleCategoryClose}
               showAddCategory={hovered}

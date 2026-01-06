@@ -31,7 +31,7 @@ export default function EditFinanceProjectDrawer({
   const [financeClient, setFinanceClient] =
     useState<Tables<"finance_client"> | null>(financeProject.client);
   const [categories, setCategories] = useState<Tables<"finance_category">[]>(
-    financeProject.categories
+    financeProject.tags
   );
 
   const drawerStack = useDrawersStack([
@@ -44,9 +44,7 @@ export default function EditFinanceProjectDrawer({
   useEffect(() => {
     if (opened) {
       drawerStack.open("edit-finance-project");
-      setCategories(
-        financeProject.categories
-      );
+      setCategories(financeProject.tags);
     } else {
       drawerStack.closeAll();
     }

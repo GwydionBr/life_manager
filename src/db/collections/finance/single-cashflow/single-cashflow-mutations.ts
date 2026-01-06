@@ -42,7 +42,7 @@ export const addSingleCashflowMutation = async (
   customTransaction.mutate(() =>
     cashflowsToInsert.forEach((cashflow) => {
       // Extract categories and cashflow data
-      const { categories, ...cashflowData } = cashflow;
+      const { tags: categories, ...cashflowData } = cashflow;
       // Generate cashflow ID
       const cashflowId = cashflowData.id || crypto.randomUUID();
       // Insert cashflow
@@ -72,7 +72,7 @@ export const addSingleCashflowMutation = async (
           user_id: userId,
         });
       });
-      allNewSingleCashflows.push({ ...newCashFlow, categories });
+      allNewSingleCashflows.push({ ...newCashFlow, tags: categories });
     })
   );
 
@@ -95,7 +95,7 @@ export const updateSingleCashflowMutation = async (
   userId: string
 ) => {
   const ids = Array.isArray(id) ? id : [id];
-  const { categories, ...cashflowData } = item;
+  const { tags: categories, ...cashflowData } = item;
 
   const customTransaction = createTransaction({
     autoCommit: false,

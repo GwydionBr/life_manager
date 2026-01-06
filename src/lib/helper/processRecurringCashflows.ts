@@ -57,7 +57,7 @@ export const processRecurringCashFlows = (
           // Past or current flow - only include fields needed for insertion
           pastAndCurrentFlows.push({
             ...baseFlow,
-            categories: flow.categories,
+            tags: flow.tags,
           });
         }
       }

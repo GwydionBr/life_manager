@@ -40,7 +40,7 @@ export function groupSessions(
       // Year
       acc[year] = acc[year] || {
         totalEarnings: { paid: [], unpaid: [] },
-        sessionIds: [],
+        timeEntryIds: [],
         totalTime: 0,
         months: {},
       };
@@ -57,12 +57,12 @@ export function groupSessions(
         );
       }
       acc[year].totalTime += timeInSeconds;
-      acc[year].sessionIds.push(session.id);
+      acc[year].timeEntryIds.push(session.id);
 
       // Month
       acc[year].months[month] = acc[year].months[month] || {
         totalEarnings: { paid: [], unpaid: [] },
-        sessionIds: [],
+        timeEntryIds: [],
         totalTime: 0,
         weeks: {},
       };
@@ -79,14 +79,14 @@ export function groupSessions(
         );
       }
       acc[year].months[month].totalTime += timeInSeconds;
-      acc[year].months[month].sessionIds.push(session.id);
+      acc[year].months[month].timeEntryIds.push(session.id);
 
       // Week
       acc[year].months[month].weeks[week] = acc[year].months[month].weeks[
         week
       ] || {
         totalEarnings: { paid: [], unpaid: [] },
-        sessionIds: [],
+        timeEntryIds: [],
         totalTime: 0,
         days: {},
       };
@@ -103,15 +103,15 @@ export function groupSessions(
         );
       }
       acc[year].months[month].weeks[week].totalTime += timeInSeconds;
-      acc[year].months[month].weeks[week].sessionIds.push(session.id);
+      acc[year].months[month].weeks[week].timeEntryIds.push(session.id);
 
       // Day
       acc[year].months[month].weeks[week].days[day] = acc[year].months[month]
         .weeks[week].days[day] || {
         totalEarnings: { paid: [], unpaid: [] },
-        sessionIds: [],
+        timeEntryIds: [],
         totalTime: 0,
-        sessions: [],
+        timeEntries: [],
       };
 
       if (session.single_cash_flow_id) {
@@ -128,11 +128,13 @@ export function groupSessions(
           );
       }
       acc[year].months[month].weeks[week].days[day].totalTime += timeInSeconds;
-      acc[year].months[month].weeks[week].days[day].sessions.push({
+      acc[year].months[month].weeks[week].days[day].timeEntries.push({
         ...session,
         index,
       });
-      acc[year].months[month].weeks[week].days[day].sessionIds.push(session.id);
+      acc[year].months[month].weeks[week].days[day].timeEntryIds.push(
+        session.id
+      );
 
       return acc;
     },

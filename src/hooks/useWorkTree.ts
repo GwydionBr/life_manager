@@ -19,7 +19,7 @@ export const useWorkTree = () => {
 
   const cleanedProjects = useMemo(() => {
     return projects.map((project) => {
-      const { categories, ...rest } = project;
+      const { tags: categories, ...rest } = project;
       return rest;
     });
   }, [projects]);

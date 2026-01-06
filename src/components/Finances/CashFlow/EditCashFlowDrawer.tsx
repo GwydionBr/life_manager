@@ -64,7 +64,7 @@ export default function EditCashFlowDrawer({
   );
   const [type, setType] = useState<CashFlowType>("income");
   const [categories, setCategories] = useState<Tables<"finance_category">[]>(
-    cashFlow.categories
+    cashFlow.tags
   );
   const [pendingValues, setPendingValues] = useState<
     UpdateSingleCashFlow | UpdateRecurringCashFlow
@@ -97,8 +97,8 @@ export default function EditCashFlowDrawer({
   }, [opened]);
 
   useEffect(() => {
-    if (categories !== cashFlow.categories) {
-      setCategories(cashFlow.categories);
+    if (categories !== cashFlow.tags) {
+      setCategories(cashFlow.tags);
     }
   }, [cashFlow]);
 
@@ -108,7 +108,7 @@ export default function EditCashFlowDrawer({
       await updateSingleCashflow(cashFlow.id, {
         ...values,
         date: values.date.toISOString(),
-        categories,
+        tags: categories,
       });
       onClose();
     } else {
@@ -118,14 +118,14 @@ export default function EditCashFlowDrawer({
         values.title !== cashFlow.title ||
         values.amount !== cashFlow.amount ||
         values.currency !== cashFlow.currency ||
-        categories !== cashFlow.categories;
+        categories !== cashFlow.tags;
 
       if (hasChanges) {
         console.log("has changes", hasChanges);
         // Store the values and show the update modal
         setPendingValues({
           id: cashFlow.id,
-          categories,
+          tags: categories,
           ...values,
           end_date: values.end_date?.toISOString() ?? null,
           start_date: values.start_date.toISOString(),
@@ -137,7 +137,7 @@ export default function EditCashFlowDrawer({
           cashFlow.id,
           {
             ...values,
-            categories,
+            tags: categories,
             end_date: values.end_date?.toISOString() ?? null,
             start_date: values.start_date.toISOString(),
           },
@@ -166,7 +166,7 @@ export default function EditCashFlowDrawer({
     if (isSingleCashFlow(cashFlow)) return;
     updateRecurringCashflow(cashFlow.id, {
       end_date: new Date().toISOString(),
-      categories,
+      tags: categories,
     });
     onClose();
   }
@@ -178,7 +178,7 @@ export default function EditCashFlowDrawer({
       cashFlow.id,
       {
         ...pendingValues,
-        categories,
+        tags: categories,
       },
       true
     );
@@ -190,7 +190,7 @@ export default function EditCashFlowDrawer({
 
     await updateRecurringCashflow(cashFlow.id, {
       ...pendingValues,
-      categories,
+      tags: categories,
     });
     onClose();
   }

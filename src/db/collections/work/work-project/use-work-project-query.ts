@@ -54,7 +54,7 @@ export const useWorkProjects = () => {
   const projectsWithCategories = useMemo((): WorkProject[] => {
     if (!projects) return [];
 
-    const categoriesByProject = new Map<string, WorkProject["categories"]>();
+    const categoriesByProject = new Map<string, WorkProject["tags"]>();
     mappings?.forEach(({ projectId, category }) => {
       if (!categoriesByProject.has(projectId)) {
         categoriesByProject.set(projectId, []);

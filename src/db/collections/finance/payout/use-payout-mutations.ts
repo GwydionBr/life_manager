@@ -55,7 +55,7 @@ export const usePayoutMutations = () => {
             title: financeProject.title,
             amount: financeProject.start_amount,
             currency: financeProject.currency,
-            categories: financeProject.categories,
+            tags: financeProject.tags,
             finance_project_id: financeProject.id,
           },
           profile.id
@@ -65,7 +65,7 @@ export const usePayoutMutations = () => {
           financeProject.id,
           {
             single_cash_flow_id: data[0].id,
-            categories: financeProject.categories,
+            tags: financeProject.tags,
             client: financeProject.client,
             adjustments: financeProject.adjustments,
           },
@@ -132,7 +132,7 @@ export const usePayoutMutations = () => {
             title: projectAdjustment.description ?? "Auszahlung",
             amount: projectAdjustment.amount,
             currency: financeProject.currency,
-            categories: financeProject.categories,
+            tags: financeProject.tags,
             finance_project_id: financeProject.id,
           },
           profile.id
@@ -224,7 +224,7 @@ export const usePayoutMutations = () => {
             amount: endValue ? endValue : parseFloat(totalAmount),
             currency: endCurrency ? endCurrency : project.currency,
             payout_id: payoutData.id,
-            categories: project.categories,
+            tags: project.tags,
           },
           profile.id
         );

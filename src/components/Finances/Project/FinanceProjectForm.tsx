@@ -82,7 +82,7 @@ export default function FinanceProjectForm({
           description: financeProject.description || "",
           currency: financeProject.currency,
           start_amount: financeProject.start_amount,
-          finance_category_ids: financeProject.categories.map(
+          finance_category_ids: financeProject.tags.map(
             (category) => category.id
           ),
           finance_client_id: financeProject.finance_client_id,

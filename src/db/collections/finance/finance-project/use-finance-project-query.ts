@@ -83,7 +83,7 @@ export const useFinanceProjects = () => {
     if (!projects) return [];
 
     // Group categories by project
-    const categoriesByProject = new Map<string, FinanceProject["categories"]>();
+    const categoriesByProject = new Map<string, FinanceProject["tags"]>();
     mappings?.forEach(({ projectId, category }) => {
       if (!categoriesByProject.has(projectId)) {
         categoriesByProject.set(projectId, []);

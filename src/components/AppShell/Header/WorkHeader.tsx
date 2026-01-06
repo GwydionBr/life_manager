@@ -115,8 +115,12 @@ export default function WorkHeader() {
       )}
       <Grid w="100%" align="center">
         <Grid.Col span={2}>
-          {project?.categories.map((category) => (
-            <FinanceCategorySingleBadge variant="filled" category={category} key={category.id} />
+          {project?.tags.map((category) => (
+            <FinanceCategorySingleBadge
+              variant="filled"
+              category={category}
+              key={category.id}
+            />
           ))}
         </Grid.Col>
         <Grid.Col span={8}>

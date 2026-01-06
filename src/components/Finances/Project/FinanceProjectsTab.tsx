@@ -99,7 +99,7 @@ export default function FinanceProjectTab() {
 
   const formattedFinanceProjects = useMemo(() => {
     return financeProjects.map((project) => {
-      const { categories, ...rest } = project;
+      const { tags: categories, ...rest } = project;
       return {
         ...rest,
         client:

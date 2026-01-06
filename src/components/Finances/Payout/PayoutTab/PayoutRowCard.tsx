@@ -28,10 +28,10 @@ export default function PayoutRowCard({ payout }: PayoutRowCardProps) {
   const { getLocalizedText, formatDate, formatMoney } = useIntl();
 
   const getTotalSessionTime = () => {
-    if (!payout.timer_sessions || payout.timer_sessions.length === 0)
+    if (!payout.work_time_entry || payout.work_time_entry.length === 0)
       return null;
 
-    const totalSeconds = payout.timer_sessions.reduce((acc, session) => {
+    const totalSeconds = payout.work_time_entry.reduce((acc, session) => {
       return acc + (session.active_seconds || 0);
     }, 0);
 
@@ -46,7 +46,7 @@ export default function PayoutRowCard({ payout }: PayoutRowCardProps) {
   const hasValueChange =
     payout.start_value !== null && payout.start_value !== payout.value;
   const showExtendedInfo = hasCurrencyConversion || hasValueChange;
-  const totalSessions = payout.timer_sessions?.length || 0;
+  const totalSessions = payout.work_time_entry?.length || 0;
   const totalTime = getTotalSessionTime();
 
   return (
@@ -91,7 +91,7 @@ export default function PayoutRowCard({ payout }: PayoutRowCardProps) {
                 </Badge>
               </Group>
             )}
-            {totalSessions === 0 && !payout.timer_project && (
+            {totalSessions === 0 && !payout.work_project && (
               <Badge
                 color="red"
                 variant="transparent"
@@ -103,14 +103,14 @@ export default function PayoutRowCard({ payout }: PayoutRowCardProps) {
                 )}
               </Badge>
             )}
-            {payout.timer_project && (
+            {payout.work_project && (
               <Group gap="xs" align="center">
                 <Badge
                   color="violet"
                   variant="transparent"
                   leftSection={<IconClipboardList size={12} />}
                 >
-                  {payout.timer_project.title}
+                  {payout.work_project.title}
                 </Badge>
               </Group>
             )}
@@ -129,7 +129,7 @@ export default function PayoutRowCard({ payout }: PayoutRowCardProps) {
               <Text size="lg" fw={700} c="green">
                 {formatMoney(
                   payout.start_value ?? payout.value,
-                  payout.start_currency ?? payout.currency,
+                  payout.start_currency ?? payout.currency
                 )}
               </Text>
             </Group>
@@ -186,7 +186,7 @@ export default function PayoutRowCard({ payout }: PayoutRowCardProps) {
                     {getLocalizedText("Differenz", "Difference")}:{" "}
                     {formatMoney(
                       payout.value! - payout.start_value!,
-                      payout.currency!,
+                      payout.currency!
                     )}{" "}
                     (
                     {((payout.value! / payout.start_value! - 1) * 100).toFixed(

@@ -32,7 +32,7 @@ export const addRecurringCashflowMutation = async (
       );
     },
   });
-  const { categories, ...cashflowData } = newRecurringCashflow;
+  const { tags: categories, ...cashflowData } = newRecurringCashflow;
   const dataToInsert = {
     ...cashflowData,
     currency: newRecurringCashflow.currency || "EUR",
@@ -65,7 +65,7 @@ export const addRecurringCashflowMutation = async (
 
   return {
     promise,
-    data: { ...dataToInsert, categories } as RecurringCashFlow,
+    data: { ...dataToInsert, tags: categories } as RecurringCashFlow,
   };
 };
 
@@ -81,7 +81,7 @@ export const updateRecurringCashflowMutation = async (
   item: UpdateRecurringCashFlow,
   userId: string
 ) => {
-  const { categories, ...cashflowData } = item;
+  const { tags: categories, ...cashflowData } = item;
   const customTransaction = recurringCashflowsCollection.update(id, (draft) => {
     Object.assign(draft, cashflowData);
   });
@@ -160,4 +160,3 @@ export async function syncRecurringCashflowCategories(
   const allTransactions = [...deletePromises, ...insertPromises];
   await Promise.all(allTransactions.map((tx) => tx.isPersisted.promise));
 }
-
