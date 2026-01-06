@@ -287,7 +287,9 @@ CREATE TABLE IF NOT EXISTS "public"."bank_account" (
     "description" "text",
     "currency" "public"."currency" NOT NULL,
     "saldo" double precision DEFAULT '0'::double precision NOT NULL,
-    "saldo_set_at" timestamp with time zone DEFAULT ("now"() AT TIME ZONE 'utc'::"text") NOT NULL
+    "saldo_set_at" timestamp with time zone DEFAULT ("now"() AT TIME ZONE 'utc'::"text") NOT NULL,
+    "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL,
+    "is_default" boolean DEFAULT false NOT NULL
 );
 
 
@@ -406,18 +408,6 @@ CREATE TABLE IF NOT EXISTS "public"."finance_rule_category" (
 ALTER TABLE "public"."finance_rule_category" OWNER TO "postgres";
 
 
-CREATE TABLE IF NOT EXISTS "public"."finance_rule_timer_project" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "finance_rule_id" "uuid" NOT NULL,
-    "timer_project_id" "uuid" NOT NULL,
-    "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL
-);
-
-
-ALTER TABLE "public"."finance_rule_timer_project" OWNER TO "postgres";
-
-
 CREATE TABLE IF NOT EXISTS "public"."friendships" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
@@ -428,21 +418,6 @@ CREATE TABLE IF NOT EXISTS "public"."friendships" (
 
 
 ALTER TABLE "public"."friendships" OWNER TO "postgres";
-
-
-CREATE TABLE IF NOT EXISTS "public"."grocery_item" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "title" "text" NOT NULL,
-    "amount" real DEFAULT '1'::real NOT NULL,
-    "checked" boolean DEFAULT false NOT NULL,
-    "active" boolean DEFAULT true NOT NULL,
-    "unit" "public"."amountUnits" DEFAULT 'amount'::"public"."amountUnits" NOT NULL,
-    "group_id" "uuid" NOT NULL
-);
-
-
-ALTER TABLE "public"."grocery_item" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."group" (
@@ -505,38 +480,16 @@ CREATE TABLE IF NOT EXISTS "public"."group_task" (
 ALTER TABLE "public"."group_task" OWNER TO "postgres";
 
 
-CREATE TABLE IF NOT EXISTS "public"."old_payou_data" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "title" "text" NOT NULL,
-    "start_currency" "public"."currency" NOT NULL,
-    "end_currency" "public"."currency",
-    "start_value" numeric NOT NULL,
-    "end_value" numeric,
-    "cashflow_id" "uuid" NOT NULL,
-    "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL,
-    "timer_project_id" "uuid",
-    "finance_project_id" "uuid",
-    "timer_session_project_id" "uuid"
-);
-
-
-ALTER TABLE "public"."old_payou_data" OWNER TO "postgres";
-
-
 CREATE TABLE IF NOT EXISTS "public"."payout" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "title" "text" NOT NULL,
-    "start_currency" "public"."currency" NOT NULL,
-    "end_currency" "public"."currency",
-    "start_value" numeric NOT NULL,
-    "end_value" numeric,
-    "cashflow_id" "uuid" NOT NULL,
+    "start_currency" "public"."currency",
+    "start_value" numeric,
     "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL,
     "timer_project_id" "uuid",
-    "finance_project_id" "uuid",
-    "timer_session_project_id" "uuid"
+    "currency" "public"."currency" NOT NULL,
+    "value" numeric NOT NULL
 );
 
 
@@ -570,9 +523,7 @@ CREATE TABLE IF NOT EXISTS "public"."recurring_cash_flow" (
     "currency" "public"."currency" DEFAULT 'USD'::"public"."currency" NOT NULL,
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "interval" "public"."finance_interval" DEFAULT 'month'::"public"."finance_interval" NOT NULL,
-    "type" "public"."cash_flow_type" DEFAULT 'expense'::"public"."cash_flow_type" NOT NULL,
     "created_at" timestamp with time zone DEFAULT ("now"() AT TIME ZONE 'utc'::"text") NOT NULL,
-    "category_id" "uuid",
     "finance_client_id" "uuid"
 );
 
@@ -654,14 +605,13 @@ CREATE TABLE IF NOT EXISTS "public"."single_cash_flow" (
     "title" "text" DEFAULT ''::"text" NOT NULL,
     "currency" "public"."currency" DEFAULT 'USD'::"public"."currency" NOT NULL,
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "type" "public"."cash_flow_type" DEFAULT 'expense'::"public"."cash_flow_type" NOT NULL,
     "created_at" timestamp with time zone DEFAULT ("now"() AT TIME ZONE 'utc'::"text") NOT NULL,
     "is_active" boolean DEFAULT true NOT NULL,
     "changed_date" timestamp with time zone,
     "recurring_cash_flow_id" "uuid",
-    "category_id" "uuid",
     "finance_project_id" "uuid",
-    "finance_client_id" "uuid"
+    "finance_client_id" "uuid",
+    "payout_id" "uuid"
 );
 
 
@@ -851,11 +801,6 @@ ALTER TABLE ONLY "public"."finance_rule_category"
 
 
 
-ALTER TABLE ONLY "public"."finance_rule_timer_project"
-    ADD CONSTRAINT "finance_rule_timer_project_pkey" PRIMARY KEY ("id");
-
-
-
 ALTER TABLE ONLY "public"."friendships"
     ADD CONSTRAINT "friendships_pkey" PRIMARY KEY ("id");
 
@@ -863,11 +808,6 @@ ALTER TABLE ONLY "public"."friendships"
 
 ALTER TABLE ONLY "public"."settings"
     ADD CONSTRAINT "generalUserSettings_pkey" PRIMARY KEY ("id");
-
-
-
-ALTER TABLE ONLY "public"."grocery_item"
-    ADD CONSTRAINT "grocery_item_pkey" PRIMARY KEY ("id");
 
 
 
@@ -888,11 +828,6 @@ ALTER TABLE ONLY "public"."group"
 
 ALTER TABLE ONLY "public"."group_task"
     ADD CONSTRAINT "group_task_pkey" PRIMARY KEY ("id");
-
-
-
-ALTER TABLE ONLY "public"."old_payou_data"
-    ADD CONSTRAINT "old_payou_data_pkey" PRIMARY KEY ("id");
 
 
 
@@ -963,6 +898,11 @@ ALTER TABLE ONLY "public"."appointment"
 
 ALTER TABLE ONLY "public"."appointment"
     ADD CONSTRAINT "appointment_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."bank_account"
+    ADD CONSTRAINT "bank_account_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
 
 
@@ -1066,21 +1006,6 @@ ALTER TABLE ONLY "public"."finance_rule_category"
 
 
 
-ALTER TABLE ONLY "public"."finance_rule_timer_project"
-    ADD CONSTRAINT "finance_rule_timer_project_finance_rule_id_fkey" FOREIGN KEY ("finance_rule_id") REFERENCES "public"."finance_rule"("id") ON DELETE CASCADE;
-
-
-
-ALTER TABLE ONLY "public"."finance_rule_timer_project"
-    ADD CONSTRAINT "finance_rule_timer_project_timer_project_id_fkey" FOREIGN KEY ("timer_project_id") REFERENCES "public"."timer_project"("id") ON DELETE CASCADE;
-
-
-
-ALTER TABLE ONLY "public"."finance_rule_timer_project"
-    ADD CONSTRAINT "finance_rule_timer_project_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
-
-
-
 ALTER TABLE ONLY "public"."friendships"
     ADD CONSTRAINT "friendships_addressee_id_fkey" FOREIGN KEY ("addressee_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
 
@@ -1093,11 +1018,6 @@ ALTER TABLE ONLY "public"."friendships"
 
 ALTER TABLE ONLY "public"."settings"
     ADD CONSTRAINT "generalUserSettings_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
-
-
-
-ALTER TABLE ONLY "public"."grocery_item"
-    ADD CONSTRAINT "grocery_item_group_id_fkey" FOREIGN KEY ("group_id") REFERENCES "public"."group"("id") ON DELETE CASCADE;
 
 
 
@@ -1136,48 +1056,8 @@ ALTER TABLE ONLY "public"."group"
 
 
 
-ALTER TABLE ONLY "public"."old_payou_data"
-    ADD CONSTRAINT "old_payou_data_cashflow_id_fkey" FOREIGN KEY ("cashflow_id") REFERENCES "public"."single_cash_flow"("id") ON DELETE CASCADE;
-
-
-
-ALTER TABLE ONLY "public"."old_payou_data"
-    ADD CONSTRAINT "old_payou_data_finance_project_id_fkey" FOREIGN KEY ("finance_project_id") REFERENCES "public"."finance_project"("id") ON DELETE SET NULL;
-
-
-
-ALTER TABLE ONLY "public"."old_payou_data"
-    ADD CONSTRAINT "old_payou_data_timer_project_id_fkey" FOREIGN KEY ("timer_project_id") REFERENCES "public"."timer_project"("id") ON DELETE SET NULL;
-
-
-
-ALTER TABLE ONLY "public"."old_payou_data"
-    ADD CONSTRAINT "old_payou_data_timer_session_project_id_fkey" FOREIGN KEY ("timer_session_project_id") REFERENCES "public"."timer_project"("id") ON DELETE SET NULL;
-
-
-
-ALTER TABLE ONLY "public"."old_payou_data"
-    ADD CONSTRAINT "old_payou_data_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
-
-
-
-ALTER TABLE ONLY "public"."payout"
-    ADD CONSTRAINT "payout_cashflow_id_fkey" FOREIGN KEY ("cashflow_id") REFERENCES "public"."single_cash_flow"("id") ON DELETE CASCADE;
-
-
-
-ALTER TABLE ONLY "public"."payout"
-    ADD CONSTRAINT "payout_finance_project_id_fkey" FOREIGN KEY ("finance_project_id") REFERENCES "public"."finance_project"("id") ON DELETE SET NULL;
-
-
-
 ALTER TABLE ONLY "public"."payout"
     ADD CONSTRAINT "payout_timer_project_id_fkey" FOREIGN KEY ("timer_project_id") REFERENCES "public"."timer_project"("id") ON DELETE SET NULL;
-
-
-
-ALTER TABLE ONLY "public"."payout"
-    ADD CONSTRAINT "payout_timer_session_project_id_fkey" FOREIGN KEY ("timer_session_project_id") REFERENCES "public"."timer_project"("id") ON DELETE SET NULL;
 
 
 
@@ -1193,11 +1073,6 @@ ALTER TABLE ONLY "public"."profiles"
 
 ALTER TABLE ONLY "public"."recurring_cash_flow_category"
     ADD CONSTRAINT "recurring_cash_flow_category_finance_category_id_fkey" FOREIGN KEY ("finance_category_id") REFERENCES "public"."finance_category"("id") ON DELETE CASCADE;
-
-
-
-ALTER TABLE ONLY "public"."recurring_cash_flow"
-    ADD CONSTRAINT "recurring_cash_flow_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "public"."finance_category"("id") ON DELETE SET NULL;
 
 
 
@@ -1236,11 +1111,6 @@ ALTER TABLE ONLY "public"."single_cash_flow_category"
 
 
 
-ALTER TABLE ONLY "public"."single_cash_flow"
-    ADD CONSTRAINT "single_cash_flow_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "public"."finance_category"("id") ON DELETE SET NULL;
-
-
-
 ALTER TABLE ONLY "public"."single_cash_flow_category"
     ADD CONSTRAINT "single_cash_flow_category_single_cash_flow_id_fkey" FOREIGN KEY ("single_cash_flow_id") REFERENCES "public"."single_cash_flow"("id") ON DELETE CASCADE;
 
@@ -1258,6 +1128,11 @@ ALTER TABLE ONLY "public"."single_cash_flow"
 
 ALTER TABLE ONLY "public"."single_cash_flow"
     ADD CONSTRAINT "single_cash_flow_finance_project_id_fkey" FOREIGN KEY ("finance_project_id") REFERENCES "public"."finance_project"("id") ON DELETE SET NULL;
+
+
+
+ALTER TABLE ONLY "public"."single_cash_flow"
+    ADD CONSTRAINT "single_cash_flow_payout_id_fkey" FOREIGN KEY ("payout_id") REFERENCES "public"."payout"("id") ON DELETE SET NULL;
 
 
 
@@ -1357,12 +1232,6 @@ CREATE POLICY "Allow update for group member" ON "public"."group_appointment" FO
 
 
 
-CREATE POLICY "Enable Update for group members" ON "public"."grocery_item" FOR UPDATE USING ((EXISTS ( SELECT 1
-   FROM "public"."group_member"
-  WHERE (("group_member"."group_id" = "grocery_item"."group_id") AND ("group_member"."user_id" = "auth"."uid"()) AND ("group_member"."status" = 'accepted'::"public"."status")))));
-
-
-
 CREATE POLICY "Enable Update for group members" ON "public"."group_task" FOR UPDATE USING ((EXISTS ( SELECT 1
    FROM "public"."group_member"
   WHERE (("group_member"."group_id" = "group_task"."group_id") AND ("group_member"."user_id" = "auth"."uid"()) AND ("group_member"."status" = 'accepted'::"public"."status")))));
@@ -1372,12 +1241,6 @@ CREATE POLICY "Enable Update for group members" ON "public"."group_task" FOR UPD
 CREATE POLICY "Enable Update for group members" ON "public"."recurring_group_task" FOR UPDATE USING ((EXISTS ( SELECT 1
    FROM "public"."group_member"
   WHERE (("group_member"."group_id" = "recurring_group_task"."group_id") AND ("group_member"."user_id" = "auth"."uid"()) AND ("group_member"."status" = 'accepted'::"public"."status")))));
-
-
-
-CREATE POLICY "Enable delete for group members" ON "public"."grocery_item" FOR DELETE USING ((EXISTS ( SELECT 1
-   FROM "public"."group_member"
-  WHERE (("group_member"."group_id" = "grocery_item"."group_id") AND ("group_member"."user_id" = "auth"."uid"()) AND ("group_member"."status" = 'accepted'::"public"."status")))));
 
 
 
@@ -1434,10 +1297,6 @@ CREATE POLICY "Enable delete for users based on user_id" ON "public"."finance_ru
 
 
 CREATE POLICY "Enable delete for users based on user_id" ON "public"."finance_rule_category" FOR DELETE USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
-
-
-
-CREATE POLICY "Enable delete for users based on user_id" ON "public"."finance_rule_timer_project" FOR DELETE USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
@@ -1525,15 +1384,7 @@ CREATE POLICY "Enable insert for authenticated users only" ON "public"."finance_
 
 
 
-CREATE POLICY "Enable insert for authenticated users only" ON "public"."finance_rule_timer_project" FOR INSERT TO "authenticated" WITH CHECK (true);
-
-
-
 CREATE POLICY "Enable insert for authenticated users only" ON "public"."friendships" FOR INSERT TO "authenticated" WITH CHECK (true);
-
-
-
-CREATE POLICY "Enable insert for authenticated users only" ON "public"."grocery_item" FOR INSERT TO "authenticated" WITH CHECK (true);
 
 
 
@@ -1607,12 +1458,6 @@ CREATE POLICY "Enable read access for all group member" ON "public"."group_appoi
 
 
 
-CREATE POLICY "Enable read access for all group members" ON "public"."grocery_item" FOR SELECT USING ((EXISTS ( SELECT 1
-   FROM "public"."group_member"
-  WHERE (("group_member"."group_id" = "grocery_item"."group_id") AND ("group_member"."user_id" = "auth"."uid"()) AND ("group_member"."status" = 'accepted'::"public"."status")))));
-
-
-
 CREATE POLICY "Enable read access for all group members" ON "public"."group_task" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."group_member"
   WHERE (("group_member"."group_id" = "group_task"."group_id") AND ("group_member"."user_id" = "auth"."uid"()) AND ("group_member"."status" = 'accepted'::"public"."status")))));
@@ -1674,10 +1519,6 @@ CREATE POLICY "Enable update for users based on user_id" ON "public"."finance_ru
 
 
 CREATE POLICY "Enable update for users based on user_id" ON "public"."finance_rule_category" FOR UPDATE USING ((( SELECT "auth"."uid"() AS "uid") = "user_id")) WITH CHECK ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
-
-
-
-CREATE POLICY "Enable update for users based on user_id" ON "public"."finance_rule_timer_project" FOR UPDATE USING ((( SELECT "auth"."uid"() AS "uid") = "user_id")) WITH CHECK ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
@@ -1762,10 +1603,6 @@ CREATE POLICY "Enable users to view their own data only" ON "public"."finance_ru
 
 
 CREATE POLICY "Enable users to view their own data only" ON "public"."finance_rule_category" FOR SELECT TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
-
-
-
-CREATE POLICY "Enable users to view their own data only" ON "public"."finance_rule_timer_project" FOR SELECT TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
@@ -1859,13 +1696,7 @@ ALTER TABLE "public"."finance_rule" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."finance_rule_category" ENABLE ROW LEVEL SECURITY;
 
 
-ALTER TABLE "public"."finance_rule_timer_project" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."friendships" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."grocery_item" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."group" ENABLE ROW LEVEL SECURITY;
@@ -1878,9 +1709,6 @@ ALTER TABLE "public"."group_member" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."group_task" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."old_payou_data" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."payout" ENABLE ROW LEVEL SECURITY;
@@ -1922,24 +1750,36 @@ ALTER TABLE "public"."timer_project_folder" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."timer_session" ENABLE ROW LEVEL SECURITY;
 
 
+CREATE PUBLICATION "cloud_electric_pub_e79ade9a_1672_483d_8c74_5430c6156f99" WITH (publish = 'insert, update, delete, truncate');
+
+
+ALTER PUBLICATION "cloud_electric_pub_e79ade9a_1672_483d_8c74_5430c6156f99" OWNER TO "postgres";
+
+
+CREATE PUBLICATION "powersync" FOR ALL TABLES WITH (publish = 'insert, update, delete, truncate');
+
+
+ALTER PUBLICATION "powersync" OWNER TO "postgres";
+
+-- Create a role/user with replication privileges for PowerSync
+CREATE ROLE powersync_role WITH REPLICATION BYPASSRLS LOGIN PASSWORD 'eII4opLtbyw8cMH';
+-- Set up permissions for the newly created role
+-- Read-only (SELECT) access is required
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO powersync_role;  
+
+-- Optionally, grant SELECT on all future tables (to cater for schema additions)
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO powersync_role;
+
+
 
 
 ALTER PUBLICATION "supabase_realtime" OWNER TO "postgres";
-
-
-
 
 
 GRANT USAGE ON SCHEMA "public" TO "postgres";
 GRANT USAGE ON SCHEMA "public" TO "anon";
 GRANT USAGE ON SCHEMA "public" TO "authenticated";
 GRANT USAGE ON SCHEMA "public" TO "service_role";
-
-
-
-
-
-
 
 
 
@@ -2153,186 +1993,196 @@ GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "service_role";
 GRANT ALL ON TABLE "public"."appointment" TO "anon";
 GRANT ALL ON TABLE "public"."appointment" TO "authenticated";
 GRANT ALL ON TABLE "public"."appointment" TO "service_role";
+GRANT SELECT ON TABLE "public"."appointment" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."bank_account" TO "anon";
 GRANT ALL ON TABLE "public"."bank_account" TO "authenticated";
 GRANT ALL ON TABLE "public"."bank_account" TO "service_role";
+GRANT SELECT ON TABLE "public"."bank_account" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."finance_category" TO "anon";
 GRANT ALL ON TABLE "public"."finance_category" TO "authenticated";
 GRANT ALL ON TABLE "public"."finance_category" TO "service_role";
+GRANT SELECT ON TABLE "public"."finance_category" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."finance_client" TO "anon";
 GRANT ALL ON TABLE "public"."finance_client" TO "authenticated";
 GRANT ALL ON TABLE "public"."finance_client" TO "service_role";
+GRANT SELECT ON TABLE "public"."finance_client" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."finance_project" TO "anon";
 GRANT ALL ON TABLE "public"."finance_project" TO "authenticated";
 GRANT ALL ON TABLE "public"."finance_project" TO "service_role";
+GRANT SELECT ON TABLE "public"."finance_project" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."finance_project_adjustment" TO "anon";
 GRANT ALL ON TABLE "public"."finance_project_adjustment" TO "authenticated";
 GRANT ALL ON TABLE "public"."finance_project_adjustment" TO "service_role";
+GRANT SELECT ON TABLE "public"."finance_project_adjustment" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."finance_project_category" TO "anon";
 GRANT ALL ON TABLE "public"."finance_project_category" TO "authenticated";
 GRANT ALL ON TABLE "public"."finance_project_category" TO "service_role";
+GRANT SELECT ON TABLE "public"."finance_project_category" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."finance_project_client" TO "anon";
 GRANT ALL ON TABLE "public"."finance_project_client" TO "authenticated";
 GRANT ALL ON TABLE "public"."finance_project_client" TO "service_role";
+GRANT SELECT ON TABLE "public"."finance_project_client" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."finance_rule" TO "anon";
 GRANT ALL ON TABLE "public"."finance_rule" TO "authenticated";
 GRANT ALL ON TABLE "public"."finance_rule" TO "service_role";
+GRANT SELECT ON TABLE "public"."finance_rule" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."finance_rule_category" TO "anon";
 GRANT ALL ON TABLE "public"."finance_rule_category" TO "authenticated";
 GRANT ALL ON TABLE "public"."finance_rule_category" TO "service_role";
-
-
-
-GRANT ALL ON TABLE "public"."finance_rule_timer_project" TO "anon";
-GRANT ALL ON TABLE "public"."finance_rule_timer_project" TO "authenticated";
-GRANT ALL ON TABLE "public"."finance_rule_timer_project" TO "service_role";
+GRANT SELECT ON TABLE "public"."finance_rule_category" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."friendships" TO "anon";
 GRANT ALL ON TABLE "public"."friendships" TO "authenticated";
 GRANT ALL ON TABLE "public"."friendships" TO "service_role";
-
-
-
-GRANT ALL ON TABLE "public"."grocery_item" TO "anon";
-GRANT ALL ON TABLE "public"."grocery_item" TO "authenticated";
-GRANT ALL ON TABLE "public"."grocery_item" TO "service_role";
+GRANT SELECT ON TABLE "public"."friendships" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."group" TO "anon";
 GRANT ALL ON TABLE "public"."group" TO "authenticated";
 GRANT ALL ON TABLE "public"."group" TO "service_role";
+GRANT SELECT ON TABLE "public"."group" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."group_appointment" TO "anon";
 GRANT ALL ON TABLE "public"."group_appointment" TO "authenticated";
 GRANT ALL ON TABLE "public"."group_appointment" TO "service_role";
+GRANT SELECT ON TABLE "public"."group_appointment" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."group_member" TO "anon";
 GRANT ALL ON TABLE "public"."group_member" TO "authenticated";
 GRANT ALL ON TABLE "public"."group_member" TO "service_role";
+GRANT SELECT ON TABLE "public"."group_member" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."group_task" TO "anon";
 GRANT ALL ON TABLE "public"."group_task" TO "authenticated";
 GRANT ALL ON TABLE "public"."group_task" TO "service_role";
-
-
-
-GRANT ALL ON TABLE "public"."old_payou_data" TO "anon";
-GRANT ALL ON TABLE "public"."old_payou_data" TO "authenticated";
-GRANT ALL ON TABLE "public"."old_payou_data" TO "service_role";
+GRANT SELECT ON TABLE "public"."group_task" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."payout" TO "anon";
 GRANT ALL ON TABLE "public"."payout" TO "authenticated";
 GRANT ALL ON TABLE "public"."payout" TO "service_role";
+GRANT SELECT ON TABLE "public"."payout" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."profiles" TO "anon";
 GRANT ALL ON TABLE "public"."profiles" TO "authenticated";
 GRANT ALL ON TABLE "public"."profiles" TO "service_role";
+GRANT SELECT ON TABLE "public"."profiles" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."recurring_cash_flow" TO "anon";
 GRANT ALL ON TABLE "public"."recurring_cash_flow" TO "authenticated";
 GRANT ALL ON TABLE "public"."recurring_cash_flow" TO "service_role";
+GRANT SELECT ON TABLE "public"."recurring_cash_flow" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."recurring_cash_flow_category" TO "anon";
 GRANT ALL ON TABLE "public"."recurring_cash_flow_category" TO "authenticated";
 GRANT ALL ON TABLE "public"."recurring_cash_flow_category" TO "service_role";
+GRANT SELECT ON TABLE "public"."recurring_cash_flow_category" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."recurring_group_task" TO "anon";
 GRANT ALL ON TABLE "public"."recurring_group_task" TO "authenticated";
 GRANT ALL ON TABLE "public"."recurring_group_task" TO "service_role";
+GRANT SELECT ON TABLE "public"."recurring_group_task" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."settings" TO "anon";
 GRANT ALL ON TABLE "public"."settings" TO "authenticated";
 GRANT ALL ON TABLE "public"."settings" TO "service_role";
+GRANT SELECT ON TABLE "public"."settings" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."single_cash_flow" TO "anon";
 GRANT ALL ON TABLE "public"."single_cash_flow" TO "authenticated";
 GRANT ALL ON TABLE "public"."single_cash_flow" TO "service_role";
+GRANT SELECT ON TABLE "public"."single_cash_flow" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."single_cash_flow_category" TO "anon";
 GRANT ALL ON TABLE "public"."single_cash_flow_category" TO "authenticated";
 GRANT ALL ON TABLE "public"."single_cash_flow_category" TO "service_role";
+GRANT SELECT ON TABLE "public"."single_cash_flow_category" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."task" TO "anon";
 GRANT ALL ON TABLE "public"."task" TO "authenticated";
 GRANT ALL ON TABLE "public"."task" TO "service_role";
+GRANT SELECT ON TABLE "public"."task" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."timer_project" TO "anon";
 GRANT ALL ON TABLE "public"."timer_project" TO "authenticated";
 GRANT ALL ON TABLE "public"."timer_project" TO "service_role";
+GRANT SELECT ON TABLE "public"."timer_project" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."timer_project_category" TO "anon";
 GRANT ALL ON TABLE "public"."timer_project_category" TO "authenticated";
 GRANT ALL ON TABLE "public"."timer_project_category" TO "service_role";
+GRANT SELECT ON TABLE "public"."timer_project_category" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."timer_project_folder" TO "anon";
 GRANT ALL ON TABLE "public"."timer_project_folder" TO "authenticated";
 GRANT ALL ON TABLE "public"."timer_project_folder" TO "service_role";
+GRANT SELECT ON TABLE "public"."timer_project_folder" TO "powersync_role";
 
 
 
 GRANT ALL ON TABLE "public"."timer_session" TO "anon";
 GRANT ALL ON TABLE "public"."timer_session" TO "authenticated";
 GRANT ALL ON TABLE "public"."timer_session" TO "service_role";
+GRANT SELECT ON TABLE "public"."timer_session" TO "powersync_role";
 
 
 
@@ -2366,6 +2216,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TAB
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "anon";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "authenticated";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "service_role";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT SELECT ON TABLES  TO "powersync_role";
 
 
 
@@ -2393,23 +2244,6 @@ ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TAB
 
 
 
-
-
-
-
---
--- Dumped schema changes for auth and storage
---
-
-CREATE OR REPLACE TRIGGER "on_auth_user_created" AFTER INSERT ON "auth"."users" FOR EACH ROW EXECUTE FUNCTION "public"."handle_new_user"();
-
-
-
-CREATE POLICY "Anyone can upload an avatar." ON "storage"."objects" FOR INSERT WITH CHECK (("bucket_id" = 'avatars'::"text"));
-
-
-
-CREATE POLICY "Avatar images are publicly accessible." ON "storage"."objects" FOR SELECT USING (("bucket_id" = 'avatars'::"text"));
 
 
 
