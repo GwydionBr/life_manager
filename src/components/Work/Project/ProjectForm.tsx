@@ -51,10 +51,10 @@ interface ProjectFormProps {
   project?: WorkProject;
   onSuccess?: (project: WorkProject) => void;
   onCancel?: () => void;
-  categoryIds: string[];
-  setCategoryIds: (categoryIds: string[]) => void;
+  tagIds: string[];
+  setTagIds: (tagIds: string[]) => void;
   setActiveProjectId?: boolean;
-  onOpenCategoryForm?: () => void;
+  onOpenTagForm?: () => void;
 }
 
 const schema = z.object({
@@ -64,7 +64,7 @@ const schema = z.object({
   salary: z.number().min(0, { message: "Salary must be positive" }),
   hourly_payment: z.boolean(),
   currency: z.enum(Constants.public.Enums.currency),
-  cash_flow_category_ids: z.array(z.string()),
+  tag_ids: z.array(z.string()),
   rounding_interval: z.number(),
   rounding_direction: z.enum(Constants.public.Enums.roundingDirection),
   round_in_time_fragments: z.boolean(),
@@ -76,14 +76,14 @@ type ProjectFormValues = z.infer<typeof schema>;
 export default function ProjectForm({
   project,
   onSuccess,
-  categoryIds,
-  setCategoryIds,
-  onOpenCategoryForm,
+  tagIds,
+  setTagIds,
+  onOpenTagForm,
   onCancel,
 }: ProjectFormProps) {
   const { data: settings } = useSettings();
   const { getLocalizedText, locale } = useIntl();
-  const { data: financeCategories } = useTags();
+  const { data: tags } = useTags();
   const { data: profile } = useProfile();
   const { addWorkProject, updateWorkProject } = useWorkProjectMutations();
   const [isColorPickerOpen, { open, close }] = useDisclosure(false);
@@ -122,7 +122,7 @@ export default function ProjectForm({
         settings?.default_project_hourly_payment ||
         false,
       currency: project?.currency || settings?.default_currency || "USD",
-      cash_flow_category_ids: categoryIds || [],
+      tag_ids: tagIds || [],
       round_in_time_fragments:
         project?.round_in_time_fragments === null ||
         project?.round_in_time_fragments === undefined
@@ -141,10 +141,10 @@ export default function ProjectForm({
   });
 
   useEffect(() => {
-    if (categoryIds) {
-      form.setFieldValue("cash_flow_category_ids", categoryIds);
+    if (tagIds) {
+      form.setFieldValue("tag_ids", tagIds);
     }
-  }, [categoryIds]);
+  }, [tagIds]);
 
   // Handle hobby toggle
   const handleHobbyToggle = (checked: boolean) => {
@@ -195,11 +195,11 @@ export default function ProjectForm({
   };
 
   const handleSubmit = async (values: z.infer<typeof schema>) => {
-    const { cash_flow_category_ids, ...cleanValues } = values;
+    const { tag_ids: _tagIds, ...cleanValues } = values;
 
     if (project) {
       // Update existing project
-      const updates: TablesUpdate<"timer_project"> = {
+      const updates: TablesUpdate<"work_project"> = {
         ...cleanValues,
         currency: values.currency as Currency,
         rounding_direction: values.rounding_direction as RoundingDirection,
@@ -213,11 +213,10 @@ export default function ProjectForm({
       }
 
       // Use the mutation hook
-      const updatedProject = await updateWorkProject(
-        project.id,
-        updates,
-        cash_flow_category_ids
-      );
+      const updatedProject = await updateWorkProject(project.id, {
+        ...updates,
+        tags: tags.filter((tag) => tagIds.includes(tag.id)),
+      });
 
       // Return the complete WorkProject to onSuccess
       if (updatedProject) {
@@ -226,7 +225,7 @@ export default function ProjectForm({
     } else {
       // Create new project
       const newId = crypto.randomUUID();
-      const projectData: Tables<"timer_project"> = {
+      const projectData: Tables<"work_project"> = {
         id: newId,
         title: cleanValues.title,
         description: cleanValues.description || null,
@@ -234,8 +233,7 @@ export default function ProjectForm({
         hourly_payment: cleanValues.hourly_payment,
         currency: values.currency as Currency,
         color: cleanValues.color || null,
-        cash_flow_category_id: null,
-        folder_id: null,
+        work_folder_id: null,
         finance_project_id: null,
         rounding_interval: isDefaultRounding
           ? null
@@ -257,10 +255,10 @@ export default function ProjectForm({
       };
 
       // Use the mutation hook
-      const newProject = await addWorkProject(
-        projectData,
-        cash_flow_category_ids
-      );
+      const newProject = await addWorkProject({
+        ...projectData,
+        tags: tags.filter((tag) => tagIds.includes(tag.id)),
+      });
 
       // Return the complete WorkProject to onSuccess
       if (newProject) {
@@ -269,12 +267,12 @@ export default function ProjectForm({
     }
   };
 
-  const categoryOptions = useMemo(() => {
-    return financeCategories.map((category) => ({
-      value: category.id,
-      label: category.title,
+  const tagOptions = useMemo(() => {
+    return tags.map((tag) => ({
+      value: tag.id,
+      label: tag.title,
     }));
-  }, [financeCategories]);
+  }, [tags]);
 
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -438,33 +436,33 @@ export default function ProjectForm({
             <Group wrap="nowrap">
               <MultiSelect
                 w="100%"
-                label={getLocalizedText("Kategorie", "Category")}
+                label={getLocalizedText("Tag", "Tag")}
                 placeholder={getLocalizedText(
-                  "Kategorie auswählen (optional)",
-                  "Select category (optional)"
+                  "Tag auswählen (optional)",
+                  "Select tag (optional)"
                 )}
-                data={categoryOptions}
+                data={tagOptions}
                 clearable
                 searchable
                 nothingFoundMessage={getLocalizedText(
-                  "Keine Kategorien gefunden",
-                  "No categories found"
+                  "Keine Tags gefunden",
+                  "No tags found"
                 )}
-                value={categoryIds}
-                onChange={(value) => setCategoryIds(value)}
-                error={form.errors.cash_flow_category_id}
+                value={tagIds}
+                onChange={(value) => setTagIds(value)}
+                error={form.errors.tag_ids}
               />
               <Button
                 mt={25}
                 w={120}
                 p={0}
-                onClick={onOpenCategoryForm}
+                onClick={onOpenTagForm}
                 fw={500}
                 variant="subtle"
                 leftSection={<IconPlus size={20} />}
               >
                 <Text fz="xs" c="dimmed">
-                  {getLocalizedText("Kategorie", "Category")}
+                  {getLocalizedText("Tag", "Tag")}
                 </Text>
               </Button>
             </Group>

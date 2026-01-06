@@ -10,49 +10,49 @@ import FinanceSettingsList from "@/components/Settings/Finances/FinanceSettingsL
 import ContactsForm from "@/components/Finances/Contact/ContactForm";
 import { Tables } from "@/types/db.types";
 
-export default function FinanceClientSettings() {
+export default function FinanceContactSettings() {
   const { getLocalizedText, getCurrencySymbol } = useIntl();
   const { data: contacts } = useContacts();
 
-  const renderRowContent = (client: Tables<"finance_client">) => (
+  const renderRowContent = (contact: Tables<"contact">) => (
     <>
       <Group>
         <Text fz="sm" fw={500}>
-          {client.name}
+          {contact.name}
         </Text>
-        {client.currency && (
+        {contact.currency && (
           <Text fz="xs" c="dimmed">
-            {getCurrencySymbol(client.currency)}
+            {getCurrencySymbol(contact.currency)}
           </Text>
         )}
       </Group>
-      {client.description && (
+      {contact.description && (
         <Text fz="xs" c="dimmed">
-          {client.description}
+          {contact.description}
         </Text>
       )}
-      {client.email && (
+      {contact.email && (
         <Text fz="xs" c="dimmed">
-          {client.email}
+          {contact.email}
         </Text>
       )}
-      {client.phone && (
+      {contact.phone && (
         <Text fz="xs" c="dimmed">
-          {client.phone}
+          {contact.phone}
         </Text>
       )}
-      {client.address && (
+      {contact.address && (
         <Text fz="xs" c="dimmed">
-          {client.address}
+          {contact.address}
         </Text>
       )}
     </>
   );
 
   const renderEditForm = (
-    client: Tables<"finance_client">,
+    contact: Tables<"contact">,
     onClose: () => void
-  ) => <ContactsForm onClose={onClose} client={client} />;
+  ) => <ContactsForm onClose={onClose} contact={contact} />;
 
   const renderAddForm = (onClose: () => void) => (
     <ContactsForm onClose={onClose} />

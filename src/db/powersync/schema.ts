@@ -26,7 +26,7 @@ const appointment = new Table(
     start_date: column.text,
     reminder: column.text,
     end_date: column.text,
-    timer_project_id: column.text,
+    work_project_id: column.text,
   },
   { indexes: {} }
 );
@@ -46,7 +46,7 @@ const bank_account = new Table(
   { indexes: {} }
 );
 
-const finance_category = new Table(
+const tag = new Table(
   {
     // id column (text) is automatically included
     created_at: column.text,
@@ -57,7 +57,7 @@ const finance_category = new Table(
   { indexes: {} }
 );
 
-const finance_client = new Table(
+const contact = new Table(
   {
     // id column (text) is automatically included
     created_at: column.text,
@@ -81,9 +81,9 @@ const finance_project = new Table(
     currency: column.text,
     due_date: column.text,
     title: column.text,
-    finance_client_id: column.text,
+    contact_id: column.text,
     description: column.text,
-    single_cash_flow_id: column.text,
+    single_cashflow_id: column.text,
   },
   { indexes: {} }
 );
@@ -95,37 +95,25 @@ const finance_project_adjustment = new Table(
     user_id: column.text,
     amount: column.real,
     description: column.text,
-    finance_client_id: column.text,
+    contact_id: column.text,
     finance_project_id: column.text,
-    finance_category_id: column.text,
-    single_cash_flow_id: column.text,
+    single_cashflow_id: column.text,
   },
   { indexes: {} }
 );
 
-const finance_project_category = new Table(
+const finance_project_tag = new Table(
   {
     // id column (text) is automatically included
     created_at: column.text,
     user_id: column.text,
-    finance_category_id: column.text,
+    tag_id: column.text,
     finance_project_id: column.text,
   },
   { indexes: {} }
 );
 
-const finance_project_client = new Table(
-  {
-    // id column (text) is automatically included
-    created_at: column.text,
-    finance_client_id: column.text,
-    finance_project_id: column.text,
-    user_id: column.text,
-  },
-  { indexes: {} }
-);
-
-const recurring_cash_flow = new Table(
+const recurring_cashflow = new Table(
   {
     // id column (text) is automatically included
     title: column.text,
@@ -137,23 +125,23 @@ const recurring_cash_flow = new Table(
     currency: column.text,
     interval: column.text,
     created_at: column.text,
-    finance_client_id: column.text,
+    contact_id: column.text,
   },
   { indexes: {} }
 );
 
-const recurring_cash_flow_category = new Table(
+const recurring_cashflow_tag = new Table(
   {
     // id column (text) is automatically included
     created_at: column.text,
     user_id: column.text,
-    recurring_cash_flow_id: column.text,
-    finance_category_id: column.text,
+    recurring_cashflow_id: column.text,
+    tag_id: column.text,
   },
   { indexes: {} }
 );
 
-const single_cash_flow = new Table(
+const single_cashflow = new Table(
   {
     // id column (text) is automatically included
     amount: column.real,
@@ -164,20 +152,20 @@ const single_cash_flow = new Table(
     created_at: column.text,
     is_active: column.integer,
     changed_date: column.text,
-    recurring_cash_flow_id: column.text,
+    recurring_cashflow_id: column.text,
     finance_project_id: column.text,
-    finance_client_id: column.text,
+    contact_id: column.text,
     payout_id: column.text,
   },
   { indexes: {} }
 );
 
-const single_cash_flow_category = new Table(
+const single_cashflow_tag = new Table(
   {
     // id column (text) is automatically included
     created_at: column.text,
-    single_cash_flow_id: column.text,
-    finance_category_id: column.text,
+    single_cashflow_id: column.text,
+    tag_id: column.text,
     user_id: column.text,
   },
   { indexes: {} }
@@ -191,14 +179,14 @@ const payout = new Table(
     start_currency: column.text,
     start_value: column.text,
     user_id: column.text,
-    timer_project_id: column.text,
+    work_project_id: column.text,
     currency: column.text,
     value: column.text,
   },
   { indexes: {} }
 );
 
-const timer_project = new Table(
+const work_project = new Table(
   {
     // id column (text) is automatically included
     title: column.text,
@@ -208,11 +196,10 @@ const timer_project = new Table(
     is_favorite: column.integer,
     user_id: column.text,
     created_at: column.text,
-    folder_id: column.text,
+    work_folder_id: column.text,
     order_index: column.integer,
     hourly_payment: column.integer,
     total_payout: column.text,
-    cash_flow_category_id: column.text,
     color: column.text,
     rounding_interval: column.integer,
     rounding_direction: column.text,
@@ -223,18 +210,18 @@ const timer_project = new Table(
   { indexes: {} }
 );
 
-const timer_project_category = new Table(
+const work_project_tag = new Table(
   {
     // id column (text) is automatically included
     created_at: column.text,
     user_id: column.text,
-    timer_project_id: column.text,
-    finance_category_id: column.text,
+    work_project_id: column.text,
+    tag_id: column.text,
   },
   { indexes: {} }
 );
 
-const timer_project_folder = new Table(
+const work_folder = new Table(
   {
     // id column (text) is automatically included
     created_at: column.text,
@@ -247,7 +234,7 @@ const timer_project_folder = new Table(
   { indexes: {} }
 );
 
-const timer_session = new Table(
+const work_time_entry = new Table(
   {
     // id column (text) is automatically included
     end_time: column.text,
@@ -256,7 +243,7 @@ const timer_session = new Table(
     start_time: column.text,
     active_seconds: column.integer,
     paused_seconds: column.integer,
-    project_id: column.text,
+    work_project_id: column.text,
     user_id: column.text,
     created_at: column.text,
     hourly_payment: column.integer,
@@ -266,7 +253,7 @@ const timer_session = new Table(
     payout_id: column.text,
     memo: column.text,
     time_fragments_interval: column.integer,
-    single_cash_flow_id: column.text,
+    single_cashflow_id: column.text,
   },
   { indexes: {} }
 );
@@ -297,52 +284,25 @@ const settings = new Table(
   { indexes: {} }
 );
 
-const lists = new Table(
-  {
-    // id column (text) is automatically included
-    created_at: column.text,
-    name: column.text,
-    owner_id: column.text,
-  },
-  { indexes: {} }
-);
-
-const todos = new Table(
-  {
-    // id column (text) is automatically included
-    created_at: column.text,
-    completed_at: column.text,
-    description: column.text,
-    completed: column.integer,
-    created_by: column.text,
-    completed_by: column.text,
-    list_id: column.text,
-  },
-  { indexes: {} }
-);
-
 export const AppSchema = new Schema({
   profiles,
   appointment,
   bank_account,
-  finance_category,
-  finance_client,
+  tag,
+  contact,
   finance_project,
   finance_project_adjustment,
-  finance_project_category,
-  finance_project_client,
-  recurring_cash_flow,
-  recurring_cash_flow_category,
-  single_cash_flow,
-  single_cash_flow_category,
+  finance_project_tag,
+  recurring_cashflow,
+  recurring_cashflow_tag,
+  single_cashflow,
+  single_cashflow_tag,
   payout,
-  timer_project,
-  timer_project_category,
-  timer_project_folder,
-  timer_session,
+  work_project,
+  work_project_tag,
+  work_folder,
+  work_time_entry,
   settings,
-  lists,
-  todos,
 });
 
 export type Database = (typeof AppSchema)["types"];

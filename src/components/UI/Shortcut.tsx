@@ -1,23 +1,15 @@
+import { useOs } from "@mantine/hooks";
+
 import { Group, Kbd } from "@mantine/core";
-import { useEffect, useState } from "react";
 
 interface ShortcutProps {
   keys: string[];
 }
 
 export default function Shortcut({ keys }: ShortcutProps) {
-  const [isMac, setIsMac] = useState<boolean>(false);
+  const os = useOs();
 
-  useEffect(() => {
-    const nav = typeof navigator !== "undefined" ? navigator : undefined;
-    const platform =
-      (nav as any)?.userAgentData?.platform || nav?.platform || "";
-    const ua = nav?.userAgent || "";
-    const detectedMac =
-      /Mac|iPhone|iPad|iPod/i.test(platform) ||
-      /Mac OS X|like Mac OS X/i.test(ua);
-    setIsMac(detectedMac);
-  }, []);
+  const isMac = os === "macos";
 
   const renderKey = (key: string): string => {
     const k = key.toLowerCase();

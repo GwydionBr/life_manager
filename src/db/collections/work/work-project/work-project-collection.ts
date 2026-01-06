@@ -6,15 +6,15 @@ import { AppSchema } from "@/db/powersync/schema";
 import {
   workProjectSchema,
   workProjectDeserializationSchema,
-  workProjectCategorySchema,
-  workProjectCategoryDeserializationSchema,
+  workProjectTagSchema,
+  workProjectTagDeserializationSchema,
 } from "@/db/collections/work/work-project/work-project-schema";
 
-// Collection based on the PowerSync table 'timer_project'
+// Collection based on the PowerSync table 'work_project'
 export const workProjectsCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,
-    table: AppSchema.props.timer_project,
+    table: AppSchema.props.work_project,
     schema: workProjectSchema,
     deserializationSchema: workProjectDeserializationSchema,
     onDeserializationError: (error) => {
@@ -23,12 +23,12 @@ export const workProjectsCollection = createCollection(
   })
 );
 
-export const workProjectCategoriesCollection = createCollection(
+export const workProjectTagsCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,
-    table: AppSchema.props.timer_project_category,
-    schema: workProjectCategorySchema,
-    deserializationSchema: workProjectCategoryDeserializationSchema,
+    table: AppSchema.props.work_project_tag,
+    schema: workProjectTagSchema,
+    deserializationSchema: workProjectTagDeserializationSchema,
     onDeserializationError: (error) => {
       console.error(error);
     },

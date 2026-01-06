@@ -7,10 +7,9 @@ export default function HabbitTrackerSettings() {
   const { getLocalizedText } = useIntl();
   return (
     <Stack>
-      <SettingsRow
-        title={getLocalizedText("Modulfarbe", "Module Color")}
-        children={<HabitColorSettings />}
-      />
+      <SettingsRow title={getLocalizedText("Modulfarbe", "Module Color")}>
+        <HabitColorSettings />
+      </SettingsRow>
     </Stack>
   );
 }

@@ -41,7 +41,6 @@ import {
 } from "@/lib/financeChartHelperFunctions";
 import React from "react";
 import FilterActionIcon from "@/components/UI/ActionIcons/FilterActionIcon";
-import ListActionIcon from "@/components/UI/ActionIcons/ListActionIcon";
 
 /**
  * Available chart visualization types
@@ -87,7 +86,7 @@ export default function WorkChartControls({
   setShowSalary,
   dateRange,
   setDateRange,
-  onClose,
+  onClose: _onClose,
 }: WorkChartControlsProps) {
   const { locale, getLocalizedText } = useIntl();
   const [filterOpen, { toggle }] = useDisclosure(false);
@@ -114,9 +113,10 @@ export default function WorkChartControls({
           month: "long",
           year: "numeric",
         });
-      case "quarter":
+      case "quarter": {
         const quarter = Math.floor(month / 3) + 1;
         return `Q${quarter} ${year}`;
+      }
       case "year":
         return year.toString();
       case "custom":
@@ -124,7 +124,7 @@ export default function WorkChartControls({
       default:
         return "";
     }
-  }, [navigationMode, currentDate]);
+  }, [navigationMode, currentDate, locale]);
 
   /**
    * Navigate to previous period
@@ -388,9 +388,7 @@ export default function WorkChartControls({
 
                 <Group>
                   <Switch
-                    label={
-                      getLocalizedText("Gehalt anzeigen", "Show Salary")
-                    }
+                    label={getLocalizedText("Gehalt anzeigen", "Show Salary")}
                     checked={showSalary}
                     onChange={(event) =>
                       setShowSalary(event.currentTarget.checked)

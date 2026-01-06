@@ -8,11 +8,11 @@ import {
   contactDeserializationSchema,
 } from "@/db/collections/finance/contacts/contact-schema";
 
-// Collection basierend auf der PowerSync-Tabelle 'finance_client'
+// Collection basierend auf der PowerSync-Tabelle 'contact'
 export const contactsCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,
-    table: AppSchema.props.finance_client,
+    table: AppSchema.props.contact,
     schema: contactSchema,
     deserializationSchema: contactDeserializationSchema,
     onDeserializationError: (error) => {

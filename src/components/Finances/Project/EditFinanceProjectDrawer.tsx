@@ -10,8 +10,8 @@ import DeleteActionIcon from "@/components/UI/ActionIcons/DeleteActionIcon";
 import { showDeleteConfirmationModal } from "@/lib/notificationFunctions";
 import { FinanceProject } from "@/types/finance.types";
 import FinanceProjectForm from "./FinanceProjectForm";
-import FinanceClientForm from "@/components/Finances/Contact/ContactForm";
-import FinanceCategoryForm from "../Category/FinanceCategoryForm";
+import ContactForm from "@/components/Finances/Contact/ContactForm";
+import FinanceTagForm from "../Tag/TagForm";
 import { Tables } from "@/types/db.types";
 
 interface EditFinanceProjectDrawerProps {
@@ -28,23 +28,22 @@ export default function EditFinanceProjectDrawer({
   const { getLocalizedText } = useIntl();
   const { deleteFinanceProject } = useFinanceProjectMutations();
   const [isLoading, setIsLoading] = useState(false);
-  const [financeClient, setFinanceClient] =
-    useState<Tables<"finance_client"> | null>(financeProject.client);
-  const [categories, setCategories] = useState<Tables<"finance_category">[]>(
-    financeProject.tags
+  const [contact, setContact] = useState<Tables<"contact"> | null>(
+    financeProject.contact
   );
+  const [tags, setTags] = useState<Tables<"tag">[]>(financeProject.tags);
 
   const drawerStack = useDrawersStack([
     "edit-finance-project",
     "delete-finance-project",
-    "category-form",
-    "client-form",
+    "tag-form",
+    "contact-form",
   ]);
 
   useEffect(() => {
     if (opened) {
       drawerStack.open("edit-finance-project");
-      setCategories(financeProject.tags);
+      setTags(financeProject.tags);
     } else {
       drawerStack.closeAll();
     }
@@ -94,12 +93,12 @@ export default function EditFinanceProjectDrawer({
         <FinanceProjectForm
           onClose={onClose}
           financeProject={financeProject}
-          financeClient={financeClient}
-          categories={categories}
-          onOpenClientForm={() => drawerStack.open("client-form")}
-          onOpenCategoryForm={() => drawerStack.open("category-form")}
-          onClientChange={setFinanceClient}
-          onCategoryChange={setCategories}
+          contact={contact}
+          tags={tags}
+          onOpenContactForm={() => drawerStack.open("contact-form")}
+          onOpenTagForm={() => drawerStack.open("tag-form")}
+          onContactChange={setContact}
+          onTagChange={setTags}
         />
       </Drawer>
       <Drawer
@@ -140,23 +139,23 @@ export default function EditFinanceProjectDrawer({
         </Group>
       </Drawer>
       <Drawer
-        {...drawerStack.register("client-form")}
-        onClose={() => drawerStack.close("client-form")}
-        title={<Text>{getLocalizedText("Kunde", "Client")}</Text>}
+        {...drawerStack.register("contact-form")}
+        onClose={() => drawerStack.close("contact-form")}
+        title={<Text>{getLocalizedText("Kontakt", "Contact")}</Text>}
       >
-        <FinanceClientForm
-          onClose={() => drawerStack.close("client-form")}
-          onSuccess={(client) => setFinanceClient(client)}
+        <ContactForm
+          onClose={() => drawerStack.close("contact-form")}
+          onSuccess={(client) => setContact(client)}
         />
       </Drawer>
       <Drawer
-        {...drawerStack.register("category-form")}
-        onClose={() => drawerStack.close("category-form")}
-        title={<Text>{getLocalizedText("Kategorie", "Category")}</Text>}
+        {...drawerStack.register("tag-form")}
+        onClose={() => drawerStack.close("tag-form")}
+        title={<Text>{getLocalizedText("Tag", "Tag")}</Text>}
       >
-        <FinanceCategoryForm
-          onClose={() => drawerStack.close("category-form")}
-          onSuccess={(category) => setCategories((prev) => [...prev, category])}
+        <FinanceTagForm
+          onClose={() => drawerStack.close("tag-form")}
+          onSuccess={(tag) => setTags((prev) => [...prev, tag])}
         />
       </Drawer>
     </Drawer.Stack>

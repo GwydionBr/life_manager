@@ -117,7 +117,7 @@ export const useRecurringCashflowMutations = () => {
 
         if (shouldUpdateSingleCashFlows) {
           const singleCashflowsToUpdate = singleCashflows.filter(
-            (cashflow) => cashflow.recurring_cash_flow_id === id
+            (cashflow) => cashflow.recurring_cashflow_id === id
           );
           console.log("singleCashflowsToUpdate", singleCashflowsToUpdate);
           await updateSingleCashflowMutation(
@@ -175,7 +175,7 @@ export const useRecurringCashflowMutations = () => {
           );
         } else if (mode === DeleteRecurringCashFlowMode.delete_all) {
           const singleCashflowsToDelete = singleCashflows.filter((cashflow) =>
-            ids.includes(cashflow.recurring_cash_flow_id ?? "")
+            ids.includes(cashflow.recurring_cashflow_id ?? "")
           );
           const transaction = deleteRecurringCashflowMutation(ids);
           await transaction.isPersisted.promise;

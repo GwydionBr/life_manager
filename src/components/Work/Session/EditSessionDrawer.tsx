@@ -12,7 +12,7 @@ import DeleteActionIcon from "@/components/UI/ActionIcons/DeleteActionIcon";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
 import DeleteButton from "@/components/UI/Buttons/DeleteButton";
 import ProjectForm from "@/components/Work/Project/ProjectForm";
-import FinanceCategoryForm from "@/components/Finances/Category/FinanceCategoryForm";
+import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 
 import { Currency } from "@/types/settings.types";
 import { Tables } from "@/types/db.types";
@@ -20,7 +20,7 @@ import { TimerRoundingSettings } from "@/types/timeTracker.types";
 import { WorkProject } from "@/types/work.types";
 
 interface TimerSessionModalProps {
-  timerSession: Tables<"timer_session">;
+  timerSession: Tables<"work_time_entry">;
   project: WorkProject;
   opened: boolean;
   onClose: () => void;
@@ -34,16 +34,16 @@ export default function EditSessionDrawer({
 }: TimerSessionModalProps) {
   const { data: settings } = useSettings();
   const { getLocalizedText } = useIntl();
-  const [categoryIds, setCategoryIds] = useState<string[]>([]);
+  const [tagIds, setTagIds] = useState<string[]>([]);
   const [currentProject, setCurrentProject] = useState<WorkProject>(project);
-  const {data: workProjects} = useWorkProjects();
+  const { data: workProjects } = useWorkProjects();
   const { updateWorkTimeEntry } = useWorkTimeEntryMutations();
 
   const drawerStack = useDrawersStack([
     "edit-session",
     "delete-session",
     "add-project",
-    "category-form",
+    "tag-form",
   ]);
 
   // Sync external opened state with internal drawer stack
@@ -69,7 +69,7 @@ export default function EditSessionDrawer({
     salary: number;
     memo?: string;
   }) {
-    const newSession: Tables<"timer_session"> = {
+    const newSession: Tables<"work_time_entry"> = {
       ...timerSession,
       ...values,
       start_time: new Date(values.start_time).toISOString(),
@@ -137,7 +137,7 @@ export default function EditSessionDrawer({
           <Flex direction="column" gap="xl">
             <SessionForm
               initialValues={{
-                project_id: timerSession.project_id,
+                project_id: timerSession.work_project_id,
                 start_time: timerSession.start_time,
                 end_time: timerSession.end_time,
                 active_seconds: timerSession.active_seconds,
@@ -169,26 +169,24 @@ export default function EditSessionDrawer({
         >
           <ProjectForm
             onCancel={() => drawerStack.close("add-project")}
-            categoryIds={categoryIds}
-            setCategoryIds={setCategoryIds}
+            tagIds={tagIds}
+            setTagIds={setTagIds}
             onSuccess={(project) =>
               setCurrentProject(
                 workProjects.find((p) => p.id === project.id) ?? project
               )
             }
-            onOpenCategoryForm={() => drawerStack.open("category-form")}
+            onOpenTagForm={() => drawerStack.open("tag-form")}
           />
         </Drawer>
         <Drawer
-          {...drawerStack.register("category-form")}
-          onClose={() => drawerStack.close("category-form")}
-          title={getLocalizedText("Kategorie hinzufügen", "Add Category")}
+          {...drawerStack.register("tag-form")}
+          onClose={() => drawerStack.close("tag-form")}
+          title={getLocalizedText("Tag hinzufügen", "Add Tag")}
         >
-          <FinanceCategoryForm
-            onClose={() => drawerStack.close("category-form")}
-            onSuccess={(category) =>
-              setCategoryIds([...categoryIds, category.id])
-            }
+          <FinanceTagForm
+            onClose={() => drawerStack.close("tag-form")}
+            onSuccess={(tag) => setTagIds([...tagIds, tag.id])}
           />
         </Drawer>
         <Drawer

@@ -50,19 +50,11 @@ import FinancesNavbarDefaultCard from "@/components/Finances/FinancesNavbar/Fina
 import FinancesNavbarToolbar from "@/components/Finances/FinancesNavbar/FinancesNavbarToolbar";
 
 export default function FinanceProjectTab() {
-  // const { mutate: deleteFinanceProjectMutation, isPending: isDeleting } =
-  //   useDeleteFinanceProjectMutation({
-  //     onSuccess: () => {
-  //       setSelectedFinanceProjects([]);
-  //       closeSelectedMode();
-  //     },
-  //   });
-
   const { getLocalizedText, formatDate, formatMoney } = useIntl();
-  const { data: financeClients = [] } = useContacts();
+  const { data: contacts } = useContacts();
   const { data: financeProjects = [], isLoading: isLoadingFinanceProjects } =
     useFinanceProjects();
-  const { data: financeCategories = [] } = useTags();
+  const { data: tags } = useTags();
   const { deleteFinanceProject } = useFinanceProjectMutations();
 
   const { setIsModalOpen, setSelectedTab } = useSettingsStore();
@@ -99,19 +91,19 @@ export default function FinanceProjectTab() {
 
   const formattedFinanceProjects = useMemo(() => {
     return financeProjects.map((project) => {
-      const { tags: categories, ...rest } = project;
+      const { tags, ...rest } = project;
       return {
         ...rest,
-        client:
-          financeClients.find(
-            (client) => client.id === project.finance_client_id
+        contact:
+          contacts.find(
+            (contact) => contact.id === project.contact_id
           ) || null,
-        categories: financeCategories.filter((category) =>
-          categories.map((c) => c.id).includes(category.id)
+        tags: tags.filter((tag) =>
+          tags.map((c) => c.id).includes(tag.id)
         ),
       };
     });
-  }, [financeProjects, financeClients, financeCategories]);
+  }, [financeProjects, contacts, tags]);
 
   useEffect(() => {
     if (formattedFinanceProjects.length === 0) {
@@ -197,7 +189,7 @@ export default function FinanceProjectTab() {
 
     // Paid
     const paidFilteredProjects = formattedFinanceProjects.filter((project) => {
-      return project.single_cash_flow_id;
+      return project.single_cashflow_id;
     });
 
     const paidTotalAmount = paidFilteredProjects.reduce((acc, project) => {
@@ -259,7 +251,7 @@ export default function FinanceProjectTab() {
           !isToday(new Date(project.due_date))
         );
       if (tab === FinanceProjectNavbarTab.Paid)
-        return project.single_cash_flow_id;
+        return project.single_cashflow_id;
     });
   }, [sortedFinanceProjects, tab]);
 
@@ -270,7 +262,7 @@ export default function FinanceProjectTab() {
   };
 
   const toggleProjectSelection = useCallback(
-    (clientId: string, index: number, range: boolean) => {
+    (contactId: string, index: number, range: boolean) => {
       if (range && lastSelectedIndex !== null) {
         const start = Math.min(lastSelectedIndex, index);
         const end = Math.max(lastSelectedIndex, index);
@@ -282,9 +274,9 @@ export default function FinanceProjectTab() {
         );
       } else {
         setSelectedFinanceProjects((prev) =>
-          prev.includes(clientId)
-            ? prev.filter((id) => id !== clientId)
-            : [...prev, clientId]
+          prev.includes(contactId)
+            ? prev.filter((id) => id !== contactId)
+            : [...prev, contactId]
         );
         setLastSelectedIndex(index);
       }

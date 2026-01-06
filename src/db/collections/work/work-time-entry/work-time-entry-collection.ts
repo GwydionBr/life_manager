@@ -8,11 +8,11 @@ import {
   workTimeEntryDeserializationSchema,
 } from "@/db/collections/work/work-time-entry/work-time-entry-schema";
 
-// Collection based on the PowerSync table 'timer_session'
+// Collection based on the PowerSync table 'work_time_entry'
 export const workTimeEntriesCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,
-    table: AppSchema.props.timer_session,
+    table: AppSchema.props.work_time_entry,
     schema: workTimeEntrySchema,
     deserializationSchema: workTimeEntryDeserializationSchema,
     onDeserializationError: (error) => {

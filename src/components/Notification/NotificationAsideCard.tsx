@@ -4,7 +4,6 @@ import { useState } from "react";
 //   useDeclineFriendshipMutation,
 // } from "@/utils/queries/profile/use-friends";
 import { useGroupStore } from "@/stores/groupStore";
-import { useSettingsStore } from "@/stores/settingsStore";
 import { useIntl } from "@/hooks/useIntl";
 
 import {

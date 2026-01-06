@@ -6,8 +6,8 @@ import { AppSchema } from "@/db/powersync/schema";
 import {
   financeProjectSchema,
   financeProjectDeserializationSchema,
-  financeProjectCategorySchema,
-  financeProjectCategoryDeserializationSchema,
+  financeProjectTagSchema,
+  financeProjectTagDeserializationSchema,
 } from "@/db/collections/finance/finance-project/finance-project-schema";
 
 // Collection basierend auf der PowerSync-Tabelle 'finance_project'
@@ -23,13 +23,13 @@ export const financeProjectsCollection = createCollection(
   })
 );
 
-// Collection basierend auf der PowerSync-Tabelle 'finance_project_category'
-export const financeProjectCategoriesCollection = createCollection(
+// Collection basierend auf der PowerSync-Tabelle 'finance_project_tag'
+export const financeProjectTagsCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,
-    table: AppSchema.props.finance_project_category,
-    schema: financeProjectCategorySchema,
-    deserializationSchema: financeProjectCategoryDeserializationSchema,
+    table: AppSchema.props.finance_project_tag,
+    schema: financeProjectTagSchema,
+    deserializationSchema: financeProjectTagDeserializationSchema,
     onDeserializationError: (error) => {
       console.error(error);
     },

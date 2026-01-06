@@ -2,35 +2,33 @@ import { useDisclosure, useHover } from "@mantine/hooks";
 
 import { Badge, Popover } from "@mantine/core";
 import { IconUser } from "@tabler/icons-react";
-import FinanceClientCard from "@/components/Finances/Contact/ContactCard";
+import ContactCard from "@/components/Finances/Contact/ContactCard";
 
 import { Tables } from "@/types/db.types";
 
-interface FinanceClientBadgeProps {
-  client: Tables<"finance_client">;
+interface ContactBadgeProps {
+  contact: Tables<"contact">;
 }
 
-export default function FinanceClientBadge({
-  client,
-}: FinanceClientBadgeProps) {
+export default function ContactBadge({ contact }: ContactBadgeProps) {
   const [
-    isClientPopoverOpen,
-    { open: openClientPopover, close: closeClientPopover },
+    isContactPopoverOpen,
+    { open: openContactPopover, close: closeContactPopover },
   ] = useDisclosure(false);
   const { hovered, ref } = useHover();
 
   return (
     <Popover
-      onDismiss={closeClientPopover}
-      opened={isClientPopoverOpen}
-      onClose={closeClientPopover}
+      onDismiss={closeContactPopover}
+      opened={isContactPopoverOpen}
+      onClose={closeContactPopover}
     >
       <Popover.Target>
         <Badge
           ref={ref}
           onClick={(e) => {
             e.stopPropagation();
-            openClientPopover();
+            openContactPopover();
           }}
           color="blue"
           variant="light"
@@ -42,11 +40,11 @@ export default function FinanceClientBadge({
               : "1px solid transparent",
           }}
         >
-          {client.name}
+          {contact.name}
         </Badge>
       </Popover.Target>
       <Popover.Dropdown>
-        <FinanceClientCard client={client} />
+        <ContactCard contact={contact} />
       </Popover.Dropdown>
     </Popover>
   );

@@ -1,10 +1,9 @@
 import { db } from "@/db/powersync/db";
 import {
   workProjectsCollection,
-  workProjectCategoriesCollection,
+  workProjectTagsCollection,
 } from "@/db/collections/work/work-project/work-project-collection";
-import { WorkProject } from "@/types/work.types";
-import { Tables, TablesUpdate } from "@/types/db.types";
+import { UpdateWorkProject, WorkProject } from "@/types/work.types";
 
 /**
  * Adds a new Work Project.
@@ -14,13 +13,11 @@ import { Tables, TablesUpdate } from "@/types/db.types";
  * @param userId - The user ID
  * @returns Transaction object with isPersisted promise
  */
-export const addWorkProject = (
-  newWorkProject: Omit<Tables<"timer_project">, "categories">,
-  userId: string
-) => {
+export const addWorkProject = (newWorkProject: WorkProject, userId: string) => {
+  const { tags: _tags, ...projectData } = newWorkProject;
   const transaction = workProjectsCollection.insert({
-    ...newWorkProject,
-    id: newWorkProject.id || crypto.randomUUID(),
+    ...projectData,
+    id: projectData.id || crypto.randomUUID(),
     created_at: new Date().toISOString(),
     user_id: userId,
   });
@@ -37,10 +34,11 @@ export const addWorkProject = (
  */
 export const updateWorkProject = (
   id: string | string[],
-  item: TablesUpdate<"timer_project">
+  item: UpdateWorkProject
 ) => {
+  const { tags: _tags, ...projectData } = item;
   return workProjectsCollection.update(id, (draft) => {
-    Object.assign(draft, item);
+    Object.assign(draft, projectData);
   });
 };
 
@@ -55,53 +53,50 @@ export const deleteWorkProject = (id: string | string[]) => {
 };
 
 /**
- * Synchronizes the Many-to-Many relations between Project and Finance Categories.
- * Deletes old relations and creates new ones based on categoryIds.
+ * Synchronizes the Many-to-Many relations between Project and Finance Tags.
+ * Deletes old relations and creates new ones based on tagIds.
  *
  * @param projectId - The project ID
- * @param categoryIds - Array of category IDs to associate
+ * @param tagIds - Array of tag IDs to associate
  * @param userId - The user ID
  */
-export async function syncProjectCategories(
+export async function syncProjectTags(
   projectId: string,
-  categoryIds: string[],
+  tagIds: string[],
   userId: string
 ): Promise<void> {
   // 1. Get all existing relations for this project
   const existingRelations = await db.getAll<{
     id: string;
-    finance_category_id: string;
-  }>(
-    "SELECT id, finance_category_id FROM timer_project_category WHERE timer_project_id = ?",
-    [projectId]
-  );
+    tag_id: string;
+  }>("SELECT id, tag_id FROM work_project_tag WHERE work_project_id = ?", [
+    projectId,
+  ]);
 
-  const existingCategoryIds = existingRelations.map(
-    (r) => r.finance_category_id
-  );
-  const newCategoryIds = categoryIds || [];
+  const existingTagIds = existingRelations.map((r) => r.tag_id);
+  const newTagIds = tagIds || [];
 
   // 2. Find relations to delete (in existing but not in new)
   const relationsToDelete = existingRelations.filter(
-    (relation) => !newCategoryIds.includes(relation.finance_category_id)
+    (relation) => !newTagIds.includes(relation.tag_id)
   );
 
-  // 3. Find categories to add (in new but not in existing)
-  const categoriesToAdd = newCategoryIds.filter(
-    (categoryId) => !existingCategoryIds.includes(categoryId)
+  // 3. Find tags to add (in new but not in existing)
+  const tagsToAdd = newTagIds.filter(
+    (tagId) => !existingTagIds.includes(tagId)
   );
 
   // 4. Delete old relations
   const deletePromises = relationsToDelete.map((relation) =>
-    workProjectCategoriesCollection.delete(relation.id)
+    workProjectTagsCollection.delete(relation.id)
   );
 
   // 5. Create new relations
-  const insertPromises = categoriesToAdd.map((categoryId) =>
-    workProjectCategoriesCollection.insert({
+  const insertPromises = tagsToAdd.map((tagId) =>
+    workProjectTagsCollection.insert({
       id: crypto.randomUUID(),
-      timer_project_id: projectId,
-      finance_category_id: categoryId,
+      work_project_id: projectId,
+      tag_id: tagId,
       user_id: userId,
       created_at: new Date().toISOString(),
     })
@@ -113,43 +108,43 @@ export async function syncProjectCategories(
 }
 
 /**
- * Loads a complete WorkProject with all Categories.
+ * Loads a complete WorkProject with all Tags.
  *
  * @param projectId - The project ID
  * @returns Complete WorkProject or undefined if not found
  */
-export async function getWorkProjectWithCategories(
+export async function getWorkProjectWithTags(
   projectId: string
 ): Promise<WorkProject | undefined> {
   // Get the project
-  const project = await db.getOptional<Omit<WorkProject, "categories">>(
-    "SELECT * FROM timer_project WHERE id = ?",
+  const project = await db.getOptional<Omit<WorkProject, "tags">>(
+    "SELECT * FROM work_project WHERE id = ?",
     [projectId]
   );
 
   if (!project) return undefined;
 
-  // Get the associated categories
-  const categoryRelations = await db.getAll<{
-    finance_category_id: string;
+  // Get the associated tags
+  const tagRelations = await db.getAll<{
+    tag_id: string;
   }>(
-    "SELECT finance_category_id FROM timer_project_category WHERE timer_project_id = ?",
+    "SELECT tag_id FROM work_project_tag WHERE work_project_id = ?",
     [projectId]
   );
 
-  const categoryIds = categoryRelations.map((r) => r.finance_category_id);
+  const tagIds = tagRelations.map((r) => r.tag_id);
 
-  // Get the complete category data
-  const categories =
-    categoryIds.length > 0
+  // Get the complete tag data
+  const tags =
+    tagIds.length > 0
       ? await db.getAll(
-          `SELECT * FROM finance_category WHERE id IN (${categoryIds.map(() => "?").join(",")})`,
-          categoryIds
+          `SELECT * FROM tag WHERE id IN (${tagIds.map(() => "?").join(",")})`,
+          tagIds
         )
       : [];
 
   return {
     ...project,
-    tags: categories || [],
+    tags: tags || [],
   } as WorkProject;
 }

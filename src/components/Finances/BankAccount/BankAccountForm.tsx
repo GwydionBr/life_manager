@@ -37,7 +37,7 @@ interface BankAccountFormProps {
 
 export default function BankAccountForm({
   onClose,
-  onSuccess,
+  onSuccess: _onSuccess,
   bankAccount,
 }: BankAccountFormProps) {
   const { getLocalizedText } = useIntl();

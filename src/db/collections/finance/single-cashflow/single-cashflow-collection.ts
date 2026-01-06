@@ -1,20 +1,19 @@
 import { createCollection } from "@tanstack/react-db";
 import { powerSyncCollectionOptions } from "@tanstack/powersync-db-collection";
-// Importiere deine PowerSync-DB und das App-Schema
 import { db } from "@/db/powersync/db";
 import { AppSchema } from "@/db/powersync/schema";
 import {
   singleCashflowDeserializationSchema,
   singleCashflowSchema,
-  singleCashflowCategorySchema,
-  singleCashflowCategoryDeserializationSchema,
+  singleCashflowTagSchema,
+  singleCashflowTagDeserializationSchema,
 } from "@/db/collections/finance/single-cashflow/single-cashflow-schema";
 
-// Collection basierend auf der PowerSync-Tabelle 'single_cash_flow'
+// Collection based on the PowerSync table 'single_cashflow'
 export const singleCashflowsCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,
-    table: AppSchema.props.single_cash_flow,
+    table: AppSchema.props.single_cashflow,
     schema: singleCashflowSchema,
     deserializationSchema: singleCashflowDeserializationSchema,
     onDeserializationError: (error) => {
@@ -23,16 +22,15 @@ export const singleCashflowsCollection = createCollection(
   })
 );
 
-// Collection basierend auf der PowerSync-Tabelle 'single_cash_flow_category'
-export const singleCashflowCategoriesCollection = createCollection(
+// Collection based on the PowerSync table 'single_cashflow_tag'
+export const singleCashflowTagsCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,
-    table: AppSchema.props.single_cash_flow_category,
-    schema: singleCashflowCategorySchema,
-    deserializationSchema: singleCashflowCategoryDeserializationSchema,
+    table: AppSchema.props.single_cashflow_tag,
+    schema: singleCashflowTagSchema,
+    deserializationSchema: singleCashflowTagDeserializationSchema,
     onDeserializationError: (error) => {
       console.error(error);
     },
   })
 );
-

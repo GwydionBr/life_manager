@@ -3,7 +3,7 @@ import { PowerSyncTransactor } from "@tanstack/powersync-db-collection";
 import { createTransaction } from "@tanstack/react-db";
 import {
   recurringCashflowsCollection,
-  recurringCashflowCategoriesCollection,
+  recurringCashflowTagsCollection,
 } from "./recurring-cashflow-collection";
 import {
   InsertRecurringCashFlow,
@@ -32,13 +32,13 @@ export const addRecurringCashflowMutation = async (
       );
     },
   });
-  const { tags: categories, ...cashflowData } = newRecurringCashflow;
+  const { tags, ...cashflowData } = newRecurringCashflow;
   const dataToInsert = {
     ...cashflowData,
     currency: newRecurringCashflow.currency || "EUR",
     start_date: newRecurringCashflow.start_date || new Date().toISOString(),
     end_date: newRecurringCashflow.end_date || null,
-    finance_client_id: newRecurringCashflow.finance_client_id || null,
+    contact_id: newRecurringCashflow.contact_id || null,
     interval: newRecurringCashflow.interval || "month",
     title: newRecurringCashflow.title || "",
     description: newRecurringCashflow.description || "",
@@ -49,12 +49,12 @@ export const addRecurringCashflowMutation = async (
 
   customTransaction.mutate(() => {
     recurringCashflowsCollection.insert(dataToInsert);
-    categories.forEach((category) => {
-      recurringCashflowCategoriesCollection.insert({
+    tags.forEach((tag) => {
+      recurringCashflowTagsCollection.insert({
         id: crypto.randomUUID(),
         created_at: new Date().toISOString(),
-        recurring_cash_flow_id: dataToInsert.id,
-        finance_category_id: category.id,
+        recurring_cashflow_id: dataToInsert.id,
+        tag_id: tag.id,
         user_id: userId,
       });
     });
@@ -65,7 +65,7 @@ export const addRecurringCashflowMutation = async (
 
   return {
     promise,
-    data: { ...dataToInsert, tags: categories } as RecurringCashFlow,
+    data: { ...dataToInsert, tags } as RecurringCashFlow,
   };
 };
 
@@ -81,14 +81,14 @@ export const updateRecurringCashflowMutation = async (
   item: UpdateRecurringCashFlow,
   userId: string
 ) => {
-  const { tags: categories, ...cashflowData } = item;
+  const { tags, ...cashflowData } = item;
   const customTransaction = recurringCashflowsCollection.update(id, (draft) => {
     Object.assign(draft, cashflowData);
   });
 
   const promise = await customTransaction.isPersisted.promise;
-  const categoryIds = categories.map((category) => category.id);
-  await syncRecurringCashflowCategories(id, categoryIds, userId);
+  const tagIds = tags.map((tag) => tag.id);
+  await syncRecurringCashflowTags(id, tagIds, userId);
 
   return promise;
 };
@@ -104,53 +104,53 @@ export const deleteRecurringCashflowMutation = (id: string | string[]) => {
 };
 
 /**
- * Synchronizes the Many-to-Many relations between Recurring Cashflow and Finance Categories.
- * Deletes old relations and creates new ones based on categoryIds.
+ * Synchronizes the Many-to-Many relations between Recurring Cashflow and Finance Tags.
+ * Deletes old relations and creates new ones based on tagIds.
  *
  * @param cashflowId - The cashflow ID
- * @param categoryIds - Array of category IDs to associate
+ * @param tagIds - Array of tag IDs to associate
  * @param userId - The user ID
  */
-export async function syncRecurringCashflowCategories(
+export async function syncRecurringCashflowTags(
   cashflowId: string,
-  categoryIds: string[],
+  tagIds: string[],
   userId: string
 ): Promise<void> {
   // 1. Get all existing relations for this cashflow
   const existingRelations = await db.getAll<{
     id: string;
-    finance_category_id: string;
+    tag_id: string;
   }>(
-    "SELECT id, finance_category_id FROM recurring_cash_flow_category WHERE recurring_cash_flow_id = ?",
+    "SELECT id, tag_id FROM recurring_cashflow_tag WHERE recurring_cashflow_id = ?",
     [cashflowId]
   );
 
-  const existingCategoryIds = existingRelations.map(
-    (r) => r.finance_category_id
+  const existingTagIds = existingRelations.map(
+    (r) => r.tag_id
   );
-  const newCategoryIds = categoryIds || [];
+  const newTagIds = tagIds || [];
 
   // 2. Find relations to delete (in existing but not in new)
   const relationsToDelete = existingRelations.filter(
-    (relation) => !newCategoryIds.includes(relation.finance_category_id)
+    (relation) => !newTagIds.includes(relation.tag_id)
   );
 
-  // 3. Find categories to add (in new but not in existing)
-  const categoriesToAdd = newCategoryIds.filter(
-    (categoryId) => !existingCategoryIds.includes(categoryId)
+  // 3. Find tags to add (in new but not in existing)
+  const tagsToAdd = newTagIds.filter(
+    (tagId) => !existingTagIds.includes(tagId)
   );
 
   // 4. Delete old relations
   const deletePromises = relationsToDelete.map((relation) =>
-    recurringCashflowCategoriesCollection.delete(relation.id)
+    recurringCashflowTagsCollection.delete(relation.id)
   );
 
   // 5. Create new relations
-  const insertPromises = categoriesToAdd.map((categoryId) =>
-    recurringCashflowCategoriesCollection.insert({
+  const insertPromises = tagsToAdd.map((tagId) =>
+    recurringCashflowTagsCollection.insert({
       id: crypto.randomUUID(),
-      recurring_cash_flow_id: cashflowId,
-      finance_category_id: categoryId,
+      recurring_cashflow_id: cashflowId,
+      tag_id: tagId,
       user_id: userId,
       created_at: new Date().toISOString(),
     })

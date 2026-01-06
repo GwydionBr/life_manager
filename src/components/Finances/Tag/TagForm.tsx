@@ -16,24 +16,24 @@ const schema = z.object({
   description: z.string().optional(),
 });
 
-interface FinanceCategoryFormProps {
+interface FinanceTagFormProps {
   onClose?: () => void;
-  onSuccess?: (category: Tables<"finance_category">) => void;
-  category?: Tables<"finance_category"> | null;
+  onSuccess?: (tag: Tables<"tag">) => void;
+  tag?: Tables<"tag"> | null;
 }
 
-export default function FinanceCategoryForm({
+export default function FinanceTagForm({
   onClose,
   onSuccess,
-  category,
-}: FinanceCategoryFormProps) {
+  tag,
+}: FinanceTagFormProps) {
   const { getLocalizedText } = useIntl();
   const { data: profile } = useProfile();
 
   const form = useForm({
     initialValues: {
-      title: category?.title || "",
-      description: category?.description || "",
+      title: tag?.title || "",
+      description: tag?.description || "",
     },
     validate: zodResolver(schema),
   });
@@ -44,25 +44,25 @@ export default function FinanceCategoryForm({
   };
 
   async function handleFormSubmit(values: z.infer<typeof schema>) {
-    if (category) {
-      const newTX = tagsCollection.update(category.id, (draft) => {
+    if (tag) {
+      const newTX = tagsCollection.update(tag.id, (draft) => {
         draft.title = values.title;
         draft.description = values.description || null;
       });
       await newTX.isPersisted.promise;
-      onSuccess?.(category);
+      onSuccess?.(tag);
     } else {
       const newId = crypto.randomUUID();
-      const newCategory: Tables<"finance_category"> = {
+      const newTag: Tables<"tag"> = {
         id: newId,
         created_at: new Date().toISOString(),
         user_id: profile?.id || "",
         title: values.title,
         description: values.description || null,
       };
-      const newTX = tagsCollection.insert(newCategory);
+      const newTX = tagsCollection.insert(newTag);
       await newTX.isPersisted.promise;
-      onSuccess?.(newCategory);
+      onSuccess?.(newTag);
     }
     handleClose();
   }
@@ -73,7 +73,7 @@ export default function FinanceCategoryForm({
         <TextInput
           withAsterisk
           label={getLocalizedText("Name", "Name")}
-          placeholder={getLocalizedText("Name eingeben", "Enter category name")}
+            placeholder={getLocalizedText("Name eingeben", "Enter tag name")}
           {...form.getInputProps("title")}
           data-autofocus
         />
@@ -81,11 +81,11 @@ export default function FinanceCategoryForm({
           label={getLocalizedText("Beschreibung", "Description")}
           placeholder={getLocalizedText(
             "Beschreibung eingeben",
-            "Enter category description"
+            "Enter tag description"
           )}
           {...form.getInputProps("description")}
         />
-        {category ? (
+        {tag ? (
           <UpdateButton
             type="submit"
             onClick={form.onSubmit(handleFormSubmit)}

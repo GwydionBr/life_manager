@@ -4,17 +4,17 @@ import { Tables } from "@/types/db.types";
 import { Badge, BadgeProps } from "@mantine/core";
 import { IconTag, IconTagPlus } from "@tabler/icons-react";
 
-interface FinanceCategorySingleBadgeProps extends BadgeProps {
-  category?: Tables<"finance_category">;
+interface FinanceTagSingleBadgeProps extends BadgeProps {
+  tag?: Tables<"tag">;
 }
 
-export default function FinanceCategorySingleBadge({
-  category,
+export default function FinanceTagSingleBadge({
+  tag,
   ...props
-}: FinanceCategorySingleBadgeProps) {
+}: FinanceTagSingleBadgeProps) {
   const { hovered, ref } = useHover();
 
-  if (!category) {
+  if (!tag) {
     return (
       <Badge
         ref={ref}
@@ -47,7 +47,7 @@ export default function FinanceCategorySingleBadge({
         ...props.style,
       }}
     >
-      {category.title}
+      {tag.title}
     </Badge>
   );
 }

@@ -8,23 +8,23 @@ import {
 
 import {
   recurringCashflowsCollection,
-  recurringCashflowCategoriesCollection,
+  recurringCashflowTagsCollection,
 } from "./recurring-cashflow-collection";
 import { tagsCollection } from "@/db/collections/finance/tags/tags-collection";
 
 import { RecurringCashFlow } from "@/types/finance.types";
 
-// Cached Live Query: Recurring Cashflow → Categories Mapping
-const recurringCashflowCategoryMappingCollection = createLiveQueryCollection(
+// Cached Live Query: Recurring Cashflow → Tags Mapping
+const recurringCashflowTagMappingCollection = createLiveQueryCollection(
   (q) =>
     q
-      .from({ relations: recurringCashflowCategoriesCollection })
-      .innerJoin({ category: tagsCollection }, ({ relations, category }) =>
-        eq(relations.finance_category_id, category.id)
+      .from({ relations: recurringCashflowTagsCollection })
+      .innerJoin({ tag: tagsCollection }, ({ relations, tag }) =>
+        eq(relations.tag_id, tag.id)
       )
-      .select(({ relations, category }) => ({
-        cashflowId: relations.recurring_cash_flow_id,
-        category,
+      .select(({ relations, tag }) => ({
+        cashflowId: relations.recurring_cashflow_id,
+        tag,
       }))
 );
 
@@ -43,7 +43,7 @@ export const useRecurringCashflows = () => {
     isLoading: isMappingsLoading,
     isReady: isMappingsReady,
   } = useLiveQuery((q) =>
-    q.from({ mappings: recurringCashflowCategoryMappingCollection })
+    q.from({ mappings: recurringCashflowTagMappingCollection })
   );
 
   useEffect(() => {
@@ -54,22 +54,22 @@ export const useRecurringCashflows = () => {
     setIsReady(isCashflowsReady && isMappingsReady);
   }, [isCashflowsReady, isMappingsReady]);
 
-  const cashflowsWithCategories = useMemo((): RecurringCashFlow[] => {
+  const cashflowsWithTags = useMemo((): RecurringCashFlow[] => {
     if (!cashflows) return [];
 
-    const categoriesByCashflow = new Map<string, RecurringCashFlow["tags"]>();
-    mappings?.forEach(({ cashflowId, category }) => {
-      if (!categoriesByCashflow.has(cashflowId)) {
-        categoriesByCashflow.set(cashflowId, []);
+    const tagsByCashflow = new Map<string, RecurringCashFlow["tags"]>();
+    mappings?.forEach(({ cashflowId, tag }) => {
+      if (!tagsByCashflow.has(cashflowId)) {
+        tagsByCashflow.set(cashflowId, []);
       }
-      categoriesByCashflow.get(cashflowId)!.push(category);
+      tagsByCashflow.get(cashflowId)!.push(tag);
     });
 
     return cashflows.map((cashflow) => ({
       ...cashflow,
-      categories: categoriesByCashflow.get(cashflow.id) || [],
+      tags: tagsByCashflow.get(cashflow.id) || [],
     }));
   }, [cashflows, mappings]);
 
-  return { data: cashflowsWithCategories, isLoading, isReady };
+  return { data: cashflowsWithTags, isLoading, isReady };
 };

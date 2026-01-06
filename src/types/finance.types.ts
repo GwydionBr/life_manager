@@ -4,7 +4,7 @@ import { Tables, TablesInsert, TablesUpdate } from "./db.types";
 export interface Payout extends Tables<"payout"> {
   cashflow: Tables<"single_cashflow"> | null;
   work_project: Tables<"work_project"> | null;
-  work_time_entry: Tables<"work_time_entry">[];
+  work_time_entries: Tables<"work_time_entry">[];
 }
 
 // Bank Account Types
@@ -37,17 +37,17 @@ export interface UpdateRecurringCashFlow extends TablesUpdate<"recurring_cashflo
 // Finance Project Types
 export interface FinanceProject extends Tables<"finance_project"> {
   adjustments: Tables<"finance_project_adjustment">[];
-  client: Tables<"contact"> | null;
+  contact: Tables<"contact"> | null;
   tags: Tables<"tag">[];
 }
 export interface UpdateFinanceProject extends TablesUpdate<"finance_project"> {
   tags: Tables<"tag">[];
-  client: Tables<"contact"> | null;
+  contact: Tables<"contact"> | null;
   adjustments: Tables<"finance_project_adjustment">[];
 }
 export interface InsertFinanceProject extends TablesInsert<"finance_project"> {
   tags: Tables<"tag">[];
-  client: Tables<"contact"> | null;
+  contact: Tables<"contact"> | null;
 }
 
 export type ProjectAdjustment = Tables<"finance_project_adjustment">;

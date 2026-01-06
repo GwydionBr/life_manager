@@ -9,7 +9,7 @@ import {
   IconCalendarOff,
   IconCalendarTime,
 } from "@tabler/icons-react";
-import FinanceCategoryBadges from "@/components/Finances/Category/FinanceCategoryBadges";
+import FinanceTagBadges from "@/components/Finances/Tag/TagBadges";
 
 import { getNextDate } from "@/lib/financeHelperFunction";
 import { isToday } from "date-fns";
@@ -37,39 +37,39 @@ export default function RecurringCashFlowRow({
   ...props
 }: RecurringCashFlowRowProps) {
   const { formatMoney, formatDate } = useIntl();
-  const { data: financeCategories } = useTags();
+  const { data: tags } = useTags();
   const { updateRecurringCashflow } = useRecurringCashflowMutations();
   const { hovered, ref } = useHover();
   const [isUpdating, setIsUpdating] = useState(false);
   const [
-    isCategoryPopoverOpen,
-    { open: openCategoryPopover, close: closeCategoryPopover },
+    isTagPopoverOpen,
+    { open: openTagPopover, close: closetagPopover },
   ] = useDisclosure(false);
 
-  const currentCategories = useMemo(() => {
-    return financeCategories.filter((category) =>
-      cashflow.tags.map((category) => category.id).includes(category.id)
+  const currentTags = useMemo(() => {
+    return tags.filter((tag) =>
+      cashflow.tags.map((tag) => tag.id).includes(tag.id)
     );
-  }, [financeCategories, cashflow.tags]);
+  }, [tags, cashflow.tags]);
 
   const nextDate = useMemo(() => {
     if (!showNextDate) return null;
     return getNextDate(cashflow.interval, new Date(cashflow.start_date));
   }, [cashflow.interval, cashflow.start_date]);
 
-  const handleCategoryClose = async (
-    updatedCategories: Tables<"finance_category">[] | null
+  const handleTagClose = async (
+    updatedTags: Tables<"tag">[] | null
   ) => {
     if (isUpdating) return;
     setIsUpdating(true);
-    closeCategoryPopover();
+    closetagPopover();
     // TODO: Ask user if they want to update the single cash flows
-    if (updatedCategories) {
+    if (updatedTags) {
       updateRecurringCashflow(
         cashflow.id,
         {
           ...cashflow,
-          tags: updatedCategories,
+          tags: updatedTags,
         },
         true
       );
@@ -91,7 +91,7 @@ export default function RecurringCashFlowRow({
       {...props}
       ref={ref}
       onClick={() => {
-        if (!isCategoryPopoverOpen) {
+        if (!isTagPopoverOpen) {
           onEdit();
         }
       }}
@@ -141,11 +141,11 @@ export default function RecurringCashFlowRow({
               </Group>
             )}
           </Group>
-          <FinanceCategoryBadges
-            initialCategories={currentCategories ?? []}
-            onPopoverOpen={openCategoryPopover}
-            onPopoverClose={handleCategoryClose}
-            showAddCategory={hovered}
+          <FinanceTagBadges
+            initialTags={currentTags ?? []}
+            onPopoverOpen={openTagPopover}
+            onPopoverClose={handleTagClose}
+            showAddTag={hovered}
           />
         </Group>
       </Group>

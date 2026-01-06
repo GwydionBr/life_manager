@@ -6,15 +6,15 @@ import { AppSchema } from "@/db/powersync/schema";
 import {
   recurringCashflowDeserializationSchema,
   recurringCashflowSchema,
-  recurringCashflowCategorySchema,
-  recurringCashflowCategoryDeserializationSchema,
+  recurringCashflowTagSchema,
+  recurringCashflowTagDeserializationSchema,
 } from "@/db/collections/finance/recurring-cashflow/recurring-cashflow-schema";
 
 // Collection basierend auf der PowerSync-Tabelle 'recurring_cash_flow'
 export const recurringCashflowsCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,
-    table: AppSchema.props.recurring_cash_flow,
+    table: AppSchema.props.recurring_cashflow,
     schema: recurringCashflowSchema,
     deserializationSchema: recurringCashflowDeserializationSchema,
     onDeserializationError: (error) => {
@@ -23,16 +23,15 @@ export const recurringCashflowsCollection = createCollection(
   })
 );
 
-// Collection basierend auf der PowerSync-Tabelle 'recurring_cash_flow_category'
-export const recurringCashflowCategoriesCollection = createCollection(
+// Collection basierend auf der PowerSync-Tabelle 'recurring_cashflow_tag'
+export const recurringCashflowTagsCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,
-    table: AppSchema.props.recurring_cash_flow_category,
-    schema: recurringCashflowCategorySchema,
-    deserializationSchema: recurringCashflowCategoryDeserializationSchema,
+    table: AppSchema.props.recurring_cashflow_tag,
+    schema: recurringCashflowTagSchema,
+    deserializationSchema: recurringCashflowTagDeserializationSchema,
     onDeserializationError: (error) => {
       console.error(error);
     },
   })
 );
-

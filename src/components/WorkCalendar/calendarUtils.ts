@@ -61,7 +61,7 @@ export function mergeAdjacentSessionsForRender(
     const prev = merged[merged.length - 1];
     if (
       prev &&
-      prev.project_id === current.project_id &&
+      prev.work_project_id === current.work_project_id &&
       (prev.memo || "") === (current.memo || "") &&
       new Date(current.start_time).getTime() <=
         new Date(prev.end_time).getTime()

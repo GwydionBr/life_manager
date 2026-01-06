@@ -7,12 +7,12 @@ export const singleCashflowSchema = z.object({
   created_at: z.string(),
   currency: z.enum(Constants.public.Enums.currency),
   date: z.string(),
-  finance_client_id: z.string().nullable(),
+  contact_id: z.string().nullable(),
   finance_project_id: z.string().nullable(),
   id: z.string(),
   is_active: z.boolean(),
   payout_id: z.string().nullable(),
-  recurring_cash_flow_id: z.string().nullable(),
+  recurring_cashflow_id: z.string().nullable(),
   title: z.string(),
   user_id: z.string(),
 });
@@ -25,28 +25,28 @@ export const singleCashflowDeserializationSchema = z.object({
     .string()
     .transform((value) => value as Database["public"]["Enums"]["currency"]),
   date: z.string(),
-  finance_client_id: z.string().nullable(),
+  contact_id: z.string().nullable(),
   finance_project_id: z.string().nullable(),
   id: z.string(),
   is_active: z.number().transform((value) => value === 1),
   payout_id: z.string().nullable(),
-  recurring_cash_flow_id: z.string().nullable(),
+  recurring_cashflow_id: z.string().nullable(),
   title: z.string(),
   user_id: z.string(),
 });
 
-export const singleCashflowCategorySchema = z.object({
+export const singleCashflowTagSchema = z.object({
   created_at: z.string(),
-  finance_category_id: z.string(),
+  tag_id: z.string(),
   id: z.string(),
-  single_cash_flow_id: z.string(),
+  single_cashflow_id: z.string(),
   user_id: z.string(),
 });
 
-export const singleCashflowCategoryDeserializationSchema = z.object({
+export const singleCashflowTagDeserializationSchema = z.object({
   created_at: z.string(),
-  finance_category_id: z.string(),
+  tag_id: z.string(),
   id: z.string(),
-  single_cash_flow_id: z.string(),
+  single_cashflow_id: z.string(),
   user_id: z.string(),
 });

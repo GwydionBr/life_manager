@@ -39,7 +39,8 @@ export default function TimeTrackerFinanceRow({
           )}
         </ThemeIcon>
       }
-      children={<Text px="md">{moneyEarned}</Text>}
-    />
+    >
+      <Text px="md">{moneyEarned}</Text>
+    </TimeTrackerRow>
   );
 }

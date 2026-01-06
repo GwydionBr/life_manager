@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { DateRange, useWorkChartData } from "@/hooks/useWorkChartData";
 import { useIntl } from "@/hooks/useIntl";
@@ -11,7 +9,7 @@ import WorkStatisticsCards from "./WorkStatisticsCards";
 import {
   getStartOfMonth,
   getEndOfMonth,
-  formatCurrency
+  formatCurrency,
 } from "@/lib/financeChartHelperFunctions";
 import { FinanceInterval } from "@/types/settings.types";
 
@@ -20,12 +18,12 @@ import { Tables } from "@/types/db.types";
 interface WorkAnalysisProps {
   isOverview?: boolean;
   onClose: () => void;
-  sessions: Tables<"timer_session">[];
-  project?: Tables<"timer_project">;
+  timeEntries: Tables<"work_time_entry">[];
+  project?: Tables<"work_project">;
 }
 
 export default function WorkAnalysis({
-  sessions,
+  timeEntries,
   project,
   isOverview,
   onClose,
@@ -46,7 +44,7 @@ export default function WorkAnalysis({
   const { chartData, stats } = useWorkChartData(
     interval,
     dateRange,
-    sessions,
+    timeEntries,
     project?.id
   );
 

@@ -12,7 +12,7 @@ import {
 export const tagsCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,
-    table: AppSchema.props.finance_category,
+    table: AppSchema.props.tag,
     schema: tagsSchema,
     deserializationSchema: tagsDeserializationSchema,
     onDeserializationError: (error) => {

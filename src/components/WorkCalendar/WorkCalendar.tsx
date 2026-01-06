@@ -41,10 +41,10 @@ export default function WorkCalendar() {
     setCurrentDateRange,
     zoomIndex,
   } = useCalendarStore();
-  const { data: projects, isLoading: isProjectsLoading } = useWorkProjects();
-  const { data: timeEntries = [], isLoading: isTimeEntriesLoading } =
+  const { data: projects } = useWorkProjects();
+  const { data: timeEntries} =
     useWorkTimeEntries();
-  const { data: appointments = [] } = useAppointments();
+  const { data: appointments} = useAppointments();
   const [viewportTop, setViewportTop] = useState({
     old: 0,
     new: 0,
@@ -97,7 +97,7 @@ export default function WorkCalendar() {
         const dayStart = getStartOfDay(d);
         const dayEnd = addDays(dayStart, 1);
         const overlaps = start < dayEnd && end > dayStart;
-        const project = projects.find((p) => p.id === s.project_id);
+        const project = projects.find((p) => p.id === s.work_project_id);
         if (overlaps) {
           const key = dayStart.toISOString().slice(0, 10);
           map.get(key)?.push({
@@ -124,7 +124,7 @@ export default function WorkCalendar() {
         const dayStart = getStartOfDay(d);
         const dayEnd = addDays(dayStart, 1);
         const overlaps = start < dayEnd && end > dayStart;
-        const project = projects.find((p) => p.id === a.timer_project_id);
+        const project = projects.find((p) => p.id === a.work_project_id);
         if (overlaps) {
           map.get(day)?.push({
             ...a,
@@ -149,7 +149,7 @@ export default function WorkCalendar() {
   const visibleProjects: WorkProject[] = useMemo(() => {
     const ids = new Set<string>();
     sessionsByDay.forEach((items) => {
-      items.forEach((s) => ids.add(String(s.project_id)));
+      items.forEach((s) => ids.add(String(s.work_project_id)));
     });
 
     // Sort projects by total time (descending) and assign colors based on time ranking
@@ -197,7 +197,7 @@ export default function WorkCalendar() {
 
   function handleSessionClick(sessionId: string) {
     const session = timeEntries.find((s) => s.id === sessionId);
-    const project = projects.find((p) => p.id === session?.project_id);
+    const project = projects.find((p) => p.id === session?.work_project_id);
     if (session && project) {
       setSelectedSession(session);
       setSelectedProject(project);

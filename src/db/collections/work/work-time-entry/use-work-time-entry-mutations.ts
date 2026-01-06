@@ -14,7 +14,6 @@ import {
   updateWorkTimeEntry,
   deleteWorkTimeEntry,
 } from "./work-time-entry-mutations";
-import { workTimeEntriesCollection } from "@/db/collections/work/work-time-entry/work-time-entry-collection";
 import {
   InsertWorkTimeEntry,
   UpdateWorkTimeEntry,
@@ -93,9 +92,9 @@ export const useWorkTimeEntryMutations = () => {
           paid: newWorkTimeEntry.paid ?? false,
           paused_seconds: newWorkTimeEntry.paused_seconds ?? 0,
           payout_id: newWorkTimeEntry.payout_id ?? null,
-          project_id: newWorkTimeEntry.project_id ?? "",
+          work_project_id: newWorkTimeEntry.work_project_id ?? "",
           real_start_time: new Date(newWorkTimeEntry.start_time).toISOString(),
-          single_cash_flow_id: null,
+          single_cashflow_id: null,
           time_fragments_interval:
             newWorkTimeEntry.time_fragments_interval ?? null,
           salary: newWorkTimeEntry.salary ?? 0,
@@ -113,7 +112,8 @@ export const useWorkTimeEntryMutations = () => {
         const { adjustedTimeEntries, overlappingTimeEntries } =
           resolveTimeEntryOverlaps(
             currentTimeEntries.filter(
-              (entry) => entry.project_id === newWorkTimeEntry.project_id
+              (entry) =>
+                entry.work_project_id === newWorkTimeEntry.work_project_id
             ),
             updatedTimeEntry
           );
@@ -188,7 +188,9 @@ export const useWorkTimeEntryMutations = () => {
         const { adjustedTimeEntries, overlappingTimeEntries } =
           resolveTimeEntryOverlaps(
             currentTimeEntries.filter(
-              (entry) => entry.project_id === oldTimeEntry.project_id && entry.id !== oldTimeEntry.id
+              (entry) =>
+                entry.work_project_id === oldTimeEntry.work_project_id &&
+                entry.id !== oldTimeEntry.id
             ),
             updatedTimeEntry
           );

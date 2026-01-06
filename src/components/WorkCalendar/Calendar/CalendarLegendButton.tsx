@@ -22,7 +22,7 @@ export default function CalendarLegendButton({ p }: CalendarLegendButtonProps) {
   });
 
   const handleColorChange = () => {
-    updateWorkProject(p.id, { color: selectedColor });
+    updateWorkProject(p.id, { color: selectedColor, tags: p.tags });
   };
 
   return (

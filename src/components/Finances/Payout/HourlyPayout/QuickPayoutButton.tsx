@@ -36,7 +36,7 @@ export default function QuickPayoutButton({
   const { hovered, ref } = useHover();
 
   const unpaidTimeEntries = timeEntries.filter(
-    (timeEntry) => !timeEntry.single_cash_flow_id
+    (timeEntry) => !timeEntry.single_cashflow_id
   );
   const unpaidTotal = unpaidTimeEntries.reduce(
     (acc, timeEntry) => acc + salary * (timeEntry.active_seconds / 3600),

@@ -17,7 +17,7 @@ import DeleteActionIcon from "@/components/UI/ActionIcons/DeleteActionIcon";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
 import DeleteButton from "@/components/UI/Buttons/DeleteButton";
 import { IconAlertTriangleFilled, IconCategoryPlus } from "@tabler/icons-react";
-import FinanceCategoryForm from "@/components/Finances/Category/FinanceCategoryForm";
+import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 
 interface EditProjectDrawerProps {
   opened: boolean;
@@ -30,7 +30,7 @@ export default function EditProjectDrawer({
 }: EditProjectDrawerProps) {
   const { getLocalizedText } = useIntl();
   const { lastActiveProjectId } = useWorkStore();
-  const { data: projects, isLoading: isProjectsLoading } = useWorkProjects();
+  const { data: projects } = useWorkProjects();
   const { deleteWorkProject } = useWorkProjectMutations();
 
   const activeProject = useMemo(
@@ -38,17 +38,17 @@ export default function EditProjectDrawer({
     [projects, lastActiveProjectId]
   );
 
-  const [categoryIds, setCategoryIds] = useState<string[]>([]);
+  const [tagIds, setTagIds] = useState<string[]>([]);
   const drawersStack = useDrawersStack([
     "edit-project",
     "delete-project",
-    "category-form",
+    "tag-form",
   ]);
 
   useEffect(() => {
     if (activeProject) {
       if (activeProject.tags) {
-        setCategoryIds(activeProject.tags.map((c) => c.id));
+        setTagIds(activeProject.tags.map((c) => c.id));
       }
     }
   }, [activeProject]);
@@ -105,9 +105,9 @@ export default function EditProjectDrawer({
               project={activeProject}
               onCancel={handleClose}
               onSuccess={handleClose}
-              categoryIds={categoryIds}
-              setCategoryIds={setCategoryIds}
-              onOpenCategoryForm={() => drawersStack.open("category-form")}
+              tagIds={tagIds}
+              setTagIds={setTagIds}
+              onOpenTagForm={() => drawersStack.open("tag-form")}
             />
           </Stack>
         </Drawer>
@@ -148,8 +148,8 @@ export default function EditProjectDrawer({
         </Drawer>
         <Drawer
           size="md"
-          {...drawersStack.register("category-form")}
-          onClose={() => drawersStack.close("category-form")}
+          {...drawersStack.register("tag-form")}
+          onClose={() => drawersStack.close("tag-form")}
           title={
             <Group>
               <IconCategoryPlus />
@@ -159,11 +159,9 @@ export default function EditProjectDrawer({
             </Group>
           }
         >
-          <FinanceCategoryForm
-            onClose={() => drawersStack.close("category-form")}
-            onSuccess={(category) =>
-              setCategoryIds([...categoryIds, category.id])
-            }
+          <FinanceTagForm
+            onClose={() => drawersStack.close("tag-form")}
+            onSuccess={(category) => setTagIds([...tagIds, category.id])}
           />
         </Drawer>
       </Drawer.Stack>

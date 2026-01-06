@@ -7,22 +7,22 @@ import {
 
 import {
   singleCashflowsCollection,
-  singleCashflowCategoriesCollection,
+  singleCashflowTagsCollection,
 } from "./single-cashflow-collection";
 import { tagsCollection } from "@/db/collections/finance/tags/tags-collection";
 
 import { SingleCashFlow } from "@/types/finance.types";
 
-// Cached Live Query: Single Cashflow → Categories Mapping
-const singleCashflowCategoryMappingCollection = createLiveQueryCollection((q) =>
+// Cached Live Query: Single Cashflow → Tags Mapping
+const singleCashflowTagMappingCollection = createLiveQueryCollection((q) =>
   q
-    .from({ relations: singleCashflowCategoriesCollection })
-    .innerJoin({ category: tagsCollection }, ({ relations, category }) =>
-      eq(relations.finance_category_id, category.id)
+    .from({ relations: singleCashflowTagsCollection })
+    .innerJoin({ tag: tagsCollection }, ({ relations, tag }) =>
+      eq(relations.tag_id, tag.id)
     )
-    .select(({ relations, category }) => ({
-      cashflowId: relations.single_cash_flow_id,
-      category,
+    .select(({ relations, tag }) => ({
+      cashflowId: relations.single_cashflow_id,
+      tag,
     }))
 );
 
@@ -36,13 +36,13 @@ export const useSingleCashflowsQuery = () => {
     q.from({ singleCashflows: singleCashflowsCollection })
   );
 
-  // Fetch single cashflow category mappings
+  // Fetch single cashflow tag mappings
   const {
     data: mappings,
     isLoading: isMappingsLoading,
     isReady: isMappingsReady,
   } = useLiveQuery((q) =>
-    q.from({ mappings: singleCashflowCategoryMappingCollection })
+    q.from({ mappings: singleCashflowTagMappingCollection })
   );
 
   // Calculate loading state
@@ -57,26 +57,26 @@ export const useSingleCashflowsQuery = () => {
     [isCashflowsReady, isMappingsReady]
   );
 
-  // Combine cashflows and categories
-  const cashflowsWithCategories = useMemo((): SingleCashFlow[] => {
+  // Combine cashflows and tags
+  const cashflowsWithTags = useMemo((): SingleCashFlow[] => {
     if (!cashflows) return [];
 
-    const categoriesByCashflow = new Map<string, SingleCashFlow["tags"]>();
-    // Map categories to cashflows
-    mappings?.forEach(({ cashflowId, category }) => {
-      if (!categoriesByCashflow.has(cashflowId)) {
-        categoriesByCashflow.set(cashflowId, []);
+    const tagsByCashflow = new Map<string, SingleCashFlow["tags"]>();
+    // Map tags to cashflows
+    mappings?.forEach(({ cashflowId, tag }) => {
+      if (!tagsByCashflow.has(cashflowId)) {
+        tagsByCashflow.set(cashflowId, []);
       }
-      categoriesByCashflow.get(cashflowId)!.push(category);
+      tagsByCashflow.get(cashflowId)!.push(tag);
     });
 
-    // Return cashflows with categories
+    // Return cashflows with tags
     return cashflows.map((cashflow) => ({
       ...cashflow,
-      categories: categoriesByCashflow.get(cashflow.id) || [],
+      tags: tagsByCashflow.get(cashflow.id) || [],
     }));
   }, [cashflows, mappings]);
 
-  // Return cashflows with categories and loading/ready states
-  return { data: cashflowsWithCategories, isLoading, isReady };
+  // Return cashflows with tags and loading/ready states
+  return { data: cashflowsWithTags, isLoading, isReady };
 };

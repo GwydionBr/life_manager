@@ -8,11 +8,11 @@ import {
   workFolderDeserializationSchema,
 } from "@/db/collections/work/work-foler/work-folder-schema";
 
-// Collection basierend auf der PowerSync-Tabelle 'timer_project'
+// Collection basierend auf der PowerSync-Tabelle 'work_folder'
 export const workFoldersCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,
-    table: AppSchema.props.timer_project_folder,
+    table: AppSchema.props.work_folder,
     schema: workFolderSchema,
     deserializationSchema: workFolderDeserializationSchema,
     onDeserializationError: (error) => {

@@ -144,19 +144,24 @@ export function formatDate(
   switch (interval) {
     case "day":
       return format(date, "dd.MM", { locale: de });
-    case "week":
+    case "week": {
       const weekNumber = getWeek(date, { locale: de });
       return `KW ${weekNumber}`; // German: Kalenderwoche
-    case "month":
+    }
+    case "month": {
       return format(date, "MMM yy", { locale: de });
-    case "1/4 year":
+    }
+    case "1/4 year": {
       const quarter = getQuarter(date);
       return `Q${quarter} ${getYear(date)}`;
-    case "1/2 year":
+    }
+    case "1/2 year": {
       const half = Math.ceil(getMonth(date) / 6);
       return `H${half} ${getYear(date)}`;
-    case "year":
+    }
+    case "year": {
       return getYear(date).toString();
+    }
     default:
       return typeof dateInput === "string" ? dateInput : dateToISOString(date);
   }

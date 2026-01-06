@@ -11,28 +11,28 @@ export default function WorkSettings() {
   const { getLocalizedText } = useIntl();
   return (
     <Stack>
-      <SettingsRow
-        title={getLocalizedText("Modulfarbe", "Module Color")}
-        children={<WorkColorSettings />}
-      />
-      <SettingsRow
-        title={getLocalizedText("Zeiterfassung", "Time Tracker")}
-        children={<TimeTrackerSettings />}
-      />
+      <SettingsRow title={getLocalizedText("Modulfarbe", "Module Color")}>
+        <WorkColorSettings />
+      </SettingsRow>
+      <SettingsRow title={getLocalizedText("Zeiterfassung", "Time Tracker")}>
+        <TimeTrackerSettings />
+      </SettingsRow>
       <SettingsRow
         title={getLocalizedText(
           "Rundung der Zeiterfassung",
           "Time Tracker Rounding"
         )}
-        children={<SelectTimerRounding />}
-      />
+      >
+        <SelectTimerRounding />
+      </SettingsRow>
       <SettingsRow
         title={getLocalizedText(
           "Arbeitsmanager Einstellungen",
           "Work Manager Settings"
         )}
-        children={<WorkDefaultSettings />}
-      />
+      >
+        <WorkDefaultSettings />
+      </SettingsRow>
     </Stack>
   );
 }

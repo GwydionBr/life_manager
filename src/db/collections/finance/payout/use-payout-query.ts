@@ -23,42 +23,42 @@ export const usePayouts = () => {
     isReady: isCashflowsReady,
   } = useLiveQuery((q) => q.from({ cashflows: singleCashflowsCollection }));
   const {
-    data: timerProjects,
-    isLoading: isTimerProjectsLoading,
-    isReady: isTimerProjectsReady,
-  } = useLiveQuery((q) => q.from({ timerProjects: workProjectsCollection }));
+    data: workProjects,
+    isLoading: isWorkProjectsLoading,
+    isReady: isWorkProjectsReady,
+  } = useLiveQuery((q) => q.from({ workProjects: workProjectsCollection }));
   const {
-    data: timerSessions,
-    isLoading: isTimerSessionsLoading,
-    isReady: isTimerSessionsReady,
-  } = useLiveQuery((q) => q.from({ timerSessions: workTimeEntriesCollection }));
+    data: workTimeEntries,
+    isLoading: isWorkTimeEntriesLoading,
+    isReady: isWorkTimeEntriesReady,
+  } = useLiveQuery((q) => q.from({ workTimeEntries: workTimeEntriesCollection }));
 
   useEffect(() => {
     setIsLoading(
       isPayoutsLoading ||
         isCashflowsLoading ||
-        isTimerProjectsLoading ||
-        isTimerSessionsLoading
+        isWorkProjectsLoading ||
+        isWorkTimeEntriesLoading
     );
   }, [
     isPayoutsLoading,
     isCashflowsLoading,
-    isTimerProjectsLoading,
-    isTimerSessionsLoading,
+    isWorkProjectsLoading,
+    isWorkTimeEntriesLoading,
   ]);
 
   useEffect(() => {
     setIsReady(
       isPayoutsReady &&
         isCashflowsReady &&
-        isTimerProjectsReady &&
-        isTimerSessionsReady
+        isWorkProjectsReady &&
+        isWorkTimeEntriesReady
     );
   }, [
     isPayoutsReady,
     isCashflowsReady,
-    isTimerProjectsReady,
-    isTimerSessionsReady,
+    isWorkProjectsReady,
+    isWorkTimeEntriesReady,
   ]);
 
   const payoutsWithRelations = useMemo((): Payout[] => {
@@ -72,31 +72,31 @@ export const usePayouts = () => {
       }
     });
 
-    const timerProjectById = new Map<string, Payout["work_project"]>();
-    timerProjects?.forEach((project) => {
-      timerProjectById.set(project.id, project);
+    const workProjectById = new Map<string, Payout["work_project"]>();
+    workProjects?.forEach((project) => {
+      workProjectById.set(project.id, project);
     });
 
-    const timerSessionsByPayoutId = new Map<
+    const workTimeEntriesByPayoutId = new Map<
       string,
       Payout["work_time_entry"]
     >();
-    timerSessions?.forEach((session) => {
-      if (session.payout_id) {
-        const existing = timerSessionsByPayoutId.get(session.payout_id) || [];
-        timerSessionsByPayoutId.set(session.payout_id, [...existing, session]);
+    workTimeEntries?.forEach((timeEntry) => {
+      if (timeEntry.payout_id) {
+        const existing = workTimeEntriesByPayoutId.get(timeEntry.payout_id) || [];
+        workTimeEntriesByPayoutId.set(timeEntry.payout_id, [...existing, timeEntry]);
       }
     });
 
     return payouts.map((payout) => ({
       ...payout,
       cashflow: cashflowByPayoutId.get(payout.id) || null,
-      timer_project: payout.timer_project_id
-        ? timerProjectById.get(payout.timer_project_id) || null
+      work_project: payout.work_project_id
+        ? workProjectById.get(payout.work_project_id) || null
         : null,
-      timer_sessions: timerSessionsByPayoutId.get(payout.id) || [],
+      work_time_entry: workTimeEntriesByPayoutId.get(payout.id) || [],
     }));
-  }, [payouts, cashflows, timerProjects, timerSessions]);
+  }, [payouts, cashflows, workProjects, workTimeEntries]);
 
   return { data: payoutsWithRelations, isLoading, isReady };
 };

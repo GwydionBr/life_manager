@@ -17,67 +17,56 @@ import {
 import { IconPlus } from "@tabler/icons-react";
 
 import { Tables } from "@/types/db.types";
-import FinanceCategorySingleBadge from "./FinanceCategorySingleBadge";
-import FinanceCategoryForm from "./FinanceCategoryForm";
+import FinanceTagSingleBadge from "./TagSingleBadge";
+import FinanceTagForm from "./TagForm";
 import { useTags } from "@/db/collections/finance/tags/tags-collection";
 
-interface FinanceCategoryBadgesProps {
-  initialCategories: Tables<"finance_category">[];
-  showAddCategory?: boolean;
+interface FinanceTagBadgesProps {
+  initialTags: Tables<"tag">[];
+  showAddTag?: boolean;
   onPopoverOpen: () => void;
-  onPopoverClose: (categories: Tables<"finance_category">[] | null) => void;
+  onPopoverClose: (categories: Tables<"tag">[] | null) => void;
 }
 
-export default function FinanceCategoryBadges({
-  initialCategories,
-  showAddCategory = true,
+export default function FinanceTagBadges({
+  initialTags,
+  showAddTag = true,
   onPopoverOpen,
   onPopoverClose,
-}: FinanceCategoryBadgesProps) {
+}: FinanceTagBadgesProps) {
   const { getLocalizedText } = useIntl();
-  const {
-    data: financeCategories = [],
-    isLoading: isFinanceCategoriesLoading,
-  } = useTags();
+  const { data: tags, isLoading: isFinanceTagsLoading } = useTags();
 
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(
-    initialCategories.map((c) => c.id)
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    initialTags.map((c) => c.id)
   );
 
   useEffect(() => {
-    setSelectedCategories(initialCategories.map((c) => c.id));
-  }, [initialCategories]);
+    setSelectedTags(initialTags.map((c) => c.id));
+  }, [initialTags]);
 
-  const [
-    isCategoryFormOpen,
-    { open: openCategoryForm, close: closeCategoryForm },
-  ] = useDisclosure(false);
-  const [
-    isCategoryPopoverOpen,
-    { open: openCategoryPopover, close: closeCategoryPopover },
-  ] = useDisclosure(false);
+  const [isTagFormOpen, { open: openTagForm, close: closeTagForm }] =
+    useDisclosure(false);
+  const [isTagPopoverOpen, { open: openTagPopover, close: closeTagPopover }] =
+    useDisclosure(false);
 
-  const currentCategorySelection = useMemo(() => {
-    return financeCategories.filter((category) =>
-      selectedCategories.includes(category.id)
-    );
-  }, [financeCategories, selectedCategories]);
+  const currentTagSelection = useMemo(() => {
+    return tags.filter((tag) => selectedTags.includes(tag.id));
+  }, [tags, selectedTags]);
 
-  if (isFinanceCategoriesLoading) return <Skeleton height={30} width={100} />;
+  if (isFinanceTagsLoading) return <Skeleton height={30} width={100} />;
 
   const handlePopoverOpen = () => {
     onPopoverOpen();
-    openCategoryPopover();
+    openTagPopover();
   };
 
   const handlePopoverClose = () => {
     onPopoverClose(
-      currentCategorySelection !== initialCategories
-        ? currentCategorySelection
-        : null
+      currentTagSelection !== initialTags ? currentTagSelection : null
     );
-    closeCategoryForm();
-    closeCategoryPopover();
+    closeTagForm();
+    closeTagPopover();
   };
 
   return (
@@ -85,7 +74,7 @@ export default function FinanceCategoryBadges({
       <Popover
         trapFocus
         onDismiss={handlePopoverClose}
-        opened={isCategoryPopoverOpen}
+        opened={isTagPopoverOpen}
         onClose={handlePopoverClose}
       >
         <Popover.Target>
@@ -98,20 +87,17 @@ export default function FinanceCategoryBadges({
               cursor: "pointer",
             }}
           >
-            {currentCategorySelection.length > 0 ? (
-              currentCategorySelection.map((category) => (
-                <FinanceCategorySingleBadge
-                  key={category.id}
-                  category={category}
-                />
+            {currentTagSelection.length > 0 ? (
+              currentTagSelection.map((tag) => (
+                <FinanceTagSingleBadge key={tag.id} tag={tag} />
               ))
             ) : (
               <Transition
-                mounted={showAddCategory || isCategoryPopoverOpen}
+                mounted={showAddTag || isTagPopoverOpen}
                 transition="fade-left"
                 duration={200}
               >
-                {(styles) => <FinanceCategorySingleBadge style={styles} />}
+                {(styles) => <FinanceTagSingleBadge style={styles} />}
               </Transition>
             )}
           </Group>
@@ -134,40 +120,40 @@ export default function FinanceCategoryBadges({
                   "Keine Kategorien gefunden",
                   "No categories found"
                 )}
-                data={financeCategories.map((c) => ({
+                data={tags.map((c) => ({
                   label: c.title,
                   value: c.id,
                 }))}
-                value={selectedCategories}
+                value={selectedTags}
                 onChange={(value) => {
-                  setSelectedCategories(value);
+                  setSelectedTags(value);
                 }}
                 data-autofocus
               />
               <Button
-                onClick={openCategoryForm}
+                onClick={openTagForm}
                 size="compact-sm"
                 variant="subtle"
                 leftSection={<IconPlus size={16} />}
               >
-                {getLocalizedText("Kategorie", "Category")}
+                {getLocalizedText("Tag", "Tag")}
               </Button>
             </Group>
-            <Collapse in={isCategoryFormOpen}>
+            <Collapse in={isTagFormOpen}>
               <Fieldset
-                legend={getLocalizedText("Neue Kategorie", "New Category")}
+                legend={getLocalizedText("Neues Tag", "New Tag")}
                 mt="lg"
                 maw={400}
                 miw={300}
               >
-                <FinanceCategoryForm
-                  onClose={closeCategoryForm}
-                  onSuccess={(category) => {
-                    setSelectedCategories((prev) => {
-                      const newCategories = [...prev, category.id];
+                <FinanceTagForm
+                  onClose={closeTagForm}
+                  onSuccess={(tag) => {
+                    setSelectedTags((prev) => {
+                      const newCategories = [...prev, tag.id];
                       return newCategories;
                     });
-                    closeCategoryForm();
+                    closeTagForm();
                   }}
                 />
               </Fieldset>

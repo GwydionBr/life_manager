@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { useFormatter } from "@/hooks/useFormatter";
+import { useIntl } from "@/hooks/useIntl";
 
 import {
   Stack,
@@ -16,16 +16,14 @@ import {
 } from "@mantine/core";
 import { IconCash } from "@tabler/icons-react";
 import FinanceForm from "@/components/Finances/CashFlow/CashflowForm";
-import { SettingsTab } from "../Settings/SettingsModal";
-import FinanceCategoryForm from "./Category/FinanceCategoryForm";
+import { SettingsTab } from "@/stores/settingsStore";
+import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 import { Tables } from "@/types/db.types";
 
 export default function FinanceInitializer() {
   const [opened, { open, close }] = useDisclosure(false);
-  const [categories, setCategories] = useState<Tables<"finance_category">[]>(
-    []
-  );
-  const { getLocalizedText } = useFormatter();
+  const [tags, setTags] = useState<Tables<"tag">[]>([]);
+  const { getLocalizedText } = useIntl();
   const { setIsModalOpen, setSelectedTab } = useSettingsStore();
   return (
     <Container size="md" py="xl">
@@ -85,9 +83,9 @@ export default function FinanceInitializer() {
           <Box maw={600} w="100%" mx="auto">
             <FinanceForm
               onClose={() => {}}
-              onOpenCategoryForm={open}
-              categories={categories}
-              setCategories={setCategories}
+              onOpenTagForm={open}
+              tags={tags}
+              setTags={setTags}
             />
           </Box>
           <Modal
@@ -95,11 +93,9 @@ export default function FinanceInitializer() {
             onClose={close}
             title={getLocalizedText("Finanz Einstellungen", "Finance Settings")}
           >
-            <FinanceCategoryForm
+            <FinanceTagForm
               onClose={close}
-              onSuccess={(category) =>
-                setCategories((prev) => [...prev, category])
-              }
+              onSuccess={(tag) => setTags((prev) => [...prev, tag])}
             />
           </Modal>
         </Stack>

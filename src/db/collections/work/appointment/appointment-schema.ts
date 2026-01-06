@@ -7,7 +7,7 @@ export const appointmentSchema = z.object({
   id: z.string(),
   reminder: z.string().nullable(),
   start_date: z.string(),
-  timer_project_id: z.string().nullable(),
+  work_project_id: z.string().nullable(),
   title: z.string(),
   user_id: z.string(),
 });
@@ -19,7 +19,7 @@ export const appointmentDeserializationSchema = z.object({
   id: z.string(),
   reminder: z.string().nullable(),
   start_date: z.string(),
-  timer_project_id: z.string().nullable(),
+  work_project_id: z.string().nullable(),
   title: z.string(),
   user_id: z.string(),
 });

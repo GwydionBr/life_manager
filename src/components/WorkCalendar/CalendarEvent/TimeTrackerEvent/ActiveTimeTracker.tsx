@@ -20,7 +20,7 @@ export default function ActiveTimeTracker({
   top,
   bottom,
   timer,
-  isYesterday,
+  isYesterday: _isYesterday,
   color,
   backgroundColor,
   title,

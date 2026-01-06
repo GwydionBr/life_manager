@@ -3,14 +3,7 @@ import { useWorkStore } from "@/stores/workManagerStore";
 import { useIntl } from "@/hooks/useIntl";
 import { usePayoutMutations } from "@/db/collections/finance/payout/use-payout-mutations";
 
-import {
-  Stack,
-  Collapse,
-  Card,
-  Group,
-  Popover,
-  ActionIcon,
-} from "@mantine/core";
+import { Stack, Card, Group, Popover, ActionIcon } from "@mantine/core";
 import { IconClockPlus } from "@tabler/icons-react";
 import FilterActionIcon from "@/components/UI/ActionIcons/FilterActionIcon";
 import PayoutActionIcon from "@/components/UI/ActionIcons/PayoutActionIcon";
@@ -20,7 +13,7 @@ import ProjectPayoutCard from "@/components/Finances/Payout/ProjectPayout/Projec
 import PayoutConversionModal from "@/components/Finances/Payout/PayoutConversionModal";
 import SelectActionIcon from "@/components/UI/ActionIcons/SelectActionIcon";
 import NewSessionModal from "@/components/Work/Session/NewSessionModal";
-import SessionSelector from "@/components/Work/Session/SessionSelector";
+import WorkTimeEntrySelector from "@/components/Work/Session/SessionSelector";
 import DelayedTooltip from "@/components/UI/DelayedTooltip";
 import { WorkProject, WorkTimeEntry } from "@/types/work.types";
 import { Currency } from "@/types/settings.types";
@@ -72,7 +65,7 @@ export default function ProjectToolbar({
     } else {
       setSelectedTimeEntryIds(
         timeFilteredTimeEntries
-          .filter((timeEntry) => !timeEntry.single_cash_flow_id)
+          .filter((timeEntry) => !timeEntry.single_cashflow_id)
           .map((timeEntry) => timeEntry.id)
       );
     }
@@ -86,7 +79,7 @@ export default function ProjectToolbar({
     setSelectedModeActive(true);
     setSelectedTimeEntryIds(
       timeFilteredTimeEntries
-        .filter((timeEntry) => !timeEntry.single_cash_flow_id)
+        .filter((timeEntry) => !timeEntry.single_cashflow_id)
         .map((timeEntry) => timeEntry.id)
     );
   }, [timeFilteredTimeEntries, setSelectedTimeEntryIds, setSelectedModeActive]);
@@ -123,7 +116,7 @@ export default function ProjectToolbar({
   };
 
   const selectableSessions = timeFilteredTimeEntries.filter(
-    (timeEntry) => !timeEntry.single_cash_flow_id
+    (timeEntry) => !timeEntry.single_cashflow_id
   );
 
   const isPayoutAvailable = project.hourly_payment
@@ -189,7 +182,7 @@ export default function ProjectToolbar({
                 <ProjectFilter
                   timeSpan={filterTimeSpan}
                   onTimeSpanChange={setFilterTimeSpan}
-                  sessions={timeFilteredTimeEntries}
+                  timeEntries={timeFilteredTimeEntries}
                   project={project}
                   isProcessingPayout={false}
                   onSelectAll={selectAllTimeEntries}
@@ -294,11 +287,11 @@ export default function ProjectToolbar({
                   "light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-2))",
               }}
             >
-              <SessionSelector
-                selectedSessions={selectedTimeEntryIds}
-                timeFilteredSessions={timeFilteredTimeEntries}
-                toggleAllSessions={toggleAllTimeEntries}
-                handleSessionPayoutClick={handleSessionPayoutClick}
+              <WorkTimeEntrySelector
+                selectedTimeEntries={selectedTimeEntryIds}
+                timeFilteredTimeEntries={timeFilteredTimeEntries}
+                toggleAllTimeEntries={toggleAllTimeEntries}
+                handleTimeEntryPayoutClick={handleSessionPayoutClick}
               />
             </Popover.Dropdown>
           </Popover>

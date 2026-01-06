@@ -16,10 +16,10 @@ import classes from "./SessionRow.module.css";
 import { WorkProject } from "@/types/work.types";
 
 interface SessionRowProps {
-  session: Tables<"timer_session"> & { index: number };
+  session: Tables<"work_time_entry"> & { index: number };
   project?: WorkProject;
   isSelected?: boolean;
-  onToggleSelected?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onToggleSelected?: (e: React.MouseEvent<HTMLDivElement>) => void;
   isOverview?: boolean;
   selectedModeActive: boolean;
 }
@@ -59,10 +59,10 @@ export default function SessionRow({
 
   // Determine if session should be considered paid
   const isSessionPaid = () => {
-    if (!project) return session.single_cash_flow_id;
+    if (!project) return session.single_cashflow_id;
     // For hourly payment projects, check if session is paid
     if (project.hourly_payment) {
-      return session.single_cash_flow_id;
+      return session.single_cashflow_id;
     }
 
     // For non-hourly payment projects, check if project is fully paid
@@ -90,8 +90,8 @@ export default function SessionRow({
         withBorder
         onClick={
           showCheckbox
-            ? (e: React.MouseEvent<HTMLDivElement>) =>
-                onToggleSelected?.(e as any)
+            ? (e) =>
+                onToggleSelected?.(e)
             : undefined
         }
       >

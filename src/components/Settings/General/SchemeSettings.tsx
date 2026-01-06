@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMounted } from "@mantine/hooks";
 import { useIntl } from "@/hooks/useIntl";
 
 import {
@@ -14,11 +14,10 @@ import { SystemSchemeButton } from "@/components/Scheme/SystemScheme";
 
 export default function SchemeToggle() {
   const { getLocalizedText } = useIntl();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
 
   const { colorScheme: currentColorScheme, setColorScheme } =
     useMantineColorScheme();
+  const mounted = useMounted();
 
   if (!mounted) {
     return null; // prevents server/client mismatch

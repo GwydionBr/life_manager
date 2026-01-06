@@ -1,5 +1,3 @@
-"use client";
-
 import { useSettingsStore } from "@/stores/settingsStore";
 
 import { Group, List, Stack, Text } from "@mantine/core";

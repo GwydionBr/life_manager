@@ -27,12 +27,12 @@ import {
   IconCashMove,
   IconAlertHexagonFilled,
   IconAlertTriangle,
-  IconCategoryPlus,
+  IconTagPlus,
 } from "@tabler/icons-react";
 import { CashFlowType } from "@/types/settings.types";
 import CancelButton from "../../UI/Buttons/CancelButton";
 import DeleteActionIcon from "../../UI/ActionIcons/DeleteActionIcon";
-import FinanceCategoryForm from "../Category/FinanceCategoryForm";
+import FinanceTagForm from "../Tag/TagForm";
 import { Radio } from "@mantine/core";
 import {
   DeleteRecurringCashFlowMode,
@@ -44,8 +44,8 @@ import {
 
 // Type guard to distinguish between single and recurring cash flows
 function isSingleCashFlow(
-  cashFlow: Tables<"single_cash_flow"> | Tables<"recurring_cash_flow">
-): cashFlow is Tables<"single_cash_flow"> {
+  cashFlow: Tables<"single_cashflow"> | Tables<"recurring_cashflow">
+): cashFlow is Tables<"single_cashflow"> {
   return "date" in cashFlow && !("interval" in cashFlow);
 }
 
@@ -63,7 +63,7 @@ export default function EditCashFlowDrawer({
     DeleteRecurringCashFlowMode.delete_all
   );
   const [type, setType] = useState<CashFlowType>("income");
-  const [categories, setCategories] = useState<Tables<"finance_category">[]>(
+  const [tags, setTags] = useState<Tables<"tag">[]>(
     cashFlow.tags
   );
   const [pendingValues, setPendingValues] = useState<
@@ -78,9 +78,9 @@ export default function EditCashFlowDrawer({
     "delete-cash-flow",
     "delete-recurring-cash-flow",
     "update-cash-flow",
-    "add-category",
+    "add-tag",
   ]);
-  const { data: financeCategories } = useTags();
+  const { data: allTags } = useTags();
 
   useEffect(() => {
     if (cashFlow) {
@@ -97,8 +97,8 @@ export default function EditCashFlowDrawer({
   }, [opened]);
 
   useEffect(() => {
-    if (categories !== cashFlow.tags) {
-      setCategories(cashFlow.tags);
+    if (tags !== cashFlow.tags) {
+      setTags(cashFlow.tags);
     }
   }, [cashFlow]);
 
@@ -108,7 +108,7 @@ export default function EditCashFlowDrawer({
       await updateSingleCashflow(cashFlow.id, {
         ...values,
         date: values.date.toISOString(),
-        tags: categories,
+        tags: tags,
       });
       onClose();
     } else {
@@ -118,14 +118,14 @@ export default function EditCashFlowDrawer({
         values.title !== cashFlow.title ||
         values.amount !== cashFlow.amount ||
         values.currency !== cashFlow.currency ||
-        categories !== cashFlow.tags;
+        tags !== cashFlow.tags;
 
       if (hasChanges) {
         console.log("has changes", hasChanges);
         // Store the values and show the update modal
         setPendingValues({
           id: cashFlow.id,
-          tags: categories,
+          tags: tags,
           ...values,
           end_date: values.end_date?.toISOString() ?? null,
           start_date: values.start_date.toISOString(),
@@ -137,7 +137,7 @@ export default function EditCashFlowDrawer({
           cashFlow.id,
           {
             ...values,
-            tags: categories,
+            tags: tags,
             end_date: values.end_date?.toISOString() ?? null,
             start_date: values.start_date.toISOString(),
           },
@@ -166,7 +166,7 @@ export default function EditCashFlowDrawer({
     if (isSingleCashFlow(cashFlow)) return;
     updateRecurringCashflow(cashFlow.id, {
       end_date: new Date().toISOString(),
-      tags: categories,
+      tags: tags,
     });
     onClose();
   }
@@ -178,7 +178,7 @@ export default function EditCashFlowDrawer({
       cashFlow.id,
       {
         ...pendingValues,
-        tags: categories,
+        tags: tags,
       },
       true
     );
@@ -190,13 +190,13 @@ export default function EditCashFlowDrawer({
 
     await updateRecurringCashflow(cashFlow.id, {
       ...pendingValues,
-      tags: categories,
+      tags: tags,
     });
     onClose();
   }
 
-  const handleAddCategory = (category: Tables<"finance_category">) => {
-    setCategories((prev) => [...prev, category]);
+  const handleAddTag = (tag: Tables<"tag">) => {
+    setTags((prev) => [...prev, tag]);
   };
 
   return (
@@ -251,29 +251,29 @@ export default function EditCashFlowDrawer({
           <Group wrap="nowrap">
             <MultiSelect
               w="100%"
-              data={financeCategories.map((category) => ({
-                label: category.title,
-                value: category.id,
+              data={allTags.map((tag) => ({
+                label: tag.title,
+                value: tag.id,
               }))}
-              label={getLocalizedText("Kategorie", "Category")}
+              label={getLocalizedText("Tag", "Tag")}
               placeholder={getLocalizedText(
-                "Kategorie auswählen",
-                "Select a category"
+                "Tag auswählen",
+                "Select a tag"
               )}
-              value={categories.map((category) => category.id)}
+              value={tags.map((tag) => tag.id)}
               onChange={(value) =>
-                setCategories(
+                setTags(
                   value.map(
-                    (category) =>
-                      financeCategories.find((c) => c.id === category)!
+                    (tag) =>
+                      allTags.find((c) => c.id === tag)!
                   )
                 )
               }
               searchable
               clearable
               nothingFoundMessage={getLocalizedText(
-                "Keine Kategorien gefunden",
-                "No categories found"
+                "Keine Tags gefunden",
+                "No tags found"
               )}
               size="sm"
             />
@@ -281,14 +281,14 @@ export default function EditCashFlowDrawer({
               mt={25}
               w={180}
               p={0}
-              onClick={() => drawerStack.open("add-category")}
+              onClick={() => drawerStack.open("add-tag")}
               fw={500}
               variant="subtle"
               size="xs"
               leftSection={<IconPlus size={20} />}
             >
               <Text fz="xs" c="dimmed">
-                {getLocalizedText("Neue Kategorie", "Add Category")}
+                {getLocalizedText("Neues Tag", "Add Tag")}
               </Text>
             </Button>
           </Group>
@@ -447,8 +447,8 @@ export default function EditCashFlowDrawer({
 
           <Text size="sm" c="dimmed">
             {getLocalizedText(
-              "Dies wird den Titel, den Betrag, die Währung und die Kategorie aller vergangenen und aktuellen Cashflows aktualisieren, die aus diesem Wiederholungsmuster generiert wurden. Zukünftige Cashflows werden automatisch die neuen Einstellungen verwenden.",
-              "This will update the title, amount, currency, and category of all past and current cash flows that were generated from this recurring pattern. Future cash flows will automatically use the new settings."
+              "Dies wird den Titel, den Betrag, die Währung und die Tags aller vergangenen und aktuellen Cashflows aktualisieren, die aus diesem Wiederholungsmuster generiert wurden. Zukünftige Cashflows werden automatisch die neuen Einstellungen verwenden.",
+              "This will update the title, amount, currency, and tags of all past and current cash flows that were generated from this recurring pattern. Future cash flows will automatically use the new settings."
             )}
           </Text>
 
@@ -463,20 +463,20 @@ export default function EditCashFlowDrawer({
         </Stack>
       </Drawer>
       <Drawer
-        {...drawerStack.register("add-category")}
-        onClose={() => drawerStack.close("add-category")}
+        {...drawerStack.register("add-tag")}
+        onClose={() => drawerStack.close("add-tag")}
         title={
           <Group>
-            <IconCategoryPlus />
+            <IconTagPlus />
             <Text>
-              {getLocalizedText("Kategorie hinzufügen", "Add Category")}
+              {getLocalizedText("Tag hinzufügen", "Add Tag")}
             </Text>
           </Group>
         }
       >
-        <FinanceCategoryForm
-          onClose={() => drawerStack.close("add-category")}
-          onSuccess={handleAddCategory}
+        <FinanceTagForm
+          onClose={() => drawerStack.close("add-tag")}
+          onSuccess={handleAddTag}
         />
       </Drawer>
     </Drawer.Stack>

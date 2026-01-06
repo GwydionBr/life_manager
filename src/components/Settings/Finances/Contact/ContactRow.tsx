@@ -16,27 +16,29 @@ import React from "react";
 import DeleteActionIcon from "@/components/UI/ActionIcons/DeleteActionIcon";
 import PencilActionIcon from "@/components/UI/ActionIcons/PencilActionIcon";
 import { IconPencil } from "@tabler/icons-react";
-import FinanceClientForm from "@/components/Finances/Contact/ContactForm";
+import ContactForm from "@/components/Finances/Contact/ContactForm";
 
-interface FinanceClientRowProps {
-  client: Tables<"finance_client">;
+interface ContactRowProps {
+  contact: Tables<"contact">;
   selectedModeActive: boolean;
   isSelected?: boolean;
-  onToggleSelected?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onToggleSelected?: (e: React.MouseEvent<HTMLDivElement>) => void;
   onDelete: (ids: string[]) => void;
 }
 
-export default function FinanceClientRow({
-  client,
+export default function ContactRow({
+  contact,
   selectedModeActive,
   isSelected,
   onToggleSelected,
   onDelete,
-}: FinanceClientRowProps) {
+}: ContactRowProps) {
   const { hovered, ref } = useHover();
   const { getLocalizedText, getCurrencySymbol } = useIntl();
-  const [isClientFormOpen, { open: openClientForm, close: closeClientForm }] =
-    useDisclosure(false);
+  const [
+    isContactFormOpen,
+    { open: openContactForm, close: closeContactForm },
+  ] = useDisclosure(false);
 
   return (
     <Card
@@ -46,19 +48,14 @@ export default function FinanceClientRow({
           : "light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-9))"
       }
       withBorder
-      key={client.id}
+      key={contact.id}
       radius="md"
       p="md"
       shadow="md"
       w="100%"
       ref={ref}
       style={{ cursor: selectedModeActive ? "pointer" : "default" }}
-      onClick={
-        selectedModeActive
-          ? (e: React.MouseEvent<HTMLDivElement>) =>
-              onToggleSelected?.(e as any)
-          : undefined
-      }
+      onClick={selectedModeActive ? (e) => onToggleSelected?.(e) : undefined}
     >
       <Group justify="space-between" w="100%">
         <Group justify="flex-start" wrap="nowrap">
@@ -72,8 +69,8 @@ export default function FinanceClientRow({
                 <SelectActionIcon
                   onClick={() => {}}
                   tooltipLabel={getLocalizedText(
-                    "Kunde auswählen",
-                    "Select client"
+                    "Kontakt auswählen",
+                    "Select contact"
                   )}
                   selected={isSelected}
                   style={styles}
@@ -89,32 +86,32 @@ export default function FinanceClientRow({
           >
             <Group>
               <Text fz="sm" fw={500}>
-                {client.name}
+                {contact.name}
               </Text>
-              {client.currency && (
+              {contact.currency && (
                 <Text fz="xs" c="dimmed">
-                  {getCurrencySymbol(client.currency)}
+                  {getCurrencySymbol(contact.currency)}
                 </Text>
               )}
             </Group>
-            {client.description && (
+            {contact.description && (
               <Text fz="xs" c="dimmed">
-                {client.description}
+                {contact.description}
               </Text>
             )}
-            {client.email && (
+            {contact.email && (
               <Text fz="xs" c="dimmed">
-                {client.email}
+                {contact.email}
               </Text>
             )}
-            {client.phone && (
+            {contact.phone && (
               <Text fz="xs" c="dimmed">
-                {client.phone}
+                {contact.phone}
               </Text>
             )}
-            {client.address && (
+            {contact.address && (
               <Text fz="xs" c="dimmed">
-                {client.address}
+                {contact.address}
               </Text>
             )}
           </Stack>
@@ -128,24 +125,26 @@ export default function FinanceClientRow({
         >
           {(styles) => (
             <Group style={styles}>
-              <PencilActionIcon onClick={openClientForm} />
+              <PencilActionIcon onClick={openContactForm} />
 
-              <DeleteActionIcon onClick={() => onDelete([client.id])} />
+              <DeleteActionIcon onClick={() => onDelete([contact.id])} />
             </Group>
           )}
         </Transition>
       </Group>
       <Modal
-        opened={isClientFormOpen}
-        onClose={closeClientForm}
+        opened={isContactFormOpen}
+        onClose={closeContactForm}
         title={
           <Group>
             <IconPencil />
-            <Text>{getLocalizedText("Kunde bearbeiten", "Edit client")}</Text>
+            <Text>
+              {getLocalizedText("Kontakt bearbeiten", "Edit contact")}
+            </Text>
           </Group>
         }
       >
-        <FinanceClientForm onClose={closeClientForm} client={client} />
+        <ContactForm onClose={closeContactForm} contact={contact} />
       </Modal>
     </Card>
   );

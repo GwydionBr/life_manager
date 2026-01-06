@@ -240,7 +240,7 @@ export default function SessionHierarchy({
                                                     projects?.find(
                                                       (p) =>
                                                         p.id ===
-                                                        session.project_id
+                                                        session.work_project_id
                                                     )
                                                   }
                                                   isSelected={selectedSessions.includes(

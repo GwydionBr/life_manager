@@ -479,9 +479,9 @@ export function useTimeTracker(initialState: TimeTrackerState) {
       );
 
     // Create database-ready session object
-    const newTimerSession: TablesInsert<"timer_session"> = {
+    const newTimerSession: TablesInsert<"work_time_entry"> = {
       user_id: state.userId,
-      project_id: state.projectId,
+      work_project_id: state.projectId,
       start_time: normalizedStartTime.toISOString(), // Normalized start time
       true_end_time: new Date().toISOString(), // Actual end time (when function is called)
       end_time: calculatedEndTime.toISOString(), // Calculated end time (based on rounded time)

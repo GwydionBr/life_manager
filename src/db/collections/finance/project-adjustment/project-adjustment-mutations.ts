@@ -23,8 +23,8 @@ export const addProjectAdjustment = async (
     user_id: userId,
     description: newProjectAdjustment.description || null,
     finance_category_id: null,
-    finance_client_id: newProjectAdjustment.finance_client_id || null,
-    single_cash_flow_id: newProjectAdjustment.single_cash_flow_id || null,
+    contact_id: newProjectAdjustment.contact_id || null,
+    single_cashflow_id: newProjectAdjustment.single_cashflow_id || null,
   };
   const result = projectAdjustmentsCollection.insert(newProjectAdjustmentData);
   const promise = await result.isPersisted.promise;

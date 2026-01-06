@@ -9,8 +9,8 @@ import type {
 } from "@/types/timerSession.types";
 
 export function groupSessions(
-  sessions: Tables<"timer_session">[],
-  locale: Locale
+  sessions: Tables<"work_time_entry">[],
+  _locale: Locale
 ): { year: number; data: Year }[] {
   const groupedSessions: Record<number, Year> = sessions.reduce(
     (acc, session, index) => {
@@ -45,7 +45,7 @@ export function groupSessions(
         months: {},
       };
 
-      if (session.single_cash_flow_id) {
+      if (session.single_cashflow_id) {
         acc[year].totalEarnings.paid = addEarnings(
           acc[year].totalEarnings.paid,
           earnings
@@ -67,7 +67,7 @@ export function groupSessions(
         weeks: {},
       };
 
-      if (session.single_cash_flow_id) {
+      if (session.single_cashflow_id) {
         acc[year].months[month].totalEarnings.paid = addEarnings(
           acc[year].months[month].totalEarnings.paid,
           earnings
@@ -91,7 +91,7 @@ export function groupSessions(
         days: {},
       };
 
-      if (session.single_cash_flow_id) {
+      if (session.single_cashflow_id) {
         acc[year].months[month].weeks[week].totalEarnings.paid = addEarnings(
           acc[year].months[month].weeks[week].totalEarnings.paid,
           earnings
@@ -114,7 +114,7 @@ export function groupSessions(
         timeEntries: [],
       };
 
-      if (session.single_cash_flow_id) {
+      if (session.single_cashflow_id) {
         acc[year].months[month].weeks[week].days[day].totalEarnings.paid =
           addEarnings(
             acc[year].months[month].weeks[week].days[day].totalEarnings.paid,

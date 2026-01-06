@@ -6,7 +6,7 @@ import { useIntl } from "@/hooks/useIntl";
 import { useWorkStore } from "@/stores/workManagerStore";
 import { getRouteApi } from "@tanstack/react-router";
 
-import { Box, Collapse, Loader, Stack, Text } from "@mantine/core";
+import { Collapse, Loader, Stack, Text } from "@mantine/core";
 import EditProjectDrawer from "@/components/Work/Project/EditProjectDrawer";
 import Header from "@/components/Header/Header";
 import WorkAnalysis from "@/components/Work/Analysis/WorkAnalysis";
@@ -36,7 +36,7 @@ export default function WorkProjectDetailsPage() {
 
   const projectTimeEntries = useMemo(() => {
     return timeEntriesData?.filter(
-      (timeEntry) => timeEntry.project_id === projectId
+      (timeEntry) => timeEntry.work_project_id === projectId
     );
   }, [timeEntriesData, projectId]);
 
@@ -58,7 +58,7 @@ export default function WorkProjectDetailsPage() {
     (timeEntryIds: string[]) => {
       const groupIds = timeEntryIds.filter((id) =>
         timeFilteredTimeEntries.some(
-          (timeEntry) => timeEntry.id === id && !timeEntry.single_cash_flow_id
+          (timeEntry) => timeEntry.id === id && !timeEntry.single_cashflow_id
         )
       );
       const isAnySelected = groupIds.some((id) =>
@@ -84,7 +84,7 @@ export default function WorkProjectDetailsPage() {
         const end = Math.max(lastSelectedIndex, index);
         const rangeIds = timeFilteredTimeEntries
           .slice(start, end + 1)
-          .filter((timeEntry) => !timeEntry.single_cash_flow_id)
+          .filter((timeEntry) => !timeEntry.single_cashflow_id)
           .map((timeEntry) => timeEntry.id);
         setSelectedTimeEntryIds(
           Array.from(new Set([...selectedTimeEntryIds, ...rangeIds]))
@@ -149,7 +149,7 @@ export default function WorkProjectDetailsPage() {
                   selectableIdSet={
                     new Set(
                       timeFilteredTimeEntries
-                        .filter((timeEntry) => !timeEntry.single_cash_flow_id)
+                        .filter((timeEntry) => !timeEntry.single_cashflow_id)
                         .map((timeEntry) => timeEntry.id)
                     )
                   }
@@ -181,7 +181,7 @@ export default function WorkProjectDetailsPage() {
       </Collapse>
       <Collapse in={analysisOpened} w="100%">
         <WorkAnalysis
-          sessions={projectTimeEntries}
+          timeEntries={projectTimeEntries}
           isOverview={false}
           project={project}
           onClose={() => setAnalysisOpened(false)}

@@ -1,5 +1,5 @@
 import { useSettingsStore } from "@/stores/settingsStore";
-import { Currency, Locale } from "@/types/settings.types";
+import { Currency } from "@/types/settings.types";
 import * as intl from "@/utils/intl";
 
 /**

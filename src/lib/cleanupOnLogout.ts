@@ -1,6 +1,5 @@
 import { db } from "@/db/powersync/db";
 import { useCalendarStore } from "@/stores/calendarStore";
-import { useProfile } from "@/db/collections/profile/profile-collection";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useTimeTrackerManager } from "@/stores/timeTrackerManagerStore";
 import { useWorkStore } from "@/stores/workManagerStore";

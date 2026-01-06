@@ -19,7 +19,6 @@ export interface InvitedMember extends Tables<"profiles"> {
 }
 
 export interface Group extends Tables<"group"> {
-  groceryItems: Tables<"grocery_item">[];
   appointments: Tables<"group_appointment">[];
   groupTasks: Tables<"group_task">[];
   recurringGroupTasks: Tables<"recurring_group_task">[];
@@ -61,9 +60,6 @@ interface GroupActions {
     isAdmin?: boolean,
     color?: string
   ) => Promise<boolean>;
-  addGroceryItem: (
-    groceryItem: TablesInsert<"grocery_item">
-  ) => Promise<boolean>;
   addAppointment: (
     appointment: TablesInsert<"group_appointment">
   ) => Promise<boolean>;
@@ -72,8 +68,6 @@ interface GroupActions {
   ) => Promise<boolean>;
   deleteAppointment: (id: string) => Promise<boolean>;
   setActiveGroup: (id: string) => void;
-  toggleGroceryItem: (id: string, checked: boolean) => Promise<boolean>;
-  deleteGroceryItem: (id: string) => Promise<boolean>;
   answerGroupRequest: (
     requestId: string,
     answer: boolean,
@@ -133,7 +127,7 @@ export const useGroupStore = create<GroupState & GroupActions>()(
       }
     },
 
-    addGroup: async (group, color, memberIds) => {
+    addGroup: async (_group, _color, _memberIds) => {
       // const { groups } = get();
       // const response = await actions.createGroup({ group, memberIds, color });
 
@@ -161,7 +155,7 @@ export const useGroupStore = create<GroupState & GroupActions>()(
       return true;
     },
 
-    updateGroup: async (group, memberIds) => {
+    updateGroup: async (_group, _memberIds) => {
       // const { groups } = get();
 
       // const response = await actions.updateGroup({ group, memberIds });
@@ -184,7 +178,7 @@ export const useGroupStore = create<GroupState & GroupActions>()(
       // return response.success;
       return false;
     },
-    updateGroupMember: async (groupId, memberId, isAdmin, color) => {
+    updateGroupMember: async (_groupId, _memberId, _isAdmin, _color) => {
       // const newMember: TablesUpdate<"group_member"> = {
       //   user_id: memberId,
       //   group_id: groupId,
@@ -215,7 +209,7 @@ export const useGroupStore = create<GroupState & GroupActions>()(
       // }
       return false;
     },
-    deleteGroup: async (groupId) => {
+    deleteGroup: async (_groupId) => {
       // const { groups } = get();
       // const response = await actions.deleteGroup({ groupId });
       // if (response.success) {
@@ -226,7 +220,7 @@ export const useGroupStore = create<GroupState & GroupActions>()(
       // }
       return false;
     },
-    addGroupMembers: async (groupId, memberIds) => {
+    addGroupMembers: async (_groupId, _memberIds) => {
       // const { groups } = get();
       // const response = await actions.insertGroupMembers(groupId, memberIds);
       // if (response.success) {
@@ -254,78 +248,10 @@ export const useGroupStore = create<GroupState & GroupActions>()(
     setActiveGroup: (id: string) => {
       set({ activeGroupId: id });
     },
-    addGroceryItem: async (groceryItem) => {
-      // const { activeGroupId, groups } = get();
-      // if (activeGroupId) {
-      //   const response = await actions.createGroceryItem({
-      //     item: {
-      //       ...groceryItem,
-      //       group_id: activeGroupId,
-      //     },
-      //   });
-
-      //   if (response.success) {
-      //     const newGroups = groups.map((g) =>
-      //       g.id === activeGroupId
-      //         ? { ...g, groceryItems: [...g.groceryItems, response.data] }
-      //         : g
-      //     );
-      //     set({ groups: newGroups });
-      //     return true;
-      //   }
-      // }
-      return false;
-    },
-    toggleGroceryItem: async (id: string, checked: boolean) => {
-      // const { activeGroupId, groups } = get();
-
-      // if (activeGroupId) {
-      //   const newGroups = groups.map((g) =>
-      //     g.id === activeGroupId
-      //       ? {
-      //           ...g,
-      //           groceryItems: g.groceryItems.map((i) =>
-      //             i.id === id ? { ...i, checked } : i
-      //           ),
-      //         }
-      //       : g
-      //   );
-      //   set({ groups: newGroups });
-
-      //   const response = await actions.updateGroceryItem({
-      //     item: {
-      //       id,
-      //       checked,
-      //     },
-      //   });
-      //   if (response.success) {
-      //     return true;
-      //   }
-      // }
-      return false;
-    },
-    deleteGroceryItem: async (id: string) => {
-      // const { activeGroupId, groups } = get();
-      // const response = await actions.deleteGroceryItem({ itemId: id });
-
-      // if (response.success) {
-      //   const newGroups = groups.map((g) =>
-      //     g.id === activeGroupId
-      //       ? {
-      //           ...g,
-      //           groceryItems: g.groceryItems.filter((i) => i.id !== id),
-      //         }
-      //       : g
-      //   );
-      //   set({ groups: newGroups });
-      //   return true;
-      // }
-      return false;
-    },
     answerGroupRequest: async (
-      requestId: string,
-      answer: boolean,
-      color: null | string
+      _requestId: string,
+      _answer: boolean,
+      _color: null | string
     ) => {
         // const { groupRequests, groups } = get();
         // if (answer) {
@@ -358,7 +284,7 @@ export const useGroupStore = create<GroupState & GroupActions>()(
         //   }
         // }
     },
-    addSingleGroupTask: async (task) => {
+    addSingleGroupTask: async (_task) => {
       // const { groups } = get();
       // const response = await actions.createSingleGroupTask(task);
       // if (response.success) {
@@ -372,7 +298,7 @@ export const useGroupStore = create<GroupState & GroupActions>()(
       // }
       return false;
     },
-    addRecurringGroupTask: async (task) => {
+    addRecurringGroupTask: async (_task) => {
       // const { groups } = get();
       // const response = await actions.createRecurringGroupTask(task);
       // if (response.success) {
@@ -389,7 +315,7 @@ export const useGroupStore = create<GroupState & GroupActions>()(
       // }
       return false;
     },
-    addAppointment: async (appointment) => {
+    addAppointment: async (_appointment) => {
       // const { groups } = get();
       // const response = await actions.createGroupAppointment(appointment);
       // if (response.success) {
@@ -404,7 +330,7 @@ export const useGroupStore = create<GroupState & GroupActions>()(
       // }
       return false;
     },
-    updateAppointment: async (appointment) => {
+    updateAppointment: async (_appointment) => {
       // const response = await actions.updateGroupAppointment(appointment);
       const response = false;
       if (response) {
@@ -412,7 +338,7 @@ export const useGroupStore = create<GroupState & GroupActions>()(
       }
       return false;
     },
-    deleteAppointment: async (id) => {
+    deleteAppointment: async (_id) => {
       // const response = await actions.deleteGroupAppointment(id);
       const response = false;
       if (response) {

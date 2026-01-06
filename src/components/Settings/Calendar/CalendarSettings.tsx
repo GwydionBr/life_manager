@@ -8,14 +8,12 @@ export default function CalendarSettings() {
   const { getLocalizedText } = useIntl();
   return (
     <Stack>
-      <SettingsRow
-        title={getLocalizedText("Modulfarbe", "Module Color")}
-        children={<CalendarColorSettings />}
-      />
-      <SettingsRow
-        title={getLocalizedText("Kalenderzeit", "Calendar Time")}
-        children={<CalendarTimeSettings />}
-      />
+      <SettingsRow title={getLocalizedText("Modulfarbe", "Module Color")}>
+        <CalendarColorSettings />
+      </SettingsRow>
+      <SettingsRow title={getLocalizedText("Kalenderzeit", "Calendar Time")}>
+        <CalendarTimeSettings />
+      </SettingsRow>
     </Stack>
   );
 }

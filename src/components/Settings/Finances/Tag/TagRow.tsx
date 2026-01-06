@@ -15,29 +15,29 @@ import SelectActionIcon from "@/components/UI/ActionIcons/SelectActionIcon";
 import React from "react";
 import DeleteActionIcon from "@/components/UI/ActionIcons/DeleteActionIcon";
 import PencilActionIcon from "@/components/UI/ActionIcons/PencilActionIcon";
-import FinanceCategoryForm from "@/components/Finances/Category/FinanceCategoryForm";
+import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 import { IconPencil } from "@tabler/icons-react";
 
-interface FinanceCategoryRowProps {
-  category: Tables<"finance_category">;
+interface TagRowProps {
+  tag: Tables<"tag">;
   selectedModeActive: boolean;
   isSelected?: boolean;
-  onToggleSelected?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onToggleSelected?: (e: React.MouseEvent<HTMLDivElement>) => void;
   onDelete: (ids: string[]) => void;
 }
 
-export default function FinanceCategoryRow({
-  category,
+export default function TagRow({
+  tag,
   selectedModeActive,
   isSelected,
   onToggleSelected,
   onDelete,
-}: FinanceCategoryRowProps) {
+}: TagRowProps) {
   const { hovered, ref } = useHover();
   const { getLocalizedText } = useIntl();
   const [
-    isCategoryFormOpen,
-    { open: openCategoryForm, close: closeCategoryForm },
+    isTagFormOpen,
+    { open: openTagForm, close: closeTagForm },
   ] = useDisclosure(false);
 
   return (
@@ -48,7 +48,7 @@ export default function FinanceCategoryRow({
           : "light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-9))"
       }
       withBorder
-      key={category.id}
+      key={tag.id}
       radius="md"
       p="md"
       shadow="md"
@@ -57,8 +57,8 @@ export default function FinanceCategoryRow({
       style={{ cursor: selectedModeActive ? "pointer" : "default" }}
       onClick={
         selectedModeActive
-          ? (e: React.MouseEvent<HTMLDivElement>) =>
-              onToggleSelected?.(e as any)
+          ? (e) =>
+              onToggleSelected?.(e)
           : undefined
       }
     >
@@ -74,8 +74,8 @@ export default function FinanceCategoryRow({
                 <SelectActionIcon
                   onClick={() => {}}
                   tooltipLabel={getLocalizedText(
-                    "Kategorie auswählen",
-                    "Select category"
+                    "Tag auswählen",
+                    "Select tag"
                   )}
                   selected={isSelected}
                   style={styles}
@@ -90,10 +90,10 @@ export default function FinanceCategoryRow({
             style={{ transition: "margin 0.2s ease" }}
           >
             <Text fz="sm" fw={500}>
-              {category.title}
+              {tag.title}
             </Text>
             <Text fz="xs" c="dimmed">
-              {category.description}
+              {tag.description}
             </Text>
           </Stack>
         </Group>
@@ -106,27 +106,27 @@ export default function FinanceCategoryRow({
         >
           {(styles) => (
             <Group style={styles}>
-              <PencilActionIcon onClick={openCategoryForm} />
+              <PencilActionIcon onClick={openTagForm} />
 
-              <DeleteActionIcon onClick={() => onDelete([category.id])} />
+              <DeleteActionIcon onClick={() => onDelete([tag.id])} />
             </Group>
           )}
         </Transition>
       </Group>
       <Modal
-        opened={isCategoryFormOpen}
-        onClose={closeCategoryForm}
+        opened={isTagFormOpen}
+        onClose={closeTagForm}
         title={
           <Group>
             <IconPencil />
             <Text>
-              {getLocalizedText("Kategorie bearbeiten", "Edit category")}
+              {getLocalizedText("Tag bearbeiten", "Edit tag")}
             </Text>
           </Group>
         }
         centered
       >
-        <FinanceCategoryForm onClose={closeCategoryForm} category={category} />
+        <FinanceTagForm onClose={closeTagForm} tag={tag} />
       </Modal>
     </Card>
   );

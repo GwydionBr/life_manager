@@ -4,17 +4,17 @@ import { Tables } from "@/types/db.types";
 import { Badge, BadgeProps } from "@mantine/core";
 import { IconUser, IconUserPlus } from "@tabler/icons-react";
 
-interface FinanceClientSingleBadgeProps extends BadgeProps {
-  client?: Tables<"finance_client">;
+interface ContactSingleBadgeProps extends BadgeProps {
+  contact?: Tables<"contact">;
 }
 
-export default function FinanceClientSingleBadge({
-  client,
+export default function ContactSingleBadge({
+  contact,
   ...props
-}: FinanceClientSingleBadgeProps) {
+}: ContactSingleBadgeProps) {
   const { hovered, ref } = useHover();
 
-  if (!client) {
+  if (!contact) {
     return (
       <Badge
         ref={ref}
@@ -45,7 +45,7 @@ export default function FinanceClientSingleBadge({
           : "1px solid transparent",
       }}
     >
-      {client.name}
+      {contact.name}
     </Badge>
   );
 }

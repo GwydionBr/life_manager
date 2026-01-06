@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 
 import { useIntl } from "@/hooks/useIntl";
 
-import { Button, Card, Divider, Text, Stack } from "@mantine/core";
+import { Button, Divider, Text, Stack } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { Tables } from "@/types/db.types";
 import {
@@ -12,17 +12,17 @@ import {
 
 interface ProjectFilterProps {
   timeSpan: [Date | null, Date | null];
-  sessions: Tables<"timer_session">[];
-  project: Tables<"timer_project">;
+  timeEntries: Tables<"work_time_entry">[];
+  project: Tables<"work_project">;
   isProcessingPayout: boolean;
   onTimeSpanChange: (timeSpan: [Date | null, Date | null]) => void;
   onSelectAll: () => void;
-  handleSessionPayoutClick: (sessions: Tables<"timer_session">[]) => void;
+  handleSessionPayoutClick: (timeEntries: Tables<"work_time_entry">[]) => void;
 }
 
 export default function ProjectFilter({
   timeSpan,
-  sessions,
+  timeEntries,
   project,
   isProcessingPayout,
   onTimeSpanChange,
@@ -31,8 +31,8 @@ export default function ProjectFilter({
 }: ProjectFilterProps) {
   const { getLocalizedText, formatMoney } = useIntl();
   const today = dayjs();
-  const unpaidSessions = sessions.filter(
-    (session) => !session.single_cash_flow_id
+  const unpaidSessions = timeEntries.filter(
+    (session) => !session.single_cashflow_id
   );
 
   const sessionPayout = unpaidSessions.reduce(
@@ -45,7 +45,7 @@ export default function ProjectFilter({
       // TODO: Implement project payout
     } else if (sessionPayout > 0) {
       handleSessionPayoutClick(
-        sessions.filter((session) => !session.single_cash_flow_id)
+        timeEntries.filter((session) => !session.single_cashflow_id)
       );
     }
   }

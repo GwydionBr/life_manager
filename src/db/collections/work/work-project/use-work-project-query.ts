@@ -8,22 +8,22 @@ import {
 
 import {
   workProjectsCollection,
-  workProjectCategoriesCollection,
+  workProjectTagsCollection,
 } from "./work-project-collection";
 import { tagsCollection } from "@/db/collections/finance/tags/tags-collection";
 
 import { WorkProject } from "@/types/work.types";
 
-// Cached Live Query: Project → Categories Mapping
-const projectCategoryMappingCollection = createLiveQueryCollection((q) =>
+// Cached Live Query: Project → Tags Mapping
+const projectTagMappingCollection = createLiveQueryCollection((q) =>
   q
-    .from({ relations: workProjectCategoriesCollection })
-    .innerJoin({ category: tagsCollection }, ({ relations, category }) =>
-      eq(relations.finance_category_id, category.id)
+    .from({ relations: workProjectTagsCollection })
+    .innerJoin({ tag: tagsCollection }, ({ relations, tag }) =>
+      eq(relations.tag_id, tag.id)
     )
-    .select(({ relations, category }) => ({
-      projectId: relations.timer_project_id,
-      category,
+    .select(({ relations, tag }) => ({
+      projectId: relations.work_project_id,
+      tag,
     }))
 );
 
@@ -40,7 +40,7 @@ export const useWorkProjects = () => {
     isLoading: isMappingsLoading,
     isReady: isMappingsReady,
   } = useLiveQuery((q) =>
-    q.from({ mappings: projectCategoryMappingCollection })
+    q.from({ mappings: projectTagMappingCollection })
   );
 
   useEffect(() => {
@@ -51,22 +51,22 @@ export const useWorkProjects = () => {
     setIsReady(isProjectsReady && isMappingsReady);
   }, [isProjectsReady, isMappingsReady]);
 
-  const projectsWithCategories = useMemo((): WorkProject[] => {
+  const projectsWithTags = useMemo((): WorkProject[] => {
     if (!projects) return [];
 
-    const categoriesByProject = new Map<string, WorkProject["tags"]>();
-    mappings?.forEach(({ projectId, category }) => {
-      if (!categoriesByProject.has(projectId)) {
-        categoriesByProject.set(projectId, []);
+    const tagsByProject = new Map<string, WorkProject["tags"]>();
+    mappings?.forEach(({ projectId, tag }) => {
+      if (!tagsByProject.has(projectId)) {
+        tagsByProject.set(projectId, []);
       }
-      categoriesByProject.get(projectId)!.push(category);
+      tagsByProject.get(projectId)!.push(tag);
     });
 
     return projects.map((project) => ({
       ...project,
-      categories: categoriesByProject.get(project.id) || [],
+      tags: tagsByProject.get(project.id) || [],
     }));
   }, [projects, mappings]);
 
-  return { data: projectsWithCategories, isLoading, isReady };
+  return { data: projectsWithTags, isLoading, isReady };
 };

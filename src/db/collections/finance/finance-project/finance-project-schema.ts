@@ -6,9 +6,9 @@ export const financeProjectSchema = z.object({
   currency: z.enum(Constants.public.Enums.currency),
   description: z.string().nullable(),
   due_date: z.string().nullable(),
-  finance_client_id: z.string().nullable(),
+  contact_id: z.string().nullable(),
   id: z.string(),
-  single_cash_flow_id: z.string().nullable(),
+  single_cashflow_id: z.string().nullable(),
   start_amount: z.number(),
   title: z.string(),
   user_id: z.string(),
@@ -21,25 +21,25 @@ export const financeProjectDeserializationSchema = z.object({
     .transform((value) => value as Database["public"]["Enums"]["currency"]),
   description: z.string().nullable(),
   due_date: z.string().nullable(),
-  finance_client_id: z.string().nullable(),
+  contact_id: z.string().nullable(),
   id: z.string(),
-  single_cash_flow_id: z.string().nullable(),
+  single_cashflow_id: z.string().nullable(),
   start_amount: z.number(),
   title: z.string(),
   user_id: z.string(),
 });
 
-export const financeProjectCategorySchema = z.object({
+export const financeProjectTagSchema = z.object({
   created_at: z.string(),
-  finance_category_id: z.string(),
+  tag_id: z.string(),
   finance_project_id: z.string(),
   id: z.string(),
   user_id: z.string(),
 });
 
-export const financeProjectCategoryDeserializationSchema = z.object({
+export const financeProjectTagDeserializationSchema = z.object({
   created_at: z.string(),
-  finance_category_id: z.string(),
+  tag_id: z.string(),
   finance_project_id: z.string(),
   id: z.string(),
   user_id: z.string(),

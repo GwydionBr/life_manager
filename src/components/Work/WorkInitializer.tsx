@@ -7,22 +7,19 @@ import {
   Stack,
   Text,
   Paper,
-  Title,
   Container,
-  ThemeIcon,
   Box,
   Anchor,
   Modal,
 } from "@mantine/core";
-import { IconBriefcase } from "@tabler/icons-react";
 import ProjectForm from "./Project/ProjectForm";
-import FinanceCategoryForm from "@/components/Finances/Category/FinanceCategoryForm";
+import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 import { SettingsTab } from "@/stores/settingsStore";
 
 export default function WorkInitializer() {
   const { getLocalizedText } = useIntl();
   const { setIsModalOpen, setSelectedTab } = useSettingsStore();
-  const [categoryIds, setCategoryIds] = useState<string[]>([]);
+  const [tagIds, setTagIds] = useState<string[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   return (
     <Container size="md" py="xl">
@@ -67,9 +64,9 @@ export default function WorkInitializer() {
 
           <Box maw={600} w="100%" mx="auto">
             <ProjectForm
-              categoryIds={categoryIds}
-              setCategoryIds={setCategoryIds}
-              onOpenCategoryForm={open}
+              tagIds={tagIds}
+              setTagIds={setTagIds}
+              onOpenTagForm={open}
             />
           </Box>
           <Modal
@@ -77,10 +74,10 @@ export default function WorkInitializer() {
             onClose={close}
             title={getLocalizedText("Arbeits-Einstellungen", "Work Settings")}
           >
-            <FinanceCategoryForm
+            <FinanceTagForm
               onClose={close}
-              onSuccess={(category) =>
-                setCategoryIds([...categoryIds, category.id])
+              onSuccess={(tag) =>
+                setTagIds([...tagIds, tag.id])
               }
             />
           </Modal>

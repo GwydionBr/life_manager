@@ -91,8 +91,8 @@ function insertNodeIntoFolder(
 }
 
 export function createTree( 
-  projects: Tables<"timer_project">[],
-  folders: Tables<"timer_project_folder">[]
+  projects: Tables<"work_project">[],
+  folders: Tables<"work_folder">[]
 ): TreeOperationResult {
   const folderMap = new Map();
 
@@ -118,7 +118,7 @@ export function createTree(
 
   // 3. Füge Projekte in ihre jeweiligen Ordner
   projects.forEach((project) => {
-    const folderId = project.folder_id;
+    const folderId = project.work_folder_id;
     if (folderId && folderMap.has(folderId)) {
       folderMap.get(folderId).children.push({
         id: project.id,
@@ -133,7 +133,7 @@ export function createTree(
   const root: ProjectTreeItem[] = [];
 
   projects.forEach((project) => {
-    if (!project.folder_id) {
+    if (!project.work_folder_id) {
       root.push({
         id: project.id,
         name: project.title,

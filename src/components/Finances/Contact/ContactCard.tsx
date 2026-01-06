@@ -2,46 +2,43 @@ import { Group, Stack, Text } from "@mantine/core";
 import { Tables } from "@/types/db.types";
 import { useIntl } from "@/hooks/useIntl";
 
-interface FinanceClientCardProps {
-  client: Tables<"finance_client">;
+interface ContactCardProps {
+  contact: Tables<"contact">;
   ref?: React.RefObject<HTMLDivElement>;
 }
 
-export default function FinanceClientCard({
-  client,
-  ref,
-}: FinanceClientCardProps) {
+export default function ContactCard({ contact, ref }: ContactCardProps) {
   const { getCurrencySymbol } = useIntl();
   return (
     <Stack gap="xs" w="100%" ref={ref}>
       <Group>
         <Text fz="sm" fw={500}>
-          {client.name}
+          {contact.name}
         </Text>
-        {client.currency && (
+        {contact.currency && (
           <Text fz="xs" c="dimmed">
-            {getCurrencySymbol(client.currency)}
+            {getCurrencySymbol(contact.currency)}
           </Text>
         )}
       </Group>
-      {client.description && (
+      {contact.description && (
         <Text fz="xs" c="dimmed">
-          {client.description}
+          {contact.description}
         </Text>
       )}
-      {client.email && (
+      {contact.email && (
         <Text fz="xs" c="dimmed">
-          {client.email}
+          {contact.email}
         </Text>
       )}
-      {client.phone && (
+      {contact.phone && (
         <Text fz="xs" c="dimmed">
-          {client.phone}
+          {contact.phone}
         </Text>
       )}
-      {client.address && (
+      {contact.address && (
         <Text fz="xs" c="dimmed">
-          {client.address}
+          {contact.address}
         </Text>
       )}
     </Stack>

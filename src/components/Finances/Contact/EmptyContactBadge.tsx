@@ -17,49 +17,49 @@ import { IconPlus, IconUserPlus } from "@tabler/icons-react";
 import ContactForm from "@/components/Finances/Contact/ContactForm";
 import { Tables } from "@/types/db.types";
 
-interface EmptyFinanceClientBadgeProps {
-  showAddClient: boolean;
+interface EmptyContactBadgeProps {
+  showAddContact: boolean;
   onPopoverOpen: () => void;
-  onPopoverClose: (client: Tables<"finance_client"> | null) => void;
+  onPopoverClose: (client: Tables<"contact"> | null) => void;
 }
 
-export default function EmptyFinanceClientBadge({
-  showAddClient,
+export default function EmptyContactBadge({
+  showAddContact,
   onPopoverOpen,
   onPopoverClose,
-}: EmptyFinanceClientBadgeProps) {
+}: EmptyContactBadgeProps) {
   const { getLocalizedText } = useIntl();
   const { hovered, ref } = useHover();
   const [
-    isClientPopoverOpen,
-    { open: openClientPopover, close: closeClientPopover },
+    isContactPopoverOpen,
+    { open: openContactPopover, close: closeContactPopover },
   ] = useDisclosure(false);
-  const [isClientFormOpen, { open: openClientForm, close: closeClientForm }] =
+  const [isContactFormOpen, { open: openContactForm, close: closeContactForm }] =
     useDisclosure(false);
-  const [selectedClient, setSelectedClient] =
-    useState<Tables<"finance_client"> | null>(null);
+  const [selectedContact, setSelectedContact] =
+    useState<Tables<"contact"> | null>(null);
   const { data: contacts  } = useContacts();
 
   const handlePopoverClose = () => {
-    closeClientForm();
-    closeClientPopover();
+    closeContactForm();
+    closeContactPopover();
     onPopoverClose(null);
   };
 
   const handlePopoverOpen = () => {
-    openClientPopover();
+    openContactPopover();
     onPopoverOpen();
   };
 
   return (
     <Popover
       onDismiss={handlePopoverClose}
-      opened={isClientPopoverOpen}
+      opened={isContactPopoverOpen}
       onClose={handlePopoverClose}
     >
       <Popover.Target>
         <Transition
-          mounted={showAddClient}
+          mounted={showAddContact}
           transition="fade-left"
           duration={200}
         >
@@ -98,9 +98,9 @@ export default function EmptyFinanceClientBadge({
                 value: c.id,
               }))}
               // comboboxProps={{ withinPortal: false }}
-              value={selectedClient?.id}
+              value={selectedContact?.id}
               onChange={(value) => {
-                setSelectedClient(
+                setSelectedContact(
                   contacts.find((c) => c.id === value) || null
                 );
               }}
@@ -109,15 +109,15 @@ export default function EmptyFinanceClientBadge({
               size="compact-sm"
               variant="subtle"
               leftSection={<IconPlus />}
-              onClick={openClientForm}
+              onClick={openContactForm}
             >
-              {getLocalizedText("Kunde", "Client")}
+              {getLocalizedText("Kontakt", "Contact")}
             </Button>
           </Group>
-          <Collapse in={isClientFormOpen}>
+          <Collapse in={isContactFormOpen}>
             <ContactForm
-              onClose={closeClientForm}
-              onSuccess={(client) => setSelectedClient(client)}
+              onClose={closeContactForm}
+              onSuccess={(contact) => setSelectedContact(contact)}
             />
           </Collapse>
         </Stack>

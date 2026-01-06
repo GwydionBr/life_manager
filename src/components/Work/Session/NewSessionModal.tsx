@@ -10,7 +10,7 @@ import ProjectForm from "../Project/ProjectForm";
 import { IconClockPlus } from "@tabler/icons-react";
 import { NewWorkTimeEntry } from "@/types/timerSession.types";
 import { TimerRoundingSettings } from "@/types/timeTracker.types";
-import FinanceCategoryForm from "@/components/Finances/Category/FinanceCategoryForm";
+import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 import { WorkProject } from "@/types/work.types";
 import { useWorkTimeEntryMutations } from "@/db/collections/work/work-time-entry/use-work-time-entry-mutations";
 
@@ -28,18 +28,14 @@ export default function NewSessionModal({
   project,
 }: NewSessionModalProps) {
   const { getLocalizedText } = useIntl();
-  const stack = useModalsStack([
-    "session-form",
-    "project-form",
-    "category-form",
-  ]);
+  const stack = useModalsStack(["session-form", "project-form", "tag-form"]);
   const { data: settings } = useSettings();
   const { addWorkTimeEntry } = useWorkTimeEntryMutations();
 
   const [currentProject, setCurrentProject] = useState<WorkProject | undefined>(
     project
   );
-  const [categoryIds, setCategoryIds] = useState<string[]>([]);
+  const [tagIds, setTagIds] = useState<string[]>([]);
 
   useEffect(() => {
     setCurrentProject(project);
@@ -56,7 +52,7 @@ export default function NewSessionModal({
   const handleClose = () => {
     onClose();
     setCurrentProject(project);
-    setCategoryIds([]);
+    setTagIds([]);
   };
 
   async function handleSessionSubmit(values: {
@@ -71,7 +67,7 @@ export default function NewSessionModal({
       return;
     }
 
-    let newSession: TablesInsert<"timer_session"> = {
+    let newSession: TablesInsert<"work_time_entry"> = {
       ...values,
       start_time: new Date(values.start_time).toISOString(),
       end_time: new Date(values.end_time).toISOString(),
@@ -146,9 +142,9 @@ export default function NewSessionModal({
       >
         <ProjectForm
           onCancel={() => stack.close("project-form")}
-          categoryIds={categoryIds}
-          setCategoryIds={setCategoryIds}
-          onOpenCategoryForm={() => stack.open("category-form")}
+          tagIds={tagIds}
+          setTagIds={setTagIds}
+          onOpenTagForm={() => stack.open("tag-form")}
           onSuccess={(project: WorkProject) => {
             setCurrentProject(project);
             stack.close("project-form");
@@ -157,15 +153,13 @@ export default function NewSessionModal({
       </Modal>
       <Modal
         size="lg"
-        {...stack.register("category-form")}
-        onClose={() => stack.close("category-form")}
-        title={getLocalizedText("Kategorie hinzufügen", "Add Category")}
+        {...stack.register("tag-form")}
+        onClose={() => stack.close("tag-form")}
+        title={getLocalizedText("Tag hinzufügen", "Add Tag")}
       >
-        <FinanceCategoryForm
-          onClose={() => stack.close("category-form")}
-          onSuccess={(category) =>
-            setCategoryIds([...categoryIds, category.id])
-          }
+        <FinanceTagForm
+          onClose={() => stack.close("tag-form")}
+          onSuccess={(tag) => setTagIds([...tagIds, tag.id])}
         />
       </Modal>
     </Modal.Stack>

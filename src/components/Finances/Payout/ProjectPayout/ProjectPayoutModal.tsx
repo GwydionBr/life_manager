@@ -20,11 +20,11 @@ import { currencies } from "@/constants/settings";
 import { Tables } from "@/types/db.types";
 
 interface ProjectModalFormProps {
-  project: Tables<"timer_project">;
+  project: Tables<"work_project">;
   handleClose: () => void;
   startValue: number;
   startCurrency: Currency;
-  categoryId: string | null;
+  tagId: string | null;
 }
 
 const schema = z.object({
@@ -35,11 +35,11 @@ const schema = z.object({
 type ProjectPayoutFormValues = z.infer<typeof schema>;
 
 export default function ProjectModalForm({
-  project,
-  handleClose,
+  project: _workProject,
+  handleClose: _handleClose,
   startValue,
   startCurrency,
-  categoryId,
+  tagId: _tagId,
 }: ProjectModalFormProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +61,7 @@ export default function ProjectModalForm({
     //   project.id,
     //   startValue,
     //   startCurrency,
-    //   categoryId,
+    //   tagId,
     //   values.endValue !== startValue ? values.endValue : null,
     //   values.endCurrency !== startCurrency
     //     ? (values.endCurrency as Currency)

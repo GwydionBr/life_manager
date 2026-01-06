@@ -38,19 +38,19 @@ export const processRecurringCashFlows = (
       const existingFlow = existingSingleCashFlows.find(
         (singleFlow) =>
           isSameDay(new Date(singleFlow.date), currentDate) &&
-          singleFlow.recurring_cash_flow_id === flow.id
+          singleFlow.recurring_cashflow_id === flow.id
       );
 
       if (!existingFlow) {
-        const baseFlow: TablesInsert<"single_cash_flow"> = {
+        const baseFlow: TablesInsert<"single_cashflow"> = {
           amount: flow.amount,
           currency: flow.currency,
           date: currentDate.toISOString(),
           title: flow.title,
           is_active: true,
           user_id: flow.user_id,
-          recurring_cash_flow_id: flow.id,
-          finance_client_id: flow.finance_client_id,
+          recurring_cashflow_id: flow.id,
+          contact_id: flow.contact_id,
         };
 
         if (currentDate <= today) {

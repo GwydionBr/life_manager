@@ -4,10 +4,10 @@ import { Modal, useModalsStack, Group, Text } from "@mantine/core";
 import FinanceProjectForm from "./FinanceProjectForm";
 import { useIntl } from "@/hooks/useIntl";
 import ContactsForm from "@/components/Finances/Contact/ContactForm";
-import FinanceCategoryForm from "@/components/Finances/Category/FinanceCategoryForm";
+import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 import {
-  IconCategoryPlus,
   IconMoneybagPlus,
+  IconTagPlus,
   IconUserPlus,
 } from "@tabler/icons-react";
 import { Tables } from "@/types/db.types";
@@ -22,24 +22,17 @@ export default function FinanceProjectFormModal({
   onClose,
 }: FinanceProjectFormModalProps) {
   const { getLocalizedText } = useIntl();
-  const [financeClient, setFinanceClient] =
-    useState<Tables<"finance_client"> | null>(null);
-  const [categories, setCategories] = useState<Tables<"finance_category">[]>(
-    []
-  );
-  const stack = useModalsStack([
-    "project-form",
-    "client-form",
-    "category-form",
-  ]);
+  const [contact, setContact] = useState<Tables<"contact"> | null>(null);
+  const [tags, setTags] = useState<Tables<"tag">[]>([]);
+  const stack = useModalsStack(["project-form", "contact-form", "tag-form"]);
 
   useEffect(() => {
     if (opened) {
       stack.open("project-form");
     } else {
       stack.closeAll();
-      setFinanceClient(null);
-      setCategories([]);
+      setContact(null);
+      setTags([]);
     }
   }, [opened]);
 
@@ -61,48 +54,46 @@ export default function FinanceProjectFormModal({
       >
         <FinanceProjectForm
           onClose={onClose}
-          financeClient={financeClient}
-          categories={categories}
-          onOpenClientForm={() => stack.open("client-form")}
-          onOpenCategoryForm={() => stack.open("category-form")}
-          onClientChange={setFinanceClient}
-          onCategoryChange={setCategories}
+          contact={contact}
+          tags={tags}
+          onOpenContactForm={() => stack.open("contact-form")}
+          onOpenTagForm={() => stack.open("tag-form")}
+          onContactChange={setContact}
+          onTagChange={setTags}
         />
       </Modal>
       <Modal
-        {...stack.register("client-form")}
-        onClose={() => stack.close("client-form")}
+        {...stack.register("contact-form")}
+        onClose={() => stack.close("contact-form")}
         title={
           <Group>
             <IconUserPlus />
-            <Text>{getLocalizedText("Neuer Kunde", "New Client")}</Text>
+            <Text>{getLocalizedText("Neuer Kontakt", "New Contact")}</Text>
           </Group>
         }
         size="lg"
         padding="md"
       >
         <ContactsForm
-          onClose={() => stack.close("client-form")}
-          onSuccess={(client) => setFinanceClient(client)}
+          onClose={() => stack.close("contact-form")}
+          onSuccess={(contact) => setContact(contact)}
         />
       </Modal>
       <Modal
-        {...stack.register("category-form")}
-        onClose={() => stack.close("category-form")}
+        {...stack.register("tag-form")}
+        onClose={() => stack.close("tag-form")}
         title={
           <Group>
-            <IconCategoryPlus />
-            <Text>
-              {getLocalizedText("Neue Finanzkategorie", "New Finance Category")}
-            </Text>
+            <IconTagPlus />
+            <Text>{getLocalizedText("Neues Tag", "New Tag")}</Text>
           </Group>
         }
         size="lg"
         padding="md"
       >
-        <FinanceCategoryForm
-          onClose={() => stack.close("category-form")}
-          onSuccess={(category) => setCategories((prev) => [...prev, category])}
+        <FinanceTagForm
+          onClose={() => stack.close("tag-form")}
+          onSuccess={(tag) => setTags((prev) => [...prev, tag])}
         />
       </Modal>
     </Modal.Stack>

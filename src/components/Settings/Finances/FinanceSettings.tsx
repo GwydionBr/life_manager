@@ -4,9 +4,8 @@ import { useFinanceStore } from "@/stores/financeStore";
 import { Grid } from "@mantine/core";
 import SettingsNavbar from "@/components/Navbar/SettingsNavbar";
 import TagSettings from "./Tag/TagSettings";
-import FinanceRuleSettings from "./FinanceRuleSettings/FinanceRuleSettings";
 import FinanceDefaultSettings from "./FinanceDefaultSettings/FinanceDefaultSettings";
-import FinanceClientSettings from "./Contact/ContactSettings";
+import FinanceContactSettings from "./Contact/ContactSettings";
 import { IconTags, IconUsers, IconBuildingBank } from "@tabler/icons-react";
 import FinanceBankAccountSettings from "./FinanceBankAccount/FinanceBankAccountSettings";
 
@@ -57,9 +56,8 @@ export default function FinanceSettings() {
         )}
         {activeSetting === FinanceSettingType.TAGS && <TagSettings />}
         {activeSetting === FinanceSettingType.CONTACTS && (
-          <FinanceClientSettings />
+          <FinanceContactSettings />
         )}
-        {activeSetting === FinanceSettingType.RULES && <FinanceRuleSettings />}
         {activeSetting === FinanceSettingType.BANK_ACCOUNTS && (
           <FinanceBankAccountSettings />
         )}

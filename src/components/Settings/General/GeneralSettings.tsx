@@ -10,18 +10,17 @@ export default function DefaultSettings() {
   const { getLocalizedText } = useIntl();
   return (
     <Stack w="100%" p="md">
-      <SettingsRow
-        title={getLocalizedText("Farbschema", "Color Scheme")}
-        children={<SchemeButtonGroup />}
-      />
-      <SettingsRow
-        title={getLocalizedText("Primärfarbe", "Primary Color")}
-        children={<PrimaryColorSettings />}
-      />
+      <SettingsRow title={getLocalizedText("Farbschema", "Color Scheme")}>
+        <SchemeButtonGroup />
+      </SettingsRow>
+      <SettingsRow title={getLocalizedText("Primärfarbe", "Primary Color")}>
+        <PrimaryColorSettings />
+      </SettingsRow>
       <SettingsRow
         title={getLocalizedText("Sprache & Format", "Language & Format")}
-        children={<LocaleSettings />}
-      />
+      >
+        <LocaleSettings />
+      </SettingsRow>
     </Stack>
   );
 }

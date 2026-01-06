@@ -3,7 +3,7 @@ import { useIntl } from "@/hooks/useIntl";
 
 import { Group, Modal, Text, useModalsStack } from "@mantine/core";
 import CashflowForm from "@/components/Finances/CashFlow/CashflowForm";
-import FinanceCategoryForm from "@/components/Finances/Category/FinanceCategoryForm";
+import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 import { IconCashPlus, IconCategoryPlus } from "@tabler/icons-react";
 import { Tables } from "@/types/db.types";
 
@@ -52,9 +52,9 @@ export default function CashFlowModal({
       >
         <CashflowForm
           onClose={handleClose}
-          onOpenCategoryForm={() => modalStack.open("category-form")}
-          categories={categories}
-          setCategories={setCategories}
+          onOpenTagForm={() => modalStack.open("category-form")}
+          tags={categories}
+          setTags={setCategories}
           isSingle={isSingle}
         />
       </Modal>
@@ -70,7 +70,7 @@ export default function CashFlowModal({
           </Group>
         }
       >
-        <FinanceCategoryForm
+        <FinanceTagForm
           onClose={() => modalStack.close("category-form")}
           onSuccess={(category) => setCategories((prev) => [...prev, category])}
         />

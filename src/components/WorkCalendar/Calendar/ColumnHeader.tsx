@@ -118,7 +118,7 @@ export default function ColumnHeader({
             const totalTime =
               day?.sessions.reduce(
                 (acc, session) =>
-                  session.project_id === p.id
+                  session.work_project_id === p.id
                     ? acc + calculateSessionTimeForDay(session, day.day)
                     : acc,
                 0

@@ -22,9 +22,9 @@ export type Database = {
           id: string
           reminder: string | null
           start_date: string
-          timer_project_id: string | null
           title: string
           user_id: string
+          work_project_id: string | null
         }
         Insert: {
           created_at?: string
@@ -33,9 +33,9 @@ export type Database = {
           id?: string
           reminder?: string | null
           start_date?: string
-          timer_project_id?: string | null
           title?: string
           user_id?: string
+          work_project_id?: string | null
         }
         Update: {
           created_at?: string
@@ -44,14 +44,14 @@ export type Database = {
           id?: string
           reminder?: string | null
           start_date?: string
-          timer_project_id?: string | null
           title?: string
           user_id?: string
+          work_project_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "appointment_timer_project_id_fkey"
-            columns: ["timer_project_id"]
+            foreignKeyName: "appointment_work_project_id_fkey"
+            columns: ["work_project_id"]
             isOneToOne: false
             referencedRelation: "work_project"
             referencedColumns: ["id"]
@@ -132,52 +132,52 @@ export type Database = {
       }
       finance_project: {
         Row: {
+          contact_id: string | null
           created_at: string
           currency: Database["public"]["Enums"]["currency"]
           description: string | null
           due_date: string | null
-          finance_client_id: string | null
           id: string
-          single_cash_flow_id: string | null
+          single_cashflow_id: string | null
           start_amount: number
           title: string
           user_id: string
         }
         Insert: {
+          contact_id?: string | null
           created_at?: string
           currency: Database["public"]["Enums"]["currency"]
           description?: string | null
           due_date?: string | null
-          finance_client_id?: string | null
           id?: string
-          single_cash_flow_id?: string | null
+          single_cashflow_id?: string | null
           start_amount: number
           title: string
           user_id?: string
         }
         Update: {
+          contact_id?: string | null
           created_at?: string
           currency?: Database["public"]["Enums"]["currency"]
           description?: string | null
           due_date?: string | null
-          finance_client_id?: string | null
           id?: string
-          single_cash_flow_id?: string | null
+          single_cashflow_id?: string | null
           start_amount?: number
           title?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "finance_project_finance_client_id_fkey"
-            columns: ["finance_client_id"]
+            foreignKeyName: "finance_project_contact_id_fkey"
+            columns: ["contact_id"]
             isOneToOne: false
             referencedRelation: "contact"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "finance_project_single_cash_flow_id_fkey"
-            columns: ["single_cash_flow_id"]
+            foreignKeyName: "finance_project_single_cashflow_id_fkey"
+            columns: ["single_cashflow_id"]
             isOneToOne: false
             referencedRelation: "single_cashflow"
             referencedColumns: ["id"]
@@ -187,48 +187,38 @@ export type Database = {
       finance_project_adjustment: {
         Row: {
           amount: number
+          contact_id: string | null
           created_at: string
           description: string | null
-          finance_category_id: string | null
-          finance_client_id: string | null
           finance_project_id: string
           id: string
-          single_cash_flow_id: string | null
+          single_cashflow_id: string | null
           user_id: string
         }
         Insert: {
           amount: number
+          contact_id?: string | null
           created_at?: string
           description?: string | null
-          finance_category_id?: string | null
-          finance_client_id?: string | null
           finance_project_id: string
           id?: string
-          single_cash_flow_id?: string | null
+          single_cashflow_id?: string | null
           user_id?: string
         }
         Update: {
           amount?: number
+          contact_id?: string | null
           created_at?: string
           description?: string | null
-          finance_category_id?: string | null
-          finance_client_id?: string | null
           finance_project_id?: string
           id?: string
-          single_cash_flow_id?: string | null
+          single_cashflow_id?: string | null
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "finance_project_adjustment_finance_category_id_fkey"
-            columns: ["finance_category_id"]
-            isOneToOne: false
-            referencedRelation: "tag"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "finance_project_adjustment_finance_client_id_fkey"
-            columns: ["finance_client_id"]
+            foreignKeyName: "finance_project_adjustment_contact_id_fkey"
+            columns: ["contact_id"]
             isOneToOne: false
             referencedRelation: "contact"
             referencedColumns: ["id"]
@@ -241,49 +231,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "finance_project_adjustment_single_cash_flow_id_fkey"
-            columns: ["single_cash_flow_id"]
+            foreignKeyName: "finance_project_adjustment_single_cashflow_id_fkey"
+            columns: ["single_cashflow_id"]
             isOneToOne: false
             referencedRelation: "single_cashflow"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      finance_project_contact: {
-        Row: {
-          created_at: string
-          finance_client_id: string
-          finance_project_id: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          finance_client_id: string
-          finance_project_id: string
-          id?: string
-          user_id?: string
-        }
-        Update: {
-          created_at?: string
-          finance_client_id?: string
-          finance_project_id?: string
-          id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "finance_project_client_finance_client_id_fkey"
-            columns: ["finance_client_id"]
-            isOneToOne: false
-            referencedRelation: "contact"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "finance_project_client_finance_project_id_fkey"
-            columns: ["finance_project_id"]
-            isOneToOne: false
-            referencedRelation: "finance_project"
             referencedColumns: ["id"]
           },
         ]
@@ -291,38 +242,38 @@ export type Database = {
       finance_project_tag: {
         Row: {
           created_at: string
-          finance_category_id: string
           finance_project_id: string
           id: string
+          tag_id: string
           user_id: string
         }
         Insert: {
           created_at?: string
-          finance_category_id: string
           finance_project_id: string
           id?: string
+          tag_id: string
           user_id?: string
         }
         Update: {
           created_at?: string
-          finance_category_id?: string
           finance_project_id?: string
           id?: string
+          tag_id?: string
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "finance_project_category_finance_category_id_fkey"
-            columns: ["finance_category_id"]
-            isOneToOne: false
-            referencedRelation: "tag"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "finance_project_category_finance_project_id_fkey"
             columns: ["finance_project_id"]
             isOneToOne: false
             referencedRelation: "finance_project"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_project_tag_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tag"
             referencedColumns: ["id"]
           },
         ]
@@ -517,10 +468,10 @@ export type Database = {
           id: string
           start_currency: Database["public"]["Enums"]["currency"] | null
           start_value: number | null
-          timer_project_id: string | null
           title: string
           user_id: string
           value: number
+          work_project_id: string | null
         }
         Insert: {
           created_at?: string
@@ -528,10 +479,10 @@ export type Database = {
           id?: string
           start_currency?: Database["public"]["Enums"]["currency"] | null
           start_value?: number | null
-          timer_project_id?: string | null
           title: string
           user_id?: string
           value: number
+          work_project_id?: string | null
         }
         Update: {
           created_at?: string
@@ -539,15 +490,15 @@ export type Database = {
           id?: string
           start_currency?: Database["public"]["Enums"]["currency"] | null
           start_value?: number | null
-          timer_project_id?: string | null
           title?: string
           user_id?: string
           value?: number
+          work_project_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "payout_timer_project_id_fkey"
-            columns: ["timer_project_id"]
+            foreignKeyName: "payout_work_project_id_fkey"
+            columns: ["work_project_id"]
             isOneToOne: false
             referencedRelation: "work_project"
             referencedColumns: ["id"]
@@ -593,11 +544,11 @@ export type Database = {
       recurring_cashflow: {
         Row: {
           amount: number
+          contact_id: string | null
           created_at: string
           currency: Database["public"]["Enums"]["currency"]
           description: string
           end_date: string | null
-          finance_client_id: string | null
           id: string
           interval: Database["public"]["Enums"]["finance_interval"]
           start_date: string
@@ -606,11 +557,11 @@ export type Database = {
         }
         Insert: {
           amount: number
+          contact_id?: string | null
           created_at?: string
           currency?: Database["public"]["Enums"]["currency"]
           description: string
           end_date?: string | null
-          finance_client_id?: string | null
           id?: string
           interval?: Database["public"]["Enums"]["finance_interval"]
           start_date: string
@@ -619,11 +570,11 @@ export type Database = {
         }
         Update: {
           amount?: number
+          contact_id?: string | null
           created_at?: string
           currency?: Database["public"]["Enums"]["currency"]
           description?: string
           end_date?: string | null
-          finance_client_id?: string | null
           id?: string
           interval?: Database["public"]["Enums"]["finance_interval"]
           start_date?: string
@@ -632,8 +583,8 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "recurring_cash_flow_finance_client_id_fkey"
-            columns: ["finance_client_id"]
+            foreignKeyName: "recurring_cashflow_contact_id_fkey"
+            columns: ["contact_id"]
             isOneToOne: false
             referencedRelation: "contact"
             referencedColumns: ["id"]
@@ -643,38 +594,38 @@ export type Database = {
       recurring_cashflow_tag: {
         Row: {
           created_at: string
-          finance_category_id: string
           id: string
-          recurring_cash_flow_id: string
+          recurring_cashflow_id: string
+          tag_id: string
           user_id: string
         }
         Insert: {
           created_at?: string
-          finance_category_id: string
           id?: string
-          recurring_cash_flow_id: string
+          recurring_cashflow_id: string
+          tag_id: string
           user_id?: string
         }
         Update: {
           created_at?: string
-          finance_category_id?: string
           id?: string
-          recurring_cash_flow_id?: string
+          recurring_cashflow_id?: string
+          tag_id?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "recurring_cash_flow_category_finance_category_id_fkey"
-            columns: ["finance_category_id"]
+            foreignKeyName: "recurring_cashflow_tag_recurring_cashflow_id_fkey"
+            columns: ["recurring_cashflow_id"]
             isOneToOne: false
-            referencedRelation: "tag"
+            referencedRelation: "recurring_cashflow"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "recurring_cash_flow_category_recurring_cash_flow_id_fkey"
-            columns: ["recurring_cash_flow_id"]
+            foreignKeyName: "recurring_cashflow_tag_tag_id_fkey"
+            columns: ["tag_id"]
             isOneToOne: false
-            referencedRelation: "recurring_cashflow"
+            referencedRelation: "tag"
             referencedColumns: ["id"]
           },
         ]
@@ -796,56 +747,49 @@ export type Database = {
         Row: {
           amount: number
           changed_date: string | null
+          contact_id: string | null
           created_at: string
           currency: Database["public"]["Enums"]["currency"]
           date: string
-          finance_client_id: string | null
           finance_project_id: string | null
           id: string
           is_active: boolean
           payout_id: string | null
-          recurring_cash_flow_id: string | null
+          recurring_cashflow_id: string | null
           title: string
           user_id: string
         }
         Insert: {
           amount: number
           changed_date?: string | null
+          contact_id?: string | null
           created_at?: string
           currency?: Database["public"]["Enums"]["currency"]
           date?: string
-          finance_client_id?: string | null
           finance_project_id?: string | null
           id?: string
           is_active?: boolean
           payout_id?: string | null
-          recurring_cash_flow_id?: string | null
+          recurring_cashflow_id?: string | null
           title?: string
           user_id?: string
         }
         Update: {
           amount?: number
           changed_date?: string | null
+          contact_id?: string | null
           created_at?: string
           currency?: Database["public"]["Enums"]["currency"]
           date?: string
-          finance_client_id?: string | null
           finance_project_id?: string | null
           id?: string
           is_active?: boolean
           payout_id?: string | null
-          recurring_cash_flow_id?: string | null
+          recurring_cashflow_id?: string | null
           title?: string
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "single_cash_flow_finance_client_id_fkey"
-            columns: ["finance_client_id"]
-            isOneToOne: false
-            referencedRelation: "contact"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "single_cash_flow_finance_project_id_fkey"
             columns: ["finance_project_id"]
@@ -861,8 +805,15 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "single_cash_flow_recurring_cash_flow_id_fkey"
-            columns: ["recurring_cash_flow_id"]
+            foreignKeyName: "single_cashflow_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contact"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "single_cashflow_recurring_cashflow_id_fkey"
+            columns: ["recurring_cashflow_id"]
             isOneToOne: false
             referencedRelation: "recurring_cashflow"
             referencedColumns: ["id"]
@@ -872,38 +823,38 @@ export type Database = {
       single_cashflow_tag: {
         Row: {
           created_at: string
-          finance_category_id: string
           id: string
-          single_cash_flow_id: string
+          single_cashflow_id: string
+          tag_id: string
           user_id: string
         }
         Insert: {
           created_at?: string
-          finance_category_id?: string
           id?: string
-          single_cash_flow_id?: string
+          single_cashflow_id?: string
+          tag_id?: string
           user_id?: string
         }
         Update: {
           created_at?: string
-          finance_category_id?: string
           id?: string
-          single_cash_flow_id?: string
+          single_cashflow_id?: string
+          tag_id?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "single_cash_flow_category_finance_category_id_fkey"
-            columns: ["finance_category_id"]
+            foreignKeyName: "single_cashflow_tag_single_cashflow_id_fkey"
+            columns: ["single_cashflow_id"]
             isOneToOne: false
-            referencedRelation: "tag"
+            referencedRelation: "single_cashflow"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "single_cash_flow_category_single_cash_flow_id_fkey"
-            columns: ["single_cash_flow_id"]
+            foreignKeyName: "single_cashflow_tag_tag_id_fkey"
+            columns: ["tag_id"]
             isOneToOne: false
-            referencedRelation: "single_cashflow"
+            referencedRelation: "tag"
             referencedColumns: ["id"]
           },
         ]
@@ -938,32 +889,32 @@ export type Database = {
           exectution_date: string
           executed: boolean
           id: string
-          timer_project_id: string | null
           title: string
           user_id: string
+          work_project_id: string | null
         }
         Insert: {
           created_at?: string
           exectution_date?: string
           executed?: boolean
           id?: string
-          timer_project_id?: string | null
           title?: string
           user_id?: string
+          work_project_id?: string | null
         }
         Update: {
           created_at?: string
           exectution_date?: string
           executed?: boolean
           id?: string
-          timer_project_id?: string | null
           title?: string
           user_id?: string
+          work_project_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "task_timer_project_id_fkey"
-            columns: ["timer_project_id"]
+            foreignKeyName: "task_work_project_id_fkey"
+            columns: ["work_project_id"]
             isOneToOne: false
             referencedRelation: "work_project"
             referencedColumns: ["id"]
@@ -1010,13 +961,11 @@ export type Database = {
       }
       work_project: {
         Row: {
-          cash_flow_category_id: string | null
           color: string | null
           created_at: string
           currency: Database["public"]["Enums"]["currency"]
           description: string | null
           finance_project_id: string | null
-          folder_id: string | null
           hourly_payment: boolean
           id: string
           is_favorite: boolean
@@ -1031,15 +980,14 @@ export type Database = {
           title: string
           total_payout: number
           user_id: string
+          work_folder_id: string | null
         }
         Insert: {
-          cash_flow_category_id?: string | null
           color?: string | null
           created_at?: string
           currency?: Database["public"]["Enums"]["currency"]
           description?: string | null
           finance_project_id?: string | null
-          folder_id?: string | null
           hourly_payment?: boolean
           id?: string
           is_favorite?: boolean
@@ -1054,15 +1002,14 @@ export type Database = {
           title: string
           total_payout?: number
           user_id?: string
+          work_folder_id?: string | null
         }
         Update: {
-          cash_flow_category_id?: string | null
           color?: string | null
           created_at?: string
           currency?: Database["public"]["Enums"]["currency"]
           description?: string | null
           finance_project_id?: string | null
-          folder_id?: string | null
           hourly_payment?: boolean
           id?: string
           is_favorite?: boolean
@@ -1077,6 +1024,7 @@ export type Database = {
           title?: string
           total_payout?: number
           user_id?: string
+          work_folder_id?: string | null
         }
         Relationships: [
           {
@@ -1087,15 +1035,8 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "timerProject_cash_flow_category_id_fkey"
-            columns: ["cash_flow_category_id"]
-            isOneToOne: false
-            referencedRelation: "tag"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "timerProject_folder_id_fkey"
-            columns: ["folder_id"]
+            foreignKeyName: "work_project_work_folder_id_fkey"
+            columns: ["work_folder_id"]
             isOneToOne: false
             referencedRelation: "work_folder"
             referencedColumns: ["id"]
@@ -1105,36 +1046,36 @@ export type Database = {
       work_project_tag: {
         Row: {
           created_at: string
-          finance_category_id: string
           id: string
-          timer_project_id: string
+          tag_id: string
           user_id: string
+          work_project_id: string
         }
         Insert: {
           created_at?: string
-          finance_category_id: string
           id?: string
-          timer_project_id: string
+          tag_id: string
           user_id?: string
+          work_project_id: string
         }
         Update: {
           created_at?: string
-          finance_category_id?: string
           id?: string
-          timer_project_id?: string
+          tag_id?: string
           user_id?: string
+          work_project_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "timer_project_category_finance_category_id_fkey"
-            columns: ["finance_category_id"]
+            foreignKeyName: "work_project_tag_tag_id_fkey"
+            columns: ["tag_id"]
             isOneToOne: false
             referencedRelation: "tag"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "timer_project_category_timer_project_id_fkey"
-            columns: ["timer_project_id"]
+            foreignKeyName: "work_project_tag_work_project_id_fkey"
+            columns: ["work_project_id"]
             isOneToOne: false
             referencedRelation: "work_project"
             referencedColumns: ["id"]
@@ -1153,14 +1094,14 @@ export type Database = {
           paid: boolean
           paused_seconds: number
           payout_id: string | null
-          project_id: string
           real_start_time: string | null
           salary: number
-          single_cash_flow_id: string | null
+          single_cashflow_id: string | null
           start_time: string
           time_fragments_interval: number | null
           true_end_time: string
           user_id: string
+          work_project_id: string
         }
         Insert: {
           active_seconds: number
@@ -1173,14 +1114,14 @@ export type Database = {
           paid?: boolean
           paused_seconds?: number
           payout_id?: string | null
-          project_id?: string
           real_start_time?: string | null
           salary: number
-          single_cash_flow_id?: string | null
+          single_cashflow_id?: string | null
           start_time: string
           time_fragments_interval?: number | null
           true_end_time: string
           user_id?: string
+          work_project_id?: string
         }
         Update: {
           active_seconds?: number
@@ -1193,23 +1134,16 @@ export type Database = {
           paid?: boolean
           paused_seconds?: number
           payout_id?: string | null
-          project_id?: string
           real_start_time?: string | null
           salary?: number
-          single_cash_flow_id?: string | null
+          single_cashflow_id?: string | null
           start_time?: string
           time_fragments_interval?: number | null
           true_end_time?: string
           user_id?: string
+          work_project_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "timer_session_single_cash_flow_id_fkey"
-            columns: ["single_cash_flow_id"]
-            isOneToOne: false
-            referencedRelation: "single_cashflow"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "timerSession_payout_id_fkey"
             columns: ["payout_id"]
@@ -1218,8 +1152,15 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "timerSession_project_id_fkey"
-            columns: ["project_id"]
+            foreignKeyName: "work_time_entry_single_cashflow_id_fkey"
+            columns: ["single_cashflow_id"]
+            isOneToOne: false
+            referencedRelation: "single_cashflow"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_time_entry_work_project_id_fkey"
+            columns: ["work_project_id"]
             isOneToOne: false
             referencedRelation: "work_project"
             referencedColumns: ["id"]

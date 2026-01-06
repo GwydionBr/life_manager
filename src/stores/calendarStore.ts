@@ -46,7 +46,7 @@ export const useCalendarStore = create<
   CalendarStoreState & CalendarStoreActions
 >()(
   persist(
-    (set, get) => ({
+    (set) => ({
       activeTimer: null,
       viewMode: "week",
       zoomIndex: 1,

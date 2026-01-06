@@ -38,23 +38,23 @@ import classes from "@/components/UI/Switch.module.css";
 interface FinanceFormProps {
   onClose: () => void;
   isSingle?: boolean;
-  onOpenCategoryForm: () => void;
-  categories: Tables<"finance_category">[];
-  setCategories: (categories: Tables<"finance_category">[]) => void;
+  onOpenTagForm: () => void;
+  tags: Tables<"tag">[];
+  setTags: (tags: Tables<"tag">[]) => void;
 }
 
 export default function FinanceForm({
   onClose,
   isSingle = true,
-  onOpenCategoryForm,
-  categories,
-  setCategories,
+  onOpenTagForm,
+  tags,
+  setTags,
 }: FinanceFormProps) {
   const [type, setType] = useState<CashFlowType>("income");
   const [isRecurring, setIsRecurring] = useState<boolean>(!isSingle);
   const { data: settings } = useSettings();
   useSettingsStore();
-  const { data: financeCategories } = useTags();
+  const { data: allTags } = useTags();
   const { getLocalizedText } = useIntl();
   const { addSingleCashflow } = useSingleCashflowMutations();
   const { addRecurringCashflow } = useRecurringCashflowMutations();
@@ -63,7 +63,7 @@ export default function FinanceForm({
     await addSingleCashflow({
       ...values,
       date: values.date.toISOString(),
-      tags: categories,
+      tags: tags,
     });
     onClose();
   }
@@ -76,7 +76,7 @@ export default function FinanceForm({
       ...values,
       end_date: values.end_date?.toISOString(),
       start_date: values.start_date.toISOString(),
-      tags: categories,
+      tags: tags,
     });
     onClose();
   }
@@ -124,29 +124,29 @@ export default function FinanceForm({
         <Group wrap="nowrap">
           <MultiSelect
             w="100%"
-            data={financeCategories?.map((category) => ({
-              label: category.title,
-              value: category.id,
+            data={allTags?.map((tag) => ({
+              label: tag.title,
+              value: tag.id,
             }))}
-            label={getLocalizedText("Kategorie", "Category")}
+            label={getLocalizedText("Tag", "Tag")}
             placeholder={getLocalizedText(
-              "Kategorie auswählen",
-              "Select a category"
+              "Tag auswählen",
+              "Select a tag"
             )}
-            value={categories.map((category) => category.id)}
+            value={tags.map((tag) => tag.id)}
             onChange={(value) =>
-              setCategories(
+              setTags(
                 value.map(
                   (id) =>
-                    financeCategories.find((category) => category.id === id)!
+                    allTags.find((tag) => tag.id === id)!
                 )
               )
             }
             searchable
             clearable
             nothingFoundMessage={getLocalizedText(
-              "Keine Kategorien gefunden",
-              "No categories found"
+              "Keine Tags gefunden",
+              "No tags found"
             )}
             size="sm"
           />
@@ -154,14 +154,14 @@ export default function FinanceForm({
             mt={25}
             w={180}
             p={0}
-            onClick={onOpenCategoryForm}
+            onClick={onOpenTagForm}
             fw={500}
             variant="subtle"
             size="xs"
             leftSection={<IconPlus size={20} />}
           >
             <Text fz="xs" c="dimmed">
-              {getLocalizedText("Neue Kategorie", "Add Category")}
+              {getLocalizedText("Neues Tag", "Add Tag")}
             </Text>
           </Button>
         </Group>

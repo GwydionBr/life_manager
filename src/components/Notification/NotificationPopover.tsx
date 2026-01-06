@@ -14,10 +14,11 @@ import { IconUserPlus, IconUsersPlus } from "@tabler/icons-react";
 import classes from "./Notification.module.css";
 import CheckActionIcon from "@/components/UI/ActionIcons/CheckActionIcon";
 import XActionIcon from "@/components/UI/ActionIcons/XActionIcon";
+import { Friend } from "@/types/profile.types";
 
 export default function NotificationPopover() {
   // const { data: friends } = useFriendsQuery();
-  const friends: any[] = [];
+  // const friends: any[] = [];
   // const { mutate: acceptFriend, isPending: isAcceptingFriend } =
   //   useAcceptFriendshipMutation();
   // const { mutate: declineFriend, isPending: isDecliningFriend } =
@@ -26,13 +27,14 @@ export default function NotificationPopover() {
   const { data: settings } = useSettings();
   const { getLocalizedText } = useIntl();
 
-  const requestedFriends = useMemo(
-    () =>
-      friends?.filter(
-        (friend) => friend.friendshipStatus === "pending" && !friend.isRequester
-      ) || [],
-    [friends]
-  );
+  // const requestedFriends = useMemo(
+  //   () =>
+  //     friends?.filter(
+  //       (friend) => friend.friendshipStatus === "pending" && !friend.isRequester
+  //     ) || [],
+  //   [friends]
+  // );
+  const requestedFriends: Friend[] = useMemo(() => [], []);
 
   return (
     <Stack gap="xs">

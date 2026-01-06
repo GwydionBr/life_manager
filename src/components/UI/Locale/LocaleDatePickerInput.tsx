@@ -1,6 +1,6 @@
 import { useSettingsStore } from "@/stores/settingsStore";
 
-import { DatePickerInput, DatePickerInputProps, DatePickerProps } from "@mantine/dates";
+import { DatePickerInput, DatePickerInputProps } from "@mantine/dates";
 
 export default function LocaleDatePickerInput({
   label,

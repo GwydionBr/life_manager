@@ -29,33 +29,32 @@ export default function TimeTrackerMemoRow({
           <IconNotes size={22} />
         </ThemeIcon>
       }
-      children={
-        <TextInput
-          w="100%"
-          value={value}
-          onChange={(event) => setMemo(event.target.value)}
-          styles={{
-            input: {
+    >
+      <TextInput
+        w="100%"
+        value={value}
+        onChange={(event) => setMemo(event.target.value)}
+        styles={{
+          input: {
+            border: "none",
+            background: "transparent",
+            padding: 0,
+            fontSize: "var(--mantine-font-size-xs)",
+            fontWeight: 400,
+            textAlign: "center",
+            color: "inherit",
+            "&:focus": {
               border: "none",
               background: "transparent",
-              padding: 0,
-              fontSize: "var(--mantine-font-size-xs)",
-              fontWeight: 400,
-              textAlign: "center",
-              color: "inherit",
-              "&:focus": {
-                border: "none",
-                background: "transparent",
-                outline: "none",
-              },
-              "&::placeholder": {
-                color: "var(--mantine-color-dimmed)",
-              },
+              outline: "none",
             },
-          }}
-          placeholder={getLocalizedText("Memo hinzufügen...", "Add memo...")}
-        />
-      }
-    />
+            "&::placeholder": {
+              color: "var(--mantine-color-dimmed)",
+            },
+          },
+        }}
+        placeholder={getLocalizedText("Memo hinzufügen...", "Add memo...")}
+      />
+    </TimeTrackerRow>
   );
 }

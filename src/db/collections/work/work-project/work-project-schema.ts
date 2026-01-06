@@ -2,13 +2,12 @@ import { z } from "zod";
 import { Constants, Database } from "@/types/db.types";
 
 export const workProjectSchema = z.object({
-  cash_flow_category_id: z.string().nullable(),
   color: z.string().nullable(),
   created_at: z.string(),
   currency: z.enum(Constants.public.Enums.currency),
   description: z.string().nullable(),
   finance_project_id: z.string().nullable(),
-  folder_id: z.string().nullable(),
+  work_folder_id: z.string().nullable(),
   hourly_payment: z.boolean(),
   id: z.string(),
   is_favorite: z.boolean(),
@@ -26,7 +25,6 @@ export const workProjectSchema = z.object({
 });
 
 export const workProjectDeserializationSchema = z.object({
-  cash_flow_category_id: z.string().nullable(),
   color: z.string().nullable(),
   created_at: z.string(),
   currency: z
@@ -34,7 +32,7 @@ export const workProjectDeserializationSchema = z.object({
     .transform((value) => value as Database["public"]["Enums"]["currency"]),
   description: z.string().nullable(),
   finance_project_id: z.string().nullable(),
-  folder_id: z.string().nullable(),
+  work_folder_id: z.string().nullable(),
   hourly_payment: z.number().transform((val) => val > 0),
   id: z.string(),
   is_favorite: z.number().transform((val) => val > 0),
@@ -57,18 +55,18 @@ export const workProjectDeserializationSchema = z.object({
   user_id: z.string(),
 });
 
-export const workProjectCategorySchema = z.object({
+export const workProjectTagSchema = z.object({
   created_at: z.string(),
-  finance_category_id: z.string(),
+  tag_id: z.string(),
   id: z.string(),
-  timer_project_id: z.string(),
+  work_project_id: z.string(),
   user_id: z.string(),
 });
 
-export const workProjectCategoryDeserializationSchema = z.object({
+export const workProjectTagDeserializationSchema = z.object({
   created_at: z.string(),
-  finance_category_id: z.string(),
+  tag_id: z.string(),
   id: z.string(),
-  timer_project_id: z.string(),
+  work_project_id: z.string(),
   user_id: z.string(),
 });

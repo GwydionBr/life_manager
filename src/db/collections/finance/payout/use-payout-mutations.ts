@@ -1,7 +1,6 @@
 import { useCallback } from "react";
 import { useProfile } from "@/db/collections/profile/profile-collection";
 import { useIntl } from "@/hooks/useIntl";
-import { useProjectAdjustmentsQuery } from "../project-adjustment/use-project-adjustment-query";
 
 import {
   showActionSuccessNotification,
@@ -37,6 +36,65 @@ export const usePayoutMutations = () => {
   const { data: profile } = useProfile();
   const { getLocalizedText } = useIntl();
 
+  const handleFinanceProjectAdjustmentPayout = useCallback(
+    async (
+      projectAdjustment: ProjectAdjustment,
+      financeProject: FinanceProject
+    ) => {
+      if (!profile?.id) {
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
+        return;
+      }
+
+      try {
+        const { promise, data } = await addSingleCashflowMutation(
+          {
+            title: projectAdjustment.description ?? "Auszahlung",
+            amount: projectAdjustment.amount,
+            currency: financeProject.currency,
+            tags: financeProject.tags,
+            finance_project_id: financeProject.id,
+          },
+          profile.id
+        );
+
+        const adjustmentResult = await updateProjectAdjustment(
+          projectAdjustment.id,
+          {
+            single_cashflow_id: data[0].id,
+          }
+        );
+        if (promise.error) {
+          showActionErrorNotification(promise.error.message);
+          return;
+        }
+        if (adjustmentResult.error) {
+          showActionErrorNotification(adjustmentResult.error.message);
+          return;
+        }
+        showActionSuccessNotification(
+          getLocalizedText(
+            "Auszahlung erfolgreich erstellt",
+            "Payout successfully created"
+          )
+        );
+      } catch (error) {
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+      }
+    },
+    [profile?.id, getLocalizedText]
+  );
+
   const handleFinanceProjectPayout = useCallback(
     async (financeProject: FinanceProject, payoutWholeProject: boolean) => {
       if (!profile?.id) {
@@ -64,9 +122,9 @@ export const usePayoutMutations = () => {
         const result = await updateFinanceProject(
           financeProject.id,
           {
-            single_cash_flow_id: data[0].id,
+            single_cashflow_id: data[0].id,
             tags: financeProject.tags,
-            client: financeProject.client,
+            contact: financeProject.contact,
             adjustments: financeProject.adjustments,
           },
           profile.id
@@ -74,7 +132,7 @@ export const usePayoutMutations = () => {
 
         if (payoutWholeProject) {
           financeProject.adjustments
-            .filter((adjustment) => !adjustment.single_cash_flow_id)
+            .filter((adjustment) => !adjustment.single_cashflow_id)
             .forEach(async (adjustment) => {
               await handleFinanceProjectAdjustmentPayout(
                 adjustment,
@@ -108,66 +166,7 @@ export const usePayoutMutations = () => {
         );
       }
     },
-    [profile?.id, getLocalizedText]
-  );
-
-  const handleFinanceProjectAdjustmentPayout = useCallback(
-    async (
-      projectAdjustment: ProjectAdjustment,
-      financeProject: FinanceProject
-    ) => {
-      if (!profile?.id) {
-        showActionErrorNotification(
-          getLocalizedText(
-            "Kein Benutzerprofil gefunden",
-            "No user profile found"
-          )
-        );
-        return;
-      }
-
-      try {
-        const { promise, data } = await addSingleCashflowMutation(
-          {
-            title: projectAdjustment.description ?? "Auszahlung",
-            amount: projectAdjustment.amount,
-            currency: financeProject.currency,
-            tags: financeProject.tags,
-            finance_project_id: financeProject.id,
-          },
-          profile.id
-        );
-
-        const adjustmentResult = await updateProjectAdjustment(
-          projectAdjustment.id,
-          {
-            single_cash_flow_id: data[0].id,
-          }
-        );
-        if (promise.error) {
-          showActionErrorNotification(promise.error.message);
-          return;
-        }
-        if (adjustmentResult.error) {
-          showActionErrorNotification(adjustmentResult.error.message);
-          return;
-        }
-        showActionSuccessNotification(
-          getLocalizedText(
-            "Auszahlung erfolgreich erstellt",
-            "Payout successfully created"
-          )
-        );
-      } catch (error) {
-        showActionErrorNotification(
-          getLocalizedText(
-            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-          )
-        );
-      }
-    },
-    [profile?.id, getLocalizedText]
+    [profile?.id, getLocalizedText, handleFinanceProjectAdjustmentPayout]
   );
 
   /**
@@ -206,7 +205,7 @@ export const usePayoutMutations = () => {
           title,
           user_id: profile.id,
           created_at: new Date().toISOString(),
-          timer_project_id: project.id,
+          work_project_id: project.id,
           currency: endCurrency ? endCurrency : project.currency,
           value: endValue ? endValue : parseFloat(totalAmount),
           start_currency: endCurrency ? project.currency : null,
@@ -235,7 +234,7 @@ export const usePayoutMutations = () => {
           {
             payout_id: payoutData.id,
             paid: true,
-            single_cash_flow_id: singleCashflowId,
+            single_cashflow_id: singleCashflowId,
           }
         );
 
@@ -316,18 +315,15 @@ export const usePayoutMutations = () => {
   /**
    * Deletes a Payout with automatic notification and side effects.
    */
-  const handleDeletePayout = useCallback(
-    async (id: string | string[]) => {
-      const transaction = deletePayout(id);
-      const result = await transaction.isPersisted.promise;
+  const handleDeletePayout = useCallback(async (id: string | string[]) => {
+    const transaction = deletePayout(id);
+    const result = await transaction.isPersisted.promise;
 
-      if (result.error) {
-        showActionErrorNotification(result.error.message);
-        return;
-      }
-    },
-    [getLocalizedText]
-  );
+    if (result.error) {
+      showActionErrorNotification(result.error.message);
+      return;
+    }
+  }, []);
 
   return {
     addHourlyPayout: handleAddHourlyPayout,

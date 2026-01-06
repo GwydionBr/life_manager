@@ -258,7 +258,15 @@ export default function FinanceRecurringTab() {
         },
       ],
     ];
-  }, [filter, getLocalizedText, recurringCashFlows, typeFilter]);
+  }, [
+    filter,
+    getLocalizedText,
+    recurringCashFlows,
+    typeFilter,
+    activeCashFlows,
+    completedCashFlows,
+    futureCashFlows,
+  ]);
 
   function getIntervalLabel(interval: FinanceInterval) {
     switch (interval) {

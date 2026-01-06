@@ -5,7 +5,9 @@ import GroupDefaultSettings from "./GroupDefaultSettings";
 export default function GroupSettings() {
   return (
     <Stack>
-      <SettingsRow title="Group Settings" children={<GroupDefaultSettings />} />
+      <SettingsRow title="Group Settings">
+        <GroupDefaultSettings />
+      </SettingsRow>
     </Stack>
   );
 }

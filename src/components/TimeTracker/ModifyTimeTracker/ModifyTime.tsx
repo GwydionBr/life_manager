@@ -41,7 +41,7 @@ export default function ModifyTime({
   modifyActiveSeconds,
   modifyPausedSeconds,
   activeTime,
-  pausedTime,
+  pausedTime: _pausedTime,
   state,
   storedActiveSeconds,
   storedPausedSeconds,

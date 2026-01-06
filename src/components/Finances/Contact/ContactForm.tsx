@@ -27,29 +27,30 @@ const schema = z.object({
   ),
 });
 
-interface FinanceClientFormProps {
+interface ContactFormProps {
   onClose?: () => void;
-  onSuccess?: (client: Tables<"finance_client">) => void;
-  client?: Tables<"finance_client">;
+  onSuccess?: (contact: Tables<"contact">) => void;
+  contact?: Tables<"contact">;
 }
 
-export default function FinanceClientForm({
+export default function ContactForm({
   onClose,
   onSuccess,
-  client,
-}: FinanceClientFormProps) {
+  contact,
+}: ContactFormProps) {
   const { getLocalizedText } = useIntl();
   const { data: profile } = useProfile();
   const { data: settings } = useSettings();
 
   const form = useForm({
     initialValues: {
-      name: client?.name || "",
-      description: client?.description || "",
-      email: client?.email || "",
-      phone: client?.phone || "",
-      address: client?.address || "",
-      currency: client?.currency || settings?.default_finance_currency || "USD",
+      name: contact?.name || "",
+      description: contact?.description || "",
+      email: contact?.email || "",
+      phone: contact?.phone || "",
+      address: contact?.address || "",
+      currency:
+        contact?.currency || settings?.default_finance_currency || "USD",
     },
     validate: zodResolver(schema),
   });
@@ -60,8 +61,8 @@ export default function FinanceClientForm({
   };
 
   function handleSubmit(values: z.infer<typeof schema>) {
-    if (client) {
-      const result = contactsCollection.update(client.id, (draft) => {
+    if (contact) {
+      const result = contactsCollection.update(contact.id, (draft) => {
         draft.name = values.name;
         draft.description = values.description || null;
         draft.email = values.email || null;
@@ -90,7 +91,9 @@ export default function FinanceClientForm({
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
       <Stack>
-        <Fieldset legend={getLocalizedText("Kunden Details", "Client details")}>
+        <Fieldset
+          legend={getLocalizedText("Kontakt Details", "Contact details")}
+        >
           <Stack>
             <TextInput
               withAsterisk
@@ -104,7 +107,12 @@ export default function FinanceClientForm({
             />
           </Stack>
         </Fieldset>
-        <Fieldset legend={getLocalizedText("Kontakt", "Contact")}>
+        <Fieldset
+          legend={getLocalizedText(
+            "Kontaktinformationen",
+            "Contact information"
+          )}
+        >
           <TextInput
             label={getLocalizedText("Email", "Email")}
             {...form.getInputProps("email")}
@@ -125,7 +133,7 @@ export default function FinanceClientForm({
             {...form.getInputProps("currency")}
           />
         </Fieldset>
-        {client ? (
+        {contact ? (
           <UpdateButton type="submit" onClick={form.onSubmit(handleSubmit)} />
         ) : (
           <CreateButton type="submit" onClick={form.onSubmit(handleSubmit)} />

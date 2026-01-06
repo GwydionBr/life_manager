@@ -9,7 +9,7 @@ import {
   addFinanceProject,
   updateFinanceProject,
   deleteFinanceProject,
-  syncFinanceProjectCategories,
+  syncFinanceProjectTags,
 } from "./finance-project-mutations";
 import {
   FinanceProject,
@@ -159,6 +159,6 @@ export const useFinanceProjectMutations = () => {
     updateFinanceProject: handleUpdateFinanceProject,
     deleteFinanceProject: handleDeleteFinanceProject,
     // Helper functions
-    syncFinanceProjectCategories,
+    syncFinanceProjectTags: syncFinanceProjectTags,
   };
 };

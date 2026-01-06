@@ -46,22 +46,26 @@ export const getNextDate = (
         return addDays(date, 1);
       case "week":
         return addWeeks(date, 1);
-      case "month":
+      case "month": {
         let newMonthDate = addMonths(date, 1);
         newMonthDate.setDate(getCorrectDay(newMonthDate, anchorDay));
         return newMonthDate;
-      case "1/4 year":
+      }
+      case "1/4 year": {
         let newQuarterDate = addQuarters(date, 1);
         newQuarterDate.setDate(getCorrectDay(newQuarterDate, anchorDay));
         return newQuarterDate;
-      case "1/2 year":
+      }
+      case "1/2 year": {
         let newHalfYearDate = addMonths(date, 6);
         newHalfYearDate.setDate(getCorrectDay(newHalfYearDate, anchorDay));
         return newHalfYearDate;
-      case "year":
+      }
+      case "year": {
         let newYearDate = addYears(date, 1);
         newYearDate.setDate(getCorrectDay(newYearDate, anchorDay));
         return newYearDate;
+      }
       default:
         return date;
     }

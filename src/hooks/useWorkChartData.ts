@@ -1,7 +1,4 @@
-"use client";
-
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { useSettingsStore } from "@/stores/settingsStore";
 
 import { FinanceInterval } from "@/types/settings.types";
 import {
@@ -67,11 +64,9 @@ export interface DateRange {
 export function useWorkChartData(
   interval: FinanceInterval,
   dateRange: DateRange,
-  sessions: Tables<"timer_session">[],
+  sessions: Tables<"work_time_entry">[],
   projectId?: string
 ) {
-  const { locale } = useSettingsStore();
-  // Data and loading state
   const [chartData, setChartData] = useState<WorkChartData[]>([]);
 
   /**
@@ -201,26 +196,28 @@ export function useWorkChartData(
               key = dateToISOString(current); // YYYY-MM-DD
               current.setTime(addDaysToDate(current, 1).getTime());
               break;
-            case "week":
-              // Calculate week start (Monday) using date-fns
+            case "week": { // Calculate week start (Monday) using date-fns
               const weekStart = getStartOfWeek(current);
               key = dateToISOString(weekStart);
               current.setTime(addWeeksToDate(current, 1).getTime());
               break;
+            }
             case "month":
               key = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, "0")}`; // YYYY-MM
               current.setTime(addMonthsToDate(current, 1).getTime());
               break;
-            case "1/4 year":
+            case "1/4 year": {
               const quarter = Math.floor(current.getMonth() / 3) + 1;
               key = `${current.getFullYear()}-Q${quarter}`; // YYYY-Q1
               current.setTime(addQuartersToDate(current, 1).getTime());
               break;
-            case "1/2 year":
+            }
+            case "1/2 year": {
               const half = Math.floor(current.getMonth() / 6) + 1;
               key = `${current.getFullYear()}-H${half}`; // YYYY-H1
               current.setTime(addMonthsToDate(current, 6).getTime());
               break;
+            }
             case "year":
               key = current.getFullYear().toString(); // YYYY
               current.setTime(addYearsToDate(current, 1).getTime());
@@ -264,20 +261,26 @@ export function useWorkChartData(
             key = dateToISOString(date);
             break;
           case "week":
+            {
             const weekStart = getStartOfWeek(date);
-            key = dateToISOString(weekStart);
-            break;
+              key = dateToISOString(weekStart);
+              break;
+            }
           case "month":
             key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
             break;
           case "1/4 year":
+            {
             const quarter = Math.floor(date.getMonth() / 3) + 1;
-            key = `${date.getFullYear()}-Q${quarter}`;
-            break;
+              key = `${date.getFullYear()}-Q${quarter}`;
+              break;
+            }
           case "1/2 year":
-            const half = Math.floor(date.getMonth() / 6) + 1;
-            key = `${date.getFullYear()}-H${half}`;
-            break;
+            {
+              const half = Math.floor(date.getMonth() / 6) + 1;
+              key = `${date.getFullYear()}-H${half}`;
+              break;
+            }
           case "year":
             key = date.getFullYear().toString();
             break;
@@ -308,7 +311,7 @@ export function useWorkChartData(
 
       return chartData;
     },
-    [interval, dateRange.from, dateRange.to, sessions, projectId]
+    [dateRange.from, dateRange.to, sessions]
   );
 
   /**

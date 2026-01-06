@@ -14,11 +14,11 @@ import {
 import { Currency } from "@/types/settings.types";
 import { Tables } from "@/types/db.types";
 import PayoutActionIcon from "@/components/UI/ActionIcons/PayoutActionIcon";
-import FinanceClientBadge from "@/components/Finances/Contact/ContactBadge";
+import ContactBadge from "@/components/Finances/Contact/ContactBadge";
 import { FinanceProject } from "@/types/finance.types";
 
 interface FinanceAdjustmentRowProps {
-  adultClientId: string | null;
+  adultContactId: string | null;
   financeProject?: FinanceProject;
   adjustment?: Tables<"finance_project_adjustment">;
   currency: Currency;
@@ -32,21 +32,21 @@ interface FinanceAdjustmentRowProps {
 }
 
 export default function FinanceAdjustmentRow({
-  adultClientId,
+  adultContactId,
   financeProject,
   adjustment,
   currency,
   handlePayout,
 }: FinanceAdjustmentRowProps) {
   const { getLocalizedText, formatMoney, formatDate } = useIntl();
-  const { data: financeClients } = useContacts();
+  const { data: contacts } = useContacts();
 
   const { hovered, ref } = useHover();
 
   if (!adjustment && !financeProject) return null;
 
   let isIncome = false;
-  let client: Tables<"finance_client"> | null = null;
+  let contact: Tables<"contact"> | null = null;
   let amount = 0;
   let description: string | null = null;
   let createdAt = new Date();
@@ -57,27 +57,26 @@ export default function FinanceAdjustmentRow({
   if (adjustment) {
     isIncome = adjustment.amount > 0;
     amount = adjustment.amount;
-    client =
-      financeClients.find(
-        (client) =>
-          client.id === adjustment.finance_client_id ||
-          client.id === adultClientId
+    contact =
+      contacts.find(
+        (contact) =>
+          contact.id === adjustment.contact_id || contact.id === adultContactId
       ) || null;
     description = adjustment.description;
     createdAt = new Date(adjustment.created_at);
     isStartValue = false;
     id = adjustment.id;
-    isPaid = !!adjustment.single_cash_flow_id;
+    isPaid = !!adjustment.single_cashflow_id;
   } else if (financeProject) {
     amount = financeProject.start_amount;
     isIncome = financeProject.start_amount > 0;
-    client =
-      financeClients.find(
-        (client) => client.id === financeProject.finance_client_id
+    contact =
+      contacts.find(
+        (contact) => contact.id === financeProject.contact_id
       ) || null;
     description = getLocalizedText("Startbetrag", "Start amount");
     createdAt = new Date(financeProject.created_at);
-    isPaid = !!financeProject.single_cash_flow_id;
+    isPaid = !!financeProject.single_cashflow_id;
   }
 
   return (
@@ -164,7 +163,7 @@ export default function FinanceAdjustmentRow({
         </Group>
 
         <Group gap="xs" align="center">
-          {client && <FinanceClientBadge client={client} />}
+          {contact && <ContactBadge contact={contact} />}
 
           <Text size="xs" c="dimmed">
             {formatDate(createdAt)}

@@ -3,7 +3,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { useIntl } from "@/hooks/useIntl";
 import { usePayouts } from "@/db/collections/finance/payout/use-payout-query";
 
-import { Stack, Group, Skeleton, Box } from "@mantine/core";
+import { Stack, Skeleton, Box } from "@mantine/core";
 
 import PayoutRowCard from "./PayoutRowCard";
 import FinancesNavbar from "../../FinancesNavbar/FinancesNavbar";
@@ -25,7 +25,7 @@ export default function PayoutTab() {
     useSingleCashflowsQuery();
   const { data: projects = [], isLoading: isProjectPending } =
     useWorkProjects();
-  const { data: timerSessions = [], isLoading: isTimeEntryPending } =
+  const { data: work_time_entries, isLoading: isTimeEntryPending } =
     useWorkTimeEntries();
 
   const payoutData = useMemo<Payout[]>(() => {
@@ -33,16 +33,16 @@ export default function PayoutTab() {
       ...payout,
       cashflow:
         singleCashFlows.find((flow) => flow.payout_id === payout.id) ?? null,
-      timer_project: payout.timer_project_id
-        ? (projects.find((project) => project.id === payout.timer_project_id) ??
+      work_project: payout.work_project_id
+        ? (projects.find((project) => project.id === payout.work_project_id) ??
           null)
         : null,
-      timer_sessions:
-        timerSessions
-          .map((session) => (session.payout_id === payout.id ? session : null))
-          .filter((session) => session !== null) ?? [],
+      work_time_entries:
+        work_time_entries
+          .map((time_entry) => (time_entry.payout_id === payout.id ? time_entry : null))
+          .filter((time_entry) => time_entry !== null) ?? [],
     }));
-  }, [payouts, singleCashFlows, projects, timerSessions]);
+  }, [payouts, singleCashFlows, projects, work_time_entries]);
 
   return (
     <Box w="100%">

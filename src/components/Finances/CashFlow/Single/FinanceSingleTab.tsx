@@ -49,7 +49,7 @@ import FinancesNavbarDefaultCard from "@/components/Finances/FinancesNavbar/Fina
 import SelectBankAccount from "@/components/Finances/BankAccount/SelectBankAccount";
 
 export default function FinanceSingleTab() {
-  const { data: singleCashFlows = [], isLoading: isSingleCashFlowsLoading } =
+  const { data: singleCashFlows, isLoading: isSingleCashFlowsLoading } =
     useSingleCashflowsQuery();
   const { data: bankAccounts } = useBankAccounts();
   const { deleteSingleCashflow } = useSingleCashflowMutations();

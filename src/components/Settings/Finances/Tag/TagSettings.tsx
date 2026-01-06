@@ -5,38 +5,38 @@ import {
 } from "@/db/collections/finance/tags/tags-collection";
 
 import { Text } from "@mantine/core";
-import { IconCategoryPlus, IconTagPlus, IconTags } from "@tabler/icons-react";
+import { IconTagPlus, IconTags } from "@tabler/icons-react";
 import FinanceSettingsList from "@/components/Settings/Finances/FinanceSettingsList";
-import FinanceCategoryForm from "@/components/Finances/Category/FinanceCategoryForm";
+import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 import { Tables } from "@/types/db.types";
 
 export default function TagSettings() {
   const { getLocalizedText } = useIntl();
-  const { data: financeCategories } = useTags();
+  const { data: tags } = useTags();
 
-  const renderRowContent = (category: Tables<"finance_category">) => (
+  const renderRowContent = (tag: Tables<"tag">) => (
     <>
       <Text fz="sm" fw={500}>
-        {category.title}
+        {tag.title}
       </Text>
       <Text fz="xs" c="dimmed">
-        {category.description}
+        {tag.description}
       </Text>
     </>
   );
 
   const renderEditForm = (
-    category: Tables<"finance_category">,
+    tag: Tables<"tag">,
     onClose: () => void
-  ) => <FinanceCategoryForm onClose={onClose} category={category} />;
+  ) => <FinanceTagForm onClose={onClose} tag={tag} />;
 
   const renderAddForm = (onClose: () => void) => (
-    <FinanceCategoryForm onClose={onClose} />
+    <FinanceTagForm onClose={onClose} />
   );
 
   return (
     <FinanceSettingsList
-      items={financeCategories}
+      items={tags}
       isLoading={false}
       getId={(item) => item.id}
       getTitle={(item) => item.title}
@@ -56,7 +56,7 @@ export default function TagSettings() {
       editText={getLocalizedText("Tag bearbeiten", "Edit Tag")}
       selectTooltip={getLocalizedText("Tag auswählen", "Select Tag")}
       titleIcon={<IconTags />}
-      addIcon={<IconTagPlus />}  
+      addIcon={<IconTagPlus />}
     />
   );
 }

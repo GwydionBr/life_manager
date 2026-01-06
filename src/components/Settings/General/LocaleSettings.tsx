@@ -17,12 +17,12 @@ export default function LocaleSettings() {
   const { getLocalizedText } = useIntl();
   const { setSettingState } = useSettingsStore();
 
-  if (!settings) return null;
-
   const currentLocale = useMemo(
-    () => locales.find((l) => l.value === settings.locale),
-    [settings.locale]
+    () => locales.find((l) => l.value === settings?.locale),
+    [settings?.locale]
   );
+
+  if (!settings) return null;
 
   return (
     <Group>

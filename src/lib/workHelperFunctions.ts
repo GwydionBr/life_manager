@@ -87,9 +87,9 @@ export function getTimeSectionSessions(
   start: Date,
   end: Date,
   timeSectionInterval: number,
-  originalSession: TablesInsert<"timer_session">
+  originalSession: TablesInsert<"work_time_entry">
 ) {
-  const sessions: TablesInsert<"timer_session">[] = [];
+  const sessions: TablesInsert<"work_time_entry">[] = [];
 
   // Calculate the start of the first time block
   const blockStart = new Date(start);
@@ -118,7 +118,7 @@ export function getTimeSectionSessions(
       singleBlockEnd.getMinutes() + timeSectionInterval
     );
 
-    const session: TablesInsert<"timer_session"> = {
+    const session: TablesInsert<"work_time_entry"> = {
       start_time: singleBlockStart.toISOString(),
       real_start_time: start.toISOString(),
       end_time: singleBlockEnd.toISOString(),
@@ -126,7 +126,7 @@ export function getTimeSectionSessions(
       active_seconds: timeSectionInterval * 60,
       paused_seconds: 0,
       salary: originalSession.salary,
-      project_id: originalSession.project_id,
+      work_project_id: originalSession.work_project_id,
       currency: originalSession.currency,
       hourly_payment: originalSession.hourly_payment,
       payout_id: null,
@@ -146,7 +146,7 @@ export function getTimeSectionSessions(
       currentBlockEnd.getMinutes() + timeSectionInterval
     );
 
-    const session: TablesInsert<"timer_session"> = {
+    const session: TablesInsert<"work_time_entry"> = {
       start_time: currentBlockStart.toISOString(),
       real_start_time:
         start > currentBlockStart
@@ -160,7 +160,7 @@ export function getTimeSectionSessions(
       active_seconds: timeSectionInterval * 60,
       paused_seconds: 0,
       salary: originalSession.salary,
-      project_id: originalSession.project_id,
+      work_project_id: originalSession.work_project_id,
       currency: originalSession.currency,
       hourly_payment: originalSession.hourly_payment,
       payout_id: null,
@@ -177,14 +177,14 @@ export function getTimeSectionSessions(
 }
 
 export function filterOutExistingSessionFragments(
-  existingSessions: Tables<"timer_session">[],
-  newSessions: TablesInsert<"timer_session">[]
+  existingSessions: Tables<"work_time_entry">[],
+  newSessions: TablesInsert<"work_time_entry">[]
 ): {
-  newSessionsToAdd: TablesInsert<"timer_session">[];
-  alreadyExistingSessions: Tables<"timer_session">[];
+  newSessionsToAdd: TablesInsert<"work_time_entry">[];
+  alreadyExistingSessions: Tables<"work_time_entry">[];
 } {
-  const alreadyExistingSessions: Tables<"timer_session">[] = [];
-  const newSessionsToAdd: TablesInsert<"timer_session">[] = [];
+  const alreadyExistingSessions: Tables<"work_time_entry">[] = [];
+  const newSessionsToAdd: TablesInsert<"work_time_entry">[] = [];
   newSessions.forEach((newSession) => {
     const existingSession = existingSessions.find((existingSession) => {
       return (
@@ -216,7 +216,7 @@ export function filterOutExistingSessionFragments(
  * @returns Adjusted session and collision fragments
  */
 export function filterOutExistingSessionTimes(
-  existingSessions: Tables<"timer_session">[],
+  existingSessions: Tables<"work_time_entry">[],
   newSessionTime: TimeSpan
 ): {
   adjustedTimeSpan: TimeSpan[] | null;

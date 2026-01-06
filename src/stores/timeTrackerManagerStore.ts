@@ -73,7 +73,7 @@ interface TimeTrackerManagerState {
    * @returns Success status, timer ID if successful, or error message
    */
   addTimer: (
-    project: Tables<"timer_project">,
+    project: Tables<"work_project">,
     roundingSettings: TimerRoundingSettings
   ) => {
     success: boolean;

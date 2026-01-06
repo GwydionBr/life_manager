@@ -1,7 +1,7 @@
 import { db } from "@/db/powersync/db";
 import {
   financeProjectsCollection,
-  financeProjectCategoriesCollection,
+  financeProjectTagsCollection,
 } from "./finance-project-collection";
 import {
   InsertFinanceProject,
@@ -31,7 +31,7 @@ export const addFinanceProject = async (
       );
     },
   });
-  const { tags: categories, client, ...projectData } = newFinanceProject;
+  const { tags, contact, ...projectData } = newFinanceProject;
   const newFinanceProjectData = {
     ...projectData,
     id: newFinanceProject.id || crypto.randomUUID(),
@@ -39,17 +39,16 @@ export const addFinanceProject = async (
     user_id: userId,
     description: projectData.description || null,
     due_date: projectData.due_date || null,
-    finance_client_id: projectData.finance_client_id || null,
-    single_cash_flow_id: projectData.single_cash_flow_id || null,
-    client_id: client?.id || null,
+    contact_id: projectData.contact_id || null,
+    single_cashflow_id: projectData.single_cashflow_id || null,
   };
   customTransaction.mutate(() => {
     financeProjectsCollection.insert(newFinanceProjectData);
-    categories.forEach((category) => {
-      financeProjectCategoriesCollection.insert({
+    tags.forEach((tag) => {
+      financeProjectTagsCollection.insert({
         id: crypto.randomUUID(),
         finance_project_id: newFinanceProjectData.id,
-        finance_category_id: category.id,
+        tag_id: tag.id,
         user_id: userId,
         created_at: new Date().toISOString(),
       });
@@ -59,7 +58,7 @@ export const addFinanceProject = async (
   const promise = await customTransaction.isPersisted.promise;
   return {
     promise,
-    data: { ...newFinanceProjectData, categories, client, adjustments: [] },
+    data: { ...newFinanceProjectData, tags, contact, adjustments: [] },
   };
 };
 
@@ -77,8 +76,8 @@ export const updateFinanceProject = async (
 ) => {
   const ids = Array.isArray(id) ? id : [id];
   const {
-    tags: categories,
-    client: _client,
+    tags,
+    contact: _contact,
     adjustments: _adjustments,
     ...projectData
   } = item;
@@ -105,8 +104,8 @@ export const updateFinanceProject = async (
   await customTransaction.commit();
   const promise = await customTransaction.isPersisted.promise;
 
-  const categoryIds = categories.map((category) => category.id);
-  await syncFinanceProjectCategories(ids, categoryIds, userId);
+  const tagIds = tags.map((tag) => tag.id);
+  await syncFinanceProjectTags(ids, tagIds, userId);
 
   return promise;
 };
@@ -122,39 +121,39 @@ export const deleteFinanceProject = (id: string | string[]) => {
 };
 
 /**
- * Synchronizes the Many-to-Many relations between Finance Project and Finance Categories.
- * Deletes old relations and creates new ones based on categoryIds.
+ * Synchronizes the Many-to-Many relations between Finance Project and Finance Tags.
+ * Deletes old relations and creates new ones based on tagIds.
  * Can handle a single project ID or an array of project IDs.
  *
  * @param projectIds - The project ID or array of project IDs
- * @param categoryIds - Array of category IDs to associate
+ * @param tagIds - Array of tag IDs to associate
  * @param userId - The user ID
  */
-export async function syncFinanceProjectCategories(
+export async function syncFinanceProjectTags(
   projectIds: string[],
-  categoryIds: string[],
+  tagIds: string[],
   userId: string
 ): Promise<void> {
   // Normalize to array
-  const newCategoryIds = categoryIds || [];
+  const newTagIds = tagIds || [];
 
   // 1. Get all existing relations for all projects
   const placeholders = projectIds.map(() => "?").join(",");
   const existingRelations = await db.getAll<{
     id: string;
     finance_project_id: string;
-    finance_category_id: string;
+    tag_id: string;
   }>(
-    `SELECT id, finance_project_id, finance_category_id FROM finance_project_category WHERE finance_project_id IN (${placeholders})`,
+    `SELECT id, finance_project_id, tag_id FROM finance_project_tag WHERE finance_project_id IN (${placeholders})`,
     projectIds
   );
 
   // 2. Process each project separately
   const allDeletePromises: ReturnType<
-    typeof financeProjectCategoriesCollection.delete
+    typeof financeProjectTagsCollection.delete
   >[] = [];
   const allInsertPromises: ReturnType<
-    typeof financeProjectCategoriesCollection.insert
+    typeof financeProjectTagsCollection.insert
   >[] = [];
 
   for (const currentProjectId of projectIds) {
@@ -162,34 +161,30 @@ export async function syncFinanceProjectCategories(
     const projectRelations = existingRelations.filter(
       (r) => r.finance_project_id === currentProjectId
     );
-    const existingCategoryIds = projectRelations.map(
-      (r) => r.finance_category_id
-    );
+    const existingTagIds = projectRelations.map((r) => r.tag_id);
 
     // Find relations to delete (in existing but not in new)
     const relationsToDelete = projectRelations.filter(
-      (relation) => !newCategoryIds.includes(relation.finance_category_id)
+      (relation) => !newTagIds.includes(relation.tag_id)
     );
 
-    // Find categories to add (in new but not in existing)
-    const categoriesToAdd = newCategoryIds.filter(
-      (categoryId) => !existingCategoryIds.includes(categoryId)
+    // Find tags to add (in new but not in existing)
+    const tagsToAdd = newTagIds.filter(
+      (tagId) => !existingTagIds.includes(tagId)
     );
 
     // Delete old relations
     relationsToDelete.forEach((relation) => {
-      allDeletePromises.push(
-        financeProjectCategoriesCollection.delete(relation.id)
-      );
+      allDeletePromises.push(financeProjectTagsCollection.delete(relation.id));
     });
 
     // Create new relations
-    categoriesToAdd.forEach((categoryId) => {
+    tagsToAdd.forEach((tagId) => {
       allInsertPromises.push(
-        financeProjectCategoriesCollection.insert({
+        financeProjectTagsCollection.insert({
           id: crypto.randomUUID(),
           finance_project_id: currentProjectId,
-          finance_category_id: categoryId,
+          tag_id: tagId,
           user_id: userId,
           created_at: new Date().toISOString(),
         })

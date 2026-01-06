@@ -1,5 +1,3 @@
-"use client";
-
 import { Stack, Text, List, Group } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IconAlertCircle } from "@tabler/icons-react";
@@ -9,9 +7,9 @@ import { Locale } from "@/types/settings.types";
 
 interface SessionNotificationProps {
   completeOverlap: boolean;
-  originalSession?: TablesInsert<"timer_session">;
-  createdSessions: Tables<"timer_session">[] | null;
-  overlappingSessions: Tables<"timer_session">[] | null;
+  originalSession?: TablesInsert<"work_time_entry">;
+  createdSessions: Tables<"work_time_entry">[] | null;
+  overlappingSessions: Tables<"work_time_entry">[] | null;
   onCompleteOverlap?: () => void;
   onCreatedSessions?: () => void;
   onError?: () => void;

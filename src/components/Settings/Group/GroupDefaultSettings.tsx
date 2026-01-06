@@ -15,13 +15,9 @@ export default function GroupDefaultSettings() {
   const { data: settings } = useSettings();
   const [color, setColor] = useState<string | null>(null);
 
-  if (!settings) return null;
-
-  const { default_group_color } = settings;
-
   useEffect(() => {
-    setColor(default_group_color);
-  }, [default_group_color]);
+    setColor(settings?.default_group_color ?? null);
+  }, [settings?.default_group_color]);
 
   function handleColorChange() {
     if (!settings) return;
@@ -29,6 +25,8 @@ export default function GroupDefaultSettings() {
       draft.default_group_color = color;
     });
   }
+
+  if (!settings) return null;
 
   return (
     <Group>

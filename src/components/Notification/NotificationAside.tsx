@@ -15,6 +15,7 @@ import NotificationAsideCard from "./NotificationAsideCard";
 import NotificationPopover from "./NotificationPopover";
 
 import classes from "./Notification.module.css";
+import { Friend } from "@/types/profile.types";
 
 export default function NotificationAside({
   isNotificationOpen,
@@ -27,18 +28,18 @@ export default function NotificationAside({
 }) {
   // TODO: Implement friends query
   // const { data: friends } = useFriendsQuery();
-  const friends: any[] = [];
   const { groupRequests } = useGroupStore();
   const [opened, setOpened] = useState(false);
   const [showCard, setShowCard] = useState(false);
 
-  const pendingFriends = useMemo(
-    () =>
-      friends?.filter(
-        (friend) => friend.friendshipStatus === "pending" && !friend.isRequester
-      ) || [],
-    [friends]
-  );
+  // const pendingFriends = useMemo(
+  //   () =>
+  //     friends?.filter(
+  //       (friend) => friend.friendshipStatus === "pending" && !friend.isRequester
+  //     ) || [],
+  //   [friends]
+  // );
+  const pendingFriends: Friend[] = useMemo(() => [], []);
 
   useEffect(() => {
     if (

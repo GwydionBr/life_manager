@@ -22,7 +22,7 @@ interface FinanceBankAccountRowProps {
   bankAccount: BankAccount;
   selectedModeActive: boolean;
   isSelected?: boolean;
-  onToggleSelected?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onToggleSelected?: (e: React.MouseEvent<HTMLDivElement>) => void;
   onDelete: (ids: string[]) => void;
 }
 
@@ -57,8 +57,8 @@ export default function FinanceBankAccountRow({
       style={{ cursor: selectedModeActive ? "pointer" : "default" }}
       onClick={
         selectedModeActive
-          ? (e: React.MouseEvent<HTMLDivElement>) =>
-              onToggleSelected?.(e as any)
+          ? (e) =>
+              onToggleSelected?.(e)
           : undefined
       }
     >

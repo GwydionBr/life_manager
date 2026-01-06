@@ -15,13 +15,12 @@ import {
   Grid,
   Loader,
   Text,
-  Badge,
 } from "@mantine/core";
 import { IconBriefcase } from "@tabler/icons-react";
 import AnalysisActionIcon from "@/components/UI/ActionIcons/AnalysisActionIcon";
 import ListActionIcon from "@/components/UI/ActionIcons/ListActionIcon";
 import EditActionIcon from "@/components/UI/ActionIcons/EditActionIcon";
-import FinanceCategorySingleBadge from "@/components/Finances/Category/FinanceCategorySingleBadge";
+import FinanceTagSingleBadge from "@/components/Finances/Tag/TagSingleBadge";
 
 export default function WorkHeader() {
   const {
@@ -50,7 +49,7 @@ export default function WorkHeader() {
   } = useWorkTimeEntries();
   const timeEntries = useMemo(() => {
     return timeEntriesData?.filter(
-      (timeEntry) => timeEntry.project_id === activeProjectId
+      (timeEntry) => timeEntry.work_project_id === activeProjectId
     );
   }, [timeEntriesData, activeProjectId]);
 
@@ -116,9 +115,9 @@ export default function WorkHeader() {
       <Grid w="100%" align="center">
         <Grid.Col span={2}>
           {project?.tags.map((category) => (
-            <FinanceCategorySingleBadge
+            <FinanceTagSingleBadge
               variant="filled"
-              category={category}
+              tag={category}
               key={category.id}
             />
           ))}

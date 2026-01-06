@@ -13,7 +13,7 @@ import {
   Stack,
   ThemeIcon,
 } from "@mantine/core";
-import FinanceCategoryBadges from "@/components/Finances/Category/FinanceCategoryBadges";
+import FinanceTagBadges from "@/components/Finances/Tag/TagBadges";
 import SelectActionIcon from "@/components/UI/ActionIcons/SelectActionIcon";
 
 import { SingleCashFlow } from "@/types/finance.types";
@@ -52,21 +52,21 @@ export default function SingleCashflowRow({
   const { updateSingleCashflow } = useSingleCashflowMutations();
   const { hovered, ref } = useHover();
   const [
-    isCategoryPopoverOpen,
-    { open: openCategoryPopover, close: closeCategoryPopover },
+    isTagPopoverOpen,
+    { open: openTagPopover, close: closeTagPopover },
   ] = useDisclosure(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const handleCategoryClose = async (
-    updatedCategories: Tables<"finance_category">[] | null
+  const handleTagClose = async (
+    updatedTags: Tables<"tag">[] | null
   ) => {
     if (isUpdating) return;
     setIsUpdating(true);
-    closeCategoryPopover();
-    if (updatedCategories) {
+    closeTagPopover();
+    if (updatedTags) {
       await updateSingleCashflow(cashflow.id, {
         ...cashflow,
-        tags: updatedCategories,
+        tags: updatedTags,
       });
     }
     setTimeout(() => setIsUpdating(false), 500);
@@ -81,7 +81,7 @@ export default function SingleCashflowRow({
       }}
       withBorder
       onClick={(e) => {
-        if (!isCategoryPopoverOpen) {
+        if (!isTagPopoverOpen) {
           if (selectedModeActive) {
             onToggleSelected(e);
           } else {
@@ -120,17 +120,17 @@ export default function SingleCashflowRow({
         </Grid.Col>
         <Grid.Col span={3}>
           <Stack>
-            <FinanceCategoryBadges
-              initialCategories={cashflow.tags}
-              onPopoverOpen={openCategoryPopover}
-              onPopoverClose={handleCategoryClose}
-              showAddCategory={hovered}
+            <FinanceTagBadges
+              initialTags={cashflow.tags}
+              onPopoverOpen={openTagPopover}
+              onPopoverClose={handleTagClose}
+              showAddTag={hovered}
             />
           </Stack>
         </Grid.Col>
         <Grid.Col span={1}>
           <Group justify="flex-end">
-            {cashflow.recurring_cash_flow_id && (
+            {cashflow.recurring_cashflow_id && (
               <ThemeIcon
                 variant="transparent"
                 color={cashflow.amount < 0 ? "red" : "green"}

@@ -14,7 +14,7 @@ import { IconBrandCashapp, IconAlertCircle } from "@tabler/icons-react";
 import type { Tables } from "@/types/db.types";
 
 interface ProjectPayoutMenuProps {
-  project: Tables<"timer_project">;
+  project: Tables<"work_project">;
   availablePayout: number;
   useCustomAmount: boolean;
   payoutAmount: number;

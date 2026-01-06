@@ -22,10 +22,10 @@ import type { TimePreset } from "@/types/timerSession.types";
 import type { FilterLogic } from "@/hooks/useSessionFiltering";
 
 interface SessionFilterProps {
-  unpaidSessions: Tables<"timer_session">[];
+  unpaidSessions: Tables<"work_time_entry">[];
   selectedSessions: string[];
-  projects?: Tables<"timer_project">[];
-  folders?: Tables<"timer_project_folder">[];
+  projects?: Tables<"work_project">[];
+  folders?: Tables<"work_folder">[];
   isOverview: boolean;
   timePresets: TimePreset[];
   selectedTimePreset: string | null;

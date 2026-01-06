@@ -36,44 +36,36 @@ const projectSchema = z.object({
   ),
   start_amount: z.number().min(0, "Start amount is required"),
   due_date: z.string().nullable(),
-  finance_category_ids: z.array(z.string()),
-  finance_client_id: z.string().nullable(),
+  tag_ids: z.array(z.string()),
+  contact_id: z.string().nullable(),
 });
 
 interface FinanceProjectFormProps {
   onClose: () => void;
   financeProject?: FinanceProject;
-  financeClient: Tables<"finance_client"> | null;
-  categories: Tables<"finance_category">[];
-  onOpenClientForm: () => void;
-  onOpenCategoryForm: () => void;
-  onClientChange: (value: Tables<"finance_client"> | null) => void;
-  onCategoryChange: (value: Tables<"finance_category">[]) => void;
+  contact: Tables<"contact"> | null;
+  tags: Tables<"tag">[];
+  onOpenContactForm: () => void;
+  onOpenTagForm: () => void;
+  onContactChange: (value: Tables<"contact"> | null) => void;
+  onTagChange: (value: Tables<"tag">[]) => void;
 }
 
 export default function FinanceProjectForm({
   onClose,
   financeProject,
-  financeClient,
-  categories,
-  onOpenClientForm,
-  onOpenCategoryForm,
-  onClientChange,
-  onCategoryChange,
+  contact,
+  tags,
+  onOpenContactForm,
+  onOpenTagForm,
+  onContactChange,
+  onTagChange,
 }: FinanceProjectFormProps) {
   const { data: settings } = useSettings();
   const { getLocalizedText } = useIntl();
   const { addFinanceProject, updateFinanceProject } =
     useFinanceProjectMutations();
-  // const {
-  //   mutate: addFinanceProjectMutation,
-  //   isPending: isAddingFinanceProject,
-  // } = useCreateFinanceProjectMutation({ onSuccess: () => handleClose() });
-  // const {
-  //   mutate: updateFinanceProjectMutation,
-  //   isPending: isUpdatingFinanceProject,
-  // } = useUpdateFinanceProjectMutation({ onSuccess: () => handleClose() });
-  const { data: financeCategories } = useTags();
+  const { data: allTags } = useTags();
   const { data: contacts } = useContacts();
   const form = useForm<z.infer<typeof projectSchema>>({
     initialValues: financeProject
@@ -82,10 +74,8 @@ export default function FinanceProjectForm({
           description: financeProject.description || "",
           currency: financeProject.currency,
           start_amount: financeProject.start_amount,
-          finance_category_ids: financeProject.tags.map(
-            (category) => category.id
-          ),
-          finance_client_id: financeProject.finance_client_id,
+          tag_ids: financeProject.tags.map((tag) => tag.id),
+          contact_id: financeProject.contact_id,
           due_date: financeProject.due_date || null,
         }
       : {
@@ -93,24 +83,24 @@ export default function FinanceProjectForm({
           description: "",
           currency: settings?.default_finance_currency || "USD",
           start_amount: 0,
-          finance_category_ids: [],
-          finance_client_id: null,
+          tag_ids: [],
+          contact_id: null,
           due_date: null,
         },
     validate: zodResolver(projectSchema),
   });
 
   useEffect(() => {
-    if (financeClient) {
-      form.setFieldValue("finance_client_id", financeClient.id);
+    if (contact) {
+      form.setFieldValue("contact_id", contact.id);
     }
-    if (categories) {
+    if (tags) {
       form.setFieldValue(
-        "finance_category_ids",
-        categories.map((c) => c.id)
+        "tag_ids",
+        tags.map((c) => c.id)
       );
     }
-  }, [financeClient, categories]);
+  }, [contact, tags]);
 
   const handleSubmit = async (values: z.infer<typeof projectSchema>) => {
     if (financeProject) {
@@ -121,11 +111,9 @@ export default function FinanceProjectForm({
         currency: values.currency,
         start_amount: values.start_amount,
         due_date: values.due_date || null,
-        finance_client_id: values.finance_client_id,
-        categories: financeCategories.filter((c) =>
-          values.finance_category_ids.includes(c.id)
-        ),
-        client: contacts.find((c) => c.id === values.finance_client_id) || null,
+        contact_id: values.contact_id,
+        tags: allTags.filter((c) => values.tag_ids.includes(c.id)),
+        contact: contacts.find((c) => c.id === values.contact_id) || null,
       };
       updateFinanceProject(financeProject.id, updateProject);
     } else {
@@ -135,11 +123,9 @@ export default function FinanceProjectForm({
         currency: values.currency,
         start_amount: values.start_amount,
         due_date: values.due_date || null,
-        finance_client_id: values.finance_client_id,
-        client: contacts.find((c) => c.id === values.finance_client_id) || null,
-        categories: financeCategories.filter((c) =>
-          values.finance_category_ids.includes(c.id)
-        ),
+        contact_id: values.contact_id,
+        contact: contacts.find((c) => c.id === values.contact_id) || null,
+        tags: allTags.filter((c) => values.tag_ids.includes(c.id)),
       };
       addFinanceProject(insertProject);
     }
@@ -151,23 +137,23 @@ export default function FinanceProjectForm({
     form.reset();
   }
 
-  const categoryOptions = financeCategories.map((category) => ({
-    value: category.id,
-    label: category.title,
+  const tagOptions = allTags.map((tag) => ({
+    value: tag.id,
+    label: tag.title,
   }));
-  const clientOptions = contacts.map((client) => ({
-    value: client.id,
-    label: client.name,
+  const contactOptions = contacts.map((contact) => ({
+    value: contact.id,
+    label: contact.name,
   }));
 
-  const handleClientChange = (value: string | null) => {
-    form.setFieldValue("finance_client_id", value);
-    onClientChange(contacts.find((c) => c.id === value) || null);
+  const handleContactChange = (value: string | null) => {
+    form.setFieldValue("contact_id", value);
+    onContactChange(contacts.find((c) => c.id === value) || null);
   };
 
-  const handleCategoryChange = (value: string[]) => {
-    form.setFieldValue("finance_category_ids", value);
-    onCategoryChange(financeCategories.filter((c) => value.includes(c.id)));
+  const handleTagChange = (value: string[]) => {
+    form.setFieldValue("tag_ids", value);
+    onTagChange(allTags.filter((c) => value.includes(c.id)));
   };
 
   return (
@@ -212,65 +198,65 @@ export default function FinanceProjectForm({
           <MultiSelect
             w="100%"
             multiple
-            data={categoryOptions}
+            data={tagOptions}
             searchable
             clearable
             nothingFoundMessage={getLocalizedText(
-              "Keine Kategorien gefunden",
-              "No categories found"
+              "Keine Tags gefunden",
+              "No tags found"
             )}
-            label={getLocalizedText("Finanzkategorie", "Finance category")}
-            placeholder={getLocalizedText(
-              "Finanzkategorie auswählen",
-              "Select finance category"
-            )}
-            value={form.values.finance_category_ids}
-            onChange={handleCategoryChange}
-            error={form.errors.finance_category_ids}
+            label={getLocalizedText("Tags", "Tags")}
+            placeholder={getLocalizedText("Tags auswählen", "Select tags")}
+            value={form.values.tag_ids}
+            onChange={handleTagChange}
+            error={form.errors.tag_ids}
           />
           <Button
             mt={25}
             w={180}
             p={0}
-            onClick={onOpenCategoryForm}
+            onClick={onOpenTagForm}
             fw={500}
             variant="subtle"
             size="xs"
             leftSection={<IconPlus size={20} />}
           >
             <Text fz="xs" c="dimmed">
-              {getLocalizedText("Neue Kategorie", "Add Category")}
+              {getLocalizedText("Neues Tag", "Add Tag")}
             </Text>
           </Button>
         </Group>
         <Group wrap="nowrap">
           <Select
             w="100%"
-            data={clientOptions}
+            data={contactOptions}
             searchable
             clearable
             nothingFoundMessage={getLocalizedText(
-              "Keine Kunden gefunden",
-              "No clients found"
+              "Keine Kontakte gefunden",
+              "No contacts found"
             )}
-            label={getLocalizedText("Kunde", "Client")}
-            placeholder={getLocalizedText("Kunde auswählen", "Select client")}
-            value={form.values.finance_client_id || null}
-            onChange={handleClientChange}
-            error={form.errors.finance_client_id}
+            label={getLocalizedText("Kontakt", "Contact")}
+            placeholder={getLocalizedText(
+              "Kontakt auswählen",
+              "Select contact"
+            )}
+            value={form.values.contact_id || null}
+            onChange={handleContactChange}
+            error={form.errors.contact_id}
           />
           <Button
             mt={25}
             w={180}
             p={0}
-            onClick={onOpenClientForm}
+            onClick={onOpenContactForm}
             fw={500}
             variant="subtle"
             size="xs"
             leftSection={<IconPlus size={20} />}
           >
             <Text fz="xs" c="dimmed">
-              {getLocalizedText("Neuer Kunde", "Add Client")}
+              {getLocalizedText("Neuer Kontakt", "Add Contact")}
             </Text>
           </Button>
         </Group>

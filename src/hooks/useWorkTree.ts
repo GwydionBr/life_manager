@@ -14,12 +14,12 @@ import {
 } from "@/types/work.types";
 
 export const useWorkTree = () => {
-  const { data: projects, isLoading: isProjectsLoading } = useWorkProjects();
+  const { data: projects } = useWorkProjects();
   const { data: folders } = useWorkFolders();
 
   const cleanedProjects = useMemo(() => {
     return projects.map((project) => {
-      const { tags: categories, ...rest } = project;
+      const { tags: _tags, ...rest } = project;
       return rest;
     });
   }, [projects]);
@@ -27,7 +27,7 @@ export const useWorkTree = () => {
   const projectTree = useMemo(() => {
     const { tree } = createTree(cleanedProjects, folders);
     return tree;
-  }, [projects, folders]);
+  }, [folders, cleanedProjects]);
 
   const handleChangedNodes = (
     changedNodes: ProjectTreeItem[],
@@ -45,7 +45,7 @@ export const useWorkTree = () => {
       .map((node) => ({
         id: node.id,
         order_index: node.index,
-        categories: null,
+        tags: null,
       }));
     for (const folder of updatedFolders) {
       workFoldersCollection.update(folder.id, (draft) => {
@@ -56,7 +56,7 @@ export const useWorkTree = () => {
     for (const project of updatedProjects) {
       workProjectsCollection.update(project.id, (draft) => {
         draft.order_index = project.order_index || 0;
-        draft.folder_id = project.folder_id || null;
+        draft.work_folder_id = project.work_folder_id || null;
       });
     }
   };
@@ -66,7 +66,7 @@ export const useWorkTree = () => {
     newParentFolderId: string | null,
     index: number
   ) => {
-    const { tree, changedNodes } = moveNode(
+    const { tree: _tree, changedNodes } = moveNode(
       projectTree,
       folderId,
       newParentFolderId,
@@ -88,7 +88,7 @@ export const useWorkTree = () => {
     const project = projects.find((p) => p.id === projectId);
     if (!project) return false;
 
-    const { tree, changedNodes } = moveNode(
+    const { tree: _tree, changedNodes } = moveNode(
       projectTree,
       projectId,
       newFolderId,
@@ -97,7 +97,7 @@ export const useWorkTree = () => {
     handleChangedNodes(changedNodes);
 
     workProjectsCollection.update(projectId, (draft) => {
-      draft.folder_id = newFolderId;
+      draft.work_folder_id = newFolderId;
       draft.order_index = index;
     });
   };

@@ -22,12 +22,12 @@ export type CalendarSession = Pick<
   | "id"
   | "start_time"
   | "end_time"
-  | "project_id"
+  | "work_project_id"
   | "memo"
   | "active_seconds"
   | "currency"
   | "salary"
-  | "single_cash_flow_id"
+  | "single_cashflow_id"
 > & {
   projectTitle: string;
   color: string;
@@ -40,7 +40,7 @@ export type CalendarAppointment = Pick<
   | "description"
   | "start_date"
   | "end_date"
-  | "timer_project_id"
+  | "work_project_id"
 > & {
   projectTitle: string;
   color: string;

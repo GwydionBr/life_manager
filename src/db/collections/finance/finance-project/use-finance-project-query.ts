@@ -8,7 +8,7 @@ import {
 
 import {
   financeProjectsCollection,
-  financeProjectCategoriesCollection,
+  financeProjectTagsCollection,
 } from "./finance-project-collection";
 import { tagsCollection } from "@/db/collections/finance/tags/tags-collection";
 import { projectAdjustmentsCollection } from "@/db/collections/finance/project-adjustment/project-adjustment-collection";
@@ -16,16 +16,16 @@ import { contactsCollection } from "@/db/collections/finance/contacts/contact-co
 
 import { FinanceProject } from "@/types/finance.types";
 
-// Cached Live Query: Finance Project → Categories Mapping
-const financeProjectCategoryMappingCollection = createLiveQueryCollection((q) =>
+// Cached Live Query: Finance Project → Tags Mapping
+const financeProjectTagMappingCollection = createLiveQueryCollection((q) =>
   q
-    .from({ relations: financeProjectCategoriesCollection })
-    .innerJoin({ category: tagsCollection }, ({ relations, category }) =>
-      eq(relations.finance_category_id, category.id)
+    .from({ relations: financeProjectTagsCollection })
+    .innerJoin({ tag: tagsCollection }, ({ relations, tag }) =>
+      eq(relations.tag_id, tag.id)
     )
-    .select(({ relations, category }) => ({
+    .select(({ relations, tag }) => ({
       projectId: relations.finance_project_id,
-      category,
+      tag,
     }))
 );
 
@@ -44,7 +44,7 @@ export const useFinanceProjects = () => {
     isLoading: isMappingsLoading,
     isReady: isMappingsReady,
   } = useLiveQuery((q) =>
-    q.from({ mappings: financeProjectCategoryMappingCollection })
+    q.from({ mappings: financeProjectTagMappingCollection })
   );
   const {
     data: adjustments,
@@ -54,41 +54,41 @@ export const useFinanceProjects = () => {
     q.from({ adjustments: projectAdjustmentsCollection })
   );
   const {
-    data: clients,
-    isLoading: isClientsLoading,
-    isReady: isClientsReady,
-  } = useLiveQuery((q) => q.from({ clients: contactsCollection }));
+    data: contacts,
+    isLoading: isContactsLoading,
+    isReady: isContactsReady,
+  } = useLiveQuery((q) => q.from({ contacts: contactsCollection }));
 
   useEffect(() => {
     setIsLoading(
       isProjectsLoading ||
         isMappingsLoading ||
         isAdjustmentsLoading ||
-        isClientsLoading
+        isContactsLoading
     );
   }, [
     isProjectsLoading,
     isMappingsLoading,
     isAdjustmentsLoading,
-    isClientsLoading,
+    isContactsLoading,
   ]);
 
   useEffect(() => {
     setIsReady(
-      isProjectsReady && isMappingsReady && isAdjustmentsReady && isClientsReady
+      isProjectsReady && isMappingsReady && isAdjustmentsReady && isContactsReady
     );
-  }, [isProjectsReady, isMappingsReady, isAdjustmentsReady, isClientsReady]);
+  }, [isProjectsReady, isMappingsReady, isAdjustmentsReady, isContactsReady]);
 
-  const projectsWithCategories = useMemo((): FinanceProject[] => {
+  const projectsWithTags = useMemo((): FinanceProject[] => {
     if (!projects) return [];
 
-    // Group categories by project
-    const categoriesByProject = new Map<string, FinanceProject["tags"]>();
-    mappings?.forEach(({ projectId, category }) => {
-      if (!categoriesByProject.has(projectId)) {
-        categoriesByProject.set(projectId, []);
+    // Group tags by project
+    const tagsByProject = new Map<string, FinanceProject["tags"]>();
+    mappings?.forEach(({ projectId, tag }) => {
+      if (!tagsByProject.has(projectId)) {
+        tagsByProject.set(projectId, []);
       }
-      categoriesByProject.get(projectId)!.push(category);
+      tagsByProject.get(projectId)!.push(tag);
     });
 
     // Group adjustments by project
@@ -104,21 +104,21 @@ export const useFinanceProjects = () => {
       adjustmentsByProject.get(projectId)!.push(adjustment);
     });
 
-    // Create a map of clients by id for quick lookup
-    const clientsById = new Map<string, FinanceProject["client"]>();
-    clients?.forEach((client) => {
-      clientsById.set(client.id, client);
+    // Create a map of contacts by id for quick lookup
+    const contactById = new Map<string, FinanceProject["contact"]>();
+    contacts?.forEach((contact) => {
+      contactById.set(contact.id, contact);
     });
 
     return projects.map((project) => ({
       ...project,
-      categories: categoriesByProject.get(project.id) || [],
+      tags: tagsByProject.get(project.id) || [],
       adjustments: adjustmentsByProject.get(project.id) || [],
-      client: project.finance_client_id
-        ? clientsById.get(project.finance_client_id) || null
+      contact: project.contact_id
+        ? contactById.get(project.contact_id) || null
         : null,
     }));
-  }, [projects, mappings, adjustments, clients]);
+  }, [projects, mappings, adjustments, contacts]);
 
-  return { data: projectsWithCategories, isLoading, isReady };
+  return { data: projectsWithTags, isLoading, isReady };
 };

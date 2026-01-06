@@ -55,7 +55,7 @@ interface RecurringFinanceFormProps {
   financeCurrency: Currency;
   handleSubmit: (values: RecurringFinanceFormValues) => void;
   isLoading: boolean;
-  cashFlow?: Tables<"recurring_cash_flow">;
+  cashFlow?: Tables<"recurring_cashflow">;
 }
 
 export default function RecurringFinanceForm({

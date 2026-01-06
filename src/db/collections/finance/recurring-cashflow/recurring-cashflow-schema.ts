@@ -7,7 +7,7 @@ export const recurringCashflowSchema = z.object({
   currency: z.enum(Constants.public.Enums.currency),
   description: z.string(),
   end_date: z.string().nullable(),
-  finance_client_id: z.string().nullable(),
+  contact_id: z.string().nullable(),
   id: z.string(),
   interval: z.enum(Constants.public.Enums.finance_interval),
   start_date: z.string(),
@@ -23,7 +23,7 @@ export const recurringCashflowDeserializationSchema = z.object({
     .transform((value) => value as Database["public"]["Enums"]["currency"]),
   description: z.string(),
   end_date: z.string().nullable(),
-  finance_client_id: z.string().nullable(),
+  contact_id: z.string().nullable(),
   id: z.string(),
   interval: z
     .string()
@@ -35,18 +35,18 @@ export const recurringCashflowDeserializationSchema = z.object({
   user_id: z.string(),
 });
 
-export const recurringCashflowCategorySchema = z.object({
+export const recurringCashflowTagSchema = z.object({
   created_at: z.string(),
-  finance_category_id: z.string(),
+  tag_id: z.string(),
   id: z.string(),
-  recurring_cash_flow_id: z.string(),
+  recurring_cashflow_id: z.string(),
   user_id: z.string(),
 });
 
-export const recurringCashflowCategoryDeserializationSchema = z.object({
+export const recurringCashflowTagDeserializationSchema = z.object({
   created_at: z.string(),
-  finance_category_id: z.string(),
+  tag_id: z.string(),
   id: z.string(),
-  recurring_cash_flow_id: z.string(),
+  recurring_cashflow_id: z.string(),
   user_id: z.string(),
 });

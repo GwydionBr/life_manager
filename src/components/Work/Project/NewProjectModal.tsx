@@ -4,7 +4,7 @@ import { useRouter } from "@tanstack/react-router";
 
 import { Modal, useModalsStack } from "@mantine/core";
 import ProjectForm from "./ProjectForm";
-import FinanceCategoryForm from "@/components/Finances/Category/FinanceCategoryForm";
+import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 
 import { WorkProject } from "@/types/work.types";
 
@@ -18,8 +18,8 @@ export default function NewProjectModal({
   onClose,
 }: NewProjectModalProps) {
   const { getLocalizedText } = useIntl();
-  const stack = useModalsStack(["project-form", "category-form"]);
-  const [categoryIds, setCategoryIds] = useState<string[]>([]);
+  const stack = useModalsStack(["project-form", "tag-form"]);
+  const [tagIds, setTagIds] = useState<string[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function NewProjectModal({
       search: { projectId: project.id },
     });
     onClose();
-    setCategoryIds([]);
+    setTagIds([]);
   };
 
   return (
@@ -50,22 +50,20 @@ export default function NewProjectModal({
         <ProjectForm
           onCancel={onClose}
           onSuccess={handleSuccess}
-          categoryIds={categoryIds}
-          setCategoryIds={setCategoryIds}
+          tagIds={tagIds}
+          setTagIds={setTagIds}
           setActiveProjectId={true}
-          onOpenCategoryForm={() => stack.open("category-form")}
+          onOpenTagForm={() => stack.open("tag-form")}
         />
       </Modal>
       <Modal
-        {...stack.register("category-form")}
-        onClose={() => stack.close("category-form")}
-        title={getLocalizedText("Neue Kategorie", "New Category")}
+        {...stack.register("tag-form")}
+        onClose={() => stack.close("tag-form")}
+        title={getLocalizedText("Neues Tag", "New Tag")}
       >
-        <FinanceCategoryForm
-          onClose={() => stack.close("category-form")}
-          onSuccess={(category) =>
-            setCategoryIds([...categoryIds, category.id])
-          }
+        <FinanceTagForm
+          onClose={() => stack.close("tag-form")}
+          onSuccess={(tag) => setTagIds([...tagIds, tag.id])}
         />
       </Modal>
     </Modal.Stack>

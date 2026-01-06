@@ -8,10 +8,6 @@ import {
 import { useIntl } from "@/hooks/useIntl";
 import { useFinanceProjectMutations } from "@/db/collections/finance/finance-project/use-finance-project-mutations";
 import { usePayoutMutations } from "@/db/collections/finance/payout/use-payout-mutations";
-// import {
-//   usePayoutFinanceProjectMutation,
-//   usePayoutFinanceAdjustmentMutation,
-// } from "@/utils/queries/finances/use-payout";
 
 import {
   Card,
@@ -42,8 +38,8 @@ import {
 } from "@tabler/icons-react";
 import MoreActionIcon from "@/components/UI/ActionIcons/MoreActionIcon";
 import PlusActionIcon from "@/components/UI/ActionIcons/PlusActionIcon";
-import FinanceClientBadge from "@/components/Finances/Contact/ContactBadge";
-import FinanceCategoryBadges from "@/components/Finances/Category/FinanceCategoryBadges";
+import ContactBadge from "@/components/Finances/Contact/ContactBadge";
+import FinanceTagBadges from "@/components/Finances/Tag/TagBadges";
 import { Tables } from "@/types/db.types";
 import PayoutActionIcon from "@/components/UI/ActionIcons/PayoutActionIcon";
 
@@ -108,10 +104,10 @@ export default function FinanceProjectCard({
     () =>
       project.adjustments.reduce(
         (acc, adjustment) =>
-          acc + (adjustment.single_cash_flow_id ? 0 : adjustment.amount),
-        project.single_cash_flow_id ? 0 : project.start_amount
+          acc + (adjustment.single_cashflow_id ? 0 : adjustment.amount),
+        project.single_cashflow_id ? 0 : project.start_amount
       ),
-    [project.adjustments, project.start_amount]
+    [project]
   );
 
   const handleAdjustmentClose = () => {
@@ -120,16 +116,14 @@ export default function FinanceProjectCard({
     }
   };
 
-  const handleCategoryClose = (
-    updatedCategories: Tables<"finance_category">[] | null
-  ) => {
+  const handleTagClose = (updatedTags: Tables<"tag">[] | null) => {
     if (isUpdating) return;
     setIsUpdating(true);
     closeBadgePopover();
-    if (updatedCategories) {
+    if (updatedTags) {
       updateFinanceProject(project.id, {
-        tags: updatedCategories,
-        client: project.client,
+        tags: updatedTags,
+        contact: project.contact,
         adjustments: project.adjustments,
       });
     }
@@ -140,10 +134,10 @@ export default function FinanceProjectCard({
 
   const isPaidTotally = useMemo(() => {
     return (
-      !!project.single_cash_flow_id &&
-      project.adjustments.filter((a) => !a.single_cash_flow_id).length === 0
+      !!project.single_cashflow_id &&
+      project.adjustments.filter((a) => !a.single_cashflow_id).length === 0
     );
-  }, [project.single_cash_flow_id, project.adjustments]);
+  }, [project.single_cashflow_id, project.adjustments]);
 
   const isPositive = totalAmountOpen > 0;
   const adjustmentTotal = project.adjustments.reduce(
@@ -244,12 +238,12 @@ export default function FinanceProjectCard({
           </Group>
 
           <Group gap="md" wrap="wrap" flex={2}>
-            {project.client && <FinanceClientBadge client={project.client} />}
-            <FinanceCategoryBadges
-              initialCategories={project.tags}
+            {project.contact && <ContactBadge contact={project.contact} />}
+            <FinanceTagBadges
+              initialTags={project.tags}
               onPopoverOpen={openBadgePopover}
-              onPopoverClose={handleCategoryClose}
-              showAddCategory={hovered || isEditing}
+              onPopoverClose={handleTagClose}
+              showAddTag={hovered || isEditing}
             />
           </Group>
 
@@ -426,7 +420,7 @@ export default function FinanceProjectCard({
                         key={adjustment.id}
                         adjustment={adjustment}
                         currency={project.currency}
-                        adultClientId={project.finance_client_id}
+                        adultContactId={project.contact_id}
                         handlePayout={handlePayoutClick}
                       />
                     ))}
@@ -435,7 +429,7 @@ export default function FinanceProjectCard({
                     key={project.id}
                     financeProject={project}
                     currency={project.currency}
-                    adultClientId={project.finance_client_id}
+                    adultContactId={project.contact_id}
                     handlePayout={handlePayoutClick}
                   />
                 </Stack>

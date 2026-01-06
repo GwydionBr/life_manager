@@ -27,7 +27,7 @@ interface SingleFinanceFormProps {
   financeCurrency: Currency;
   handleSubmit: (values: SingleFinanceFormValues) => void;
   isLoading: boolean;
-  cashFlow?: Tables<"single_cash_flow">;
+  cashFlow?: Tables<"single_cashflow">;
 }
 
 export default function SingleFinanceForm({

@@ -1,5 +1,3 @@
-"use client";
-
 import { useIntl } from "@/hooks/useIntl";
 
 import {
@@ -74,7 +72,7 @@ export default function TimeInput({
     onChange(newSeconds);
   };
 
-  const handleSecondsChange = (seconds: string | number) => {
+  const _handleSecondsChange = (seconds: string | number) => {
     const numSeconds =
       typeof seconds === "string" ? parseInt(seconds) || 0 : seconds;
     const newSeconds = timeComponentsToSeconds(

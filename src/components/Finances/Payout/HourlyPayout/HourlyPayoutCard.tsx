@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 
 import { useIntl } from "@/hooks/useIntl";
 
-import { Text, Stack, Card, Group, Loader } from "@mantine/core";
+import { Text, Stack, Group, Loader } from "@mantine/core";
 import { IconCashBanknotePlus } from "@tabler/icons-react";
 import QuickPayoutButton from "@/components/Finances/Payout/HourlyPayout/QuickPayoutButton";
 

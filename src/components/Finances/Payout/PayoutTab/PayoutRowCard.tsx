@@ -28,11 +28,11 @@ export default function PayoutRowCard({ payout }: PayoutRowCardProps) {
   const { getLocalizedText, formatDate, formatMoney } = useIntl();
 
   const getTotalSessionTime = () => {
-    if (!payout.work_time_entry || payout.work_time_entry.length === 0)
+    if (!payout.work_time_entries || payout.work_time_entries.length === 0)
       return null;
 
-    const totalSeconds = payout.work_time_entry.reduce((acc, session) => {
-      return acc + (session.active_seconds || 0);
+    const totalSeconds = payout.work_time_entries.reduce((acc, time_entry) => {
+      return acc + (time_entry.active_seconds || 0);
     }, 0);
 
     const hours = Math.floor(totalSeconds / 3600);
@@ -46,7 +46,7 @@ export default function PayoutRowCard({ payout }: PayoutRowCardProps) {
   const hasValueChange =
     payout.start_value !== null && payout.start_value !== payout.value;
   const showExtendedInfo = hasCurrencyConversion || hasValueChange;
-  const totalSessions = payout.work_time_entry?.length || 0;
+  const totalSessions = payout.work_time_entries?.length || 0;
   const totalTime = getTotalSessionTime();
 
   return (

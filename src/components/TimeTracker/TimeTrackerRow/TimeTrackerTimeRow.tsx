@@ -34,12 +34,11 @@ export default function TimeTrackerTimeRow({
           <IconClock size={22} />
         </ThemeIcon>
       }
-      children={
-        <Group justify="space-between" px="md">
-          <Text fw={600}>{activeTime}</Text>
-          <Text c="dimmed">{roundedActiveTime}</Text>
-        </Group>
-      }
-    />
+    >
+      <Group justify="space-between" px="md">
+        <Text fw={600}>{activeTime}</Text>
+        <Text c="dimmed">{roundedActiveTime}</Text>
+      </Group>
+    </TimeTrackerRow>
   );
 }

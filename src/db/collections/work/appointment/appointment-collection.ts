@@ -8,7 +8,7 @@ import {
   appointmentDeserializationSchema,
 } from "@/db/collections/work/appointment/appointment-schema";
 
-// Collection basierend auf der PowerSync-Tabelle 'timer_project'
+// Collection basierend auf der PowerSync-Tabelle 'appointment'
 export const appointmentsCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,

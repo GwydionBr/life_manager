@@ -6,10 +6,10 @@ import type { Tables } from "@/types/db.types";
 import { IconBrandCashapp } from "@tabler/icons-react";
 
 interface ProjectPayoutCardProps {
-  project: Tables<"timer_project">;
+  project: Tables<"work_project">;
 }
 
-export default function ProjectPayoutCard({ project }: ProjectPayoutCardProps) {
+export default function ProjectPayoutCard({ project: _workProject }: ProjectPayoutCardProps) {
   const { getLocalizedText } = useIntl();
 
   return (

@@ -30,7 +30,7 @@ export function useTimeEntryFiltering(
   timeEntry: WorkTimeEntry[],
   timeSpan: [Date | null, Date | null],
   projects?: WorkProject[],
-  folders?: Tables<"timer_project_folder">[],
+  folders?: Tables<"work_folder">[],
   isOverview = false
 ) {
   // Unified filter state for all filters
@@ -79,7 +79,7 @@ export function useTimeEntryFiltering(
     if (!timeSpan[0] || !timeSpan[1]) {
       return timeEntry.filter((session) => {
         const sessionProject = projects?.find(
-          (p) => p.id === session.project_id
+          (p) => p.id === session.work_project_id
         );
         if (!sessionProject) return false;
 
@@ -88,14 +88,14 @@ export function useTimeEntryFiltering(
         // Project filter
         if (filterState.selectedProjects.length > 0) {
           conditions.push(
-            filterState.selectedProjects.includes(session.project_id)
+            filterState.selectedProjects.includes(session.work_project_id)
           );
         }
 
         // Folder filter
         if (filterState.selectedFolders.length > 0) {
           const folder = folders?.find(
-            (f) => f.id === sessionProject.folder_id
+            (f) => f.id === sessionProject.work_folder_id
           );
           conditions.push(
             !!(folder && filterState.selectedFolders.includes(folder.id))
@@ -127,7 +127,7 @@ export function useTimeEntryFiltering(
     const timeFilteredSessions = getTimeFilteredSessions();
 
     return timeEntry.filter((session) => {
-      const sessionProject = projects?.find((p) => p.id === session.project_id);
+      const sessionProject = projects?.find((p) => p.id === session.work_project_id);
       if (!sessionProject) return false;
 
       // Check if session matches time filter
@@ -141,13 +141,13 @@ export function useTimeEntryFiltering(
       // Project filter
       if (filterState.selectedProjects.length > 0) {
         projectConditions.push(
-          filterState.selectedProjects.includes(session.project_id)
+          filterState.selectedProjects.includes(session.work_project_id)
         );
       }
 
       // Folder filter
       if (filterState.selectedFolders.length > 0) {
-        const folder = folders?.find((f) => f.id === sessionProject.folder_id);
+        const folder = folders?.find((f) => f.id === sessionProject.work_folder_id);
         projectConditions.push(
           !!(folder && filterState.selectedFolders.includes(folder.id))
         );
@@ -189,18 +189,18 @@ export function useTimeEntryFiltering(
   const unpaidSessions = filteredSessions.filter((session) => {
     if (isOverview) {
       // In overview mode, we need to find the project for each session
-      const sessionProject = projects?.find((p) => p.id === session.project_id);
+      const sessionProject = projects?.find((p) => p.id === session.work_project_id);
       if (!sessionProject) return false;
 
       // For hourly payment projects, check if session is paid
       if (sessionProject.hourly_payment) {
-        return !session.single_cash_flow_id;
+        return !session.single_cashflow_id;
       }
       return false;
     }
 
     // Normal mode - just check session.payed
-    return !session.single_cash_flow_id;
+    return !session.single_cashflow_id;
   });
 
   const handleCustomDaysChange = (days: number) => {

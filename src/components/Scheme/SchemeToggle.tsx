@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useIntl } from "@/hooks/useIntl";
 
-import { useMantineColorScheme, Menu, Group, Text } from "@mantine/core";
+import { useMantineColorScheme, Menu } from "@mantine/core";
 import { LightSchemeActionIcon, LightSchemeIcon } from "./LightScheme";
 import { DarkSchemeActionIcon, DarkSchemeIcon } from "./DarkScheme";
 import { SystemSchemeActionIcon, SystemSchemeIcon } from "./SystemScheme";

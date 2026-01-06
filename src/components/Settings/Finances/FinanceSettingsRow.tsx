@@ -20,7 +20,7 @@ interface FinanceSettingsRowProps<T> {
   itemId: string;
   selectedModeActive: boolean;
   isSelected?: boolean;
-  onToggleSelected?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onToggleSelected?: (e: React.MouseEvent<HTMLDivElement>) => void;
   onDelete: (ids: string[]) => void;
   renderContent: (item: T) => React.ReactNode;
   renderEditForm?: (item: T, onClose: () => void) => React.ReactNode;
@@ -61,8 +61,8 @@ export default function FinanceSettingsRow<T>({
       style={{ cursor: selectedModeActive ? "pointer" : "default" }}
       onClick={
         selectedModeActive
-          ? (e: React.MouseEvent<HTMLDivElement>) =>
-              onToggleSelected?.(e as any)
+          ? (e) =>
+              onToggleSelected?.(e)
           : undefined
       }
     >

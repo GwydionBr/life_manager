@@ -9,10 +9,10 @@ import {
   addWorkProject,
   updateWorkProject,
   deleteWorkProject,
-  syncProjectCategories,
-  getWorkProjectWithCategories,
+  syncProjectTags,
+  getWorkProjectWithTags,
 } from "./work-project-mutations";
-import { WorkProject } from "@/types/work.types";
+import { UpdateWorkProject, WorkProject } from "@/types/work.types";
 import { Tables, TablesUpdate } from "@/types/db.types";
 
 /**
@@ -31,10 +31,7 @@ export const useWorkProjectMutations = () => {
    * Adds a new Work Project with automatic notification.
    */
   const handleAddWorkProject = useCallback(
-    async (
-      newWorkProject: Omit<Tables<"timer_project">, "categories">,
-      categoryIds?: string[]
-    ): Promise<WorkProject | undefined> => {
+    async (newWorkProject: WorkProject): Promise<WorkProject | undefined> => {
       if (!profile?.id) {
         showActionErrorNotification(
           getLocalizedText(
@@ -54,19 +51,17 @@ export const useWorkProjectMutations = () => {
           return;
         }
 
-        // Sync categories if provided
-        if (categoryIds && categoryIds.length > 0) {
-          await syncProjectCategories(
+        // Sync tags if provided
+        if (newWorkProject.tags && newWorkProject.tags.length > 0) {
+          await syncProjectTags(
             newWorkProject.id,
-            categoryIds,
+            newWorkProject.tags.map((tag) => tag.id),
             profile.id
           );
         }
 
-        // Get complete project with categories
-        const completeProject = await getWorkProjectWithCategories(
-          newWorkProject.id
-        );
+        // Get complete project with tags
+        const completeProject = await getWorkProjectWithTags(newWorkProject.id);
 
         showActionSuccessNotification(
           getLocalizedText(
@@ -94,8 +89,7 @@ export const useWorkProjectMutations = () => {
   const handleUpdateWorkProject = useCallback(
     async (
       id: string | string[],
-      item: TablesUpdate<"timer_project">,
-      categoryIds?: string[]
+      item: UpdateWorkProject
     ): Promise<WorkProject | undefined> => {
       if (!profile?.id) {
         showActionErrorNotification(
@@ -116,14 +110,18 @@ export const useWorkProjectMutations = () => {
           return;
         }
 
-        // Sync categories if provided
+        // Sync tags if provided
         const projectId = typeof id === "string" ? id : id[0];
-        if (categoryIds !== undefined) {
-          await syncProjectCategories(projectId, categoryIds, profile.id);
+        if (item.tags && item.tags.length > 0) {
+          await syncProjectTags(
+            projectId,
+            item.tags.map((tag) => tag.id),
+            profile.id
+          );
         }
 
-        // Get complete project with categories
-        const completeProject = await getWorkProjectWithCategories(projectId);
+        // Get complete project with tags
+        const completeProject = await getWorkProjectWithTags(projectId);
 
         showActionSuccessNotification(
           getLocalizedText(
@@ -184,7 +182,7 @@ export const useWorkProjectMutations = () => {
     updateWorkProject: handleUpdateWorkProject,
     deleteWorkProject: handleDeleteWorkProject,
     // Helper functions
-    syncProjectCategories,
-    getWorkProjectWithCategories,
+    syncProjectTags: syncProjectTags,
+    getWorkProjectWithTags: getWorkProjectWithTags,
   };
 };
