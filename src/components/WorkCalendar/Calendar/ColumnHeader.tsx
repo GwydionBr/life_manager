@@ -34,8 +34,11 @@ export default function ColumnHeader({
 }: ColumnHeaderProps) {
   const { hovered, ref } = useHover();
   const { formatDate, formatMoney, formatDuration } = useIntl();
-  const { isTimerRunning, getRunningTimer } = useTimeTrackerManager();
-  const timer = getRunningTimer();
+  const { isTimerRunning, timers } = useTimeTrackerManager();
+  const timer = useMemo(
+    () => Object.values(timers).find((t) => t.state === TimerState.Running),
+    [timers]
+  );
   const isDayToday = day ? isToday(day.day) : false;
   const totalTime = useMemo(() => {
     if (!day) return 0;
@@ -100,7 +103,7 @@ export default function ColumnHeader({
                   {formatDuration(
                     totalTime +
                       (isToday(day.day) && isTimerRunning
-                        ? (getRunningTimer()?.activeSeconds ?? 0)
+                        ? (timer?.activeSeconds ?? 0)
                         : 0)
                   )}
                 </Text>

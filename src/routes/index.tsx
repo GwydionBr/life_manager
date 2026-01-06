@@ -14,7 +14,6 @@ import {
   Badge,
   Divider,
 } from "@mantine/core";
-import * as Sentry from "@sentry/tanstackstart-react";
 import {
   IconClock,
   IconCalendar,
@@ -100,15 +99,6 @@ function Home() {
             >
               Your Personal Life Manager
             </Badge>
-            {/* Test Sentry Error */}
-            <button
-              type="button"
-              onClick={() => {
-                throw new Error("Sentry Test Error");
-              }}
-            >
-              Break the world
-            </button>
             <Box ta="center">
               <Title
                 order={1}
