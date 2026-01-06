@@ -19,6 +19,8 @@ import { createTheme, MantineProvider, ColorSchemeScript } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
 import { DatesProvider } from "@mantine/dates";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { QueryClient } from "@tanstack/react-query";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
@@ -146,6 +148,8 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         </MantineProvider>
         <TanStackRouterDevtools position="bottom-right" />
         <Scripts />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

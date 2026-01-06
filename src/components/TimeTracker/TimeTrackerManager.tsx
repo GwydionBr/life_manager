@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMounted } from "@mantine/hooks";
 import {
   TimerData,
   useTimeTrackerManager,
@@ -60,13 +61,12 @@ export default function TimerManager({
   setIsTimeTrackerMinimized,
 }: TimerManagerProps) {
   const theme = useMantineTheme();
+  const isMounted = useMounted();
   // Error message state for displaying validation errors
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { currentAppColor } = useSettingsStore();
 
-  // Client-side hydration flag (prevents SSR mismatches)
-  const [isClient, setIsClient] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     null
   );
@@ -151,16 +151,6 @@ export default function TimerManager({
 
     setTimers(newTimers);
   }, [timerData, getAllTimers]);
-
-  /**
-   * Client-side hydration effect.
-   *
-   * Sets isClient to true after mount to enable client-side rendering.
-   * This prevents SSR mismatches when using persisted store data.
-   */
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   /**
    * Handler for adding a new timer.
@@ -268,7 +258,7 @@ export default function TimerManager({
    * hydration is complete. This prevents SSR mismatches with
    * persisted store data.
    */
-  if (!isClient) {
+  if (!isMounted) {
     return (
       <Stack align="center" gap="md" mb="md">
         <PlusActionIcon onClick={() => {}} />
@@ -317,53 +307,55 @@ export default function TimerManager({
             state={mainTimerStatus}
             getStatusColor={() => getStatusColor(mainTimerStatus)}
           />
-          <Select
-            w={210}
-            placeholder={getLocalizedText(
-              "Projekt auswählen",
-              "Select project"
-            )}
-            data={projects
-              .filter(
-                (p) =>
-                  p.id !== timers.find((t) => t.projectId === p.id)?.projectId
-              )
-              .map((p) => ({
-                label: p.title,
-                value: p.id,
-              }))}
-            value={selectedProjectId}
-            onChange={setSelectedProjectId}
-            searchable
-            leftSection={
-              <Text fz="xs" c="dimmed">
-                {timers.length}/10
-              </Text>
-            }
-            rightSectionPointerEvents="auto"
-            rightSection={
-              <PlusActionIcon
-                onClick={() => {
-                  if (!selectedProjectId) return;
-                  const selectedProject = projects.find(
-                    (p) => p.id === selectedProjectId
-                  )!;
-                  if (!selectedProject) return;
-                  handleAddTimer(selectedProject);
-                }}
-              />
-            }
-            styles={{
-              input: {
-                textAlign: "center",
-                textOverflow: "ellipsis",
-                fontSize: "var(--mantine-font-size-md)",
-                backgroundColor: alpha("var(--mantine-color-body)", 0.5),
-                borderRadius: "var(--mantine-radius-lg)",
-                border: "none",
-              },
-            }}
-          />
+          {isBig && (
+            <Select
+              w={210}
+              placeholder={getLocalizedText(
+                "Projekt auswählen",
+                "Select project"
+              )}
+              data={projects
+                .filter(
+                  (p) =>
+                    p.id !== timers.find((t) => t.projectId === p.id)?.projectId
+                )
+                .map((p) => ({
+                  label: p.title,
+                  value: p.id,
+                }))}
+              value={selectedProjectId}
+              onChange={setSelectedProjectId}
+              searchable
+              leftSection={
+                <Text fz="xs" c="dimmed">
+                  {timers.length}/10
+                </Text>
+              }
+              rightSectionPointerEvents="auto"
+              rightSection={
+                <PlusActionIcon
+                  onClick={() => {
+                    if (!selectedProjectId) return;
+                    const selectedProject = projects.find(
+                      (p) => p.id === selectedProjectId
+                    )!;
+                    if (!selectedProject) return;
+                    handleAddTimer(selectedProject);
+                  }}
+                />
+              }
+              styles={{
+                input: {
+                  textAlign: "center",
+                  textOverflow: "ellipsis",
+                  fontSize: "var(--mantine-font-size-md)",
+                  backgroundColor: alpha("var(--mantine-color-body)", 0.5),
+                  borderRadius: "var(--mantine-radius-lg)",
+                  border: "none",
+                },
+              }}
+            />
+          )}
         </Group>
       </Box>
 
