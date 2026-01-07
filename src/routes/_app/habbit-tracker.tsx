@@ -6,5 +6,5 @@ export const Route = createFileRoute("/_app/habbit-tracker")({
 });
 
 function RouteComponent() {
-  return <div>Hello "/_dashboard/habbit-tracker"!</div>
+  return <div>Habbit-Tracker</div>
 }

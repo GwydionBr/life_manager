@@ -13,7 +13,6 @@ import {
   getWorkProjectWithTags,
 } from "./work-project-mutations";
 import { UpdateWorkProject, WorkProject } from "@/types/work.types";
-import { Tables, TablesUpdate } from "@/types/db.types";
 
 /**
  * Hook for Work Project operations with automatic notifications.

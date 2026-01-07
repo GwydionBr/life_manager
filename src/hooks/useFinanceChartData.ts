@@ -69,18 +69,6 @@ export function useFinanceChartData(
   // Get data from stores
   const { data: singleCashFlows } = useSingleCashflowsQuery();
 
-  // stats will be computed after chartData is defined
-
-  /**
-   * Create a stable key for useEffect dependencies
-   * Prevents unnecessary re-renders by memoizing the dependency array
-   */
-  const chartDataKey = useMemo(() => {
-    const fromStr = dateRange.from ? dateToISOString(dateRange.from) : "null";
-    const toStr = dateRange.to ? dateToISOString(dateRange.to) : "null";
-    return `${interval}-${fromStr}-${toStr}-${singleCashFlows.length}`;
-  }, [interval, dateRange.from, dateRange.to, singleCashFlows.length]);
-
   /**
    * Generate chart data from cash flows
    *
@@ -130,26 +118,29 @@ export function useFinanceChartData(
               key = dateToISOString(current); // YYYY-MM-DD
               current.setTime(addDaysToDate(current, 1).getTime());
               break;
-            case "week":
+            case "week": {
               // Calculate week start (Monday) using date-fns
               const weekStart = getStartOfWeek(current);
               key = dateToISOString(weekStart);
               current.setTime(addWeeksToDate(current, 1).getTime());
               break;
+            }
             case "month":
               key = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, "0")}`; // YYYY-MM
               current.setTime(addMonthsToDate(current, 1).getTime());
               break;
-            case "1/4 year":
+            case "1/4 year": {
               const quarter = Math.floor(current.getMonth() / 3) + 1;
               key = `${current.getFullYear()}-Q${quarter}`; // YYYY-Q1
               current.setTime(addQuartersToDate(current, 1).getTime());
               break;
-            case "1/2 year":
+            }
+            case "1/2 year": {
               const half = Math.floor(current.getMonth() / 6) + 1;
               key = `${current.getFullYear()}-H${half}`; // YYYY-H1
               current.setTime(addMonthsToDate(current, 6).getTime());
               break;
+            }
             case "year":
               key = current.getFullYear().toString(); // YYYY
               current.setTime(addYearsToDate(current, 1).getTime());
@@ -192,21 +183,24 @@ export function useFinanceChartData(
           case "day":
             key = dateToISOString(date);
             break;
-          case "week":
+          case "week": {
             const weekStart = getStartOfWeek(date);
             key = dateToISOString(weekStart);
             break;
+          }
           case "month":
             key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
             break;
-          case "1/4 year":
+          case "1/4 year": {
             const quarter = Math.floor(date.getMonth() / 3) + 1;
             key = `${date.getFullYear()}-Q${quarter}`;
             break;
-          case "1/2 year":
+          }
+          case "1/2 year": {
             const half = Math.floor(date.getMonth() / 6) + 1;
             key = `${date.getFullYear()}-H${half}`;
             break;
+          }
           case "year":
             key = date.getFullYear().toString();
             break;
@@ -235,7 +229,7 @@ export function useFinanceChartData(
 
       return chartData;
     },
-    [interval, dateRange.from, dateRange.to, singleCashFlows]
+    [dateRange.from, dateRange.to, singleCashFlows]
   );
 
   /**
@@ -248,7 +242,7 @@ export function useFinanceChartData(
       ...item,
       net: item.income - item.expense,
     }));
-  }, [chartDataKey, getChartData, interval]);
+  }, [getChartData, interval]);
 
   /**
    * Calculate comprehensive statistics from chart data

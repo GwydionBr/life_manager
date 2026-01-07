@@ -54,7 +54,6 @@ export default function FinanceProjectTab() {
   const { data: contacts } = useContacts();
   const { data: financeProjects = [], isLoading: isLoadingFinanceProjects } =
     useFinanceProjects();
-  const { data: tags } = useTags();
   const { deleteFinanceProject } = useFinanceProjectMutations();
 
   const { setIsModalOpen, setSelectedTab } = useSettingsStore();
@@ -103,7 +102,7 @@ export default function FinanceProjectTab() {
         ),
       };
     });
-  }, [financeProjects, contacts, tags]);
+  }, [financeProjects, contacts]);
 
   useEffect(() => {
     if (formattedFinanceProjects.length === 0) {

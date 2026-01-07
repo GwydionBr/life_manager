@@ -48,7 +48,7 @@ export default function TimeEntryForm({
   const { getLocalizedText } = useIntl();
   const { data: workProjects } = useWorkProjects();
   const [userChangedStartTime, setUserChangedStartTime] = useState(false);
-  const [userChangedEndTime, setUserChangedEndTime] = useState(false);
+  const [_userChangedEndTime, setUserChangedEndTime] = useState(false);
   const [formInitialized, setFormInitialized] = useState(false);
 
   const schema = z.object({

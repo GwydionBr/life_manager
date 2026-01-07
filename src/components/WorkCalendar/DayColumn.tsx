@@ -100,7 +100,7 @@ export function DayColumn({
     };
   });
   // Merge touching/overlapping sessions for the same project+memo to reduce clutter
-  const itemsForRender: CalendarSession[] =
+  const _itemsForRender: CalendarSession[] =
     mergeAdjacentSessionsForRender(clippedItems);
 
   const snappedY = snapYToInterval(y);

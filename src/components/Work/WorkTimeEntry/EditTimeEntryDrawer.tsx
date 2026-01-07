@@ -79,7 +79,7 @@ export default function EditTimeEntryDrawer({
       memo: values.memo || null,
     };
 
-    const roundingSettings: TimerRoundingSettings = {
+    const _roundingSettings: TimerRoundingSettings = {
       roundInTimeFragments:
         currentProject.round_in_time_fragments !== null
           ? currentProject.round_in_time_fragments
