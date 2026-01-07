@@ -3,7 +3,6 @@ import { useDisclosure } from "@mantine/hooks";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useFinanceProjects } from "@/db/collections/finance/finance-project/use-finance-project-query";
 import { useFinanceProjectMutations } from "@/db/collections/finance/finance-project/use-finance-project-mutations";
-import { useTags } from "@/db/collections/finance/tags/tags-collection";
 import { useContacts } from "@/db/collections/finance/contacts/contact-collection";
 import { useIntl } from "@/hooks/useIntl";
 
@@ -94,12 +93,8 @@ export default function FinanceProjectTab() {
       return {
         ...rest,
         contact:
-          contacts.find(
-            (contact) => contact.id === project.contact_id
-          ) || null,
-        tags: tags.filter((tag) =>
-          tags.map((c) => c.id).includes(tag.id)
-        ),
+          contacts.find((contact) => contact.id === project.contact_id) || null,
+        tags: tags.filter((tag) => tags.map((c) => c.id).includes(tag.id)),
       };
     });
   }, [financeProjects, contacts]);

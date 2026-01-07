@@ -12,6 +12,11 @@ export type BankAccount = Tables<"bank_account">;
 export type InsertBankAccount = TablesInsert<"bank_account">;
 export type UpdateBankAccount = TablesUpdate<"bank_account">;
 
+// Tag Types
+export type Tag = Tables<"tag">;
+export type InsertTag = TablesInsert<"tag">;
+export type UpdateTag = TablesUpdate<"tag">;
+
 // Single Cash Flow Types
 export interface SingleCashFlow extends Tables<"single_cashflow"> {
   tags: Tables<"tag">[];

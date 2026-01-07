@@ -2,7 +2,7 @@ import { useForm } from "@mantine/form";
 
 import { useEffect, useState, useMemo } from "react";
 import { useDisclosure, useClickOutside } from "@mantine/hooks";
-import { useTags } from "@/db/collections/finance/tags/tags-collection";
+import { useTags } from "@/db/collections/finance/tags/use-tags-query";
 import { useWorkProjectMutations } from "@/db/collections/work/work-project/use-work-project-mutations";
 import { useSettings } from "@/db/collections/settings/settings-collection";
 import { useIntl } from "@/hooks/useIntl";

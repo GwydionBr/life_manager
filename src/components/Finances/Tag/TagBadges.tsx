@@ -19,7 +19,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { Tables } from "@/types/db.types";
 import FinanceTagSingleBadge from "./TagSingleBadge";
 import FinanceTagForm from "./TagForm";
-import { useTags } from "@/db/collections/finance/tags/tags-collection";
+import { useTags } from "@/db/collections/finance/tags/use-tags-query";
 
 interface FinanceTagBadgesProps {
   initialTags: Tables<"tag">[];

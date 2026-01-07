@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useIntl } from "@/hooks/useIntl";
 import { useSingleCashflowMutations } from "@/db/collections/finance/single-cashflow/use-single-cashflow-mutations";
-import { useTags } from "@/db/collections/finance/tags/tags-collection";
+import { useTags } from "@/db/collections/finance/tags/use-tags-query";
 import { useRecurringCashflowMutations } from "@/db/collections/finance/recurring-cashflow/use-recurring-cashflow-mutations";
 import { useSettings } from "@/db/collections/settings/settings-collection";
 
@@ -129,18 +129,10 @@ export default function FinanceForm({
               value: tag.id,
             }))}
             label={getLocalizedText("Tag", "Tag")}
-            placeholder={getLocalizedText(
-              "Tag auswählen",
-              "Select a tag"
-            )}
+            placeholder={getLocalizedText("Tag auswählen", "Select a tag")}
             value={tags.map((tag) => tag.id)}
             onChange={(value) =>
-              setTags(
-                value.map(
-                  (id) =>
-                    allTags.find((tag) => tag.id === id)!
-                )
-              )
+              setTags(value.map((id) => allTags.find((tag) => tag.id === id)!))
             }
             searchable
             clearable

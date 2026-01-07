@@ -17,7 +17,7 @@ import { isToday } from "date-fns";
 import { RecurringCashFlow } from "@/types/finance.types";
 import { FinanceInterval } from "@/types/settings.types";
 import { Tables } from "@/types/db.types";
-import { useTags } from "@/db/collections/finance/tags/tags-collection";
+import { useTags } from "@/db/collections/finance/tags/use-tags-query";
 interface RecurringCashFlowRowProps extends CardProps {
   cashflow: RecurringCashFlow;
   showEndDate?: boolean;
@@ -41,10 +41,8 @@ export default function RecurringCashFlowRow({
   const { updateRecurringCashflow } = useRecurringCashflowMutations();
   const { hovered, ref } = useHover();
   const [isUpdating, setIsUpdating] = useState(false);
-  const [
-    isTagPopoverOpen,
-    { open: openTagPopover, close: closetagPopover },
-  ] = useDisclosure(false);
+  const [isTagPopoverOpen, { open: openTagPopover, close: closetagPopover }] =
+    useDisclosure(false);
 
   const currentTags = useMemo(() => {
     return tags.filter((tag) =>
@@ -57,9 +55,7 @@ export default function RecurringCashFlowRow({
     return getNextDate(cashflow.interval, new Date(cashflow.start_date));
   }, [cashflow.interval, cashflow.start_date]);
 
-  const handleTagClose = async (
-    updatedTags: Tables<"tag">[] | null
-  ) => {
+  const handleTagClose = async (updatedTags: Tables<"tag">[] | null) => {
     if (isUpdating) return;
     setIsUpdating(true);
     closetagPopover();

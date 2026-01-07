@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useIntl } from "@/hooks/useIntl";
-import { useTags } from "@/db/collections/finance/tags/tags-collection";
+import { useTags } from "@/db/collections/finance/tags/use-tags-query";
 import { useSingleCashflowMutations } from "@/db/collections/finance/single-cashflow/use-single-cashflow-mutations";
 import { useRecurringCashflowMutations } from "@/db/collections/finance/recurring-cashflow/use-recurring-cashflow-mutations";
 
@@ -63,9 +63,7 @@ export default function EditCashFlowDrawer({
     DeleteRecurringCashFlowMode.delete_all
   );
   const [type, setType] = useState<CashFlowType>("income");
-  const [tags, setTags] = useState<Tables<"tag">[]>(
-    cashFlow.tags
-  );
+  const [tags, setTags] = useState<Tables<"tag">[]>(cashFlow.tags);
   const [pendingValues, setPendingValues] = useState<
     UpdateSingleCashFlow | UpdateRecurringCashFlow
   >(cashFlow);
@@ -256,18 +254,10 @@ export default function EditCashFlowDrawer({
                 value: tag.id,
               }))}
               label={getLocalizedText("Tag", "Tag")}
-              placeholder={getLocalizedText(
-                "Tag auswählen",
-                "Select a tag"
-              )}
+              placeholder={getLocalizedText("Tag auswählen", "Select a tag")}
               value={tags.map((tag) => tag.id)}
               onChange={(value) =>
-                setTags(
-                  value.map(
-                    (tag) =>
-                      allTags.find((c) => c.id === tag)!
-                  )
-                )
+                setTags(value.map((tag) => allTags.find((c) => c.id === tag)!))
               }
               searchable
               clearable
@@ -468,9 +458,7 @@ export default function EditCashFlowDrawer({
         title={
           <Group>
             <IconTagPlus />
-            <Text>
-              {getLocalizedText("Tag hinzufügen", "Add Tag")}
-            </Text>
+            <Text>{getLocalizedText("Tag hinzufügen", "Add Tag")}</Text>
           </Group>
         }
       >

@@ -2,7 +2,7 @@ import { useForm } from "@mantine/form";
 import { useEffect } from "react";
 import { useFinanceProjectMutations } from "@/db/collections/finance/finance-project/use-finance-project-mutations";
 import { useContacts } from "@/db/collections/finance/contacts/contact-collection";
-import { useTags } from "@/db/collections/finance/tags/tags-collection";
+import { useTags } from "@/db/collections/finance/tags/use-tags-query";
 
 import { z } from "zod";
 import { zodResolver } from "mantine-form-zod-resolver";

@@ -11,7 +11,7 @@ import { z } from "zod";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { projectAdjustmentsCollection } from "@/db/collections/finance/project-adjustment/project-adjustment-collection";
 import { useContacts } from "@/db/collections/finance/contacts/contact-collection";
-import { useTags } from "@/db/collections/finance/tags/tags-collection";
+import { useTags } from "@/db/collections/finance/tags/use-tags-query";
 
 const schema = z.object({
   amount: z.number(),

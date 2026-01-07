@@ -1,5 +1,5 @@
 import { useIntl } from "@/hooks/useIntl";
-import { useTags } from "@/db/collections/finance/tags/tags-collection";
+import { useTags } from "@/db/collections/finance/tags/use-tags-query";
 
 import {
   Group,

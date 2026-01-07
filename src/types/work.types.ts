@@ -24,6 +24,11 @@ export type WorkFolder = Tables<"work_folder">;
 export type InsertWorkFolder = TablesInsert<"work_folder">;
 export type UpdateWorkFolder = TablesUpdate<"work_folder">;
 
+// Appointment Types
+export type Appointment = Tables<"appointment">;
+export type InsertAppointment = TablesInsert<"appointment">;
+export type UpdateAppointment = TablesUpdate<"appointment">;
+
 export interface ProjectTreeItem {
   id: string;
   name: string;

@@ -1,8 +1,6 @@
 import { useIntl } from "@/hooks/useIntl";
-import {
-  tagsCollection,
-  useTags,
-} from "@/db/collections/finance/tags/tags-collection";
+import { tagsCollection } from "@/db/collections/finance/tags/tags-collection";
+import { useTags } from "@/db/collections/finance/tags/use-tags-query";
 
 import { Text } from "@mantine/core";
 import { IconTagPlus, IconTags } from "@tabler/icons-react";
@@ -25,10 +23,9 @@ export default function TagSettings() {
     </>
   );
 
-  const renderEditForm = (
-    tag: Tables<"tag">,
-    onClose: () => void
-  ) => <FinanceTagForm onClose={onClose} tag={tag} />;
+  const renderEditForm = (tag: Tables<"tag">, onClose: () => void) => (
+    <FinanceTagForm onClose={onClose} tag={tag} />
+  );
 
   const renderAddForm = (onClose: () => void) => (
     <FinanceTagForm onClose={onClose} />

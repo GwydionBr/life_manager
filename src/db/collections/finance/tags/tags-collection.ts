@@ -1,8 +1,4 @@
-import {
-  createCollection,
-  createLiveQueryCollection,
-  useLiveQuery,
-} from "@tanstack/react-db";
+import { createCollection } from "@tanstack/react-db";
 import { powerSyncCollectionOptions } from "@tanstack/powersync-db-collection";
 // Importiere deine PowerSync-DB und das App-Schema
 import { db } from "@/db/powersync/db";
@@ -12,7 +8,7 @@ import {
   tagsDeserializationSchema,
 } from "@/db/collections/finance/tags/tags-schema";
 
-// Collection basierend auf der PowerSync-Tabelle 'bank_account'
+// Collection basierend auf der PowerSync-Tabelle 'tag'
 export const tagsCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,
@@ -24,10 +20,3 @@ export const tagsCollection = createCollection(
     },
   })
 );
-
-export const allTags = createLiveQueryCollection((q) =>
-  q.from({ tags: tagsCollection })
-);
-
-export const useTags = () =>
-  useLiveQuery((q) => q.from({ financeCategories: tagsCollection }));
