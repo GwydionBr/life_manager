@@ -7,7 +7,7 @@ import { useWorkTimeEntryMutations } from "@/db/collections/work/work-time-entry
 
 import { Drawer, Flex, Group, Text, useDrawersStack, Box } from "@mantine/core";
 import { IconExclamationMark } from "@tabler/icons-react";
-import SessionForm from "@/components/Work/Session/SessionForm";
+import TimeEntryForm from "@/components/Work/WorkTimeEntry/TimeEntryForm";
 import DeleteActionIcon from "@/components/UI/ActionIcons/DeleteActionIcon";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
 import DeleteButton from "@/components/UI/Buttons/DeleteButton";
@@ -19,19 +19,19 @@ import { Tables } from "@/types/db.types";
 import { TimerRoundingSettings } from "@/types/timeTracker.types";
 import { WorkProject } from "@/types/work.types";
 
-interface TimerSessionModalProps {
-  timerSession: Tables<"work_time_entry">;
+interface EditTimeEntryModalProps {
+  timeEntry: Tables<"work_time_entry">;
   project: WorkProject;
   opened: boolean;
   onClose: () => void;
 }
 
-export default function EditSessionDrawer({
-  timerSession,
+export default function EditTimeEntryDrawer({
+  timeEntry,
   opened,
   onClose,
   project,
-}: TimerSessionModalProps) {
+}: EditTimeEntryModalProps) {
   const { data: settings } = useSettings();
   const { getLocalizedText } = useIntl();
   const [tagIds, setTagIds] = useState<string[]>([]);
@@ -40,8 +40,8 @@ export default function EditSessionDrawer({
   const { updateWorkTimeEntry } = useWorkTimeEntryMutations();
 
   const drawerStack = useDrawersStack([
-    "edit-session",
-    "delete-session",
+    "edit-time-entry",
+    "delete-time-entry",
     "add-project",
     "tag-form",
   ]);
@@ -49,7 +49,7 @@ export default function EditSessionDrawer({
   // Sync external opened state with internal drawer stack
   useEffect(() => {
     if (opened) {
-      drawerStack.open("edit-session");
+      drawerStack.open("edit-time-entry");
     } else {
       drawerStack.closeAll();
     }
@@ -69,8 +69,8 @@ export default function EditSessionDrawer({
     salary: number;
     memo?: string;
   }) {
-    const newSession: Tables<"work_time_entry"> = {
-      ...timerSession,
+    const newTimeEntry: Tables<"work_time_entry"> = {
+      ...timeEntry,
       ...values,
       start_time: new Date(values.start_time).toISOString(),
       end_time: new Date(values.end_time).toISOString(),
@@ -97,37 +97,37 @@ export default function EditSessionDrawer({
     };
 
     // updateWorkTimeEntryMutation({
-    //   updateTimeEntry: newSession,
+    //   updateTimeEntry: newTimeEntry,
     //   roundingSettings,
     // });
     // TODO Handle Rounding ETC.
-    updateWorkTimeEntry(timerSession.id, newSession);
+    updateWorkTimeEntry(timeEntry.id, newTimeEntry);
     handleClose();
   }
 
   function handleDelete() {
-    workTimeEntriesCollection.delete(timerSession.id);
+    workTimeEntriesCollection.delete(timeEntry.id);
   }
 
   return (
     <Box>
       <Drawer.Stack>
         <Drawer
-          {...drawerStack.register("edit-session")}
+          {...drawerStack.register("edit-time-entry")}
           onClose={handleClose}
           title={
             <Group>
               <DeleteActionIcon
                 tooltipLabel={getLocalizedText(
-                  "Sitzung löschen",
-                  "Delete Session"
+                  "Zeit-Eintrag löschen",
+                  "Delete Time Entry"
                 )}
                 onClick={() => {
-                  drawerStack.open("delete-session");
+                  drawerStack.open("delete-time-entry");
                 }}
               />
               <Text>
-                {getLocalizedText("Sitzung bearbeiten", "Edit Session")}
+                {getLocalizedText("Zeit-Eintrag bearbeiten", "Edit Time Entry")}
               </Text>
             </Group>
           }
@@ -135,22 +135,22 @@ export default function EditSessionDrawer({
           padding="md"
         >
           <Flex direction="column" gap="xl">
-            <SessionForm
+            <TimeEntryForm
               initialValues={{
-                project_id: timerSession.work_project_id,
-                start_time: timerSession.start_time,
-                end_time: timerSession.end_time,
-                active_seconds: timerSession.active_seconds,
-                paused_seconds: timerSession.paused_seconds,
-                currency: timerSession.currency,
-                salary: timerSession.salary,
-                memo: timerSession.memo || undefined,
+                project_id: timeEntry.work_project_id,
+                start_time: timeEntry.start_time,
+                end_time: timeEntry.end_time,
+                active_seconds: timeEntry.active_seconds,
+                paused_seconds: timeEntry.paused_seconds,
+                currency: timeEntry.currency,
+                salary: timeEntry.salary,
+                memo: timeEntry.memo || undefined,
               }}
               onCancel={handleClose}
               onSubmit={handleSubmit}
               onOpenProjectForm={() => drawerStack.open("add-project")}
               onProjectChange={setCurrentProject}
-              newSession={false}
+              newTimeEntry={false}
               project={currentProject}
             />
           </Flex>
@@ -190,13 +190,13 @@ export default function EditSessionDrawer({
           />
         </Drawer>
         <Drawer
-          {...drawerStack.register("delete-session")}
-          onClose={() => drawerStack.close("delete-session")}
+          {...drawerStack.register("delete-time-entry")}
+          onClose={() => drawerStack.close("delete-time-entry")}
           title={
             <Group>
               <IconExclamationMark size={25} color="red" />
               <Text>
-                {getLocalizedText("Sitzung löschen", "Delete Session")}
+                {getLocalizedText("Zeit-Eintrag löschen", "Delete Time Entry")}
               </Text>
             </Group>
           }
@@ -204,8 +204,8 @@ export default function EditSessionDrawer({
         >
           <Text>
             {getLocalizedText(
-              "Bist du dir sicher, dass du diese Sitzung löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden. ",
-              "Are you sure you want to delete this session? This action cannot be undone. "
+              "Bist du dir sicher, dass du diesen Zeit-Eintrag löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden. ",
+              "Are you sure you want to delete this time entry? This action cannot be undone. "
             )}
           </Text>
           <Group mt="md" justify="flex-end" gap="sm">
@@ -213,8 +213,8 @@ export default function EditSessionDrawer({
             <DeleteButton
               onClick={handleDelete}
               tooltipLabel={getLocalizedText(
-                "Sitzung löschen",
-                "Delete Session"
+                "Zeit-Eintrag löschen",
+                "Delete Time Entry"
               )}
             />
           </Group>

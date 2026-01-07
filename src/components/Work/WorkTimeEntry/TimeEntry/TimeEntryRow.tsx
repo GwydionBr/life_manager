@@ -5,18 +5,18 @@ import { workTimeEntriesCollection } from "@/db/collections/work/work-time-entry
 import { Card, Group, Stack, Text, Box } from "@mantine/core";
 import { IconClock } from "@tabler/icons-react";
 import DeleteActionIcon from "@/components/UI/ActionIcons/DeleteActionIcon";
-import EditSessionDrawer from "@/components/Work/Session/EditSessionDrawer";
+import EditTimeEntryDrawer from "@/components/Work/WorkTimeEntry/EditTimeEntryDrawer";
 
 import type { Tables } from "@/types/db.types";
 import PencilActionIcon from "@/components/UI/ActionIcons/PencilActionIcon";
 import SelectActionIcon from "@/components/UI/ActionIcons/SelectActionIcon";
 import { showDeleteConfirmationModal } from "@/lib/notificationFunctions";
 
-import classes from "./SessionRow.module.css";
+import classes from "./TimeEntryRow.module.css";
 import { WorkProject } from "@/types/work.types";
 
-interface SessionRowProps {
-  session: Tables<"work_time_entry"> & { index: number };
+interface TimeEntryRowProps {
+  timeEntry: Tables<"work_time_entry"> & { index: number };
   project?: WorkProject;
   isSelected?: boolean;
   onToggleSelected?: (e: React.MouseEvent<HTMLDivElement>) => void;
@@ -24,45 +24,45 @@ interface SessionRowProps {
   selectedModeActive: boolean;
 }
 
-export default function SessionRow({
-  session,
+export default function TimeEntryRow({
+  timeEntry,
   project,
   isSelected,
   onToggleSelected,
   isOverview = false,
   selectedModeActive,
-}: SessionRowProps) {
+}: TimeEntryRowProps) {
   const { getLocalizedText, formatTimeSpan, formatDuration, formatMoney } =
     useIntl();
   const [editDrawerOpened, editDrawerHandler] = useDisclosure(false);
 
   const { hovered, ref } = useHover();
 
-  const { index, ...cleanedSession } = session;
+  const { index: _index, ...cleanedTimeEntry } = timeEntry;
 
   async function handleDelete() {
     showDeleteConfirmationModal(
-      getLocalizedText("Sitzung löschen", "Delete Session"),
+      getLocalizedText("Zeit-Eintrag löschen", "Delete Time Entry"),
       getLocalizedText(
-        "Sind Sie sicher, dass Sie diese Sitzung löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
-        "Are you sure you want to delete this session? This action cannot be undone."
+        "Sind Sie sicher, dass Sie diesen Zeit-Eintrag löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "Are you sure you want to delete this time entry? This action cannot be undone."
       ),
       async () => {
-        workTimeEntriesCollection.delete(session.id);
+        workTimeEntriesCollection.delete(timeEntry.id);
       }
     );
   }
 
   const earnings = Number(
-    ((session.active_seconds * session.salary) / 3600).toFixed(2)
+    ((timeEntry.active_seconds * timeEntry.salary) / 3600).toFixed(2)
   );
 
-  // Determine if session should be considered paid
-  const isSessionPaid = () => {
-    if (!project) return session.single_cashflow_id;
-    // For hourly payment projects, check if session is paid
+  // Determine if time entry should be considered paid
+  const isTimeEntryPaid = () => {
+    if (!project) return timeEntry.single_cashflow_id;
+    // For hourly payment projects, check if time entry is paid
     if (project.hourly_payment) {
-      return session.single_cashflow_id;
+      return timeEntry.single_cashflow_id;
     }
 
     // For non-hourly payment projects, check if project is fully paid
@@ -72,10 +72,10 @@ export default function SessionRow({
     return false;
   };
 
-  const sessionPaid = isSessionPaid();
+  const timeEntryPaid = isTimeEntryPaid();
 
-  // Only show checkbox for hourly payment projects and unpaid sessions
-  const showCheckbox = selectedModeActive && onToggleSelected && !sessionPaid;
+  // Only show checkbox for hourly payment projects and unpaid time entries
+  const showCheckbox = selectedModeActive && onToggleSelected && !timeEntryPaid;
 
   return (
     <Box>
@@ -84,16 +84,11 @@ export default function SessionRow({
         className={classes.card}
         mod={{
           selected: isSelected,
-          paid: sessionPaid,
+          paid: timeEntryPaid,
           selectable: showCheckbox,
         }}
         withBorder
-        onClick={
-          showCheckbox
-            ? (e) =>
-                onToggleSelected?.(e)
-            : undefined
-        }
+        onClick={showCheckbox ? (e) => onToggleSelected?.(e) : undefined}
       >
         <Group justify="space-between">
           <Group gap="xl">
@@ -114,44 +109,46 @@ export default function SessionRow({
                 <IconClock size={14} color="gray" />
                 <Text>
                   {formatTimeSpan(
-                    new Date(session.start_time),
-                    new Date(session.end_time)
+                    new Date(timeEntry.start_time),
+                    new Date(timeEntry.end_time)
                   )}
                 </Text>
-                {sessionPaid && (
+                {timeEntryPaid && (
                   <Text size="xs" c="green" fw={500}>
                     {getLocalizedText("✓ Bezahlt", "✓ Paid")}
                   </Text>
                 )}
               </Group>
-              {session.memo && (
+              {timeEntry.memo && (
                 <Text size="sm" c="dimmed" maw={225}>
-                  {session.memo}
+                  {timeEntry.memo}
                 </Text>
               )}
               <Group>
                 <Text size="sm" c="teal">
                   {getLocalizedText("Aktiv", "Active")}:{" "}
-                  {formatDuration(session.active_seconds)}
+                  {formatDuration(timeEntry.active_seconds)}
                 </Text>
               </Group>
             </Stack>
             <Group
               className={classes.actionIconsGroup}
-              mod={{ visible: hovered && !sessionPaid && !selectedModeActive }}
+              mod={{
+                visible: hovered && !timeEntryPaid && !selectedModeActive,
+              }}
             >
               <PencilActionIcon
                 onClick={() => editDrawerHandler.open()}
                 tooltipLabel={getLocalizedText(
-                  "Sitzung bearbeiten",
-                  "Edit session"
+                  "Zeit-Eintrag bearbeiten",
+                  "Edit time entry"
                 )}
               />
               <DeleteActionIcon
                 onClick={() => handleDelete()}
                 tooltipLabel={getLocalizedText(
-                  "Sitzung löschen",
-                  "Delete session"
+                  "Zeit-Eintrag löschen",
+                  "Delete time entry"
                 )}
               />
             </Group>
@@ -162,17 +159,17 @@ export default function SessionRow({
                 {project.title}
               </Text>
             )}
-            <Text className={classes.salaryText} mod={{ paid: sessionPaid }}>
-              {session.hourly_payment
-                ? formatMoney(earnings, session.currency)
+            <Text className={classes.salaryText} mod={{ paid: timeEntryPaid }}>
+              {timeEntry.hourly_payment
+                ? formatMoney(earnings, timeEntry.currency)
                 : ""}
             </Text>
           </Group>
         </Group>
       </Card>
       {project && (
-        <EditSessionDrawer
-          timerSession={cleanedSession}
+        <EditTimeEntryDrawer
+          timeEntry={cleanedTimeEntry}
           project={project}
           opened={editDrawerOpened}
           onClose={() => editDrawerHandler.close()}

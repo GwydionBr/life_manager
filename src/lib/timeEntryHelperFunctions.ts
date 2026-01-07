@@ -6,36 +6,36 @@ import type {
   Earnings,
   EarningsBreakdown,
   Year,
-} from "@/types/timerSession.types";
+} from "@/types/workTimeEntry.types";
 
-export function groupSessions(
-  sessions: Tables<"work_time_entry">[],
+export function groupWorkTimeEntries(
+  timeEntries: Tables<"work_time_entry">[],
   _locale: Locale
 ): { year: number; data: Year }[] {
-  const groupedSessions: Record<number, Year> = sessions.reduce(
-    (acc, session, index) => {
-      if (!session.start_time || !session.currency) {
+  const groupedTimeEntries: Record<number, Year> = timeEntries.reduce(
+    (acc, timeEntry, index) => {
+      if (!timeEntry.start_time || !timeEntry.currency) {
         return acc;
       }
 
-      const startTime = new Date(session.start_time);
+      const startTime = new Date(timeEntry.start_time);
       const year = startTime.getFullYear();
       // Use numeric month (1-12) as stable key to avoid locale parsing issues
       const month = startTime.getMonth() + 1;
       const week = getWeekNumber(startTime);
       // Use ISO date (YYYY-MM-DD) as stable key to avoid Invalid Date parsing
       const day = startTime.toISOString().slice(0, 10);
-      // Calculate earnings for all sessions (both paid and unpaid)
+      // Calculate earnings for all time entries (both paid and unpaid)
       const earnings: Earnings = {
-        amount: session.hourly_payment
+        amount: timeEntry.hourly_payment
           ? Number(
-              ((session.active_seconds * session.salary) / 3600).toFixed(2)
+              ((timeEntry.active_seconds * timeEntry.salary) / 3600).toFixed(2)
             )
           : 0,
-        currency: session.currency,
+        currency: timeEntry.currency,
       };
 
-      const timeInSeconds = session.active_seconds || 0;
+      const timeInSeconds = timeEntry.active_seconds || 0;
 
       // Year
       acc[year] = acc[year] || {
@@ -45,7 +45,7 @@ export function groupSessions(
         months: {},
       };
 
-      if (session.single_cashflow_id) {
+      if (timeEntry.single_cashflow_id) {
         acc[year].totalEarnings.paid = addEarnings(
           acc[year].totalEarnings.paid,
           earnings
@@ -57,7 +57,7 @@ export function groupSessions(
         );
       }
       acc[year].totalTime += timeInSeconds;
-      acc[year].timeEntryIds.push(session.id);
+      acc[year].timeEntryIds.push(timeEntry.id);
 
       // Month
       acc[year].months[month] = acc[year].months[month] || {
@@ -67,7 +67,7 @@ export function groupSessions(
         weeks: {},
       };
 
-      if (session.single_cashflow_id) {
+      if (timeEntry.single_cashflow_id) {
         acc[year].months[month].totalEarnings.paid = addEarnings(
           acc[year].months[month].totalEarnings.paid,
           earnings
@@ -79,7 +79,7 @@ export function groupSessions(
         );
       }
       acc[year].months[month].totalTime += timeInSeconds;
-      acc[year].months[month].timeEntryIds.push(session.id);
+      acc[year].months[month].timeEntryIds.push(timeEntry.id);
 
       // Week
       acc[year].months[month].weeks[week] = acc[year].months[month].weeks[
@@ -91,7 +91,7 @@ export function groupSessions(
         days: {},
       };
 
-      if (session.single_cashflow_id) {
+      if (timeEntry.single_cashflow_id) {
         acc[year].months[month].weeks[week].totalEarnings.paid = addEarnings(
           acc[year].months[month].weeks[week].totalEarnings.paid,
           earnings
@@ -103,7 +103,7 @@ export function groupSessions(
         );
       }
       acc[year].months[month].weeks[week].totalTime += timeInSeconds;
-      acc[year].months[month].weeks[week].timeEntryIds.push(session.id);
+      acc[year].months[month].weeks[week].timeEntryIds.push(timeEntry.id);
 
       // Day
       acc[year].months[month].weeks[week].days[day] = acc[year].months[month]
@@ -114,7 +114,7 @@ export function groupSessions(
         timeEntries: [],
       };
 
-      if (session.single_cashflow_id) {
+      if (timeEntry.single_cashflow_id) {
         acc[year].months[month].weeks[week].days[day].totalEarnings.paid =
           addEarnings(
             acc[year].months[month].weeks[week].days[day].totalEarnings.paid,
@@ -129,11 +129,11 @@ export function groupSessions(
       }
       acc[year].months[month].weeks[week].days[day].totalTime += timeInSeconds;
       acc[year].months[month].weeks[week].days[day].timeEntries.push({
-        ...session,
+        ...timeEntry,
         index,
       });
       acc[year].months[month].weeks[week].days[day].timeEntryIds.push(
-        session.id
+        timeEntry.id
       );
 
       return acc;
@@ -141,7 +141,7 @@ export function groupSessions(
     {} as Record<number, Year>
   );
 
-  return Object.entries(groupedSessions).map(([year, data]) => ({
+  return Object.entries(groupedTimeEntries).map(([year, data]) => ({
     year: Number(year),
     data,
   }));

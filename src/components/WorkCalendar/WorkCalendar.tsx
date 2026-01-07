@@ -7,7 +7,7 @@ import { useCalendarStore } from "@/stores/calendarStore";
 
 import { ScrollArea, Stack } from "@mantine/core";
 import CalendarGrid from "./Calendar/CalendarGrid";
-import EditSessionDrawer from "@/components/Work/Session/EditSessionDrawer";
+import EditTimeEntryDrawer from "@/components/Work/WorkTimeEntry/EditTimeEntryDrawer";
 import CalendarLegend from "./Calendar/CalendarLegend";
 
 import { getStartOfDay } from "./calendarUtils";
@@ -42,9 +42,8 @@ export default function WorkCalendar() {
     zoomIndex,
   } = useCalendarStore();
   const { data: projects } = useWorkProjects();
-  const { data: timeEntries} =
-    useWorkTimeEntries();
-  const { data: appointments} = useAppointments();
+  const { data: timeEntries } = useWorkTimeEntries();
+  const { data: appointments } = useAppointments();
   const [viewportTop, setViewportTop] = useState({
     old: 0,
     new: 0,
@@ -306,8 +305,8 @@ export default function WorkCalendar() {
         handleScrollToNow={handleScrollToNow}
       />
       {selectedSession && selectedProject && (
-        <EditSessionDrawer
-          timerSession={selectedSession}
+        <EditTimeEntryDrawer
+          timeEntry={selectedSession}
           project={selectedProject}
           opened={drawerOpened}
           onClose={() => {

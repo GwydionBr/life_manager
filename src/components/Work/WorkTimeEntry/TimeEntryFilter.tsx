@@ -5,15 +5,15 @@ import { useIntl } from "@/hooks/useIntl";
 import { Card } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 
-interface SessionFilterProps {
+interface TimeEntryFilterProps {
   timeSpan: [Date | null, Date | null];
   onTimeSpanChange: (timeSpan: [Date | null, Date | null]) => void;
 }
 
-export default function SessionFilter({
+export default function TimeEntryFilter({
   timeSpan,
   onTimeSpanChange,
-}: SessionFilterProps) {
+}: TimeEntryFilterProps) {
   const { getLocalizedText } = useIntl();
   const today = dayjs();
 

@@ -17,18 +17,18 @@ import { IconPlayerPlay, IconPlus } from "@tabler/icons-react";
 import { z } from "zod";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { currencies } from "@/constants/settings";
-import TimeInput from "@/components/Work/Session/SessionTimeInput";
+import TimeInput from "@/components/Work/WorkTimeEntry/TimeEntryTimeInput";
 import UpdateButton from "@/components/UI/Buttons/UpdateButton";
 import CreateButton from "@/components/UI/Buttons/CreateButton";
 import LocaleDateTimePicker from "@/components/UI/Locale/LocaleDateTimePicker";
 
-import { NewWorkTimeEntry } from "@/types/timerSession.types";
+import { NewWorkTimeEntry } from "@/types/workTimeEntry.types";
 import CustomNumberInput from "@/components/UI/CustomNumberInput";
 import { WorkProject } from "@/types/work.types";
 
-interface SessionFormProps {
+interface TimeEntryFormProps {
   initialValues: NewWorkTimeEntry;
-  newSession: boolean;
+  newTimeEntry: boolean;
   project?: WorkProject;
 
   onProjectChange?: (value: WorkProject) => void;
@@ -37,16 +37,16 @@ interface SessionFormProps {
   onOpenProjectForm?: () => void;
 }
 
-export default function SessionForm({
+export default function TimeEntryForm({
   initialValues,
-  newSession,
+  newTimeEntry,
   project,
   onSubmit,
   onOpenProjectForm,
   onProjectChange,
-}: SessionFormProps) {
+}: TimeEntryFormProps) {
   const { getLocalizedText } = useIntl();
-  const {data: workProjects} = useWorkProjects();
+  const { data: workProjects } = useWorkProjects();
   const [userChangedStartTime, setUserChangedStartTime] = useState(false);
   const [userChangedEndTime, setUserChangedEndTime] = useState(false);
   const [formInitialized, setFormInitialized] = useState(false);
@@ -79,7 +79,8 @@ export default function SessionForm({
   const form = useForm<NewWorkTimeEntry>({
     initialValues: {
       ...initialValues,
-      work_project_id: initialValues.work_project_id || project?.id || undefined,
+      work_project_id:
+        initialValues.work_project_id || project?.id || undefined,
       start_time: (() => {
         const d = new Date(initialValues.start_time);
         d.setSeconds(0, 0);
@@ -306,7 +307,7 @@ export default function SessionForm({
           placeholder={getLocalizedText("Notiz eingeben", "Enter memo")}
           {...form.getInputProps("memo")}
         />
-        {newSession ? (
+        {newTimeEntry ? (
           <CreateButton
             onClick={form.onSubmit(onSubmit)}
             type="submit"

@@ -10,7 +10,7 @@ import { TimeColumn } from "@/components/WorkCalendar/TimeColumn";
 import ColumnHeader from "@/components/WorkCalendar/Calendar/ColumnHeader";
 import PrevActionIcon from "@/components/UI/ActionIcons/PrevActionIcon";
 import NextActionIcon from "@/components/UI/ActionIcons/NextActionIcon";
-import NewSessionModal from "@/components/Work/Session/NewSessionModal";
+import NewSessionModal from "@/components/Work/WorkTimeEntry/NewTimeEntryModal";
 
 import { clamp } from "@/components/WorkCalendar/calendarUtils";
 

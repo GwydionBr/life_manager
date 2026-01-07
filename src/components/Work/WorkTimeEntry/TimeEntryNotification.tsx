@@ -5,49 +5,49 @@ import { formatTimeSpan } from "@/utils/intl";
 import { Tables, TablesInsert } from "@/types/db.types";
 import { Locale } from "@/types/settings.types";
 
-interface SessionNotificationProps {
+interface TimeEntryNotificationProps {
   completeOverlap: boolean;
-  originalSession?: TablesInsert<"work_time_entry">;
-  createdSessions: Tables<"work_time_entry">[] | null;
-  overlappingSessions: Tables<"work_time_entry">[] | null;
+  originalTimeEntry?: TablesInsert<"work_time_entry">;
+  createdTimeEntries: Tables<"work_time_entry">[] | null;
+  overlappingTimeEntries: Tables<"work_time_entry">[] | null;
   onCompleteOverlap?: () => void;
-  onCreatedSessions?: () => void;
+  onCreatedTimeEntries?: () => void;
   onError?: () => void;
   locale: Locale;
   format24h: boolean;
 }
 
-export default function SessionNotification({
+export default function TimeEntryNotification({
   completeOverlap,
-  originalSession,
-  createdSessions,
-  overlappingSessions,
+  originalTimeEntry,
+  createdTimeEntries,
+  overlappingTimeEntries,
   onCompleteOverlap,
-  onCreatedSessions,
+  onCreatedTimeEntries,
   onError,
   locale,
   format24h,
-}: SessionNotificationProps) {
+}: TimeEntryNotificationProps) {
   const isSingleOverlap =
-    overlappingSessions && overlappingSessions.length === 1;
-  const isSingleCreatedSession =
-    createdSessions && createdSessions.length === 1;
+    overlappingTimeEntries && overlappingTimeEntries.length === 1;
+  const isSingleCreatedTimeEntry =
+    createdTimeEntries && createdTimeEntries.length === 1;
   if (completeOverlap) {
     notifications.show({
       title:
         locale === "de-DE" ? "Komplette Überschneidung" : "Complete overlap",
       message:
         locale === "de-DE"
-          ? "Timer Sitzung überschneided sich komplett mit bereits bestehenden Sitzungen und wurde daher nicht gespeichert."
-          : "Timer session completely overlaps with another session and was not saved.",
+          ? "Timer Zeit-Eintrag überschneided sich komplett mit bereits bestehenden Zeit-Einträgen und wurde daher nicht gespeichert."
+          : "Timer time entry completely overlaps with another time entry and was not saved.",
       color: "red",
       icon: <IconAlertCircle />,
       autoClose: false,
       withBorder: true,
     });
     onCompleteOverlap?.();
-  } else if (createdSessions) {
-    if (overlappingSessions) {
+  } else if (createdTimeEntries) {
+    if (overlappingTimeEntries) {
       notifications.show({
         style: {
           maxHeight: "600px",
@@ -58,21 +58,21 @@ export default function SessionNotification({
           <Stack>
             <Text>
               {locale === "de-DE"
-                ? "Timer Sitzung hat Überschneidungen und wurde angepasst."
-                : "Timer session has overlaps and was adjusted."}
+                ? "Timer Zeit-Eintrag hat Überschneidungen und wurde angepasst."
+                : "Timer time entry has overlaps and was adjusted."}
             </Text>
-            {originalSession && (
+            {originalTimeEntry && (
               <Group>
                 <Text>
                   {locale === "de-DE"
-                    ? "Ursprüngliche Sitzung: "
-                    : "Original session: "}
+                    ? "Ursprüngliche Zeit-Eintrag: "
+                    : "Original time entry: "}
                 </Text>
                 <List>
-                  <List.Item key={originalSession.id}>
+                  <List.Item key={originalTimeEntry.id}>
                     {formatTimeSpan(
-                      new Date(originalSession.start_time),
-                      new Date(originalSession.end_time),
+                      new Date(originalTimeEntry.start_time),
+                      new Date(originalTimeEntry.end_time),
                       locale,
                       format24h
                     )}
@@ -91,7 +91,7 @@ export default function SessionNotification({
                     : "Overlaps: "}
               </Text>
               <List>
-                {overlappingSessions.map((fragment) => (
+                {overlappingTimeEntries.map((fragment) => (
                   <List.Item key={fragment.id}>
                     {formatTimeSpan(
                       new Date(fragment.start_time),
@@ -106,20 +106,20 @@ export default function SessionNotification({
             <Group>
               <Text>
                 Erstellte{" "}
-                {isSingleCreatedSession
+                {isSingleCreatedTimeEntry
                   ? locale === "de-DE"
-                    ? "Sitzung: "
-                    : "Session: "
+                    ? "Zeit-Eintrag: "
+                    : "Time entry: "
                   : locale === "de-DE"
-                    ? "Sitzungen: "
-                    : "Sessions: "}
+                    ? "Zeit-Einträge: "
+                    : "Time entries: "}
               </Text>
               <List>
-                {createdSessions.map((session) => (
-                  <List.Item key={session.id}>
+                {createdTimeEntries.map((timeEntry) => (
+                  <List.Item key={timeEntry.id}>
                     {formatTimeSpan(
-                      new Date(session.start_time),
-                      new Date(session.end_time),
+                      new Date(timeEntry.start_time),
+                      new Date(timeEntry.end_time),
                       locale,
                       format24h
                     )}
@@ -134,14 +134,14 @@ export default function SessionNotification({
         withBorder: true,
       });
     }
-    onCreatedSessions?.();
+    onCreatedTimeEntries?.();
   } else {
     notifications.show({
       title: locale === "de-DE" ? "Fehler" : "Error",
       message:
         locale === "de-DE"
-          ? "Fehler beim Speichern der Sitzung. Bitte versuche es erneut."
-          : "Error saving session. Please try again.",
+          ? "Fehler beim Speichern des Zeit-Eintrags. Bitte versuche es erneut."
+          : "Error saving time entry. Please try again.",
       color: "red",
       autoClose: 6000,
       withBorder: true,

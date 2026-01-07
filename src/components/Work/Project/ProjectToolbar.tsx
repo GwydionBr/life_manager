@@ -12,8 +12,8 @@ import HourlyPayoutCard from "@/components/Finances/Payout/HourlyPayout/HourlyPa
 import ProjectPayoutCard from "@/components/Finances/Payout/ProjectPayout/ProjectPayoutCard";
 import PayoutConversionModal from "@/components/Finances/Payout/PayoutConversionModal";
 import SelectActionIcon from "@/components/UI/ActionIcons/SelectActionIcon";
-import NewSessionModal from "@/components/Work/Session/NewSessionModal";
-import WorkTimeEntrySelector from "@/components/Work/Session/SessionSelector";
+import NewSessionModal from "@/components/Work/WorkTimeEntry/NewTimeEntryModal";
+import WorkTimeEntrySelector from "@/components/Work/WorkTimeEntry/TimeEntrySelector";
 import DelayedTooltip from "@/components/UI/DelayedTooltip";
 import { WorkProject, WorkTimeEntry } from "@/types/work.types";
 import { Currency } from "@/types/settings.types";

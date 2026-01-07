@@ -2,19 +2,23 @@ import { useIntl } from "@/hooks/useIntl";
 
 import { Accordion, Box } from "@mantine/core";
 import { IconCalendar, IconClock, IconFolder } from "@tabler/icons-react";
-import SessionRow from "@/components/Work/Session/SessionRow/SessionRow";
+import TimeEntryRow from "@/components/Work/WorkTimeEntry/TimeEntry/TimeEntryRow";
 
-import type { Year } from "@/types/timerSession.types";
+import type { Year } from "@/types/workTimeEntry.types";
 import type { WorkProject } from "@/types/work.types";
 import CustomAccordionControl from "./CustomAccordionControl";
 
 const Radius = 20;
 
-interface SessionHierarchyProps {
-  groupedSessions: { year: number; data: Year }[];
-  selectedSessions: string[];
-  onSessionToggle: (sessionId: string, index: number, range: boolean) => void;
-  onGroupToggle: (sessionIds: string[]) => void;
+interface TimeEntryHierarchyProps {
+  groupedTimeEntries: { year: number; data: Year }[];
+  selectedTimeEntries: string[];
+  onTimeEntryToggle: (
+    timeEntryId: string,
+    index: number,
+    range: boolean
+  ) => void;
+  onGroupToggle: (timeEntryIds: string[]) => void;
   selectableIdSet: Set<string>;
   project?: WorkProject;
   projects?: WorkProject[];
@@ -22,34 +26,34 @@ interface SessionHierarchyProps {
   selectedModeActive: boolean;
 }
 
-export default function SessionHierarchy({
-  groupedSessions,
-  selectedSessions,
-  onSessionToggle,
+export default function TimeEntryHierarchy({
+  groupedTimeEntries,
+  selectedTimeEntries,
+  onTimeEntryToggle,
   onGroupToggle,
   selectableIdSet,
   project,
   projects,
   isOverview,
   selectedModeActive,
-}: SessionHierarchyProps) {
+}: TimeEntryHierarchyProps) {
   const { getLocalizedText, formatDate, formatMonth } = useIntl();
-  const getBorderColor = (sessionIds: string[]): string | undefined => {
-    const groupIds = sessionIds.filter((id) => selectableIdSet.has(id));
+  const getBorderColor = (timeEntryIds: string[]): string | undefined => {
+    const groupIds = timeEntryIds.filter((id) => selectableIdSet.has(id));
     if (groupIds.length === 0) return undefined;
     const selectedCount = groupIds.filter((id) =>
-      selectedSessions.includes(id)
+      selectedTimeEntries.includes(id)
     ).length;
     if (selectedCount === 0) return undefined;
     if (selectedCount === groupIds.length) return "var(--mantine-color-blue-6)";
     return "var(--mantine-color-teal-6)";
   };
 
-  const getBackgroundColor = (sessionIds: string[]): string | undefined => {
-    const groupIds = sessionIds.filter((id) => selectableIdSet.has(id));
+  const getBackgroundColor = (timeEntryIds: string[]): string | undefined => {
+    const groupIds = timeEntryIds.filter((id) => selectableIdSet.has(id));
     if (groupIds.length === 0) return undefined;
     const selectedCount = groupIds.filter((id) =>
-      selectedSessions.includes(id)
+      selectedTimeEntries.includes(id)
     ).length;
     if (selectedCount === groupIds.length)
       return "light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-6))";
@@ -58,7 +62,7 @@ export default function SessionHierarchy({
 
   return (
     <Box w="100%" maw={900}>
-      {groupedSessions.reverse().map(({ year, data: yearData }, index) => (
+      {groupedTimeEntries.reverse().map(({ year, data: yearData }, index) => (
         // Year Section
         <Accordion
           key={year}
@@ -80,8 +84,8 @@ export default function SessionHierarchy({
               label={year.toString()}
               earnings={yearData.totalEarnings}
               time={yearData.totalTime}
-              selectedSessionIds={selectedSessions}
-              sessionIds={yearData.timeEntryIds}
+              selectedTimeEntryIds={selectedTimeEntries}
+              timeEntryIds={yearData.timeEntryIds}
               selectionModeActive={selectedModeActive}
               onGroupToggle={onGroupToggle}
               selectableIdSet={selectableIdSet}
@@ -115,8 +119,8 @@ export default function SessionHierarchy({
                         label={formatMonth(Number(month))}
                         earnings={monthData.totalEarnings}
                         time={monthData.totalTime}
-                        selectedSessionIds={selectedSessions}
-                        sessionIds={monthData.timeEntryIds}
+                        selectedTimeEntryIds={selectedTimeEntries}
+                        timeEntryIds={monthData.timeEntryIds}
                         selectionModeActive={selectedModeActive}
                         onGroupToggle={onGroupToggle}
                         selectableIdSet={selectableIdSet}
@@ -159,8 +163,8 @@ export default function SessionHierarchy({
                                   )}
                                   earnings={weekData.totalEarnings}
                                   time={weekData.totalTime}
-                                  selectedSessionIds={selectedSessions}
-                                  sessionIds={weekData.timeEntryIds}
+                                  selectedTimeEntryIds={selectedTimeEntries}
+                                  timeEntryIds={weekData.timeEntryIds}
                                   selectionModeActive={selectedModeActive}
                                   onGroupToggle={onGroupToggle}
                                   selectableIdSet={selectableIdSet}
@@ -206,10 +210,10 @@ export default function SessionHierarchy({
                                             label={formatDate(new Date(day))}
                                             earnings={dayData.totalEarnings}
                                             time={dayData.totalTime}
-                                            selectedSessionIds={
-                                              selectedSessions
+                                            selectedTimeEntryIds={
+                                              selectedTimeEntries
                                             }
-                                            sessionIds={dayData.timeEntryIds}
+                                            timeEntryIds={dayData.timeEntryIds}
                                             selectionModeActive={
                                               selectedModeActive
                                             }
@@ -228,28 +232,28 @@ export default function SessionHierarchy({
                                                   ).getTime()
                                               )
                                               .reverse()
-                                              .map((session) => (
-                                                <SessionRow
+                                              .map((timeEntry) => (
+                                                <TimeEntryRow
                                                   selectedModeActive={
                                                     selectedModeActive
                                                   }
-                                                  key={session.id}
-                                                  session={session}
+                                                  key={timeEntry.id}
+                                                  timeEntry={timeEntry}
                                                   project={
                                                     project ||
                                                     projects?.find(
                                                       (p) =>
                                                         p.id ===
-                                                        session.work_project_id
+                                                        timeEntry.work_project_id
                                                     )
                                                   }
-                                                  isSelected={selectedSessions.includes(
-                                                    session.id
+                                                  isSelected={selectedTimeEntries.includes(
+                                                    timeEntry.id
                                                   )}
                                                   onToggleSelected={(e) =>
-                                                    onSessionToggle(
-                                                      session.id,
-                                                      session.index,
+                                                    onTimeEntryToggle(
+                                                      timeEntry.id,
+                                                      timeEntry.index,
                                                       e.shiftKey
                                                     )
                                                   }

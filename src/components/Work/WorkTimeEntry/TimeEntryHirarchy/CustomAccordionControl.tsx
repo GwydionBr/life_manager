@@ -8,11 +8,11 @@ import {
   Text,
   Transition,
 } from "@mantine/core";
-import { EarningsBreakdown } from "@/types/timerSession.types";
+import { EarningsBreakdown } from "@/types/workTimeEntry.types";
 import {
   areEarningsBreakdownEmpty,
   formatTime,
-} from "@/lib/sessionHelperFunctions";
+} from "@/lib/timeEntryHelperFunctions";
 import SelectActionIcon from "@/components/UI/ActionIcons/SelectActionIcon";
 
 interface CustomAccordionControlProps extends AccordionControlProps {
@@ -20,11 +20,11 @@ interface CustomAccordionControlProps extends AccordionControlProps {
   label: string;
   earnings: EarningsBreakdown;
   time: number;
-  selectedSessionIds: string[];
-  sessionIds: string[];
+  selectedTimeEntryIds: string[];
+  timeEntryIds: string[];
   selectionModeActive: boolean;
   selectableIdSet: Set<string>;
-  onGroupToggle: (sessionIds: string[]) => void;
+  onGroupToggle: (timeEntryIds: string[]) => void;
 }
 
 export default function CustomAccordionControl({
@@ -32,17 +32,19 @@ export default function CustomAccordionControl({
   label,
   earnings,
   time,
-  selectedSessionIds,
-  sessionIds,
+  selectedTimeEntryIds,
+  timeEntryIds,
   selectionModeActive,
   selectableIdSet,
   onGroupToggle,
   ...props
 }: CustomAccordionControlProps) {
   const { getLocalizedText, formatMoney } = useIntl();
-  const groupSelectableIds = sessionIds.filter((id) => selectableIdSet.has(id));
+  const groupSelectableIds = timeEntryIds.filter((id) =>
+    selectableIdSet.has(id)
+  );
   const selectedCount = groupSelectableIds.filter((id) =>
-    selectedSessionIds.includes(id)
+    selectedTimeEntryIds.includes(id)
   ).length;
   const allSelected =
     groupSelectableIds.length > 0 &&
@@ -91,8 +93,8 @@ export default function CustomAccordionControl({
               }}
               iconSize={24}
               tooltipLabel={getLocalizedText(
-                "Sitzungen auswählen",
-                "Select sessions"
+                "Zeit-Einträge auswählen",
+                "Select time entries"
               )}
               selected={allSelected}
               partiallySelected={partiallySelected}

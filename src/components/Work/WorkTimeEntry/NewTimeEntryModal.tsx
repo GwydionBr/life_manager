@@ -3,32 +3,32 @@ import { useIntl } from "@/hooks/useIntl";
 import { useSettings } from "@/db/collections/settings/settings-collection";
 
 import { Group, Modal, Text, useModalsStack } from "@mantine/core";
-import SessionForm from "./SessionForm";
+import TimeEntryForm from "./TimeEntryForm";
 import { TablesInsert } from "@/types/db.types";
 import { Currency } from "@/types/settings.types";
 import ProjectForm from "../Project/ProjectForm";
 import { IconClockPlus } from "@tabler/icons-react";
-import { NewWorkTimeEntry } from "@/types/timerSession.types";
+import { NewWorkTimeEntry } from "@/types/workTimeEntry.types";
 import { TimerRoundingSettings } from "@/types/timeTracker.types";
 import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 import { WorkProject } from "@/types/work.types";
 import { useWorkTimeEntryMutations } from "@/db/collections/work/work-time-entry/use-work-time-entry-mutations";
 
-interface NewSessionModalProps {
+interface NewTimeEntryModalProps {
   opened: boolean;
   onClose: () => void;
   initialValues?: NewWorkTimeEntry;
   project?: WorkProject;
 }
 
-export default function NewSessionModal({
+export default function NewTimeEntryModal({
   opened,
   onClose,
   initialValues,
   project,
-}: NewSessionModalProps) {
+}: NewTimeEntryModalProps) {
   const { getLocalizedText } = useIntl();
-  const stack = useModalsStack(["session-form", "project-form", "tag-form"]);
+  const stack = useModalsStack(["time-entry-form", "project-form", "tag-form"]);
   const { data: settings } = useSettings();
   const { addWorkTimeEntry } = useWorkTimeEntryMutations();
 
@@ -43,7 +43,7 @@ export default function NewSessionModal({
 
   useEffect(() => {
     if (opened) {
-      stack.open("session-form");
+      stack.open("time-entry-form");
     } else {
       stack.closeAll();
     }
@@ -55,7 +55,7 @@ export default function NewSessionModal({
     setTagIds([]);
   };
 
-  async function handleSessionSubmit(values: {
+  async function handleTimeEntrySubmit(values: {
     start_time: string;
     end_time: string;
     active_seconds: number;
@@ -67,7 +67,7 @@ export default function NewSessionModal({
       return;
     }
 
-    let newSession: TablesInsert<"work_time_entry"> = {
+    let newTimeEntry: TablesInsert<"work_time_entry"> = {
       ...values,
       start_time: new Date(values.start_time).toISOString(),
       end_time: new Date(values.end_time).toISOString(),
@@ -94,7 +94,7 @@ export default function NewSessionModal({
         "up",
     };
 
-    await addWorkTimeEntry(newSession, roundingSettings);
+    await addWorkTimeEntry(newTimeEntry, roundingSettings);
     onClose();
   }
 
@@ -102,17 +102,17 @@ export default function NewSessionModal({
     <Modal.Stack>
       <Modal
         size="lg"
-        {...stack.register("session-form")}
+        {...stack.register("time-entry-form")}
         onClose={handleClose}
         title={
           <Group>
             <IconClockPlus />
-            <Text>{getLocalizedText("Sitzung hinzufügen", "Add Session")}</Text>
+            <Text>{getLocalizedText("Zeit-Eintrag hinzufügen", "Add Time Entry")}</Text>
           </Group>
         }
         transitionProps={{ transition: "fade-right", duration: 400 }}
       >
-        <SessionForm
+        <TimeEntryForm
           initialValues={
             initialValues ?? {
               work_project_id: undefined,
@@ -125,8 +125,8 @@ export default function NewSessionModal({
               salary: project?.salary ?? settings?.default_salary_amount ?? 0,
             }
           }
-          newSession={true}
-          onSubmit={handleSessionSubmit}
+          newTimeEntry={true}
+          onSubmit={handleTimeEntrySubmit}
           onProjectChange={setCurrentProject}
           onOpenProjectForm={() => stack.open("project-form")}
           onCancel={handleClose}

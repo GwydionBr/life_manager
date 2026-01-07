@@ -43,10 +43,10 @@ export function useTimeEntryFiltering(
   });
 
   /**
-   * Filters sessions by selected time period
-   * Returns all sessions if no time preset is selected
+   * Filters time entries by selected time period
+   * Returns all time entries if no time preset is selected
    */
-  const getTimeFilteredSessions = () => {
+  const getTimeFilteredTimeEntries = () => {
     if (!timeSpan[0] || !timeSpan[1]) {
       return timeEntry;
     }
@@ -54,9 +54,9 @@ export function useTimeEntryFiltering(
     let startDate = startOfDay(new Date(timeSpan[0]));
     let endDate = endOfDay(new Date(timeSpan[1]));
 
-    return timeEntry.filter((session) => {
-      const sessionDate = new Date(session.start_time);
-      return sessionDate >= startDate && sessionDate <= endDate;
+    return timeEntry.filter((timeEntry) => {
+      const timeEntryDate = new Date(timeEntry.start_time);
+      return timeEntryDate >= startDate && timeEntryDate <= endDate;
     });
   };
 
@@ -64,38 +64,38 @@ export function useTimeEntryFiltering(
    * Main filtering function that combines time and project filters
    * Handles different scenarios based on active filters and filter logic
    */
-  const getFilteredSessions = () => {
-    // If no project filters are active, just return time-filtered sessions
+  const getFilteredTimeEntries = () => {
+    // If no project filters are active, just return time-filtered time entries
     if (
       !isOverview ||
       (!filterState.selectedProjects.length &&
         !filterState.selectedFolders.length &&
         !filterState.selectedCategories.length)
     ) {
-      return getTimeFilteredSessions();
+      return getTimeFilteredTimeEntries();
     }
 
     // If no time filter is active, just filter by project criteria
     if (!timeSpan[0] || !timeSpan[1]) {
-      return timeEntry.filter((session) => {
-        const sessionProject = projects?.find(
-          (p) => p.id === session.work_project_id
+      return timeEntry.filter((timeEntry) => {
+        const timeEntryProject = projects?.find(
+          (p) => p.id === timeEntry.work_project_id
         );
-        if (!sessionProject) return false;
+        if (!timeEntryProject) return false;
 
         const conditions: boolean[] = [];
 
         // Project filter
         if (filterState.selectedProjects.length > 0) {
           conditions.push(
-            filterState.selectedProjects.includes(session.work_project_id)
+            filterState.selectedProjects.includes(timeEntry.work_project_id)
           );
         }
 
         // Folder filter
         if (filterState.selectedFolders.length > 0) {
           const folder = folders?.find(
-            (f) => f.id === sessionProject.work_folder_id
+            (f) => f.id === timeEntryProject.work_folder_id
           );
           conditions.push(
             !!(folder && filterState.selectedFolders.includes(folder.id))
@@ -106,12 +106,14 @@ export function useTimeEntryFiltering(
         if (filterState.selectedCategories.length > 0) {
           conditions.push(
             filterState.selectedCategories.some((categoryId) =>
-              sessionProject.tags.some((category) => category.id === categoryId)
+              timeEntryProject.tags.some(
+                (category) => category.id === categoryId
+              )
             )
           );
         }
 
-        // If no conditions, include all sessions
+        // If no conditions, include all time entries
         if (conditions.length === 0) return true;
 
         // Apply filter logic (AND: all conditions must be true, OR: at least one must be true)
@@ -124,30 +126,34 @@ export function useTimeEntryFiltering(
     }
 
     // Both time and project filters are active - combine them based on logic
-    const timeFilteredSessions = getTimeFilteredSessions();
+    const timeFilteredTimeEntries = getTimeFilteredTimeEntries();
 
-    return timeEntry.filter((session) => {
-      const sessionProject = projects?.find((p) => p.id === session.work_project_id);
-      if (!sessionProject) return false;
+    return timeEntry.filter((timeEntry) => {
+      const timeEntryProject = projects?.find(
+        (p) => p.id === timeEntry.work_project_id
+      );
+      if (!timeEntryProject) return false;
 
-      // Check if session matches time filter
-      const matchesTimeFilter = timeFilteredSessions.some(
-        (timeSession) => timeSession.id === session.id
+      // Check if time entry matches time filter
+      const matchesTimeFilter = timeFilteredTimeEntries.some(
+        (timeEntry) => timeEntry.id === timeEntry.id
       );
 
-      // Check if session matches project filters
+      // Check if time entry matches project filters
       const projectConditions: boolean[] = [];
 
       // Project filter
       if (filterState.selectedProjects.length > 0) {
         projectConditions.push(
-          filterState.selectedProjects.includes(session.work_project_id)
+          filterState.selectedProjects.includes(timeEntry.work_project_id)
         );
       }
 
       // Folder filter
       if (filterState.selectedFolders.length > 0) {
-        const folder = folders?.find((f) => f.id === sessionProject.work_folder_id);
+        const folder = folders?.find(
+          (f) => f.id === timeEntryProject.work_folder_id
+        );
         projectConditions.push(
           !!(folder && filterState.selectedFolders.includes(folder.id))
         );
@@ -157,7 +163,7 @@ export function useTimeEntryFiltering(
       if (filterState.selectedCategories.length > 0) {
         projectConditions.push(
           filterState.selectedCategories.some((categoryId) =>
-            sessionProject.tags.some((category) => category.id === categoryId)
+            timeEntryProject.tags.some((category) => category.id === categoryId)
           )
         );
       }
@@ -180,27 +186,29 @@ export function useTimeEntryFiltering(
     });
   };
 
-  const filteredSessions = getFilteredSessions();
+  const filteredTimeEntries = getFilteredTimeEntries();
 
   /**
-   * Filters out paid sessions for selection
+   * Filters out paid time entries for selection
    * In overview mode, checks project hourly_payment setting
    */
-  const unpaidSessions = filteredSessions.filter((session) => {
+  const unpaidTimeEntries = filteredTimeEntries.filter((timeEntry) => {
     if (isOverview) {
-      // In overview mode, we need to find the project for each session
-      const sessionProject = projects?.find((p) => p.id === session.work_project_id);
-      if (!sessionProject) return false;
+      // In overview mode, we need to find the project for each time entry
+      const timeEntryProject = projects?.find(
+        (p) => p.id === timeEntry.work_project_id
+      );
+      if (!timeEntryProject) return false;
 
-      // For hourly payment projects, check if session is paid
-      if (sessionProject.hourly_payment) {
-        return !session.single_cashflow_id;
+      // For hourly payment projects, check if time entry is paid
+      if (timeEntryProject.hourly_payment) {
+        return !timeEntry.single_cashflow_id;
       }
       return false;
     }
 
-    // Normal mode - just check session.payed
-    return !session.single_cashflow_id;
+    // Normal mode - just check time entry.payed
+    return !timeEntry.single_cashflow_id;
   });
 
   const handleCustomDaysChange = (days: number) => {
@@ -248,8 +256,8 @@ export function useTimeEntryFiltering(
 
   return {
     timeFilterDays: filterState.timeFilterDays,
-    filteredSessions,
-    unpaidSessions,
+    filteredTimeEntries,
+    unpaidTimeEntries,
     filterState,
     handleCustomDaysChange,
     handleSetDaysForPreset,

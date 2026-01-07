@@ -10,9 +10,9 @@ import { Collapse, Loader, Stack, Text } from "@mantine/core";
 import EditProjectDrawer from "@/components/Work/Project/EditProjectDrawer";
 import Header from "@/components/Header/Header";
 import WorkAnalysis from "@/components/Work/Analysis/WorkAnalysis";
-import SessionHierarchy from "@/components/Work/Session/SessionHirarchy/SessionHierarchy";
+import WorkTimeEntryHierarchy from "@/components/Work/WorkTimeEntry/TimeEntryHirarchy/TimeEntryHierarchy";
 
-import { groupSessions } from "@/lib/sessionHelperFunctions";
+import { groupWorkTimeEntries } from "@/lib/timeEntryHelperFunctions";
 import ProjectToolbar from "./ProjectToolbar";
 
 const route = getRouteApi("/_app/work");
@@ -133,9 +133,9 @@ export default function WorkProjectDetailsPage() {
             <Stack w="100%" align="center">
               {/* Session Hierarchy */}
               {timeFilteredTimeEntries.length > 0 ? (
-                <SessionHierarchy
+                <WorkTimeEntryHierarchy
                   selectedModeActive={selectedModeActive}
-                  groupedSessions={groupSessions(
+                  groupedTimeEntries={groupWorkTimeEntries(
                     timeFilteredTimeEntries.sort(
                       (a, b) =>
                         new Date(b.start_time).getTime() -
@@ -143,8 +143,8 @@ export default function WorkProjectDetailsPage() {
                     ),
                     locale
                   )}
-                  selectedSessions={selectedTimeEntryIds}
-                  onSessionToggle={toggleTimeEntrySelection}
+                  selectedTimeEntries={selectedTimeEntryIds}
+                  onTimeEntryToggle={toggleTimeEntrySelection}
                   onGroupToggle={toggleGroupSelection}
                   selectableIdSet={
                     new Set(

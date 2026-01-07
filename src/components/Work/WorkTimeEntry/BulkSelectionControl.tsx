@@ -18,12 +18,12 @@ import {
 } from "@mantine/core";
 
 import type { Tables } from "@/types/db.types";
-import type { TimePreset } from "@/types/timerSession.types";
-import type { FilterLogic } from "@/hooks/useSessionFiltering";
+import type { TimePreset } from "@/types/workTimeEntry.types";
+import type { FilterLogic } from "@/hooks/useTimeEntryFiltering";
 
-interface SessionFilterProps {
-  unpaidSessions: Tables<"work_time_entry">[];
-  selectedSessions: string[];
+interface TimeEntryFilterProps {
+  unpaidTimeEntries: Tables<"work_time_entry">[];
+  selectedTimeEntries: string[];
   projects?: Tables<"work_project">[];
   folders?: Tables<"work_folder">[];
   isOverview: boolean;
@@ -37,7 +37,7 @@ interface SessionFilterProps {
     selectedCategories: string[];
     filterLogic: FilterLogic;
   };
-  onSessionsChange: (sessions: string[]) => void;
+  onTimeEntriesChange: (timeEntries: string[]) => void;
   onTimePresetChange: (preset: string | null) => void;
   onCustomDaysChange: (days: number) => void;
   onSetDaysForPreset?: (days: number) => void;
@@ -49,12 +49,12 @@ interface SessionFilterProps {
 }
 
 /**
- * Bulk selection controls for timer sessions with filtering capabilities
- * Allows users to select multiple sessions by various criteria (project, folder, time period)
+ * Bulk selection controls for timer time entries with filtering capabilities
+ * Allows users to select multiple time entries by various criteria (project, folder, time period)
  */
-export default function SessionFilter({
-  unpaidSessions,
-  selectedSessions,
+export default function TimeEntryFilter({
+  unpaidTimeEntries,
+  selectedTimeEntries,
   projects,
   folders,
   isOverview,
@@ -62,7 +62,7 @@ export default function SessionFilter({
   selectedTimePreset,
   timeFilterDays,
   filterState,
-  onSessionsChange,
+  onTimeEntriesChange,
   onTimePresetChange,
   onCustomDaysChange,
   onSetDaysForPreset,
@@ -71,22 +71,22 @@ export default function SessionFilter({
   onCategoryFilterChange,
   onFilterLogicChange,
   onClearAllFilters,
-}: SessionFilterProps) {
+}: TimeEntryFilterProps) {
   const { getLocalizedText } = useIntl();
   const { data: financeCategories } = useTags();
 
-  // Toggle between selecting all sessions or none
+  // Toggle between selecting all time entries or none
   const handleSelectAll = () => {
-    if (selectedSessions.length === unpaidSessions.length) {
-      onSessionsChange([]);
+    if (selectedTimeEntries.length === unpaidTimeEntries.length) {
+      onTimeEntriesChange([]);
     } else {
-      onSessionsChange(unpaidSessions.map((s) => s.id));
+      onTimeEntriesChange(unpaidTimeEntries.map((s) => s.id));
     }
   };
 
   // Handle time preset changes and update days accordingly
   const handleTimePresetChange = (preset: string | null) => {
-    onSessionsChange([]);
+    onTimeEntriesChange([]);
     onTimePresetChange(preset);
     if (preset && preset !== "custom") {
       const presetData = timePresets.find((p) => p.value === preset);
@@ -158,32 +158,32 @@ export default function SessionFilter({
       <Stack gap="xs" style={{ flex: 1 }}>
         <Group>
           <Checkbox
-            label={`${getLocalizedText("Alle auswählen", "Select All")} (${unpaidSessions.length} ${getLocalizedText("unbezahlte Sitzungen", "unpaid sessions")})`}
+            label={`${getLocalizedText("Alle auswählen", "Select All")} (${unpaidTimeEntries.length} ${getLocalizedText("unbezahlte Zeit-Einträge", "unpaid time entries")})`}
             checked={
-              selectedSessions.length === unpaidSessions.length &&
-              unpaidSessions.length > 0
+              selectedTimeEntries.length === unpaidTimeEntries.length &&
+              unpaidTimeEntries.length > 0
             }
             indeterminate={
-              selectedSessions.length > 0 &&
-              selectedSessions.length < unpaidSessions.length
+              selectedTimeEntries.length > 0 &&
+              selectedTimeEntries.length < unpaidTimeEntries.length
             }
             onChange={handleSelectAll}
-            disabled={unpaidSessions.length === 0}
+            disabled={unpaidTimeEntries.length === 0}
           />
           <Stack gap="xs" align="flex-end">
-            {unpaidSessions.length > 0 && selectedSessions.length > 0 && (
+            {unpaidTimeEntries.length > 0 && selectedTimeEntries.length > 0 && (
               <Text size="sm" c="dimmed">
-                {selectedSessions.length}{" "}
-                {getLocalizedText("Sitzung", "session")}
-                {selectedSessions.length > 1 ? "en" : ""}{" "}
+                {selectedTimeEntries.length}{" "}
+                {getLocalizedText("Zeit-Eintrag", "time entry")}
+                {selectedTimeEntries.length > 1 ? "en" : ""}{" "}
                 {getLocalizedText("ausgewählt", "selected")}
               </Text>
             )}
-            {unpaidSessions.length === 0 && (
+            {unpaidTimeEntries.length === 0 && (
               <Text size="sm" c="dimmed">
                 {getLocalizedText(
-                  "Alle Sitzungen bezahlt",
-                  "All sessions paid"
+                  "Alle Zeit-Einträge bezahlt",
+                  "All time entries paid"
                 )}
               </Text>
             )}
@@ -195,8 +195,8 @@ export default function SessionFilter({
         <Stack gap="xs">
           <Text size="sm" fw={500}>
             {getLocalizedText(
-              "Sitzungen nach Zeitrahmen filtern",
-              "Select Sessions by Time Period"
+              "Zeit-Einträge nach Zeitrahmen filtern",
+              "Select Time Entries by Time Period"
             )}
           </Text>
           <Group gap="md" align="flex-end">
@@ -217,9 +217,15 @@ export default function SessionFilter({
             />
             {selectedTimePreset && !isOverview && (
               <Button size="sm" onClick={handleSelectAll} variant="light">
-                {selectedSessions.length === unpaidSessions.length
-                  ? `${getLocalizedText("Alle Sitzungen abwählen", "Deselect all Sessions")}`
-                  : `${getLocalizedText("Alle unbezahlten Sitzungen auswählen", "Select ${unpaidSessions.length} Unpaid Sessions")}`}
+                {selectedTimeEntries.length === unpaidTimeEntries.length
+                  ? getLocalizedText(
+                      "Alle Zeit-Einträge abwählen",
+                      "Deselect all Time Entries"
+                    )
+                  : getLocalizedText(
+                      `Alle unbezahlten Zeit-Einträge auswählen (${unpaidTimeEntries.length})`,
+                      `Select ${unpaidTimeEntries.length} unpaid time entries`
+                    )}
               </Button>
             )}
           </Group>
@@ -248,11 +254,14 @@ export default function SessionFilter({
           )}
           <Collapse in={selectedTimePreset !== null && !isOverview}>
             <Badge
-              color={unpaidSessions.length > 0 ? "blue" : "red"}
+              color={unpaidTimeEntries.length > 0 ? "blue" : "red"}
               variant="light"
             >
-              {unpaidSessions.length}{" "}
-              {getLocalizedText("unbezahlte Sitzungen", "unpaid sessions")}
+              {unpaidTimeEntries.length}{" "}
+              {getLocalizedText(
+                "unbezahlte Zeit-Einträge",
+                "unpaid time entries"
+              )}
               {getLocalizedText("in letzten", "in last")} {timeFilterDays}{" "}
               {getLocalizedText("Tagen", "days")}
             </Badge>
@@ -266,8 +275,8 @@ export default function SessionFilter({
             <Stack gap="xs">
               <Text size="sm" fw={500}>
                 {getLocalizedText(
-                  "Sitzungen nach Projektkriterien filtern",
-                  "Filter Sessions by Project Criteria"
+                  "Zeit-Einträge nach Projektkriterien filtern",
+                  "Filter Time Entries by Project Criteria"
                 )}
               </Text>
 
@@ -348,12 +357,12 @@ export default function SessionFilter({
                   <Text size="xs" c="dimmed">
                     {filterState?.filterLogic === "AND"
                       ? getLocalizedText(
-                          "Sitzungen müssen allen ausgewählten Kriterien entsprechen",
-                          "Sessions must belong to ALL selected criteria"
+                          "Zeit-Einträge müssen allen ausgewählten Kriterien entsprechen",
+                          "Time entries must belong to ALL selected criteria"
                         )
                       : getLocalizedText(
-                          "Sitzungen können einem der ausgewählten Kriterien entsprechen",
-                          "Sessions can belong to ANY selected criteria"
+                          "Zeit-Einträge können einem der ausgewählten Kriterien entsprechen",
+                          "Time entries can belong to ANY selected criteria"
                         )}
                   </Text>
                 </Group>
@@ -362,13 +371,13 @@ export default function SessionFilter({
                 <Stack align="center">
                   <Badge
                     mt="md"
-                    color={unpaidSessions.length > 0 ? "blue" : "red"}
+                    color={unpaidTimeEntries.length > 0 ? "blue" : "red"}
                     variant="light"
                   >
-                    {unpaidSessions.length}{" "}
+                    {unpaidTimeEntries.length}{" "}
                     {getLocalizedText(
-                      "unbezahlte Sitzungen",
-                      "unpaid sessions"
+                      "unbezahlte Zeit-Einträge",
+                      "unpaid time entries"
                     )}
                     {getLocalizedText("in letzten", "in last")} {timeFilterDays}{" "}
                     {getLocalizedText("Tagen", "days")}
@@ -386,9 +395,15 @@ export default function SessionFilter({
                         onClick={handleSelectAll}
                         variant="light"
                       >
-                        {selectedSessions.length === unpaidSessions.length
-                          ? `${getLocalizedText("Alle Sitzungen abwählen", "Deselect all Sessions")}`
-                          : `${getLocalizedText("Alle unbezahlten Sitzungen auswählen", "Select ${unpaidSessions.length} Unpaid Sessions")}`}
+                        {selectedTimeEntries.length === unpaidTimeEntries.length
+                          ? getLocalizedText(
+                              "Alle Zeit-Einträge abwählen",
+                              "Deselect all Time Entries"
+                            )
+                          : getLocalizedText(
+                              `Alle unbezahlten Zeit-Einträge auswählen (${unpaidTimeEntries.length})`,
+                              `Select ${unpaidTimeEntries.length} unpaid time entries`
+                            )}
                       </Button>
                     )}
                     <Button
