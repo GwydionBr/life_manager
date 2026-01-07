@@ -17,6 +17,11 @@ export type Tag = Tables<"tag">;
 export type InsertTag = TablesInsert<"tag">;
 export type UpdateTag = TablesUpdate<"tag">;
 
+// Contact Types
+export type Contact = Tables<"contact">;
+export type InsertContact = TablesInsert<"contact">;
+export type UpdateContact = TablesUpdate<"contact">;
+
 // Single Cash Flow Types
 export interface SingleCashFlow extends Tables<"single_cashflow"> {
   tags: Tables<"tag">[];

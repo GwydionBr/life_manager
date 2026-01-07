@@ -3,7 +3,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useFinanceProjects } from "@/db/collections/finance/finance-project/use-finance-project-query";
 import { useFinanceProjectMutations } from "@/db/collections/finance/finance-project/use-finance-project-mutations";
-import { useContacts } from "@/db/collections/finance/contacts/contact-collection";
+import { useContacts } from "@/db/collections/finance/contacts/use-contact-query";
 import { useIntl } from "@/hooks/useIntl";
 
 import {

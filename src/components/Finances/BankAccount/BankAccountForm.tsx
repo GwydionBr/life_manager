@@ -3,7 +3,7 @@ import { useForm } from "@mantine/form";
 import { useIntl } from "@/hooks/useIntl";
 import { bankAccountsCollection } from "@/db/collections/finance/bank-account/bank-account-collection";
 import { useProfile } from "@/db/collections/profile/profile-collection";
-import { useBankAccounts } from "@/db/collections/finance/bank-account/bank-account-collection";
+import { useBankAccounts } from "@/db/collections/finance/bank-account/use-bank-account-query";
 
 import { Stack, Select, TextInput, Checkbox } from "@mantine/core";
 

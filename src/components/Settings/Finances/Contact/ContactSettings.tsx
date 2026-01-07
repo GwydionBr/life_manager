@@ -1,8 +1,6 @@
 import { useIntl } from "@/hooks/useIntl";
-import {
-  contactsCollection,
-  useContacts,
-} from "@/db/collections/finance/contacts/contact-collection";
+import { contactsCollection } from "@/db/collections/finance/contacts/contact-collection";
+import { useContacts } from "@/db/collections/finance/contacts/use-contact-query";
 
 import { Group, Text } from "@mantine/core";
 import { IconUserPlus, IconUsers } from "@tabler/icons-react";
@@ -49,10 +47,9 @@ export default function FinanceContactSettings() {
     </>
   );
 
-  const renderEditForm = (
-    contact: Tables<"contact">,
-    onClose: () => void
-  ) => <ContactsForm onClose={onClose} contact={contact} />;
+  const renderEditForm = (contact: Tables<"contact">, onClose: () => void) => (
+    <ContactsForm onClose={onClose} contact={contact} />
+  );
 
   const renderAddForm = (onClose: () => void) => (
     <ContactsForm onClose={onClose} />

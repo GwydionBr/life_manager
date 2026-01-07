@@ -1,7 +1,7 @@
 import { useForm } from "@mantine/form";
 import { useEffect } from "react";
 import { useFinanceProjectMutations } from "@/db/collections/finance/finance-project/use-finance-project-mutations";
-import { useContacts } from "@/db/collections/finance/contacts/contact-collection";
+import { useContacts } from "@/db/collections/finance/contacts/use-contact-query";
 import { useTags } from "@/db/collections/finance/tags/use-tags-query";
 
 import { z } from "zod";

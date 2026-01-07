@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDisclosure, useHover } from "@mantine/hooks";
 import { useIntl } from "@/hooks/useIntl";
-import { useContacts } from "@/db/collections/finance/contacts/contact-collection";
+import { useContacts } from "@/db/collections/finance/contacts/use-contact-query";
 
 import {
   Badge,
@@ -34,11 +34,13 @@ export default function EmptyContactBadge({
     isContactPopoverOpen,
     { open: openContactPopover, close: closeContactPopover },
   ] = useDisclosure(false);
-  const [isContactFormOpen, { open: openContactForm, close: closeContactForm }] =
-    useDisclosure(false);
+  const [
+    isContactFormOpen,
+    { open: openContactForm, close: closeContactForm },
+  ] = useDisclosure(false);
   const [selectedContact, setSelectedContact] =
     useState<Tables<"contact"> | null>(null);
-  const { data: contacts  } = useContacts();
+  const { data: contacts } = useContacts();
 
   const handlePopoverClose = () => {
     closeContactForm();

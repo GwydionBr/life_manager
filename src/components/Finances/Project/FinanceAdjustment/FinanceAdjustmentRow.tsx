@@ -1,6 +1,6 @@
 import { useHover } from "@mantine/hooks";
 import { useIntl } from "@/hooks/useIntl";
-import { useContacts } from "@/db/collections/finance/contacts/contact-collection";
+import { useContacts } from "@/db/collections/finance/contacts/use-contact-query";
 
 import { Group, Text, ThemeIcon, Card, Transition } from "@mantine/core";
 import {
@@ -71,9 +71,8 @@ export default function FinanceAdjustmentRow({
     amount = financeProject.start_amount;
     isIncome = financeProject.start_amount > 0;
     contact =
-      contacts.find(
-        (contact) => contact.id === financeProject.contact_id
-      ) || null;
+      contacts.find((contact) => contact.id === financeProject.contact_id) ||
+      null;
     description = getLocalizedText("Startbetrag", "Start amount");
     createdAt = new Date(financeProject.created_at);
     isPaid = !!financeProject.single_cashflow_id;

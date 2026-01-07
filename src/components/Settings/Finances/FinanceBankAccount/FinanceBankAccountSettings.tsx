@@ -1,9 +1,7 @@
 import { useIntl } from "@/hooks/useIntl";
 import { useSettingsStore } from "@/stores/settingsStore";
-import {
-  bankAccountsCollection,
-  useBankAccounts,
-} from "@/db/collections/finance/bank-account/bank-account-collection";
+import { bankAccountsCollection } from "@/db/collections/finance/bank-account/bank-account-collection";
+import { useBankAccounts } from "@/db/collections/finance/bank-account/use-bank-account-query";
 
 import { Group, Stack, Text, Badge } from "@mantine/core";
 import { IconBuildingBank, IconPlus, IconStar } from "@tabler/icons-react";

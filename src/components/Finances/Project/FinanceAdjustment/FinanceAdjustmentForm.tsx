@@ -10,7 +10,7 @@ import CreateButton from "@/components/UI/Buttons/CreateButton";
 import { z } from "zod";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { projectAdjustmentsCollection } from "@/db/collections/finance/project-adjustment/project-adjustment-collection";
-import { useContacts } from "@/db/collections/finance/contacts/contact-collection";
+import { useContacts } from "@/db/collections/finance/contacts/use-contact-query";
 import { useTags } from "@/db/collections/finance/tags/use-tags-query";
 
 const schema = z.object({
@@ -28,8 +28,8 @@ interface FinanceAdjustmentFormProps {
 
 export default function FinanceAdjustmentForm({
   onClose,
-  onDropdownOpen,
-  onDropdownClose,
+  onDropdownOpen: _onDropdownOpen,
+  onDropdownClose: _onDropdownClose,
   projectId,
 }: FinanceAdjustmentFormProps) {
   const { getLocalizedText } = useIntl();

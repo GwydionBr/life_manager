@@ -5,8 +5,7 @@ import { useIntl } from "@/hooks/useIntl";
 import { useFinanceStore } from "@/stores/financeStore";
 import { useSingleCashflowsQuery } from "@/db/collections/finance/single-cashflow/use-single-cashflow-query";
 import { useSingleCashflowMutations } from "@/db/collections/finance/single-cashflow/use-single-cashflow-mutations";
-import { useBankAccounts } from "@/db/collections/finance/bank-account/bank-account-collection";
-
+import { useBankAccounts } from "@/db/collections/finance/bank-account/use-bank-account-query";
 
 import {
   Group,
@@ -61,7 +60,11 @@ export default function FinanceSingleTab() {
   const { selectedBankAccountId } = useFinanceStore();
 
   const selectedBankAccount = useMemo(() => {
-    return bankAccounts.find((bankAccount) => bankAccount.id === selectedBankAccountId) ?? null;
+    return (
+      bankAccounts.find(
+        (bankAccount) => bankAccount.id === selectedBankAccountId
+      ) ?? null
+    );
   }, [bankAccounts, selectedBankAccountId]);
 
   // Single Add

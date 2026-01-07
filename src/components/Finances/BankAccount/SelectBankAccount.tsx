@@ -1,4 +1,4 @@
-import { useBankAccounts } from "@/db/collections/finance/bank-account/bank-account-collection";
+import { useBankAccounts } from "@/db/collections/finance/bank-account/use-bank-account-query";
 import { useFinanceStore } from "@/stores/financeStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 
