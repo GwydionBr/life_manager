@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import {
-  useSettings,
-  settingsCollection,
-} from "@/db/collections/settings/settings-collection";
+import { settingsCollection } from "@/db/collections/settings/settings-collection";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
 import { useIntl } from "@/hooks/useIntl";
 
 import { Radio, Select, Stack } from "@mantine/core";

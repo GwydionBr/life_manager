@@ -6,7 +6,7 @@
 import { useGroupStore } from "@/stores/groupStore";
 import { useIntl } from "@/hooks/useIntl";
 import { useMemo } from "react";
-import { useSettings } from "@/db/collections/settings/settings-collection";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
 
 import { Group, Indicator, Stack, Text } from "@mantine/core";
 import { IconUserPlus, IconUsersPlus } from "@tabler/icons-react";

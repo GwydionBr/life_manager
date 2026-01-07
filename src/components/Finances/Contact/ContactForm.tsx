@@ -1,7 +1,7 @@
 import { useForm } from "@mantine/form";
 import { useIntl } from "@/hooks/useIntl";
-import { useProfile } from "@/db/collections/profile/profile-collection";
-import { useSettings } from "@/db/collections/settings/settings-collection";
+import { useProfile } from "@/db/collections/profile/use-profile-query";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
 
 import { Fieldset, Select, Stack, TextInput } from "@mantine/core";
 
@@ -35,7 +35,7 @@ interface ContactFormProps {
 
 export default function ContactForm({
   onClose,
-  onSuccess,
+  onSuccess: _onSuccess,
   contact,
 }: ContactFormProps) {
   const { getLocalizedText } = useIntl();

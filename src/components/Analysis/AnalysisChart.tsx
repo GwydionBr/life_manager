@@ -1,7 +1,7 @@
 import { Box } from "@mantine/core";
 import { AreaChart, BarChart, LineChart } from "@mantine/charts";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { useSettings } from "@/db/collections/settings/settings-collection";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
 
 type ChartType = "area" | "bar" | "line";
 type ChartMode = "work" | "finance";

@@ -4,7 +4,7 @@ import { useIntl } from "@/hooks/useIntl";
 import { useSingleCashflowMutations } from "@/db/collections/finance/single-cashflow/use-single-cashflow-mutations";
 import { useTags } from "@/db/collections/finance/tags/use-tags-query";
 import { useRecurringCashflowMutations } from "@/db/collections/finance/recurring-cashflow/use-recurring-cashflow-mutations";
-import { useSettings } from "@/db/collections/settings/settings-collection";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
 
 import {
   Stack,

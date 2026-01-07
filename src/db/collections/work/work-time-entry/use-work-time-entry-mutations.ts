@@ -1,5 +1,5 @@
 import { useCallback, useRef, useEffect } from "react";
-import { useProfile } from "@/db/collections/profile/profile-collection";
+import { useProfile } from "@/db/collections/profile/use-profile-query";
 import { useWorkTimeEntries } from "@/db/collections/work/work-time-entry/use-work-time-entry-query";
 
 import {

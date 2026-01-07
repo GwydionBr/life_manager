@@ -7,7 +7,7 @@ import {
 import { Shell } from "@/components/AppShell/Shell";
 import { PowerSyncInitializer } from "@/components/PowerSyncInitializer";
 import { RoutePrefetcher } from "@/components/RoutePrefetcher";
-import { useProfile } from "@/db/collections/profile/profile-collection";
+import { useProfile } from "@/db/collections/profile/use-profile-query";
 
 export const Route = createFileRoute("/_app")({
   ssr: false,

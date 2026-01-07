@@ -1,7 +1,7 @@
 import { db } from "@/db/powersync/db";
 import { AppSchema } from "@/db/powersync/schema";
 import { powerSyncCollectionOptions } from "@tanstack/powersync-db-collection";
-import { createCollection, useLiveQuery } from "@tanstack/react-db";
+import { createCollection } from "@tanstack/react-db";
 import {
   settingsSchema,
   settingsDeserializationSchema,
@@ -18,6 +18,3 @@ export const settingsCollection = createCollection(
     },
   })
 );
-
-export const useSettings = () =>
-  useLiveQuery((q) => q.from({ settings: settingsCollection }).findOne());

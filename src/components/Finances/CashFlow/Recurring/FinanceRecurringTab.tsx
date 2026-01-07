@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useDisclosure } from "@mantine/hooks";
-import { useSettings } from "@/db/collections/settings/settings-collection";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
 import { useIntl } from "@/hooks/useIntl";
 import { useSettingsStore } from "@/stores/settingsStore";
 

@@ -1,8 +1,6 @@
 import { useIntl } from "@/hooks/useIntl";
-import {
-  useSettings,
-  settingsCollection,
-} from "@/db/collections/settings/settings-collection";
+import { settingsCollection } from "@/db/collections/settings/settings-collection";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
 
 import { Stack, Switch } from "@mantine/core";
 

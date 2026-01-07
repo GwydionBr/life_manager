@@ -1,9 +1,7 @@
 import { useMemo } from "react";
 import { useIntl } from "@/hooks/useIntl";
-import {
-  useSettings,
-  settingsCollection,
-} from "@/db/collections/settings/settings-collection";
+import { settingsCollection } from "@/db/collections/settings/settings-collection";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
 import { useSettingsStore } from "@/stores/settingsStore";
 
 import { Group, Select, Text } from "@mantine/core";

@@ -24,7 +24,7 @@ import TimeTrackerInstance from "./TimeTrackerInstance";
 import PlusActionIcon from "@/components/UI/ActionIcons/PlusActionIcon";
 import TimeTrackerActionIcon from "./TimeTrackerActionIcons/TimeTrackerActionIcon";
 import { getStatusColor } from "@/lib/workHelperFunctions";
-import { useSettings } from "@/db/collections/settings/settings-collection";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { WorkProject } from "@/types/work.types";
 import classes from "./TimeTracker.module.css";

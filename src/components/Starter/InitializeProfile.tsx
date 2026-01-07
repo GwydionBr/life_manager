@@ -3,11 +3,8 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { useIntl } from "@/hooks/useIntl";
 import { useRouter } from "@tanstack/react-router";
 import { useForm } from "@mantine/form";
-import {
-  profileCollection,
-  useOtherProfiles,
-  useProfile,
-} from "@/db/collections/profile/profile-collection";
+import { profileCollection } from "@/db/collections/profile/profile-collection";
+import { useOtherProfiles, useProfile } from "@/db/collections/profile/use-profile-query";
 
 import {
   Text,

@@ -22,7 +22,7 @@ import CheckActionIcon from "../UI/ActionIcons/CheckActionIcon";
 import XActionIcon from "../UI/ActionIcons/XActionIcon";
 
 import { Friend } from "@/types/profile.types";
-import { useSettings } from "@/db/collections/settings/settings-collection";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
 
 interface NotificationAsideCardProps {
   pendingFriends: Friend[];

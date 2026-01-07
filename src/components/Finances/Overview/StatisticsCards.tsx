@@ -1,4 +1,4 @@
-import { useSettings } from "@/db/collections/settings/settings-collection";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
 import { useIntl } from "@/hooks/useIntl";
 
 import { Grid } from "@mantine/core";

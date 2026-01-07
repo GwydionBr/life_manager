@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useIntl } from "@/hooks/useIntl";
 import { useForm } from "@mantine/form";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { useSettings } from "@/db/collections/settings/settings-collection";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
 
 import { z } from "zod";
 

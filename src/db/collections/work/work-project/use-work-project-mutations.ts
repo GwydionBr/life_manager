@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useProfile } from "@/db/collections/profile/profile-collection";
+import { useProfile } from "@/db/collections/profile/use-profile-query";
 import {
   showActionSuccessNotification,
   showActionErrorNotification,

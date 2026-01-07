@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { workTimeEntriesCollection } from "@/db/collections/work/work-time-entry/work-time-entry-collection";
-import { useSettings } from "@/db/collections/settings/settings-collection";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
 import { useIntl } from "@/hooks/useIntl";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { useWorkTimeEntryMutations } from "@/db/collections/work/work-time-entry/use-work-time-entry-mutations";

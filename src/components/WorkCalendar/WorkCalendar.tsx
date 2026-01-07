@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useDisclosure, useHotkeys, usePrevious } from "@mantine/hooks";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { useWorkTimeEntries } from "@/db/collections/work/work-time-entry/use-work-time-entry-query";
-import { useAppointments } from "@/db/collections/work/appointment/appointment-collection";
+import { useAppointments } from "@/db/collections/work/appointment/use-appointment-query";
 import { useCalendarStore } from "@/stores/calendarStore";
 
 import { ScrollArea, Stack } from "@mantine/core";

@@ -1,5 +1,5 @@
 import { useRouter } from "@tanstack/react-router";
-import { useProfile } from "@/db/collections/profile/profile-collection";
+import { useProfile } from "@/db/collections/profile/use-profile-query";
 import { useIntl } from "@/hooks/useIntl";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useNetwork } from "@mantine/hooks";

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useIntl } from "@/hooks/useIntl";
-import { useSettings } from "@/db/collections/settings/settings-collection";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
 
 import { Group, Modal, Text, useModalsStack } from "@mantine/core";
 import TimeEntryForm from "./TimeEntryForm";

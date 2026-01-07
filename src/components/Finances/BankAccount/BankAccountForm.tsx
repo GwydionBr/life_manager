@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useForm } from "@mantine/form";
 import { useIntl } from "@/hooks/useIntl";
 import { bankAccountsCollection } from "@/db/collections/finance/bank-account/bank-account-collection";
-import { useProfile } from "@/db/collections/profile/profile-collection";
+import { useProfile } from "@/db/collections/profile/use-profile-query";
 import { useBankAccounts } from "@/db/collections/finance/bank-account/use-bank-account-query";
 
 import { Stack, Select, TextInput, Checkbox } from "@mantine/core";
@@ -16,7 +16,7 @@ import CustomNumberInput from "@/components/UI/CustomNumberInput";
 import UpdateButton from "@/components/UI/Buttons/UpdateButton";
 import CreateButton from "@/components/UI/Buttons/CreateButton";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
-import { useSettings } from "@/db/collections/settings/settings-collection";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
 import { BankAccount } from "@/types/finance.types";
 
 const schema = z.object({

@@ -1,6 +1,6 @@
 import { useForm } from "@mantine/form";
 import { useIntl } from "@/hooks/useIntl";
-import { useProfile } from "@/db/collections/profile/profile-collection";
+import { useProfile } from "@/db/collections/profile/use-profile-query";
 
 import { TextInput, Stack, Textarea } from "@mantine/core";
 import { z } from "zod";

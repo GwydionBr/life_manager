@@ -6,7 +6,7 @@ import { useTags } from "@/db/collections/finance/tags/use-tags-query";
 
 import { z } from "zod";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { useSettings } from "@/db/collections/settings/settings-collection";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
 import { useIntl } from "@/hooks/useIntl";
 import {
   Group,

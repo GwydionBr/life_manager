@@ -1,5 +1,5 @@
 import { useDisclosure } from "@mantine/hooks";
-import { useProfile } from "@/db/collections/profile/profile-collection";
+import { useProfile } from "@/db/collections/profile/use-profile-query";
 
 import {
   Modal,

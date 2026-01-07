@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useRef } from "react";
-import { useProfile } from "@/db/collections/profile/profile-collection";
+import { useProfile } from "@/db/collections/profile/use-profile-query";
 import { useRecurringCashflows } from "@/db/collections/finance/recurring-cashflow/use-recurring-cashflow-query";
 import { useSingleCashflowsQuery } from "@/db/collections/finance/single-cashflow/use-single-cashflow-query";
 import { processRecurringCashFlows } from "@/lib/helper/processRecurringCashflows";
