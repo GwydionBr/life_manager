@@ -2,10 +2,8 @@ import { useMemo } from "react";
 
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { workProjectsCollection } from "@/db/collections/work/work-project/work-project-collection";
-import {
-  useWorkFolders,
-  workFoldersCollection,
-} from "@/db/collections/work/work-foler/work-folder-collection";
+import { workFoldersCollection } from "@/db/collections/work/work-folder/work-folder-collection";
+import { useWorkFolders } from "@/db/collections/work/work-folder/use-work-folder-query";
 import { createTree, moveNode } from "@/lib/treeHelperFunctions";
 import {
   ProjectTreeItem,

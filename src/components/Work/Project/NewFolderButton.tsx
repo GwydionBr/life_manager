@@ -16,7 +16,7 @@ import { IconFolderPlus } from "@tabler/icons-react";
 import CreateButton from "@/components/UI/Buttons/CreateButton";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
 import DelayedTooltip from "@/components/UI/DelayedTooltip";
-import { workFoldersCollection } from "@/db/collections/work/work-foler/work-folder-collection";
+import { workFoldersCollection } from "@/db/collections/work/work-folder/work-folder-collection";
 
 const folderSchema = z.object({
   title: z.string().min(1, "Title is required"),

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDisclosure, useClickOutside } from "@mantine/hooks";
-import { updateWorkProject } from "@/db/collections/work/work-project/work-project-mutations";
+import { useWorkProjectMutations } from "@/db/collections/work/work-project/use-work-project-mutations";
 
 import { Popover, Button, Box } from "@mantine/core";
 import ProjectColorPicker from "@/components/UI/ProjectColorPicker";
@@ -12,6 +12,7 @@ interface CalendarLegendButtonProps {
 }
 
 export default function CalendarLegendButton({ p }: CalendarLegendButtonProps) {
+  const { updateWorkProject } = useWorkProjectMutations();
   const [selectedColor, setSelectedColor] = useState<string>(
     p.color ?? "var(--mantine-color-teal-6)"
   );

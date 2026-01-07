@@ -19,7 +19,7 @@ export default function CashFlowModal({
   isSingle = true,
 }: CashFlowModalProps) {
   const modalStack = useModalsStack(["cash-flow", "category-form"]);
-  const [categories, setCategories] = useState<Tables<"finance_category">[]>(
+  const [categories, setCategories] = useState<Tables<"tag">[]>(
     []
   );
   const { getLocalizedText } = useIntl();

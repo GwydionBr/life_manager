@@ -9,7 +9,7 @@
      "start": "node --import ./.output/server/instrument.server.mjs /dist/index.mjs",
     "test": "bun test",
     "test:watch": "bun test --watch",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint": "tsc --noEmit && eslint . --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix"
   },
   "devDependencies": {

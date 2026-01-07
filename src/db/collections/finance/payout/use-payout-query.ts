@@ -79,7 +79,7 @@ export const usePayouts = () => {
 
     const workTimeEntriesByPayoutId = new Map<
       string,
-      Payout["work_time_entry"]
+      Payout["work_time_entries"]
     >();
     workTimeEntries?.forEach((timeEntry) => {
       if (timeEntry.payout_id) {
@@ -94,7 +94,7 @@ export const usePayouts = () => {
       work_project: payout.work_project_id
         ? workProjectById.get(payout.work_project_id) || null
         : null,
-      work_time_entry: workTimeEntriesByPayoutId.get(payout.id) || [],
+      work_time_entries: workTimeEntriesByPayoutId.get(payout.id) || [],
     }));
   }, [payouts, cashflows, workProjects, workTimeEntries]);
 
