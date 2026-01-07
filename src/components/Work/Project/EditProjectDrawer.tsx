@@ -61,15 +61,10 @@ export default function EditProjectDrawer({
     }
   }, [opened]);
 
-  function handleClose() {
-    drawersStack.closeAll();
-    onClose();
-  }
-
   async function handleDelete() {
     if (activeProject) {
       await deleteWorkProject(activeProject.id);
-      handleClose();
+      onClose();
     }
   }
 
@@ -82,7 +77,7 @@ export default function EditProjectDrawer({
       <Drawer.Stack>
         <Drawer
           {...drawersStack.register("edit-project")}
-          onClose={handleClose}
+          onClose={onClose}
           title={
             <Group gap="xs">
               <DeleteActionIcon
@@ -103,8 +98,8 @@ export default function EditProjectDrawer({
           <Stack justify="flex-start" gap="xl">
             <ProjectForm
               project={activeProject}
-              onCancel={handleClose}
-              onSuccess={handleClose}
+              onCancel={onClose}
+              onSuccess={onClose}
               tagIds={tagIds}
               setTagIds={setTagIds}
               onOpenTagForm={() => drawersStack.open("tag-form")}

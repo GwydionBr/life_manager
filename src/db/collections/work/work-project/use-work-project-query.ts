@@ -1,31 +1,13 @@
 import { useEffect, useState } from "react";
 import { useMemo } from "react";
-import {
-  createLiveQueryCollection,
-  eq,
-  useLiveQuery,
-} from "@tanstack/react-db";
+import { useLiveQuery } from "@tanstack/react-db";
 
 import {
+  projectTagMappingCollection,
   workProjectsCollection,
-  workProjectTagsCollection,
 } from "./work-project-collection";
-import { tagsCollection } from "@/db/collections/finance/tags/tags-collection";
 
 import { WorkProject } from "@/types/work.types";
-
-// Cached Live Query: Project → Tags Mapping
-const projectTagMappingCollection = createLiveQueryCollection((q) =>
-  q
-    .from({ relations: workProjectTagsCollection })
-    .innerJoin({ tag: tagsCollection }, ({ relations, tag }) =>
-      eq(relations.tag_id, tag.id)
-    )
-    .select(({ relations, tag }) => ({
-      projectId: relations.work_project_id,
-      tag,
-    }))
-);
 
 export const useWorkProjects = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -39,9 +21,7 @@ export const useWorkProjects = () => {
     data: mappings,
     isLoading: isMappingsLoading,
     isReady: isMappingsReady,
-  } = useLiveQuery((q) =>
-    q.from({ mappings: projectTagMappingCollection })
-  );
+  } = useLiveQuery((q) => q.from({ mappings: projectTagMappingCollection }));
 
   useEffect(() => {
     setIsLoading(isProjectsLoading || isMappingsLoading);

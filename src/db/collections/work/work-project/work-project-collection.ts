@@ -1,6 +1,7 @@
 import {
   createCollection,
   createLiveQueryCollection,
+  eq,
 } from "@tanstack/react-db";
 import { powerSyncCollectionOptions } from "@tanstack/powersync-db-collection";
 // Import the PowerSync DB and the App Schema
@@ -12,6 +13,7 @@ import {
   workProjectTagSchema,
   workProjectTagDeserializationSchema,
 } from "@/db/collections/work/work-project/work-project-schema";
+import { tagsCollection } from "../../finance/tags/tags-collection";
 
 // Collection based on the PowerSync table 'work_project'
 export const workProjectsCollection = createCollection(
@@ -26,10 +28,6 @@ export const workProjectsCollection = createCollection(
   })
 );
 
-export const allWorkProjects = createLiveQueryCollection((q) =>
-  q.from({ projects: workProjectsCollection })
-);
-
 export const workProjectTagsCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,
@@ -42,6 +40,15 @@ export const workProjectTagsCollection = createCollection(
   })
 );
 
-export const allWorkProjectTags = createLiveQueryCollection((q) =>
-  q.from({ tags: workProjectTagsCollection })
+// Cached Live Query: Project → Tags Mapping
+export const projectTagMappingCollection = createLiveQueryCollection((q) =>
+  q
+    .from({ relations: workProjectTagsCollection })
+    .innerJoin({ tag: tagsCollection }, ({ relations, tag }) =>
+      eq(relations.tag_id, tag.id)
+    )
+    .select(({ relations, tag }) => ({
+      projectId: relations.work_project_id,
+      tag,
+    }))
 );

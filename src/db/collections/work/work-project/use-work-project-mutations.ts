@@ -9,10 +9,12 @@ import {
   addWorkProject,
   updateWorkProject,
   deleteWorkProject,
-  syncProjectTags,
-  getWorkProjectWithTags,
 } from "./work-project-mutations";
-import { UpdateWorkProject, WorkProject } from "@/types/work.types";
+import {
+  InsertWorkProject,
+  UpdateWorkProject,
+  WorkProject,
+} from "@/types/work.types";
 
 /**
  * Hook for Work Project operations with automatic notifications.
@@ -30,7 +32,9 @@ export const useWorkProjectMutations = () => {
    * Adds a new Work Project with automatic notification.
    */
   const handleAddWorkProject = useCallback(
-    async (newWorkProject: WorkProject): Promise<WorkProject | undefined> => {
+    async (
+      newWorkProject: InsertWorkProject
+    ): Promise<WorkProject | undefined> => {
       if (!profile?.id) {
         showActionErrorNotification(
           getLocalizedText(
@@ -42,25 +46,17 @@ export const useWorkProjectMutations = () => {
       }
 
       try {
-        const transaction = addWorkProject(newWorkProject, profile.id);
-        const result = await transaction.isPersisted.promise;
+        const result = await addWorkProject(newWorkProject, profile.id);
 
-        if (result.error) {
-          showActionErrorNotification(result.error.message);
+        if (!result) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen des Projekts",
+              "Error creating project"
+            )
+          );
           return;
         }
-
-        // Sync tags if provided
-        if (newWorkProject.tags && newWorkProject.tags.length > 0) {
-          await syncProjectTags(
-            newWorkProject.id,
-            newWorkProject.tags.map((tag) => tag.id),
-            profile.id
-          );
-        }
-
-        // Get complete project with tags
-        const completeProject = await getWorkProjectWithTags(newWorkProject.id);
 
         showActionSuccessNotification(
           getLocalizedText(
@@ -69,8 +65,9 @@ export const useWorkProjectMutations = () => {
           )
         );
 
-        return completeProject;
+        return result;
       } catch (error) {
+        console.error(error);
         showActionErrorNotification(
           getLocalizedText(
             `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
@@ -86,10 +83,7 @@ export const useWorkProjectMutations = () => {
    * Updates a Work Project with automatic notification.
    */
   const handleUpdateWorkProject = useCallback(
-    async (
-      id: string | string[],
-      item: UpdateWorkProject
-    ): Promise<WorkProject | undefined> => {
+    async (id: string, item: UpdateWorkProject) => {
       if (!profile?.id) {
         showActionErrorNotification(
           getLocalizedText(
@@ -101,26 +95,17 @@ export const useWorkProjectMutations = () => {
       }
 
       try {
-        const transaction = updateWorkProject(id, item);
-        const result = await transaction.isPersisted.promise;
+        const result = await updateWorkProject(id, item, profile.id);
 
-        if (result.error) {
-          showActionErrorNotification(result.error.message);
+        if (!result) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Aktualisieren des Projekts",
+              "Error updating project"
+            )
+          );
           return;
         }
-
-        // Sync tags if provided
-        const projectId = typeof id === "string" ? id : id[0];
-        if (item.tags && item.tags.length > 0) {
-          await syncProjectTags(
-            projectId,
-            item.tags.map((tag) => tag.id),
-            profile.id
-          );
-        }
-
-        // Get complete project with tags
-        const completeProject = await getWorkProjectWithTags(projectId);
 
         showActionSuccessNotification(
           getLocalizedText(
@@ -129,8 +114,9 @@ export const useWorkProjectMutations = () => {
           )
         );
 
-        return completeProject;
+        return true;
       } catch (error) {
+        console.error(error);
         showActionErrorNotification(
           getLocalizedText(
             `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
@@ -148,11 +134,15 @@ export const useWorkProjectMutations = () => {
   const handleDeleteWorkProject = useCallback(
     async (id: string | string[]) => {
       try {
-        const transaction = deleteWorkProject(id);
-        const result = await transaction.isPersisted.promise;
+        const result = await deleteWorkProject(id);
 
-        if (result.error) {
-          showActionErrorNotification(result.error.message);
+        if (!result) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Löschen des Projekts",
+              "Error deleting project"
+            )
+          );
           return;
         }
 
@@ -165,6 +155,7 @@ export const useWorkProjectMutations = () => {
 
         return result;
       } catch (error) {
+        console.error(error);
         showActionErrorNotification(
           getLocalizedText(
             `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
@@ -180,8 +171,5 @@ export const useWorkProjectMutations = () => {
     addWorkProject: handleAddWorkProject,
     updateWorkProject: handleUpdateWorkProject,
     deleteWorkProject: handleDeleteWorkProject,
-    // Helper functions
-    syncProjectTags: syncProjectTags,
-    getWorkProjectWithTags: getWorkProjectWithTags,
   };
 };

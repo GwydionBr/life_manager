@@ -5,7 +5,6 @@ import { useDisclosure, useClickOutside } from "@mantine/hooks";
 import { useTags } from "@/db/collections/finance/tags/tags-collection";
 import { useWorkProjectMutations } from "@/db/collections/work/work-project/use-work-project-mutations";
 import { useSettings } from "@/db/collections/settings/settings-collection";
-import { useProfile } from "@/db/collections/profile/profile-collection";
 import { useIntl } from "@/hooks/useIntl";
 
 import {
@@ -43,9 +42,13 @@ import {
 } from "@tabler/icons-react";
 import { Currency, RoundingDirection } from "@/types/settings.types";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
-import { WorkProject } from "@/types/work.types";
+import {
+  InsertWorkProject,
+  UpdateWorkProject,
+  WorkProject,
+} from "@/types/work.types";
 import CustomNumberInput from "@/components/UI/CustomNumberInput";
-import { Constants, Tables, TablesUpdate } from "@/types/db.types";
+import { Constants } from "@/types/db.types";
 
 interface ProjectFormProps {
   project?: WorkProject;
@@ -84,7 +87,6 @@ export default function ProjectForm({
   const { data: settings } = useSettings();
   const { getLocalizedText, locale } = useIntl();
   const { data: tags } = useTags();
-  const { data: profile } = useProfile();
   const { addWorkProject, updateWorkProject } = useWorkProjectMutations();
   const [isColorPickerOpen, { open, close }] = useDisclosure(false);
   const [
@@ -199,10 +201,11 @@ export default function ProjectForm({
 
     if (project) {
       // Update existing project
-      const updates: TablesUpdate<"work_project"> = {
+      const updates: UpdateWorkProject = {
         ...cleanValues,
         currency: values.currency as Currency,
         rounding_direction: values.rounding_direction as RoundingDirection,
+        tags: tags.filter((tag) => tagIds.includes(tag.id)),
       };
 
       if (isDefaultRounding) {
@@ -213,28 +216,21 @@ export default function ProjectForm({
       }
 
       // Use the mutation hook
-      const updatedProject = await updateWorkProject(project.id, {
-        ...updates,
-        tags: tags.filter((tag) => tagIds.includes(tag.id)),
-      });
-
-      // Return the complete WorkProject to onSuccess
-      if (updatedProject) {
-        onSuccess?.(updatedProject);
+      const result = await updateWorkProject(project.id, updates);
+      if (result) {
+        onSuccess?.({
+          ...project,
+          ...updates,
+          tags: tags.filter((tag) => tagIds.includes(tag.id)),
+        });
       }
     } else {
       // Create new project
-      const newId = crypto.randomUUID();
-      const projectData: Tables<"work_project"> = {
-        id: newId,
-        title: cleanValues.title,
+      const projectData: InsertWorkProject = {
+        ...cleanValues,
         description: cleanValues.description || null,
-        salary: cleanValues.salary,
-        hourly_payment: cleanValues.hourly_payment,
         currency: values.currency as Currency,
         color: cleanValues.color || null,
-        work_folder_id: null,
-        finance_project_id: null,
         rounding_interval: isDefaultRounding
           ? null
           : cleanValues.rounding_interval,
@@ -247,18 +243,11 @@ export default function ProjectForm({
         time_fragment_interval: isDefaultRounding
           ? null
           : cleanValues.time_fragment_interval,
-        created_at: new Date().toISOString(),
-        user_id: profile?.id || "",
-        total_payout: 0,
-        order_index: 0,
-        is_favorite: false,
+        tags: tags.filter((tag) => tagIds.includes(tag.id)),
       };
 
       // Use the mutation hook
-      const newProject = await addWorkProject({
-        ...projectData,
-        tags: tags.filter((tag) => tagIds.includes(tag.id)),
-      });
+      const newProject = await addWorkProject(projectData);
 
       // Return the complete WorkProject to onSuccess
       if (newProject) {

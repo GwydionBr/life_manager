@@ -5,10 +5,10 @@ export interface WorkProject extends Tables<"work_project"> {
   tags: Tables<"tag">[];
 }
 export interface InsertWorkProject extends TablesInsert<"work_project"> {
-  tags: Tables<"tag">[];
+  tags?: Tables<"tag">[];
 }
 export interface UpdateWorkProject extends TablesUpdate<"work_project"> {
-  tags: Tables<"tag">[] | null;
+  tags?: Tables<"tag">[] | null;
 }
 export interface CompleteWorkProject extends WorkProject {
   timeEntries: WorkTimeEntry[];
