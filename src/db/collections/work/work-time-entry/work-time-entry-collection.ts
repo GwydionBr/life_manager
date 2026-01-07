@@ -20,4 +20,3 @@ export const workTimeEntriesCollection = createCollection(
     },
   })
 );
-  

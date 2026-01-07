@@ -1,4 +1,7 @@
-import { createCollection } from "@tanstack/react-db";
+import {
+  createCollection,
+  createLiveQueryCollection,
+} from "@tanstack/react-db";
 import { powerSyncCollectionOptions } from "@tanstack/powersync-db-collection";
 // Import the PowerSync DB and the App Schema
 import { db } from "@/db/powersync/db";
@@ -23,6 +26,10 @@ export const workProjectsCollection = createCollection(
   })
 );
 
+export const allWorkProjects = createLiveQueryCollection((q) =>
+  q.from({ projects: workProjectsCollection })
+);
+
 export const workProjectTagsCollection = createCollection(
   powerSyncCollectionOptions({
     database: db,
@@ -33,4 +40,8 @@ export const workProjectTagsCollection = createCollection(
       console.error(error);
     },
   })
+);
+
+export const allWorkProjectTags = createLiveQueryCollection((q) =>
+  q.from({ tags: workProjectTagsCollection })
 );

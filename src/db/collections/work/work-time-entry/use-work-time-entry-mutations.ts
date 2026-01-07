@@ -79,6 +79,7 @@ export const useWorkTimeEntryMutations = () => {
 
       try {
         const newTimeEntry: WorkTimeEntry = {
+          ...newWorkTimeEntry,
           id: crypto.randomUUID(),
           created_at: new Date().toISOString(),
           user_id: profile.id,
@@ -88,7 +89,6 @@ export const useWorkTimeEntryMutations = () => {
           true_end_time: new Date(newWorkTimeEntry.end_time).toISOString(),
           start_time: new Date(newWorkTimeEntry.start_time).toISOString(),
           end_time: new Date(newWorkTimeEntry.end_time).toISOString(),
-          active_seconds: newWorkTimeEntry.active_seconds,
           paid: newWorkTimeEntry.paid ?? false,
           paused_seconds: newWorkTimeEntry.paused_seconds ?? 0,
           payout_id: newWorkTimeEntry.payout_id ?? null,
@@ -97,9 +97,8 @@ export const useWorkTimeEntryMutations = () => {
           single_cashflow_id: null,
           time_fragments_interval:
             newWorkTimeEntry.time_fragments_interval ?? null,
-          salary: newWorkTimeEntry.salary ?? 0,
         };
-        let updatedTimeEntry: WorkTimeEntry = newTimeEntry;
+        let updatedTimeEntry = newTimeEntry;
         if (roundingSettings.roundInTimeFragments) {
           updatedTimeEntry = getTimeFragmentSession(
             roundingSettings.timeFragmentInterval,
@@ -121,6 +120,18 @@ export const useWorkTimeEntryMutations = () => {
         if (!adjustedTimeEntries) {
           showCompleteOverlapNotification();
           return;
+        }
+
+        const result = await addWorkTimeEntry(adjustedTimeEntries);
+
+        if (!result) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen der Arbeitszeit",
+              "Error creating work time"
+            )
+          );
+          return;
         } else if (overlappingTimeEntries.length > 0) {
           showOverlapNotification(
             updatedTimeEntry,
@@ -136,16 +147,9 @@ export const useWorkTimeEntryMutations = () => {
           );
         }
 
-        const transaction = addWorkTimeEntry(adjustedTimeEntries);
-        const result = await transaction.isPersisted.promise;
-
-        if (result.error) {
-          showActionErrorNotification(result.error.message);
-          return;
-        }
-
         return result;
       } catch (error) {
+        console.error(error);
         showActionErrorNotification(
           getLocalizedText(
             `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
@@ -240,6 +244,7 @@ export const useWorkTimeEntryMutations = () => {
 
         return result;
       } catch (error) {
+        console.error(error);
         showActionErrorNotification(
           getLocalizedText(
             `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
@@ -257,23 +262,28 @@ export const useWorkTimeEntryMutations = () => {
   const handleDeleteWorkTimeEntry = useCallback(
     async (id: string) => {
       try {
-        const transaction = deleteWorkTimeEntry(id);
-        const result = await transaction.isPersisted.promise;
+        const result = await deleteWorkTimeEntry(id);
 
-        if (result.error) {
-          showActionErrorNotification(result.error.message);
+        if (!result) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Löschen der Arbeitszeit",
+              "Error deleting work time"
+            )
+          );
           return;
         }
 
         showActionSuccessNotification(
           getLocalizedText(
-            "Sitzung erfolgreich gelöscht",
-            "Session successfully deleted"
+            "Arbeitszeit erfolgreich gelöscht",
+            "Work time successfully deleted"
           )
         );
 
         return result;
       } catch (error) {
+        console.error(error);
         showActionErrorNotification(
           getLocalizedText(
             `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,

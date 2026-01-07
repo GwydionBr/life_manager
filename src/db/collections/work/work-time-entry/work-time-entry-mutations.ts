@@ -6,17 +6,21 @@ import { createTransaction } from "@tanstack/react-db";
 
 /**
  * Adds a new Work Time Entry.
- * Returns the transaction for further processing.
  *
  * @param newWorkTimeEntry - The data of the new time entry or an array of time entries
- * @returns Transaction object with isPersisted promise
+ * @returns The new time entry or an array of time entries or undefined if the operation failed
  */
-export const addWorkTimeEntry = (
+export const addWorkTimeEntry = async (
   newWorkTimeEntry: WorkTimeEntry[] | WorkTimeEntry
 ) => {
-  const transaction = workTimeEntriesCollection.insert(newWorkTimeEntry);
-
-  return transaction;
+  try {
+    const transaction = workTimeEntriesCollection.insert(newWorkTimeEntry);
+    await transaction.isPersisted.promise;
+    return newWorkTimeEntry;
+  } catch (error) {
+    console.error(error);
+    return;
+  }
 };
 
 /**
@@ -24,7 +28,7 @@ export const addWorkTimeEntry = (
  *
  * @param id - The ID or IDs of the time entry to update
  * @param item - The item to update
- * @returns Transaction object with isPersisted promise
+ * @returns True if the time entry was updated, false otherwise
  */
 export const updateWorkTimeEntry = async (
   id: string | string[],
@@ -47,17 +51,29 @@ export const updateWorkTimeEntry = async (
       });
     })
   );
-  await transaction.commit();
-  const promise = await transaction.isPersisted.promise;
-  return promise;
+  try {
+    await transaction.commit();
+    await transaction.isPersisted.promise;
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };
 
 /**
  * Deletes a Work Time Entry.
  *
  * @param id - The ID or IDs of the time entry to delete
- * @returns Transaction object with isPersisted promise
+ * @returns True if the time entry was deleted, false otherwise
  */
-export const deleteWorkTimeEntry = (id: string | string[]) => {
-  return workTimeEntriesCollection.delete(id);
+export const deleteWorkTimeEntry = async (id: string | string[]) => {
+  try {
+    const transaction = workTimeEntriesCollection.delete(id);
+    await transaction.isPersisted.promise;
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };

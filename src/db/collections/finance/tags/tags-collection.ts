@@ -1,4 +1,8 @@
-import { createCollection, useLiveQuery } from "@tanstack/react-db";
+import {
+  createCollection,
+  createLiveQueryCollection,
+  useLiveQuery,
+} from "@tanstack/react-db";
 import { powerSyncCollectionOptions } from "@tanstack/powersync-db-collection";
 // Importiere deine PowerSync-DB und das App-Schema
 import { db } from "@/db/powersync/db";
@@ -19,6 +23,10 @@ export const tagsCollection = createCollection(
       console.error(error);
     },
   })
+);
+
+export const allTags = createLiveQueryCollection((q) =>
+  q.from({ tags: tagsCollection })
 );
 
 export const useTags = () =>
