@@ -115,7 +115,7 @@ export default function NewSessionModal({
         <SessionForm
           initialValues={
             initialValues ?? {
-              project_id: undefined,
+              work_project_id: undefined,
               start_time: new Date(new Date().setSeconds(0, 0)).toISOString(),
               end_time: new Date(new Date().setSeconds(0, 0)).toISOString(),
               active_seconds: 0,

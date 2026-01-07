@@ -61,7 +61,7 @@ export default function EditSessionDrawer({
   }
 
   async function handleSubmit(values: {
-    project_id?: string;
+    work_project_id?: string;
     start_time: string;
     end_time: string;
     active_seconds: number;

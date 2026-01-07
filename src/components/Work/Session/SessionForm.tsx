@@ -52,7 +52,7 @@ export default function SessionForm({
   const [formInitialized, setFormInitialized] = useState(false);
 
   const schema = z.object({
-    project_id: z.string(),
+    work_project_id: z.string(),
     start_time: z.string().transform((str) => new Date(str).toISOString()),
     end_time: z.string().transform((str) => new Date(str).toISOString()),
     active_seconds: z.number().min(1, {
@@ -79,7 +79,7 @@ export default function SessionForm({
   const form = useForm<NewWorkTimeEntry>({
     initialValues: {
       ...initialValues,
-      project_id: initialValues.project_id || project?.id || undefined,
+      work_project_id: initialValues.work_project_id || project?.id || undefined,
       start_time: (() => {
         const d = new Date(initialValues.start_time);
         d.setSeconds(0, 0);
@@ -106,8 +106,8 @@ export default function SessionForm({
   }, [formInitialized, form]);
 
   useEffect(() => {
-    if (project && project.id !== form.values.project_id) {
-      form.setFieldValue("project_id", project.id);
+    if (project && project.id !== form.values.work_project_id) {
+      form.setFieldValue("work_project_id", project.id);
       form.setFieldValue("currency", project.currency);
       form.setFieldValue("salary", project.salary);
     }
@@ -224,8 +224,8 @@ export default function SessionForm({
             withAsterisk
             allowDeselect={false}
             label={getLocalizedText("Projekt", "Project")}
-            value={form.values.project_id}
-            error={form.errors.project_id}
+            value={form.values.work_project_id}
+            error={form.errors.work_project_id}
             placeholder={getLocalizedText(
               "Projekt auswählen",
               "Select project"
