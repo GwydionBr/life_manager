@@ -83,7 +83,7 @@ export const useAppointmentMutations = () => {
    * Updates an Appointment with automatic notification.
    */
   const handleUpdateAppointment = useCallback(
-    async (id: string, item: UpdateAppointment) => {
+    async (id: string, item: UpdateAppointment): Promise<boolean> => {
       try {
         const result = await updateAppointment(id, item);
 
@@ -94,7 +94,7 @@ export const useAppointmentMutations = () => {
               "Error updating appointment"
             )
           );
-          return;
+          return false;
         }
 
         showActionSuccessNotification(
@@ -113,6 +113,7 @@ export const useAppointmentMutations = () => {
             `Error: ${error instanceof Error ? error.message : "Unknown error"}`
           )
         );
+        return false;
       }
     },
     [getLocalizedText]
@@ -122,7 +123,7 @@ export const useAppointmentMutations = () => {
    * Deletes an Appointment with automatic notification.
    */
   const handleDeleteAppointment = useCallback(
-    async (id: string | string[]) => {
+    async (id: string | string[]): Promise<boolean> => {
       try {
         const result = await deleteAppointment(id);
 
@@ -133,7 +134,7 @@ export const useAppointmentMutations = () => {
               "Error deleting appointment"
             )
           );
-          return;
+          return false;
         }
 
         showActionSuccessNotification(
@@ -143,7 +144,7 @@ export const useAppointmentMutations = () => {
           )
         );
 
-        return result;
+        return true;
       } catch (error) {
         console.error(error);
         showActionErrorNotification(
@@ -152,6 +153,7 @@ export const useAppointmentMutations = () => {
             `Error: ${error instanceof Error ? error.message : "Unknown error"}`
           )
         );
+        return false;
       }
     },
     [getLocalizedText]

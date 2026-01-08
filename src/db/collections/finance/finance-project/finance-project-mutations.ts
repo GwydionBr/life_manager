@@ -6,22 +6,22 @@ import {
 import {
   InsertFinanceProject,
   UpdateFinanceProject,
+  FinanceProject,
 } from "@/types/finance.types";
 import { PowerSyncTransactor } from "@tanstack/powersync-db-collection";
 import { createTransaction } from "@tanstack/react-db";
 
 /**
  * Adds a new Finance Project.
- * Returns the transaction for further processing.
  *
  * @param newFinanceProject - The data of the new project
  * @param userId - The user ID
- * @returns Transaction object with isPersisted promise
+ * @returns The new FinanceProject or undefined if an error occurs
  */
 export const addFinanceProject = async (
   newFinanceProject: InsertFinanceProject,
   userId: string
-) => {
+): Promise<FinanceProject | undefined> => {
   const customTransaction = createTransaction({
     autoCommit: false,
     mutationFn: async ({ transaction }) => {
@@ -54,12 +54,14 @@ export const addFinanceProject = async (
       });
     });
   });
-  await customTransaction.commit();
-  const promise = await customTransaction.isPersisted.promise;
-  return {
-    promise,
-    data: { ...newFinanceProjectData, tags, contact, adjustments: [] },
-  };
+  try {
+    await customTransaction.commit();
+    await customTransaction.isPersisted.promise;
+    return { ...newFinanceProjectData, tags, contact, adjustments: [] };
+  } catch (error) {
+    console.error(error);
+    return;
+  }
 };
 
 /**
@@ -67,13 +69,14 @@ export const addFinanceProject = async (
  *
  * @param id - The ID or IDs of the project to update
  * @param item - The item to update
- * @returns Transaction object with isPersisted promise
+ * @param userId - The user ID
+ * @returns Returns true if the project was updated, false otherwise
  */
 export const updateFinanceProject = async (
   id: string | string[],
   item: UpdateFinanceProject,
   userId: string
-) => {
+): Promise<boolean> => {
   const ids = Array.isArray(id) ? id : [id];
   const {
     tags,
@@ -100,24 +103,38 @@ export const updateFinanceProject = async (
     })
   );
 
-  // Wait for all updates to complete
-  await customTransaction.commit();
-  const promise = await customTransaction.isPersisted.promise;
+  try {
+    // Wait for all updates to complete
+    await customTransaction.commit();
+    await customTransaction.isPersisted.promise;
 
-  const tagIds = tags.map((tag) => tag.id);
-  await syncFinanceProjectTags(ids, tagIds, userId);
+    const tagIds = tags.map((tag) => tag.id);
+    await syncFinanceProjectTags(ids, tagIds, userId);
 
-  return promise;
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };
 
 /**
  * Deletes a Finance Project.
  *
  * @param id - The ID or IDs of the project to delete
- * @returns Transaction object with isPersisted promise
+ * @returns True if the project was deleted, false otherwise
  */
-export const deleteFinanceProject = (id: string | string[]) => {
-  return financeProjectsCollection.delete(id);
+export const deleteFinanceProject = async (
+  id: string | string[]
+): Promise<boolean> => {
+  try {
+    const transaction = financeProjectsCollection.delete(id);
+    await transaction.isPersisted.promise;
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };
 
 /**

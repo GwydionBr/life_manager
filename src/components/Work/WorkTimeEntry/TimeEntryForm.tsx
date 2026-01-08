@@ -112,7 +112,7 @@ export default function TimeEntryForm({
       form.setFieldValue("currency", project.currency);
       form.setFieldValue("salary", project.salary);
     }
-  }, [project]);
+  }, [project, form]);
 
   const projects = useMemo(() => {
     return (

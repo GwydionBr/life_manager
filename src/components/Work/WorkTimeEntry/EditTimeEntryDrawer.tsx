@@ -137,7 +137,7 @@ export default function EditTimeEntryDrawer({
           <Flex direction="column" gap="xl">
             <TimeEntryForm
               initialValues={{
-                project_id: timeEntry.work_project_id,
+                work_project_id: timeEntry.work_project_id,
                 start_time: timeEntry.start_time,
                 end_time: timeEntry.end_time,
                 active_seconds: timeEntry.active_seconds,

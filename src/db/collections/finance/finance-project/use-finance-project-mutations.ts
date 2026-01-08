@@ -47,13 +47,15 @@ export const useFinanceProjectMutations = () => {
       }
 
       try {
-        const { promise, data } = await addFinanceProject(
-          newFinanceProject,
-          profile.id
-        );
+        const result = await addFinanceProject(newFinanceProject, profile.id);
 
-        if (promise.error) {
-          showActionErrorNotification(promise.error.message);
+        if (!result) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen des Finanzprojekts",
+              "Error creating finance project"
+            )
+          );
           return;
         }
 
@@ -64,7 +66,7 @@ export const useFinanceProjectMutations = () => {
           )
         );
 
-        return data;
+        return result;
       } catch (error) {
         showActionErrorNotification(
           getLocalizedText(
@@ -94,10 +96,15 @@ export const useFinanceProjectMutations = () => {
       }
 
       try {
-        const promise = await updateFinanceProject(id, item, profile.id);
+        const result = await updateFinanceProject(id, item, profile.id);
 
-        if (promise.error) {
-          showActionErrorNotification(promise.error.message);
+        if (!result) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Aktualisieren des Finanzprojekts",
+              "Error updating finance project"
+            )
+          );
           return;
         }
 
@@ -107,6 +114,8 @@ export const useFinanceProjectMutations = () => {
             "Finance project successfully updated"
           )
         );
+
+        return true;
       } catch (error) {
         console.log(error);
         showActionErrorNotification(
@@ -126,11 +135,15 @@ export const useFinanceProjectMutations = () => {
   const handleDeleteFinanceProject = useCallback(
     async (id: string | string[]) => {
       try {
-        const transaction = deleteFinanceProject(id);
-        const result = await transaction.isPersisted.promise;
+        const result = await deleteFinanceProject(id);
 
-        if (result.error) {
-          showActionErrorNotification(result.error.message);
+        if (!result) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Löschen des Finanzprojekts",
+              "Error deleting finance project"
+            )
+          );
           return;
         }
 
@@ -141,7 +154,7 @@ export const useFinanceProjectMutations = () => {
           )
         );
 
-        return result;
+        return true;
       } catch (error) {
         showActionErrorNotification(
           getLocalizedText(
