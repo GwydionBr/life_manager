@@ -4,20 +4,11 @@ import { useIntl } from "@/hooks/useIntl";
 
 import { alpha, Box, Skeleton, Stack, Text } from "@mantine/core";
 
-import {
-  getStartOfDay,
-  getEndOfDay,
-  mergeAdjacentSessionsForRender,
-  isToday,
-} from "./calendarUtils";
-import {
-  CalendarSession,
-  CalendarAppointment,
-} from "@/types/workCalendar.types";
+import { getStartOfDay, getEndOfDay, isToday } from "./calendarUtils";
+import { CalendarSession } from "@/types/workCalendar.types";
 import CalendarSessionEvent from "./CalendarEvent/CalendarSessionEvent";
 import TimeTrackerEvent from "./CalendarEvent/TimeTrackerEvent/TimeTrackerEvent";
 import NewSessionEvent from "./CalendarEvent/NewSessionEvent";
-import CalendarAppointmentEvent from "./CalendarEvent/CalendarAppointmentEvent";
 
 interface DayColumnProps {
   day: Date;
@@ -27,7 +18,6 @@ interface DayColumnProps {
   isFetching: boolean;
   currentTime: Date;
   sessions: CalendarSession[];
-  appointments: CalendarAppointment[];
   handleSessionClick: (sessionId: string) => void;
   hourMultiplier: number;
   rasterHeight: number;
@@ -47,7 +37,6 @@ export function DayColumn({
   isFetching,
   currentTime,
   sessions,
-  appointments,
   handleSessionClick,
   hourMultiplier,
   rasterHeight,
@@ -87,21 +76,6 @@ export function DayColumn({
       salary: s.salary,
     };
   });
-
-  const clippedAppointments: CalendarAppointment[] = appointments.map((a) => {
-    const aStart = new Date(a.start_date);
-    const aEnd = new Date(a.end_date);
-    const start = aStart < dayStart ? dayStart : aStart;
-    const end = aEnd > dayEnd ? dayEnd : aEnd;
-    return {
-      ...a,
-      start_date: start.toISOString(),
-      end_date: end.toISOString(),
-    };
-  });
-  // Merge touching/overlapping sessions for the same project+memo to reduce clutter
-  const _itemsForRender: CalendarSession[] =
-    mergeAdjacentSessionsForRender(clippedItems);
 
   const snappedY = snapYToInterval(y);
 
@@ -184,9 +158,7 @@ export function DayColumn({
               zIndex: 10,
             }}
           >
-            <Text ta="center">
-              {formatDateTime(yToTime(snappedY, day))}
-            </Text>
+            <Text ta="center">{formatDateTime(yToTime(snappedY, day))}</Text>
           </Stack>
         )}
 
@@ -226,17 +198,6 @@ export function DayColumn({
                   toY={timeToY}
                   handleSessionClick={handleSessionClick}
                   color={s.color}
-                />
-              );
-            })}
-            {clippedAppointments.map((a) => {
-              console.log("a", a);
-              return (
-                <CalendarAppointmentEvent
-                  key={a.id}
-                  a={a}
-                  toY={timeToY}
-                  color={a.color}
                 />
               );
             })}

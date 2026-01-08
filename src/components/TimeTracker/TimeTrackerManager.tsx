@@ -65,11 +65,18 @@ export default function TimerManager({
   // Error message state for displaying validation errors
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const { getLocalizedText } = useIntl();
+
+  const { data: settings } = useSettings();
+  const { data: projects, isReady: isProjectsReady } = useWorkProjects();
+
   const { currentAppColor } = useSettingsStore();
+  const { activeProjectId } = useWorkStore();
 
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     null
   );
+  const [timers, setTimers] = useState<TimerData[]>([]);
 
   // Store functions and data
   const {
@@ -80,29 +87,28 @@ export default function TimerManager({
   } = useTimeTrackerManager();
 
   // Get active project from work store
-  const { activeProjectId } = useWorkStore();
-
-  // Fetch settings for default rounding configuration
-  const { data: settings } = useSettings();
-
-  // Internationalization helper
-  const { getLocalizedText } = useIntl();
-
-  // Fetch projects data
-  const { data: projects, isReady: isProjectsReady } = useWorkProjects();
-
   // Find the currently active project
   const activeProject = useMemo(
     () => projects.find((p) => p.id === activeProjectId),
     [projects, activeProjectId]
   );
 
+  const projectsToAdd = useMemo(() => {
+    return (
+      projects
+        .filter(
+          (p) => p.id !== timers.find((t) => t.projectId === p.id)?.projectId
+        )
+        .map((p) => ({
+          label: p.title,
+          value: p.id,
+        })) || []
+    );
+  }, [projects, timers]);
+
   const backgroundColor = useMemo(() => {
     return alpha(getThemeColor(currentAppColor, theme), 0.4);
   }, [currentAppColor, theme]);
-
-  // Local state for processed timers (with ensured rounding settings)
-  const [timers, setTimers] = useState<TimerData[]>([]);
 
   /**
    * Process timers and ensure they have rounding settings.
@@ -314,15 +320,7 @@ export default function TimerManager({
                 "Projekt auswählen",
                 "Select project"
               )}
-              data={projects
-                .filter(
-                  (p) =>
-                    p.id !== timers.find((t) => t.projectId === p.id)?.projectId
-                )
-                .map((p) => ({
-                  label: p.title,
-                  value: p.id,
-                }))}
+              data={projectsToAdd}
               value={selectedProjectId}
               onChange={setSelectedProjectId}
               searchable

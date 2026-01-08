@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useDisclosure, useHotkeys, usePrevious } from "@mantine/hooks";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { useWorkTimeEntries } from "@/db/collections/work/work-time-entry/use-work-time-entry-query";
-import { useAppointments } from "@/db/collections/work/appointment/use-appointment-query";
 import { useCalendarStore } from "@/stores/calendarStore";
 
 import { ScrollArea, Stack } from "@mantine/core";
@@ -13,11 +12,7 @@ import CalendarLegend from "./Calendar/CalendarLegend";
 import { getStartOfDay } from "./calendarUtils";
 import { addDays, differenceInCalendarDays } from "date-fns";
 
-import {
-  CalendarSession,
-  CalendarDay,
-  CalendarAppointment,
-} from "@/types/workCalendar.types";
+import { CalendarSession, CalendarDay } from "@/types/workCalendar.types";
 import { WorkProject } from "@/types/work.types";
 
 const zoomLevel = [1, 2, 4, 6, 12]; // multiplier for hour height
@@ -43,7 +38,6 @@ export default function WorkCalendar() {
   } = useCalendarStore();
   const { data: projects } = useWorkProjects();
   const { data: timeEntries } = useWorkTimeEntries();
-  const { data: appointments } = useAppointments();
   const [viewportTop, setViewportTop] = useState({
     old: 0,
     new: 0,
@@ -110,39 +104,12 @@ export default function WorkCalendar() {
     return map;
   }, [timeEntries, days, projects]);
 
-  const appointmentsByDay = useMemo(() => {
-    const map = new Map<string, CalendarAppointment[]>();
-    days.forEach((d) => {
-      map.set(d.toISOString().slice(0, 10), []);
-    });
-    appointments.forEach((a) => {
-      const start = new Date(a.start_date);
-      const end = new Date(a.end_date);
-      const day = a.start_date.slice(0, 10);
-      days.forEach((d) => {
-        const dayStart = getStartOfDay(d);
-        const dayEnd = addDays(dayStart, 1);
-        const overlaps = start < dayEnd && end > dayStart;
-        const project = projects.find((p) => p.id === a.work_project_id);
-        if (overlaps) {
-          map.get(day)?.push({
-            ...a,
-            projectTitle: project?.title ?? "",
-            color: project?.color ?? "var(--mantine-color-teal-6)",
-          });
-        }
-      });
-    });
-    return map;
-  }, [appointments, days, projects]);
-
   const calendarDays: CalendarDay[] = useMemo(() => {
     return days.map((d) => ({
       day: d,
       sessions: sessionsByDay.get(d.toISOString().slice(0, 10)) ?? [],
-      appointments: appointmentsByDay.get(d.toISOString().slice(0, 10)) ?? [],
     }));
-  }, [days, sessionsByDay, appointmentsByDay]);
+  }, [days, sessionsByDay]);
 
   // Projects visible in the current view (based on sessions overlapping the visible days)
   const visibleProjects: WorkProject[] = useMemo(() => {
@@ -275,7 +242,7 @@ export default function WorkCalendar() {
   return (
     <ScrollArea
       viewportRef={viewport}
-      h="calc(100vh - 60px)"
+      h="calc(100vh - 55px)"
       type="never"
       scrollbars="y"
     >

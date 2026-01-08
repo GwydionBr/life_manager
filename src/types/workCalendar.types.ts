@@ -6,7 +6,6 @@ export type ViewMode = "day" | "week";
 export type CalendarDay = {
   day: Date;
   sessions: CalendarSession[];
-  appointments: CalendarAppointment[];
 };
 
 export type VisibleProject = {

@@ -1,5 +1,6 @@
 import { useIntl } from "@/hooks/useIntl";
 import { useCalendarStore } from "@/stores/calendarStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 import { Group, ActionIcon, Text, Grid, SegmentedControl } from "@mantine/core";
 import { IconArrowsSort } from "@tabler/icons-react";
@@ -20,16 +21,19 @@ export default function CalendarLegend({
 }: CalendarLegendProps) {
   const { getLocalizedText } = useIntl();
   const { viewMode, setViewMode } = useCalendarStore();
+  const { isAsideOpen } = useSettingsStore();
 
   return (
     <Grid
       p={5}
-      w="100%"
       style={{
-        position: "absolute",
+        position: "fixed",
         bottom: 0,
+        left: 50,
+        right: isAsideOpen ? 300 : 50,
         zIndex: 100,
         background: "var(--mantine-color-body)",
+        transition: "right 0.4s ease-in",
         borderTop:
           "1px solid light-dark(var(--mantine-color-gray-8), var(--mantine-color-dark-1))",
       }}

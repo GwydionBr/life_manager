@@ -21,7 +21,7 @@ import { Notifications } from "@mantine/notifications";
 import { DatesProvider } from "@mantine/dates";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+// import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { QueryClient } from "@tanstack/react-query";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/NotFound";
@@ -146,7 +146,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
             {children}
           </DatesProvider>
         </MantineProvider>
-        <TanStackRouterDevtools position="bottom-right" />
+        {/* <TanStackRouterDevtools position="bottom-right" /> */}
         <Scripts />
         <Analytics />
         <SpeedInsights />

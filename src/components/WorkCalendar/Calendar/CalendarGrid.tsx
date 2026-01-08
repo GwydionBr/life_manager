@@ -243,7 +243,6 @@ export default function CalendarGrid({
                         isFetching={isFetching}
                         currentTime={currentTime}
                         sessions={d.sessions}
-                        appointments={d.appointments}
                         handleSessionClick={handleSessionClick}
                         hourMultiplier={hourMultiplier}
                         rasterHeight={rasterHeight}
