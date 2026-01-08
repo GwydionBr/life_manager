@@ -1,9 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useForm } from "@mantine/form";
 import { useIntl } from "@/hooks/useIntl";
-import { bankAccountsCollection } from "@/db/collections/finance/bank-account/bank-account-collection";
-import { useProfile } from "@/db/collections/profile/use-profile-query";
 import { useBankAccounts } from "@/db/collections/finance/bank-account/use-bank-account-query";
+import { useBankAccountMutations } from "@/db/collections/finance/bank-account/use-bank-account-mutations";
 
 import { Stack, Select, TextInput, Checkbox } from "@mantine/core";
 
@@ -11,7 +10,6 @@ import { z } from "zod";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { currencies } from "@/constants/settings";
 import { Currency } from "@/types/settings.types";
-import { Database } from "@/types/db.types";
 import CustomNumberInput from "@/components/UI/CustomNumberInput";
 import UpdateButton from "@/components/UI/Buttons/UpdateButton";
 import CreateButton from "@/components/UI/Buttons/CreateButton";
@@ -43,8 +41,7 @@ export default function BankAccountForm({
   const { getLocalizedText } = useIntl();
   const { data: bankAccounts } = useBankAccounts();
   const { data: settings } = useSettings();
-  const { data: profile } = useProfile();
-
+  const { addBankAccount, updateBankAccount } = useBankAccountMutations();
   const isDefaultSetRef = useRef(false);
 
   const form = useForm({
@@ -82,28 +79,11 @@ export default function BankAccountForm({
     onClose?.();
   };
 
-  function handleSubmit(values: z.infer<typeof schema>) {
+  async function handleSubmit(values: z.infer<typeof schema>) {
     if (bankAccount) {
-      bankAccountsCollection.update(bankAccount.id, (draft) => {
-        draft.title = values.title;
-        draft.description = values.description || null;
-        draft.currency =
-          values.currency as Database["public"]["Enums"]["currency"];
-        draft.saldo = values.saldo;
-        draft.is_default = values.is_default;
-      });
+      await updateBankAccount(bankAccount.id, values);
     } else {
-      bankAccountsCollection.insert({
-        id: crypto.randomUUID(),
-        created_at: new Date().toISOString(),
-        saldo_set_at: new Date().toISOString(),
-        user_id: profile?.id || "",
-        title: values.title,
-        description: values.description || null,
-        currency: values.currency as Database["public"]["Enums"]["currency"],
-        saldo: values.saldo,
-        is_default: values.is_default,
-      });
+      await addBankAccount(values);
     }
     handleClose();
   }

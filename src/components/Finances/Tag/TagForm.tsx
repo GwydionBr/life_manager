@@ -1,6 +1,6 @@
 import { useForm } from "@mantine/form";
 import { useIntl } from "@/hooks/useIntl";
-import { useProfile } from "@/db/collections/profile/use-profile-query";
+import { useTagsMutations } from "@/db/collections/finance/tags/use-tags-mutations";
 
 import { TextInput, Stack, Textarea } from "@mantine/core";
 import { z } from "zod";
@@ -9,7 +9,6 @@ import CancelButton from "@/components/UI/Buttons/CancelButton";
 import CreateButton from "@/components/UI/Buttons/CreateButton";
 import UpdateButton from "@/components/UI/Buttons/UpdateButton";
 import { Tables } from "@/types/db.types";
-import { tagsCollection } from "@/db/collections/finance/tags/tags-collection";
 
 const schema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
@@ -28,8 +27,7 @@ export default function FinanceTagForm({
   tag,
 }: FinanceTagFormProps) {
   const { getLocalizedText } = useIntl();
-  const { data: profile } = useProfile();
-
+  const { addTag, updateTag } = useTagsMutations();
   const form = useForm({
     initialValues: {
       title: tag?.title || "",
@@ -45,26 +43,18 @@ export default function FinanceTagForm({
 
   async function handleFormSubmit(values: z.infer<typeof schema>) {
     if (tag) {
-      const newTX = tagsCollection.update(tag.id, (draft) => {
-        draft.title = values.title;
-        draft.description = values.description || null;
-      });
-      await newTX.isPersisted.promise;
-      onSuccess?.(tag);
+      const result = await updateTag(tag.id, values);
+      if (result) {
+        onSuccess?.({ ...tag, ...values });
+        handleClose();
+      }
     } else {
-      const newId = crypto.randomUUID();
-      const newTag: Tables<"tag"> = {
-        id: newId,
-        created_at: new Date().toISOString(),
-        user_id: profile?.id || "",
-        title: values.title,
-        description: values.description || null,
-      };
-      const newTX = tagsCollection.insert(newTag);
-      await newTX.isPersisted.promise;
-      onSuccess?.(newTag);
+      const result = await addTag(values);
+      if (result) {
+        onSuccess?.(result);
+        handleClose();
+      }
     }
-    handleClose();
   }
 
   return (
@@ -73,7 +63,7 @@ export default function FinanceTagForm({
         <TextInput
           withAsterisk
           label={getLocalizedText("Name", "Name")}
-            placeholder={getLocalizedText("Name eingeben", "Enter tag name")}
+          placeholder={getLocalizedText("Name eingeben", "Enter tag name")}
           {...form.getInputProps("title")}
           data-autofocus
         />

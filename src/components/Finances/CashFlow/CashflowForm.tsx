@@ -36,18 +36,18 @@ import { Tables } from "@/types/db.types";
 import classes from "@/components/UI/Switch.module.css";
 
 interface FinanceFormProps {
-  onClose: () => void;
   isSingle?: boolean;
-  onOpenTagForm: () => void;
   tags: Tables<"tag">[];
+  onClose: () => void;
+  onOpenTagForm: () => void;
   setTags: (tags: Tables<"tag">[]) => void;
 }
 
 export default function FinanceForm({
-  onClose,
   isSingle = true,
-  onOpenTagForm,
   tags,
+  onClose,
+  onOpenTagForm,
   setTags,
 }: FinanceFormProps) {
   const [type, setType] = useState<CashFlowType>("income");
@@ -72,7 +72,7 @@ export default function FinanceForm({
     values: RecurringFinanceFormValues
   ) {
     // TODO: Optimize Add Recurring Cashflow Mutation
-    addRecurringCashflow({
+    await addRecurringCashflow({
       ...values,
       end_date: values.end_date?.toISOString(),
       start_date: values.start_date.toISOString(),

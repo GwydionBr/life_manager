@@ -1,7 +1,7 @@
 import { useForm } from "@mantine/form";
 import { useIntl } from "@/hooks/useIntl";
-import { useProfile } from "@/db/collections/profile/use-profile-query";
 import { useSettings } from "@/db/collections/settings/use-settings-query";
+import { useContactMutations } from "@/db/collections/finance/contacts/use-contact-mutations";
 
 import { Fieldset, Select, Stack, TextInput } from "@mantine/core";
 
@@ -10,11 +10,10 @@ import { zodResolver } from "mantine-form-zod-resolver";
 import { currencies } from "@/constants/settings";
 import CreateButton from "@/components/UI/Buttons/CreateButton";
 import UpdateButton from "@/components/UI/Buttons/UpdateButton";
-import { Currency } from "@/types/settings.types";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
-import { contactsCollection } from "@/db/collections/finance/contacts/contact-collection";
 
 import { Tables } from "@/types/db.types";
+import { Currency } from "@/types/settings.types";
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -23,7 +22,7 @@ const schema = z.object({
   phone: z.string().optional(),
   address: z.string().optional(),
   currency: z.enum(
-    currencies.map((currency) => currency.value) as [string, ...string[]]
+    currencies.map((currency) => currency.value) as [Currency, ...Currency[]]
   ),
 });
 
@@ -35,13 +34,12 @@ interface ContactFormProps {
 
 export default function ContactForm({
   onClose,
-  onSuccess: _onSuccess,
+  onSuccess,
   contact,
 }: ContactFormProps) {
   const { getLocalizedText } = useIntl();
-  const { data: profile } = useProfile();
   const { data: settings } = useSettings();
-
+  const { addContact, updateContact } = useContactMutations();
   const form = useForm({
     initialValues: {
       name: contact?.name || "",
@@ -60,32 +58,20 @@ export default function ContactForm({
     onClose?.();
   };
 
-  function handleSubmit(values: z.infer<typeof schema>) {
+  async function handleSubmit(values: z.infer<typeof schema>) {
     if (contact) {
-      const result = contactsCollection.update(contact.id, (draft) => {
-        draft.name = values.name;
-        draft.description = values.description || null;
-        draft.email = values.email || null;
-        draft.phone = values.phone || null;
-        draft.address = values.address || null;
-        draft.currency = values.currency as Currency;
-      });
-      console.log(result);
+      const result = await updateContact(contact.id, values);
+      if (result) {
+        onSuccess?.({ ...contact, ...values });
+        handleClose();
+      }
     } else {
-      const result = contactsCollection.insert({
-        id: crypto.randomUUID(),
-        created_at: new Date().toISOString(),
-        user_id: profile?.id || "",
-        name: values.name,
-        description: values.description || null,
-        email: values.email || null,
-        phone: values.phone || null,
-        address: values.address || null,
-        currency: values.currency as Currency,
-      });
-      console.log(result);
+      const result = await addContact(values);
+      if (result) {
+        onSuccess?.(result);
+        handleClose();
+      }
     }
-    handleClose();
   }
 
   return (
