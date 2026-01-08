@@ -1,21 +1,21 @@
 import {
   InsertProjectAdjustment,
+  ProjectAdjustment,
   UpdateProjectAdjustment,
 } from "@/types/finance.types";
 import { projectAdjustmentsCollection } from "./project-adjustment-collection";
 
 /**
- * Adds a new Finance Project.
- * Returns the transaction for further processing.
+ * Adds a new Finance Project Adjustment.
  *
- * @param newFinanceProject - The data of the new project
+ * @param newProjectAdjustment - The data of the new project adjustment
  * @param userId - The user ID
- * @returns Transaction object with isPersisted promise
+ * @returns The new project adjustment or undefined if an error occurs
  */
 export const addProjectAdjustment = async (
   newProjectAdjustment: InsertProjectAdjustment,
   userId: string
-) => {
+): Promise<ProjectAdjustment | undefined> => {
   const newProjectAdjustmentData = {
     ...newProjectAdjustment,
     id: newProjectAdjustment.id || crypto.randomUUID(),
@@ -26,24 +26,56 @@ export const addProjectAdjustment = async (
     contact_id: newProjectAdjustment.contact_id || null,
     single_cashflow_id: newProjectAdjustment.single_cashflow_id || null,
   };
-  const result = projectAdjustmentsCollection.insert(newProjectAdjustmentData);
-  const promise = await result.isPersisted.promise;
-  return promise;
+  try {
+    const result = projectAdjustmentsCollection.insert(
+      newProjectAdjustmentData
+    );
+    await result.isPersisted.promise;
+    return newProjectAdjustmentData;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
 };
 
+/**
+ * Updates a Finance Project Adjustment.
+ *
+ * @param id - The ID of the project adjustment to update
+ * @param item - The data of the project adjustment to update
+ * @returns True if the project adjustment was updated, false if an error occurs
+ */
 export const updateProjectAdjustment = async (
   id: string,
   item: UpdateProjectAdjustment
-) => {
-  const result = projectAdjustmentsCollection.update(id, (draft) => {
-    Object.assign(draft, item);
-  });
-  const promise = await result.isPersisted.promise;
-  return promise;
+): Promise<boolean> => {
+  try {
+    const result = projectAdjustmentsCollection.update(id, (draft) => {
+      Object.assign(draft, item);
+    });
+    await result.isPersisted.promise;
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };
 
-export const deleteProjectAdjustment = async (id: string) => {
-  const result = projectAdjustmentsCollection.delete(id);
-  const promise = await result.isPersisted.promise;
-  return promise;
+/**
+ * Deletes a Finance Project Adjustment.
+ *
+ * @param id - The ID or IDs of the project adjustment to delete
+ * @returns True if the project adjustment was deleted, false if an error occurs
+ */
+export const deleteProjectAdjustment = async (
+  id: string | string[]
+): Promise<boolean> => {
+  try {
+    const result = projectAdjustmentsCollection.delete(id);
+    await result.isPersisted.promise;
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };

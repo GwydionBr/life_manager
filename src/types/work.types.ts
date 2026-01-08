@@ -1,18 +1,18 @@
 import { Tables, TablesInsert, TablesUpdate } from "./db.types";
 
 // Timer Project Types
-export interface WorkProject extends Tables<"work_project"> {
+export type WorkProject = Tables<"work_project"> & {
   tags: Tables<"tag">[];
-}
-export interface InsertWorkProject extends TablesInsert<"work_project"> {
+};
+export type InsertWorkProject = TablesInsert<"work_project"> & {
   tags?: Tables<"tag">[];
-}
-export interface UpdateWorkProject extends TablesUpdate<"work_project"> {
+};
+export type UpdateWorkProject = TablesUpdate<"work_project"> & {
   tags?: Tables<"tag">[] | null;
-}
-export interface CompleteWorkProject extends WorkProject {
+};
+export type CompleteWorkProject = WorkProject & {
   timeEntries: WorkTimeEntry[];
-}
+};
 
 // Timer Session Types
 export type WorkTimeEntry = Tables<"work_time_entry">;

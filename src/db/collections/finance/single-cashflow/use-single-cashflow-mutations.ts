@@ -50,15 +50,19 @@ export const useSingleCashflowMutations = () => {
 
       try {
         // Add single cashflows to database
-        const { promise, data } = await addSingleCashflowMutation(
+        const result = await addSingleCashflowMutation(
           newSingleCashflow,
           profile.id
         );
 
         // Check if transaction failed
-        if (promise.error) {
-          console.error("Error adding single cashflow", promise.error);
-          showActionErrorNotification(promise.error.message);
+        if (!result) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen des Einzel-Cashflows",
+              "Error creating single cashflow"
+            )
+          );
           return undefined;
         }
 
@@ -67,8 +71,8 @@ export const useSingleCashflowMutations = () => {
           // Show success notification for multiple cashflows
           showActionSuccessNotification(
             getLocalizedText(
-              ` ${data.length} Einzelne Cashflows erfolgreich erstellt`,
-              ` ${data.length} Single cashflows successfully created`
+              ` ${result.length} Einzelne Cashflows erfolgreich erstellt`,
+              ` ${result.length} Single cashflows successfully created`
             )
           );
         } else {
@@ -80,8 +84,7 @@ export const useSingleCashflowMutations = () => {
             )
           );
         }
-        console.log(data);
-        return data;
+        return result;
       } catch (error) {
         console.error("Error adding single cashflow try/catch", error);
         // Show total error notification
@@ -103,7 +106,7 @@ export const useSingleCashflowMutations = () => {
     async (
       id: string | string[],
       item: UpdateSingleCashFlow
-    ): Promise<SingleCashFlow | undefined> => {
+    ): Promise<boolean> => {
       if (!profile?.id) {
         showActionErrorNotification(
           getLocalizedText(
@@ -111,20 +114,20 @@ export const useSingleCashflowMutations = () => {
             "No user profile found"
           )
         );
-        return;
+        return false;
       }
 
       try {
-        const transaction = await updateSingleCashflowMutation(
-          id,
-          item,
-          profile.id
-        );
-        const result = await transaction.isPersisted.promise;
+        const result = await updateSingleCashflowMutation(id, item, profile.id);
 
-        if (result.error) {
-          showActionErrorNotification(result.error.message);
-          return;
+        if (!result) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Aktualisieren des Einzel-Cashflows",
+              "Error updating single cashflow"
+            )
+          );
+          return false;
         }
 
         showActionSuccessNotification(
@@ -133,30 +136,34 @@ export const useSingleCashflowMutations = () => {
             "Single cashflow successfully updated"
           )
         );
+        return result;
       } catch (error) {
+        console.error("Error updating single cashflow try/catch", error);
         showActionErrorNotification(
           getLocalizedText(
             `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
             `Error: ${error instanceof Error ? error.message : "Unknown error"}`
           )
         );
+        return false;
       }
     },
     [profile?.id, getLocalizedText]
   );
 
-  /**
-   * Deletes a Single Cashflow with automatic notification.
-   */
   const handleDeleteSingleCashflow = useCallback(
-    async (id: string | string[]) => {
+    async (id: string | string[]): Promise<boolean> => {
       try {
-        const transaction = deleteSingleCashflowMutation(id);
-        const result = await transaction.isPersisted.promise;
+        const result = await deleteSingleCashflowMutation(id);
 
-        if (result.error) {
-          showActionErrorNotification(result.error.message);
-          return;
+        if (!result) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Löschen des Einzel-Cashflows",
+              "Error deleting single cashflow"
+            )
+          );
+          return false;
         }
 
         showActionSuccessNotification(
@@ -166,14 +173,16 @@ export const useSingleCashflowMutations = () => {
           )
         );
 
-        return result;
+        return true;
       } catch (error) {
+        console.error("Error deleting single cashflow try/catch", error);
         showActionErrorNotification(
           getLocalizedText(
             `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
             `Error: ${error instanceof Error ? error.message : "Unknown error"}`
           )
         );
+        return false;
       }
     },
     [getLocalizedText]

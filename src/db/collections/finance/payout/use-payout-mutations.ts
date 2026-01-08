@@ -36,11 +36,17 @@ export const usePayoutMutations = () => {
   const { data: profile } = useProfile();
   const { getLocalizedText } = useIntl();
 
+  /**
+   * Handles the payout of a finance project adjustment.
+   * @param projectAdjustment - The project adjustment to payout
+   * @param financeProject - The finance project to payout
+   * @returns True if the payout was successful, false if an error occurs
+   */
   const handleFinanceProjectAdjustmentPayout = useCallback(
     async (
       projectAdjustment: ProjectAdjustment,
       financeProject: FinanceProject
-    ) => {
+    ): Promise<boolean> => {
       if (!profile?.id) {
         showActionErrorNotification(
           getLocalizedText(
@@ -48,11 +54,11 @@ export const usePayoutMutations = () => {
             "No user profile found"
           )
         );
-        return;
+        return false;
       }
 
       try {
-        const { promise, data } = await addSingleCashflowMutation(
+        const singleCashflowResult = await addSingleCashflowMutation(
           {
             title: projectAdjustment.description ?? "Auszahlung",
             amount: projectAdjustment.amount,
@@ -63,19 +69,30 @@ export const usePayoutMutations = () => {
           profile.id
         );
 
+        if (!singleCashflowResult) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen der Auszahlung",
+              "Error creating payout"
+            )
+          );
+          return false;
+        }
+
         const adjustmentResult = await updateProjectAdjustment(
           projectAdjustment.id,
           {
-            single_cashflow_id: data[0].id,
+            single_cashflow_id: singleCashflowResult[0].id,
           }
         );
-        if (promise.error) {
-          showActionErrorNotification(promise.error.message);
-          return;
-        }
-        if (adjustmentResult.error) {
-          showActionErrorNotification(adjustmentResult.error.message);
-          return;
+        if (!adjustmentResult) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen der Projektanpassung",
+              "Error creating project adjustment"
+            )
+          );
+          return false;
         }
         showActionSuccessNotification(
           getLocalizedText(
@@ -83,20 +100,32 @@ export const usePayoutMutations = () => {
             "Payout successfully created"
           )
         );
+        return true;
       } catch (error) {
+        console.error(error);
         showActionErrorNotification(
           getLocalizedText(
             `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
             `Error: ${error instanceof Error ? error.message : "Unknown error"}`
           )
         );
+        return false;
       }
     },
     [profile?.id, getLocalizedText]
   );
 
+  /**
+   * Handles the payout of a finance project.
+   * @param financeProject - The finance project to payout
+   * @param payoutWholeProject - Whether to payout the whole project
+   * @returns True if the payout was successful, false if an error occurs
+   */
   const handleFinanceProjectPayout = useCallback(
-    async (financeProject: FinanceProject, payoutWholeProject: boolean) => {
+    async (
+      financeProject: FinanceProject,
+      payoutWholeProject: boolean
+    ): Promise<boolean> => {
       if (!profile?.id) {
         showActionErrorNotification(
           getLocalizedText(
@@ -104,11 +133,11 @@ export const usePayoutMutations = () => {
             "No user profile found"
           )
         );
-        return;
+        return false;
       }
 
       try {
-        const { promise, data } = await addSingleCashflowMutation(
+        const singleCashflowResult = await addSingleCashflowMutation(
           {
             title: financeProject.title,
             amount: financeProject.start_amount,
@@ -118,17 +147,35 @@ export const usePayoutMutations = () => {
           },
           profile.id
         );
+        if (!singleCashflowResult) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen der Auszahlung",
+              "Error creating payout"
+            )
+          );
+          return false;
+        }
 
-        const result = await updateFinanceProject(
+        const financeProjectResult = await updateFinanceProject(
           financeProject.id,
           {
-            single_cashflow_id: data[0].id,
+            single_cashflow_id: singleCashflowResult[0].id,
             tags: financeProject.tags,
             contact: financeProject.contact,
             adjustments: financeProject.adjustments,
           },
           profile.id
         );
+        if (!financeProjectResult) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen der Projektanpassung",
+              "Error creating project adjustment"
+            )
+          );
+          return false;
+        }
 
         if (payoutWholeProject) {
           financeProject.adjustments
@@ -141,29 +188,22 @@ export const usePayoutMutations = () => {
             });
         }
 
-        if (result.error) {
-          showActionErrorNotification(result.error.message);
-          return;
-        }
-
-        if (promise.error) {
-          showActionErrorNotification(promise.error.message);
-          return;
-        }
-
         showActionSuccessNotification(
           getLocalizedText(
             "Auszahlung erfolgreich erstellt",
             "Payout successfully created"
           )
         );
+        return true;
       } catch (error) {
+        console.error(error);
         showActionErrorNotification(
           getLocalizedText(
             `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
             `Error: ${error instanceof Error ? error.message : "Unknown error"}`
           )
         );
+        return false;
       }
     },
     [profile?.id, getLocalizedText, handleFinanceProjectAdjustmentPayout]
@@ -171,6 +211,12 @@ export const usePayoutMutations = () => {
 
   /**
    * Adds a new Payout with automatic notification and side effects.
+   * @param project - The project to add the payout for
+   * @param title - The title of the payout
+   * @param timeEntries - The time entries to add the payout for
+   * @param endCurrency - The currency of the payout
+   * @param endValue - The value of the payout
+   * @returns The payout or undefined if an error occurs
    */
   const handleAddHourlyPayout = useCallback(
     async (
@@ -266,6 +312,9 @@ export const usePayoutMutations = () => {
 
   /**
    * Updates a Payout with automatic notification and side effects.
+   * @param id - The ID of the payout to update
+   * @param item - The item to update
+   * @returns The payout or undefined if an error occurs
    */
   const handleUpdatePayout = useCallback(
     async (
@@ -314,6 +363,8 @@ export const usePayoutMutations = () => {
 
   /**
    * Deletes a Payout with automatic notification and side effects.
+   * @param id - The ID of the payout to delete
+   * @returns True if the payout was deleted, false if an error occurs
    */
   const handleDeletePayout = useCallback(async (id: string | string[]) => {
     const transaction = deletePayout(id);

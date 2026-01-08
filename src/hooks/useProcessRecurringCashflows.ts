@@ -3,7 +3,7 @@ import { useProfile } from "@/db/collections/profile/use-profile-query";
 import { useRecurringCashflows } from "@/db/collections/finance/recurring-cashflow/use-recurring-cashflow-query";
 import { useSingleCashflowsQuery } from "@/db/collections/finance/single-cashflow/use-single-cashflow-query";
 import { processRecurringCashFlows } from "@/lib/helper/processRecurringCashflows";
-import { addSingleCashflowMutation } from "@/db/collections/finance/single-cashflow/single-cashflow-mutations";
+import { useSingleCashflowMutations } from "@/db/collections/finance/single-cashflow/use-single-cashflow-mutations";
 import { isSameDay } from "date-fns";
 
 const LAST_PROCESSED_KEY = "recurringCashflowsLastProcessed";
@@ -25,7 +25,7 @@ export const useProcessRecurringCashflows = () => {
     useSingleCashflowsQuery();
   const processingRef = useRef(false);
   const hasProcessedTodayRef = useRef(false);
-
+  const { addSingleCashflow } = useSingleCashflowMutations();
   /**
    * Checks if today has already been processed
    */
@@ -104,15 +104,7 @@ export const useProcessRecurringCashflows = () => {
       }
 
       // Create the new single cashflows
-      const { promise } = await addSingleCashflowMutation(
-        singleCashflowsToInsert,
-        profile.id
-      );
-
-      if (promise.error) {
-        console.error("Error creating single cashflows:", promise.error);
-        return;
-      }
+      await addSingleCashflow(singleCashflowsToInsert);
 
       console.log(
         `Successfully created ${singleCashflowsToInsert.length} single cashflow(s) from recurring cashflows`
@@ -131,6 +123,7 @@ export const useProcessRecurringCashflows = () => {
     isSingleReady,
     hasProcessedToday,
     markAsProcessed,
+    addSingleCashflow,
   ]);
 
   /**

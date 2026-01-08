@@ -13,16 +13,15 @@ import { createTransaction } from "@tanstack/react-db";
 
 /**
  * Adds a new Single Cashflow.
- * Returns the transaction for further processing.
  *
  * @param newSingleCashflow - The data of the new cashflow
  * @param userId - The user ID
- * @returns Transaction object with isPersisted promise and created cashflows
+ * @returns Created cashflows or undefined if an error occurs
  */
 export const addSingleCashflowMutation = async (
   newSingleCashflow: InsertSingleCashFlow | InsertSingleCashFlow[],
   userId: string
-) => {
+): Promise<SingleCashFlow[] | undefined> => {
   const customTransaction = createTransaction({
     autoCommit: false,
     mutationFn: async ({ transaction }) => {
@@ -63,22 +62,29 @@ export const addSingleCashflowMutation = async (
       };
       singleCashflowsCollection.insert(newCashFlow);
       // Insert tags
-      tags.forEach((tag) => {
-        singleCashflowTagsCollection.insert({
-          id: crypto.randomUUID(),
-          created_at: new Date().toISOString(),
-          single_cashflow_id: cashflowId,
-          tag_id: tag.id,
-          user_id: userId,
+      if (tags) {
+        tags.forEach((tag) => {
+          singleCashflowTagsCollection.insert({
+            id: crypto.randomUUID(),
+            created_at: new Date().toISOString(),
+            single_cashflow_id: cashflowId,
+            tag_id: tag.id,
+            user_id: userId,
+          });
         });
-      });
-      allNewSingleCashflows.push({ ...newCashFlow, tags });
+      }
+      allNewSingleCashflows.push({ ...newCashFlow, tags: tags ?? [] });
     })
   );
 
-  await customTransaction.commit();
-  const promise = await customTransaction.isPersisted.promise;
-  return { promise, data: allNewSingleCashflows };
+  try {
+    await customTransaction.commit();
+    await customTransaction.isPersisted.promise;
+    return allNewSingleCashflows;
+  } catch (error) {
+    console.error(error);
+    return;
+  }
 };
 
 /**
@@ -87,13 +93,13 @@ export const addSingleCashflowMutation = async (
  * @param id - The ID or IDs of the cashflow to update
  * @param item - The item to update
  * @param userId - The user ID
- * @returns Transaction object with isPersisted promise
+ * @returns True if the cashflow was updated, false if an error occurs
  */
 export const updateSingleCashflowMutation = async (
   id: string | string[],
   item: UpdateSingleCashFlow,
   userId: string
-) => {
+): Promise<boolean> => {
   const ids = Array.isArray(id) ? id : [id];
   const { tags, ...cashflowData } = item;
 
@@ -116,26 +122,41 @@ export const updateSingleCashflowMutation = async (
     })
   );
 
-  // Wait for all updates to complete
-  await customTransaction.commit();
-  const promise = await customTransaction.isPersisted.promise;
+  try {
+    // Wait for all updates to complete
+    await customTransaction.commit();
+    await customTransaction.isPersisted.promise;
 
-  // Sync tags for all updated cashflows
-  const tagIds = tags.map((tag) => tag.id);
-  await syncSingleCashflowTags(ids, tagIds, userId);
+    // Sync tags for all updated cashflows
+    if (tags) {
+      const tagIds = tags.map((tag) => tag.id);
+      await syncSingleCashflowTags(ids, tagIds, userId);
+    }
 
-  // Return the first transaction (or create a combined one if needed)
-  return promise;
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };
 
 /**
  * Deletes a Single Cashflow.
  *
  * @param id - The ID or IDs of the cashflow to delete
- * @returns Transaction object with isPersisted promise
+ * @returns True if the cashflow was deleted, false if an error occurs
  */
-export const deleteSingleCashflowMutation = (id: string | string[]) => {
-  return singleCashflowsCollection.delete(id);
+export const deleteSingleCashflowMutation = async (
+  id: string | string[]
+): Promise<boolean> => {
+  try {
+    const transaction = singleCashflowsCollection.delete(id);
+    await transaction.isPersisted.promise;
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };
 
 /**
@@ -179,9 +200,7 @@ export async function syncSingleCashflowTags(
     const cashflowRelations = existingRelations.filter(
       (r) => r.single_cashflow_id === currentCashflowId
     );
-    const existingTagIds = cashflowRelations.map(
-      (r) => r.tag_id
-    );
+    const existingTagIds = cashflowRelations.map((r) => r.tag_id);
 
     // Find relations to delete (in existing but not in new)
     const relationsToDelete = cashflowRelations.filter(

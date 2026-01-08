@@ -7,7 +7,7 @@ export enum FriendshipStatusEnum {
   ACCEPTED = "accepted",
 }
 
-export interface Friend extends Tables<"profiles"> {
+export type Friend = Tables<"profiles"> & {
   friendshipId: string;
   friendshipCreatedAt: string;
   friendshipStatus: FriendshipStatus;

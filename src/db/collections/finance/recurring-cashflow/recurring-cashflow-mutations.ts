@@ -17,12 +17,12 @@ import {
  *
  * @param newRecurringCashflow - The data of the new cashflow
  * @param userId - The user ID
- * @returns Transaction object with isPersisted promise and created cashflow
+ * @returns Created cashflow or undefined if an error occurs
  */
 export const addRecurringCashflowMutation = async (
   newRecurringCashflow: InsertRecurringCashFlow,
   userId: string
-) => {
+): Promise<RecurringCashFlow | undefined> => {
   const customTransaction = createTransaction({
     autoCommit: false,
     mutationFn: async ({ transaction }) => {
@@ -49,24 +49,27 @@ export const addRecurringCashflowMutation = async (
 
   customTransaction.mutate(() => {
     recurringCashflowsCollection.insert(dataToInsert);
-    tags.forEach((tag) => {
-      recurringCashflowTagsCollection.insert({
-        id: crypto.randomUUID(),
-        created_at: new Date().toISOString(),
-        recurring_cashflow_id: dataToInsert.id,
-        tag_id: tag.id,
-        user_id: userId,
+    if (tags) {
+      tags.forEach((tag) => {
+        recurringCashflowTagsCollection.insert({
+          id: crypto.randomUUID(),
+          created_at: new Date().toISOString(),
+          recurring_cashflow_id: dataToInsert.id,
+          tag_id: tag.id,
+          user_id: userId,
+        });
       });
-    });
+    }
   });
 
-  await customTransaction.commit();
-  const promise = await customTransaction.isPersisted.promise;
-
-  return {
-    promise,
-    data: { ...dataToInsert, tags } as RecurringCashFlow,
-  };
+  try {
+    await customTransaction.commit();
+    await customTransaction.isPersisted.promise;
+    return { ...dataToInsert, tags: tags ?? [] };
+  } catch (error) {
+    console.error(error);
+    return;
+  }
 };
 
 /**
@@ -74,33 +77,51 @@ export const addRecurringCashflowMutation = async (
  *
  * @param id - The ID of the cashflow to update
  * @param item - The item to update
- * @returns Transaction object with isPersisted promise
+ * @returns True if the cashflow was updated, false if an error occurs
  */
 export const updateRecurringCashflowMutation = async (
   id: string,
   item: UpdateRecurringCashFlow,
   userId: string
-) => {
+): Promise<boolean> => {
   const { tags, ...cashflowData } = item;
-  const customTransaction = recurringCashflowsCollection.update(id, (draft) => {
-    Object.assign(draft, cashflowData);
-  });
+  try {
+    const customTransaction = recurringCashflowsCollection.update(
+      id,
+      (draft) => {
+        Object.assign(draft, cashflowData);
+      }
+    );
 
-  const promise = await customTransaction.isPersisted.promise;
-  const tagIds = tags.map((tag) => tag.id);
-  await syncRecurringCashflowTags(id, tagIds, userId);
-
-  return promise;
+    await customTransaction.isPersisted.promise;
+    if (tags) {
+      const tagIds = tags.map((tag) => tag.id);
+      await syncRecurringCashflowTags(id, tagIds, userId);
+    }
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };
 
 /**
  * Deletes a Recurring Cashflow.
  *
  * @param id - The ID or IDs of the cashflow to delete
- * @returns Transaction object with isPersisted promise
+ * @returns True if the cashflow was deleted, false if an error occurs
  */
-export const deleteRecurringCashflowMutation = (id: string | string[]) => {
-  return recurringCashflowsCollection.delete(id);
+export const deleteRecurringCashflowMutation = async (
+  id: string | string[]
+): Promise<boolean> => {
+  try {
+    const transaction = recurringCashflowsCollection.delete(id);
+    await transaction.isPersisted.promise;
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };
 
 /**
@@ -125,9 +146,7 @@ export async function syncRecurringCashflowTags(
     [cashflowId]
   );
 
-  const existingTagIds = existingRelations.map(
-    (r) => r.tag_id
-  );
+  const existingTagIds = existingRelations.map((r) => r.tag_id);
   const newTagIds = tagIds || [];
 
   // 2. Find relations to delete (in existing but not in new)
