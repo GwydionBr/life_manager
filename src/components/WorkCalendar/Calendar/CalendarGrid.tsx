@@ -179,7 +179,7 @@ export default function CalendarGrid({
           </Box>
         </Group>
         {/* Body */}
-        <Group gap={0} wrap="nowrap" align="flex-start">
+        <Group gap={0} wrap="nowrap" align="flex-start" pb="lg">
           <Stack w={42} align="center">
             <TimeColumn
               hourHeight={rasterHeight}

@@ -260,7 +260,7 @@ export const useWorkTimeEntryMutations = () => {
    * Deletes a Work Time Entry with automatic notification.
    */
   const handleDeleteWorkTimeEntry = useCallback(
-    async (id: string) => {
+    async (id: string | string[]) => {
       try {
         const result = await deleteWorkTimeEntry(id);
 

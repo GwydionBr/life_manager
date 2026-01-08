@@ -247,19 +247,10 @@ export default function WorkCalendar() {
       scrollbars="y"
     >
       <Stack>
-        {/* <CalendarHeader
-          referenceDate={referenceDate}
-          handleZoomChange={handleZoomChange}
-        /> */}
         <CalendarGrid
           visibleProjects={visibleProjects}
           handleNextAndPrev={handleNextAndPrev}
-          isFetching={
-            // isFetchingProjects ||
-            // isFetchingTimeEntries ||
-            // isFetchingAppointments
-            false
-          }
+          isFetching={false}
           days={calendarDays}
           setReferenceDate={handleReferenceDateChange}
           handleSessionClick={handleSessionClick}

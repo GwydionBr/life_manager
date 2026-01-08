@@ -99,8 +99,14 @@ export default function ProjectToolbar({
     setPayoutConversionOpened(true);
     setFilterOpened(false);
     setPayoutOpened(false);
+    setSelectedTimeEntryIds([]);
     setSelectedModeActive(false);
   };
+
+  const handleTimeEntrySelectionToggle = useCallback(() => {
+    setSelectedTimeEntryIds([]);
+    toggleSelectedModeActive();
+  }, [setSelectedTimeEntryIds, toggleSelectedModeActive]);
 
   const handleSessionPayout = (
     timeEntries: WorkTimeEntry[],
@@ -111,7 +117,7 @@ export default function ProjectToolbar({
     const title = `${getLocalizedText("Auszahlung", "Payout")} (${project.title}) ${formatDate(new Date())}`;
 
     addHourlyPayout(project, title, timeEntries, endCurrency, endValue);
-    // setSelectedTimeEntryIds([]);
+    setSelectedTimeEntryIds([]);
     setSelectedModeActive(false);
   };
 
@@ -262,7 +268,7 @@ export default function ProjectToolbar({
             <Popover.Target>
               <SelectActionIcon
                 disabled={selectableSessions.length === 0}
-                onClick={toggleSelectedModeActive}
+                onClick={handleTimeEntrySelectionToggle}
                 tooltipLabel={
                   selectedModeActive
                     ? getLocalizedText(
@@ -292,6 +298,10 @@ export default function ProjectToolbar({
                 timeFilteredTimeEntries={timeFilteredTimeEntries}
                 toggleAllTimeEntries={toggleAllTimeEntries}
                 handleTimeEntryPayoutClick={handleSessionPayoutClick}
+                onClose={() => {
+                  setSelectedModeActive(false);
+                  setSelectedTimeEntryIds([]);
+                }}
               />
             </Popover.Dropdown>
           </Popover>

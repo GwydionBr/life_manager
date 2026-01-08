@@ -1,5 +1,5 @@
 import { useDisclosure } from "@mantine/hooks";
-import { workTimeEntriesCollection } from "@/db/collections/work/work-time-entry/work-time-entry-collection";
+import { useWorkTimeEntryMutations } from "@/db/collections/work/work-time-entry/use-work-time-entry-mutations";
 import { useIntl } from "@/hooks/useIntl";
 
 import { Group, Text, Divider, Stack, Button, Collapse } from "@mantine/core";
@@ -16,6 +16,7 @@ interface WorkTimeEntrySelectorProps {
   handleTimeEntryPayoutClick: (
     timeEntries: Tables<"work_time_entry">[]
   ) => void;
+  onClose: () => void;
 }
 
 export default function WorkTimeEntrySelector({
@@ -23,12 +24,15 @@ export default function WorkTimeEntrySelector({
   timeFilteredTimeEntries,
   toggleAllTimeEntries,
   handleTimeEntryPayoutClick,
+  onClose,
 }: WorkTimeEntrySelectorProps) {
   const { getLocalizedText } = useIntl();
   const [editModalOpened, { open: openEditModal, close: closeEditModal }] =
     useDisclosure(false);
+  const { deleteWorkTimeEntry } = useWorkTimeEntryMutations();
 
   const handleDelete = () => {
+    onClose();
     showDeleteConfirmationModal(
       getLocalizedText("Auswahl löschen", "Delete Selection"),
       getLocalizedText(
@@ -36,7 +40,7 @@ export default function WorkTimeEntrySelector({
         "Are you sure you want to delete this selection?"
       ),
       async () => {
-        workTimeEntriesCollection.delete(selectedTimeEntries);
+        await deleteWorkTimeEntry(selectedTimeEntries);
       }
     );
   };

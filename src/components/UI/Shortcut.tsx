@@ -9,7 +9,7 @@ interface ShortcutProps {
 export default function Shortcut({ keys }: ShortcutProps) {
   const os = useOs();
 
-  const isMac = os === "macos";
+  const isMac = os === "macos" || os === "ios";
 
   const renderKey = (key: string): string => {
     const k = key.toLowerCase();
