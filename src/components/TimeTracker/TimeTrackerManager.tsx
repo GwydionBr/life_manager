@@ -223,10 +223,13 @@ export default function TimerManager({
   }, [timers, activeProject, isProjectsReady, handleAddTimer]);
 
   useEffect(() => {
-    if (activeProject) {
+    if (
+      activeProject &&
+      !timers.some((t) => t.projectId === activeProject.id)
+    ) {
       setSelectedProjectId(activeProject.id);
     }
-  }, [activeProject]);
+  }, [activeProject, timers]);
 
   /**
    * Calculate aggregate timer states for the summary icon.
