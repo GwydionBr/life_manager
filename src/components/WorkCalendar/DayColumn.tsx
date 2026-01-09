@@ -5,8 +5,12 @@ import { useIntl } from "@/hooks/useIntl";
 import { alpha, Box, Skeleton, Stack, Text } from "@mantine/core";
 
 import { getStartOfDay, getEndOfDay, isToday } from "./calendarUtils";
-import { CalendarSession } from "@/types/workCalendar.types";
+import {
+  CalendarSession,
+  CalendarAppointment,
+} from "@/types/workCalendar.types";
 import CalendarSessionEvent from "./CalendarEvent/CalendarSessionEvent";
+import CalendarAppointmentEvent from "./CalendarEvent/CalendarAppointmentEvent";
 import TimeTrackerEvent from "./CalendarEvent/TimeTrackerEvent/TimeTrackerEvent";
 import NewSessionEvent from "./CalendarEvent/NewSessionEvent";
 
@@ -18,7 +22,9 @@ interface DayColumnProps {
   isFetching: boolean;
   currentTime: Date;
   sessions: CalendarSession[];
+  appointments: CalendarAppointment[];
   handleSessionClick: (sessionId: string) => void;
+  handleAppointmentClick?: (appointmentId: string) => void;
   hourMultiplier: number;
   rasterHeight: number;
   startNewSession: number | null;
@@ -37,7 +43,9 @@ export function DayColumn({
   isFetching,
   currentTime,
   sessions,
+  appointments,
   handleSessionClick,
+  handleAppointmentClick,
   hourMultiplier,
   rasterHeight,
   startNewSession,
@@ -57,23 +65,29 @@ export function DayColumn({
   const dayStart = getStartOfDay(day);
   const dayEnd = getEndOfDay(day);
 
-  const clippedItems: CalendarSession[] = sessions.map((s) => {
+  // Clip sessions to the visible day window
+  const clippedSessions: CalendarSession[] = sessions.map((s) => {
     const sStart = new Date(s.start_time);
     const sEnd = new Date(s.end_time);
     const start = sStart < dayStart ? dayStart : sStart;
     const end = sEnd > dayEnd ? dayEnd : sEnd;
     return {
-      id: s.id,
+      ...s,
       start_time: start.toISOString(),
       end_time: end.toISOString(),
-      work_project_id: s.work_project_id,
-      memo: s.memo,
-      single_cashflow_id: s.single_cashflow_id,
-      active_seconds: s.active_seconds,
-      projectTitle: s.projectTitle,
-      color: s.color,
-      currency: s.currency,
-      salary: s.salary,
+    };
+  });
+
+  // Clip appointments to the visible day window
+  const clippedAppointments: CalendarAppointment[] = appointments.map((a) => {
+    const aStart = new Date(a.start_date);
+    const aEnd = new Date(a.end_date);
+    const start = aStart < dayStart ? dayStart : aStart;
+    const end = aEnd > dayEnd ? dayEnd : aEnd;
+    return {
+      ...a,
+      start_date: start.toISOString(),
+      end_date: end.toISOString(),
     };
   });
 
@@ -189,18 +203,29 @@ export function DayColumn({
           ))
         ) : (
           <Box>
-            {clippedItems.map((s) => {
-              return (
-                <CalendarSessionEvent
-                  key={s.id}
-                  isNewSession={startNewSession !== null}
-                  s={s}
-                  toY={timeToY}
-                  handleSessionClick={handleSessionClick}
-                  color={s.color}
-                />
-              );
-            })}
+            {/* Render sessions */}
+            {clippedSessions.map((s) => (
+              <CalendarSessionEvent
+                key={s.id}
+                isNewSession={startNewSession !== null}
+                s={s}
+                toY={timeToY}
+                handleSessionClick={handleSessionClick}
+                color={s.color}
+              />
+            ))}
+            {/* Render appointments */}
+            {clippedAppointments.map((a) => (
+              <Box
+                key={a.id}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAppointmentClick?.(a.id);
+                }}
+              >
+                <CalendarAppointmentEvent a={a} toY={timeToY} color={a.color} />
+              </Box>
+            ))}
           </Box>
         )}
       </Box>

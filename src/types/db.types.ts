@@ -20,9 +20,11 @@ export type Database = {
           description: string | null
           end_date: string
           id: string
+          is_all_day: boolean
           reminder: string | null
           start_date: string
           title: string
+          type: Database["public"]["Enums"]["appointment-type"]
           user_id: string
           work_project_id: string | null
         }
@@ -31,9 +33,11 @@ export type Database = {
           description?: string | null
           end_date?: string
           id?: string
+          is_all_day?: boolean
           reminder?: string | null
           start_date?: string
           title?: string
+          type: Database["public"]["Enums"]["appointment-type"]
           user_id?: string
           work_project_id?: string | null
         }
@@ -42,9 +46,11 @@ export type Database = {
           description?: string | null
           end_date?: string
           id?: string
+          is_all_day?: boolean
           reminder?: string | null
           start_date?: string
           title?: string
+          type?: Database["public"]["Enums"]["appointment-type"]
           user_id?: string
           work_project_id?: string | null
         }
@@ -1176,7 +1182,7 @@ export type Database = {
     }
     Enums: {
       amountUnits: "kg" | "g" | "t" | "ml" | "l" | "amount"
-      cash_flow_type: "expense" | "income"
+      "appointment-type": "work" | "private" | "meeting" | "blocked"
       currency:
         | "USD"
         | "EUR"
@@ -1330,7 +1336,7 @@ export const Constants = {
   public: {
     Enums: {
       amountUnits: ["kg", "g", "t", "ml", "l", "amount"],
-      cash_flow_type: ["expense", "income"],
+      "appointment-type": ["work", "private", "meeting", "blocked"],
       currency: [
         "USD",
         "EUR",

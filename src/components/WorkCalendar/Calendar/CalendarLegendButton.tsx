@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { useDisclosure, useClickOutside } from "@mantine/hooks";
+import {
+  useDisclosure,
+  useClickOutside,
+  useDebouncedCallback,
+} from "@mantine/hooks";
 import { useWorkProjectMutations } from "@/db/collections/work/work-project/use-work-project-mutations";
 
 import { Popover, Button, Box } from "@mantine/core";
@@ -22,9 +26,9 @@ export default function CalendarLegendButton({ p }: CalendarLegendButtonProps) {
     close();
   });
 
-  const handleColorChange = () => {
+  const handleColorChange = useDebouncedCallback(() => {
     updateWorkProject(p.id, { color: selectedColor, tags: p.tags });
-  };
+  }, 200);
 
   return (
     <Popover

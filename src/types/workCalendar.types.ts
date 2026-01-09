@@ -1,12 +1,11 @@
-import { Tables } from "./db.types";
+import { Tables, TablesInsert, TablesUpdate } from "./db.types";
 import { Currency } from "./settings.types";
 
 export type ViewMode = "day" | "week";
 
-export type CalendarDay = {
-  day: Date;
-  sessions: CalendarSession[];
-};
+export type Appointment = Tables<"appointment">;
+export type InsertAppointment = TablesInsert<"appointment">;
+export type UpdateAppointment = TablesUpdate<"appointment">;
 
 export type VisibleProject = {
   id: string;
@@ -16,31 +15,29 @@ export type VisibleProject = {
   currency: Currency;
 };
 
-export type CalendarSession = Pick<
-  Tables<"work_time_entry">, 
-  | "id"
-  | "start_time"
-  | "end_time"
-  | "work_project_id"
-  | "memo"
-  | "active_seconds"
-  | "currency"
-  | "salary"
-  | "single_cashflow_id"
-> & {
+// Calendar session with project info for rendering
+export type CalendarSession = Tables<"work_time_entry"> & {
   projectTitle: string;
   color: string;
 };
 
-export type CalendarAppointment = Pick<
-  Tables<"appointment">,
-  | "id"
-  | "title"
-  | "description"
-  | "start_date"
-  | "end_date"
-  | "work_project_id"
-> & {
+// Calendar appointment with project info for rendering
+// Note: Using Pick to match the fields available from PowerSync schema
+export type CalendarAppointment = Tables<"appointment"> & {
   projectTitle: string;
   color: string;
+};
+
+// Unified calendar event type for easier handling
+export type CalendarEvent =
+  | { type: "session"; data: CalendarSession }
+  | { type: "appointment"; data: CalendarAppointment };
+
+// Calendar day containing both sessions and appointments
+export type CalendarDay = {
+  day: Date;
+  sessions: CalendarSession[];
+  appointments: CalendarAppointment[];
+  // All events sorted by start time for unified rendering
+  events: CalendarEvent[];
 };

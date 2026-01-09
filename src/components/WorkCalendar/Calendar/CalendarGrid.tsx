@@ -26,6 +26,7 @@ interface CalendarGridProps {
   rasterHeight: number;
   setReferenceDate: (date: Date) => void;
   handleSessionClick: (sessionId: string) => void;
+  handleAppointmentClick?: (appointmentId: string) => void;
   handleNextAndPrev: (direction: number) => void;
   visibleProjects: WorkProject[];
 }
@@ -37,6 +38,7 @@ export default function CalendarGrid({
   visibleProjects,
   setReferenceDate,
   handleSessionClick,
+  handleAppointmentClick,
   handleNextAndPrev,
 }: CalendarGridProps) {
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
@@ -243,7 +245,9 @@ export default function CalendarGrid({
                         isFetching={isFetching}
                         currentTime={currentTime}
                         sessions={d.sessions}
+                        appointments={d.appointments}
                         handleSessionClick={handleSessionClick}
+                        handleAppointmentClick={handleAppointmentClick}
                         hourMultiplier={hourMultiplier}
                         rasterHeight={rasterHeight}
                         startNewSession={startNewSession}
