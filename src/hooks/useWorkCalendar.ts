@@ -1,13 +1,12 @@
-import { useEffect, useMemo, useRef, useCallback } from "react";
-import { useDisclosure, usePrevious } from "@mantine/hooks";
+import { useMemo, useRef, useCallback, useLayoutEffect } from "react";
+import { useDisclosure, usePrevious, useDidUpdate } from "@mantine/hooks";
 
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { useWorkTimeEntries } from "@/db/collections/work/work-time-entry/use-work-time-entry-query";
 import { useAppointments } from "@/db/collections/work/appointment/use-appointment-query";
 import { useCalendarStore } from "@/stores/calendarStore";
 
-import { getStartOfDay } from "@/components/WorkCalendar/calendarUtils";
-import { addDays, differenceInCalendarDays } from "date-fns";
+import { addDays, differenceInCalendarDays, startOfDay } from "date-fns";
 
 import {
   CalendarSession,
@@ -24,12 +23,6 @@ const ZOOM_LEVELS = [1, 2, 4, 6, 12] as const;
 // Default appointment color when no project is associated
 const DEFAULT_APPOINTMENT_COLOR = "var(--mantine-color-gray-6)";
 const DEFAULT_SESSION_COLOR = "var(--mantine-color-teal-6)";
-
-interface ViewportTop {
-  old: number;
-  new: number;
-  isSmooth: boolean;
-}
 
 interface UseWorkCalendarReturn {
   // Data
@@ -109,11 +102,11 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
     const [rangeStart, rangeEnd] = currentDateRange;
 
     if (viewMode === "day") {
-      return [getStartOfDay(referenceDate)];
+      return [startOfDay(referenceDate)];
     }
 
-    const start = getStartOfDay(rangeStart);
-    const end = getStartOfDay(rangeEnd);
+    const start = startOfDay(rangeStart);
+    const end = startOfDay(rangeEnd);
     const length = differenceInCalendarDays(end, start) + 1;
 
     return Array.from({ length }, (_, i) => addDays(start, i));
@@ -152,7 +145,7 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
 
       // Check each day for overlap with this session
       days.forEach((d) => {
-        const dayStart = getStartOfDay(d);
+        const dayStart = startOfDay(d);
         const dayEnd = addDays(dayStart, 1);
         const overlaps = start < dayEnd && end > dayStart;
 
@@ -202,7 +195,7 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
 
       // Check each day for overlap with this appointment
       days.forEach((d) => {
-        const dayStart = getStartOfDay(d);
+        const dayStart = startOfDay(d);
         const dayEnd = addDays(dayStart, 1);
         const overlaps = start < dayEnd && end > dayStart;
 
@@ -417,12 +410,17 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
   }, [closeDrawer, setSelectedSession, setSelectedProject]);
 
   // Scroll to current time on initial mount
-  useEffect(() => {
-    handleScrollToNow();
-  }, []);
+  // Uses useLayoutEffect to run before paint, with a small delay to ensure DOM is ready
+  useLayoutEffect(() => {
+    // Small timeout to ensure ScrollArea has mounted and rendered
+    const timeoutId = requestAnimationFrame(() => {
+      handleScrollToNow();
+    });
+    return () => cancelAnimationFrame(timeoutId);
+  }, [handleScrollToNow]);
 
-  // Maintain scroll position when zoom changes
-  useEffect(() => {
+  // Maintain scroll position when zoom changes (only on updates, not initial mount)
+  useDidUpdate(() => {
     if (viewport.current && previousZoomIndex !== undefined) {
       const currentTimeTop =
         (viewport.current.scrollTop - 50) /
@@ -436,7 +434,7 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
         behavior: "instant",
       });
     }
-  }, [zoomIndex, previousZoomIndex, rasterHeight, hourMultiplier]);
+  }, [zoomIndex]);
 
   return {
     // Data

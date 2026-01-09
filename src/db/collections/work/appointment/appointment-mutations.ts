@@ -26,6 +26,8 @@ export const addAppointment = async (
     end_date: newAppointment.end_date || new Date().toISOString(),
     reminder: newAppointment.reminder || null,
     work_project_id: newAppointment.work_project_id || null,
+    is_all_day: newAppointment.is_all_day || false,
+    type: newAppointment.type || "work",
   };
 
   try {

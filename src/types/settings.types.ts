@@ -10,6 +10,8 @@ export type RoundingInTimeSections =
 
 export type Locale = Database["public"]["Enums"]["locales"];
 
+export type CashFlowType = "income" | "expense";
+
 export type Language = {
   value: Locale;
   label: string;
@@ -18,7 +20,6 @@ export type Language = {
 
 export type Currency = Database["public"]["Enums"]["currency"];
 
-export type CashFlowType = Database["public"]["Enums"]["cash_flow_type"];
 export type FinanceInterval = Database["public"]["Enums"]["finance_interval"];
 
 export enum AppOptions {

@@ -45,8 +45,8 @@ interface FinanceFormProps {
 
 export default function FinanceForm({
   isSingle = true,
-  tags,
   onClose,
+  tags,
   onOpenTagForm,
   setTags,
 }: FinanceFormProps) {
@@ -72,7 +72,7 @@ export default function FinanceForm({
     values: RecurringFinanceFormValues
   ) {
     // TODO: Optimize Add Recurring Cashflow Mutation
-    await addRecurringCashflow({
+    addRecurringCashflow({
       ...values,
       end_date: values.end_date?.toISOString(),
       start_date: values.start_date.toISOString(),
