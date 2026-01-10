@@ -24,6 +24,8 @@ import {
   IconHelp,
   IconWifi,
   IconWifiOff,
+  IconFileText,
+  IconShield,
 } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 
@@ -186,6 +188,25 @@ export function UserMenu() {
         </Menu.Item>
         <Menu.Item leftSection={<IconHelp size={16} />}>
           {getLocalizedText("Hilfe & Dokumentation", "Help & Documentation")}
+        </Menu.Item>
+
+        <Menu.Divider />
+
+        {/* Legal */}
+        <Menu.Label>{getLocalizedText("Rechtliches", "Legal")}</Menu.Label>
+        <Menu.Item
+          leftSection={<IconFileText size={16} />}
+          component={Link}
+          to="/impressum"
+        >
+          {getLocalizedText("Impressum", "Imprint")}
+        </Menu.Item>
+        <Menu.Item
+          leftSection={<IconShield size={16} />}
+          component={Link}
+          to="/datenschutz"
+        >
+          {getLocalizedText("Datenschutzerklärung", "Privacy Policy")}
         </Menu.Item>
 
         <Menu.Divider />

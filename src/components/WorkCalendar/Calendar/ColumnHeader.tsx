@@ -16,7 +16,6 @@ import {
   Badge,
 } from "@mantine/core";
 import {
-  IconClock,
   IconCurrencyEuro,
   IconCurrencyDollar,
   IconCalendar,

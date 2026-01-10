@@ -23,6 +23,7 @@ import {
   IconBolt,
   IconShield,
 } from "@tabler/icons-react";
+import { Anchor } from "@mantine/core";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -298,6 +299,37 @@ function Home() {
           </Stack>
         </Card>
       </Container>
+
+      {/* Footer */}
+      <Box
+        py={40}
+        style={{
+          borderTop: "1px solid var(--mantine-color-gray-3)",
+        }}
+      >
+        <Container size="lg">
+          <Group justify="center" gap="xl">
+            <Anchor
+              component={Link}
+              to="/impressum"
+              size="sm"
+              c="dimmed"
+              style={{ textDecoration: "none" }}
+            >
+              Impressum
+            </Anchor>
+            <Anchor
+              component={Link}
+              to="/datenschutz"
+              size="sm"
+              c="dimmed"
+              style={{ textDecoration: "none" }}
+            >
+              Datenschutzerklärung
+            </Anchor>
+          </Group>
+        </Container>
+      </Box>
     </Box>
   );
 }
