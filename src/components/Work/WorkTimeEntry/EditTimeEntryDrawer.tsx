@@ -6,7 +6,7 @@ import { useWorkProjects } from "@/db/collections/work/work-project/use-work-pro
 import { useWorkTimeEntryMutations } from "@/db/collections/work/work-time-entry/use-work-time-entry-mutations";
 
 import { Drawer, Flex, Group, Text, useDrawersStack, Box } from "@mantine/core";
-import { IconExclamationMark } from "@tabler/icons-react";
+import { IconExclamationCircle } from "@tabler/icons-react";
 import TimeEntryForm from "@/components/Work/WorkTimeEntry/TimeEntryForm";
 import DeleteActionIcon from "@/components/UI/ActionIcons/DeleteActionIcon";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
@@ -107,6 +107,7 @@ export default function EditTimeEntryDrawer({
 
   function handleDelete() {
     workTimeEntriesCollection.delete(timeEntry.id);
+    handleClose();
   }
 
   return (
@@ -194,7 +195,7 @@ export default function EditTimeEntryDrawer({
           onClose={() => drawerStack.close("delete-time-entry")}
           title={
             <Group>
-              <IconExclamationMark size={25} color="red" />
+              <IconExclamationCircle size={25} color="red" />
               <Text>
                 {getLocalizedText("Zeit-Eintrag löschen", "Delete Time Entry")}
               </Text>

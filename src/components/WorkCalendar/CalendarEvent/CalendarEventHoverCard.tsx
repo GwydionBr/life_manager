@@ -36,13 +36,21 @@ export default function CalendarEventHoverCard({
       </Card.Section>
       <Stack pt="sm" pb="xs" gap="sm" px="sm">
         <Group gap="xs" wrap="nowrap">
-          <IconClock size={16} style={{ color, flexShrink: 0 }} />
+          <IconClock
+            size={16}
+            strokeWidth={1.5}
+            style={{ color, flexShrink: 0 }}
+          />
           <Text size="xs" fw={500} style={{ flex: 1 }}>
             {formatTimeSpan(new Date(s.start_time), new Date(s.end_time))}
           </Text>
         </Group>
         <Group gap="xs" wrap="nowrap">
-          <IconHourglass size={16} style={{ color, flexShrink: 0 }} />
+          <IconHourglass
+            size={16}
+            strokeWidth={1.5}
+            style={{ color, flexShrink: 0 }}
+          />
           <Text size="xs" fw={500} style={{ flex: 1 }}>
             {formatDuration(s.active_seconds)}
           </Text>

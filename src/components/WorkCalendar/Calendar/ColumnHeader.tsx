@@ -20,6 +20,7 @@ import {
   IconCurrencyEuro,
   IconCurrencyDollar,
   IconCalendar,
+  IconHourglass,
 } from "@tabler/icons-react";
 
 import { CalendarDay } from "@/types/workCalendar.types";
@@ -136,7 +137,7 @@ export default function ColumnHeader({
                     />
                   )}
                   <Group gap={4} wrap="nowrap">
-                    <IconClock size={14} style={{ opacity: 0.7 }} />
+                    <IconHourglass size={14} strokeWidth={1.5} />
                     <Badge
                       variant="light"
                       size="sm"
@@ -210,7 +211,7 @@ export default function ColumnHeader({
                       </Text>
                       <Group gap="md" mt={4}>
                         <Group gap={4}>
-                          <IconClock size={14} />
+                          <IconHourglass size={14} strokeWidth={1.5}/>
                           <Text size="xs" c="dimmed" fw={500}>
                             {formatDuration(totalTime)}
                           </Text>
@@ -218,9 +219,9 @@ export default function ColumnHeader({
                         {earnings > 0 && (
                           <Group gap={4}>
                             {p.currency === "EUR" ? (
-                              <IconCurrencyEuro size={14} />
+                              <IconCurrencyEuro size={14} strokeWidth={1.5}/>
                             ) : (
-                              <IconCurrencyDollar size={14} />
+                              <IconCurrencyDollar size={14} strokeWidth={1.5}/>
                             )}
                             <Text size="xs" c="dimmed" fw={500}>
                               {formatMoney(earnings, p.currency)}
@@ -244,7 +245,7 @@ export default function ColumnHeader({
                 <Stack gap="xs">
                   <Group gap="md" justify="space-between">
                     <Group gap={4}>
-                      <IconClock size={16} />
+                      <IconHourglass size={16} strokeWidth={1.5}/>
                       <Text size="sm" fw={600}>
                         {getLocalizedText("Gesamt", "Total")}
                       </Text>
