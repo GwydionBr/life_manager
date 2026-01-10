@@ -23,10 +23,12 @@ export type Database = {
           is_all_day: boolean
           reminder: string | null
           start_date: string
+          status: Database["public"]["Enums"]["appointmentStatus"]
           title: string
           type: Database["public"]["Enums"]["appointment-type"]
           user_id: string
           work_project_id: string | null
+          work_time_entry_id: string | null
         }
         Insert: {
           created_at?: string
@@ -36,10 +38,12 @@ export type Database = {
           is_all_day?: boolean
           reminder?: string | null
           start_date?: string
+          status?: Database["public"]["Enums"]["appointmentStatus"]
           title?: string
           type: Database["public"]["Enums"]["appointment-type"]
           user_id?: string
           work_project_id?: string | null
+          work_time_entry_id?: string | null
         }
         Update: {
           created_at?: string
@@ -49,10 +53,12 @@ export type Database = {
           is_all_day?: boolean
           reminder?: string | null
           start_date?: string
+          status?: Database["public"]["Enums"]["appointmentStatus"]
           title?: string
           type?: Database["public"]["Enums"]["appointment-type"]
           user_id?: string
           work_project_id?: string | null
+          work_time_entry_id?: string | null
         }
         Relationships: [
           {
@@ -60,6 +66,13 @@ export type Database = {
             columns: ["work_project_id"]
             isOneToOne: false
             referencedRelation: "work_project"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_work_time_entry_id_fkey"
+            columns: ["work_time_entry_id"]
+            isOneToOne: false
+            referencedRelation: "work_time_entry"
             referencedColumns: ["id"]
           },
         ]
@@ -1183,6 +1196,12 @@ export type Database = {
     Enums: {
       amountUnits: "kg" | "g" | "t" | "ml" | "l" | "amount"
       "appointment-type": "work" | "private" | "meeting" | "blocked"
+      appointmentStatus:
+        | "upcoming"
+        | "active"
+        | "completed"
+        | "missed"
+        | "converted"
       currency:
         | "USD"
         | "EUR"
@@ -1337,6 +1356,13 @@ export const Constants = {
     Enums: {
       amountUnits: ["kg", "g", "t", "ml", "l", "amount"],
       "appointment-type": ["work", "private", "meeting", "blocked"],
+      appointmentStatus: [
+        "upcoming",
+        "active",
+        "completed",
+        "missed",
+        "converted",
+      ],
       currency: [
         "USD",
         "EUR",

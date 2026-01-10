@@ -27,8 +27,10 @@ const appointment = new Table(
     reminder: column.text,
     end_date: column.text,
     work_project_id: column.text,
+    work_time_entry_id: column.text,
     is_all_day: column.integer,
     type: column.text,
+    status: column.text,
   },
   { indexes: {} }
 );

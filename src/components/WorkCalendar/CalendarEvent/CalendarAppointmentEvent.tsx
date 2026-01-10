@@ -1,6 +1,24 @@
-import { alpha, Card, Stack, Text } from "@mantine/core";
+import { useIntl } from "@/hooks/useIntl";
+import {
+  IconClock,
+  IconCheck,
+  IconX,
+  IconClockPlay,
+  IconCalendarEvent,
+} from "@tabler/icons-react";
+
+import {
+  alpha,
+  Card,
+  Stack,
+  Text,
+  Group,
+  Badge,
+  HoverCard,
+} from "@mantine/core";
 
 import { CalendarAppointment } from "@/types/workCalendar.types";
+import AppointmentHoverCard from "./AppointmentHoverCard";
 
 interface CalendarAppointmentEventProps {
   a: CalendarAppointment;
@@ -8,57 +26,186 @@ interface CalendarAppointmentEventProps {
   color: string;
 }
 
+/**
+ * Get status-based styling for appointments
+ */
+function getStatusStyles(status: CalendarAppointment["status"]) {
+  switch (status) {
+    case "upcoming":
+      return {
+        borderColor: "var(--mantine-color-blue-6)",
+        bgOpacity: 0.15,
+        textOpacity: 1,
+      };
+    case "active":
+      return {
+        borderColor: "var(--mantine-color-teal-6)",
+        bgOpacity: 0.25,
+        textOpacity: 1,
+      };
+    case "completed":
+      return {
+        borderColor: "var(--mantine-color-green-6)",
+        bgOpacity: 0.1,
+        textOpacity: 0.7,
+      };
+    case "missed":
+      return {
+        borderColor: "var(--mantine-color-red-6)",
+        bgOpacity: 0.1,
+        textOpacity: 0.6,
+      };
+    case "converted":
+      return {
+        borderColor: "var(--mantine-color-violet-6)",
+        bgOpacity: 0.1,
+        textOpacity: 0.7,
+      };
+    default:
+      return {
+        borderColor: "var(--mantine-color-gray-6)",
+        bgOpacity: 0.15,
+        textOpacity: 1,
+      };
+  }
+}
+
+/**
+ * Get status icon
+ */
+function getStatusIcon(status: CalendarAppointment["status"]) {
+  const iconSize = 12;
+  switch (status) {
+    case "upcoming":
+      return <IconClock size={iconSize} />;
+    case "active":
+      return <IconClockPlay size={iconSize} />;
+    case "completed":
+      return <IconCheck size={iconSize} />;
+    case "missed":
+      return <IconX size={iconSize} />;
+    case "converted":
+      return <IconCalendarEvent size={iconSize} />;
+    default:
+      return <IconCalendarEvent size={iconSize} />;
+  }
+}
+
+/**
+ * Get localized status text
+ */
+function getStatusText(
+  status: CalendarAppointment["status"],
+  getLocalizedText: (de: string, en: string) => string
+) {
+  switch (status) {
+    case "upcoming":
+      return getLocalizedText("Bevorstehend", "Upcoming");
+    case "active":
+      return getLocalizedText("Aktiv", "Active");
+    case "completed":
+      return getLocalizedText("Abgeschlossen", "Completed");
+    case "missed":
+      return getLocalizedText("Verpasst", "Missed");
+    case "converted":
+      return getLocalizedText("Konvertiert", "Converted");
+    default:
+      return status;
+  }
+}
+
 export default function CalendarAppointmentEvent({
   a,
   color,
   toY,
 }: CalendarAppointmentEventProps) {
+  const { getLocalizedText } = useIntl();
   const start = new Date(a.start_date);
   const end = new Date(a.end_date);
   const top = toY(start);
   const bottom = toY(end);
   const height = bottom - top;
-  const backgroundColor = alpha(color, 0.15);
+  const statusStyles = getStatusStyles(a.status);
+  const backgroundColor = alpha(color, statusStyles.bgOpacity);
+  const statusColor = statusStyles.borderColor;
+
+  // Use status color if appointment has no project color
+  const borderColor = a.work_project_id ? color : statusColor;
 
   return (
-    <Card
-      p={0}
-      radius="sm"
-      withBorder
-      w="100%"
-      h={Math.max(height, 4)}
-      bg="light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-9))"
-      style={{
-        position: "absolute",
-        left: 0,
-        top: top,
-        cursor: "pointer",
-        border: `1px solid light-dark(var(--mantine-color-gray-9), var(--mantine-color-gray-1))`,
-        borderLeft: `6px solid ${color}`,
-        zIndex: 13,
-      }}
-    >
-      <Stack h="100%" pl={6} pt={4} gap={0} bg={backgroundColor}>
-        <Text size="xs" fw={600}>
-          {a.title}
-        </Text>
-        {a.description && (
-          <Text size="xs" c="dimmed">
-            {a.description}
-          </Text>
-        )}
-        <Text
-          maw="100%"
-          size="xs"
-          fw={600}
+    <HoverCard openDelay={200} closeDelay={100} position="right">
+      <HoverCard.Target>
+        <Card
+          p={0}
+          radius="sm"
+          withBorder
+          w="100%"
+          h={Math.max(height, 4)}
+          bg="light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-9))"
           style={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
+            position: "absolute",
+            left: 0,
+            top: top,
+            cursor: "pointer",
+            border: `1px solid ${borderColor}`,
+            borderLeft: `6px solid ${borderColor}`,
+            opacity: statusStyles.textOpacity,
+            zIndex: 13,
           }}
         >
-          {a.projectTitle}
-        </Text>
-      </Stack>
-    </Card>
+          <Stack h="100%" pl={6} pt={4} gap={2} bg={backgroundColor}>
+            <Group gap={4} wrap="nowrap">
+              {getStatusIcon(a.status)}
+              <Text size="xs" fw={600} style={{ flex: 1, minWidth: 0 }}>
+                {a.title}
+              </Text>
+            </Group>
+            {a.description && (
+              <Text size="xs" c="dimmed" lineClamp={1}>
+                {a.description}
+              </Text>
+            )}
+            {a.projectTitle && (
+              <Text
+                maw="100%"
+                size="xs"
+                fw={500}
+                c="dimmed"
+                style={{
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {a.projectTitle}
+              </Text>
+            )}
+            {height > 30 && (
+              <Badge
+                size="xs"
+                variant="light"
+                color={
+                  a.status === "active"
+                    ? "teal"
+                    : a.status === "completed"
+                      ? "green"
+                      : a.status === "missed"
+                        ? "red"
+                        : a.status === "converted"
+                          ? "violet"
+                          : "blue"
+                }
+                style={{ alignSelf: "flex-start" }}
+              >
+                {getStatusText(a.status, getLocalizedText)}
+              </Badge>
+            )}
+          </Stack>
+        </Card>
+      </HoverCard.Target>
+      <HoverCard.Dropdown p={0}>
+        <AppointmentHoverCard appointment={a} color={borderColor} />
+      </HoverCard.Dropdown>
+    </HoverCard>
   );
 }

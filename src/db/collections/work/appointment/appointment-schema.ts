@@ -13,6 +13,8 @@ export const appointmentSchema = z.object({
   user_id: z.string(),
   is_all_day: z.boolean(),
   type: z.enum(Constants.public.Enums["appointment-type"]),
+  status: z.enum(Constants.public.Enums["appointmentStatus"]),
+  work_time_entry_id: z.string().nullable(),
 });
 
 export const appointmentDeserializationSchema = z.object({
@@ -31,4 +33,10 @@ export const appointmentDeserializationSchema = z.object({
     .transform(
       (value) => value as Database["public"]["Enums"]["appointment-type"]
     ),
+  status: z
+    .string()
+    .transform(
+      (value) => value as Database["public"]["Enums"]["appointmentStatus"]
+    ),
+  work_time_entry_id: z.string().nullable(),
 });
