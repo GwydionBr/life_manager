@@ -175,39 +175,56 @@ export function UserMenu() {
         <Menu.Divider />
 
         {/* Help & Support */}
-        <Menu.Label>{getLocalizedText("Hilfe", "Help")}</Menu.Label>
-        <Menu.Item
-          leftSection={<IconKeyboard size={16} />}
-          rightSection={
-            <Text size="xs" c="dimmed">
-              ?
-            </Text>
-          }
-        >
-          {getLocalizedText("Tastenkürzel", "Keyboard Shortcuts")}
-        </Menu.Item>
-        <Menu.Item leftSection={<IconHelp size={16} />}>
-          {getLocalizedText("Hilfe & Dokumentation", "Help & Documentation")}
-        </Menu.Item>
-
-        <Menu.Divider />
+        <Menu.Sub openDelay={120} closeDelay={150}>
+          <Menu.Sub.Target>
+            <Menu.Sub.Item leftSection={<IconHelp size={16} />}>
+              {getLocalizedText("Hilfe", "Help")}
+            </Menu.Sub.Item>
+          </Menu.Sub.Target>
+          <Menu.Sub.Dropdown>
+            <Menu.Item
+              leftSection={<IconKeyboard size={16} />}
+              rightSection={
+                <Text size="xs" c="dimmed">
+                  ?
+                </Text>
+              }
+            >
+              {getLocalizedText("Tastenkürzel", "Keyboard Shortcuts")}
+            </Menu.Item>
+            <Menu.Item leftSection={<IconHelp size={16} />}>
+              {getLocalizedText(
+                "Hilfe & Dokumentation",
+                "Help & Documentation"
+              )}
+            </Menu.Item>
+          </Menu.Sub.Dropdown>
+        </Menu.Sub>
 
         {/* Legal */}
-        <Menu.Label>{getLocalizedText("Rechtliches", "Legal")}</Menu.Label>
-        <Menu.Item
-          leftSection={<IconFileText size={16} />}
-          component={Link}
-          to="/impressum"
-        >
-          {getLocalizedText("Impressum", "Imprint")}
-        </Menu.Item>
-        <Menu.Item
-          leftSection={<IconShield size={16} />}
-          component={Link}
-          to="/datenschutz"
-        >
-          {getLocalizedText("Datenschutzerklärung", "Privacy Policy")}
-        </Menu.Item>
+        <Menu.Sub openDelay={120} closeDelay={150}>
+          <Menu.Sub.Target>
+            <Menu.Sub.Item leftSection={<IconShield size={16} />}>
+              {getLocalizedText("Rechtliches", "Legal")}
+            </Menu.Sub.Item>
+          </Menu.Sub.Target>
+          <Menu.Sub.Dropdown>
+            <Menu.Item
+              leftSection={<IconFileText size={16} />}
+              component={Link}
+              to="/impressum"
+            >
+              {getLocalizedText("Impressum", "Imprint")}
+            </Menu.Item>
+            <Menu.Item
+              leftSection={<IconShield size={16} />}
+              component={Link}
+              to="/datenschutz"
+            >
+              {getLocalizedText("Datenschutzerklärung", "Privacy Policy")}
+            </Menu.Item>
+          </Menu.Sub.Dropdown>
+        </Menu.Sub>
 
         <Menu.Divider />
 

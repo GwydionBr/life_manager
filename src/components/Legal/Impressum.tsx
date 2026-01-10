@@ -1,95 +1,131 @@
-import { Link } from "@tanstack/react-router";
 import {
   Container,
   Title,
   Text,
   Stack,
   Box,
-  Button,
+  Card,
+  Divider,
+  ThemeIcon,
   Group,
 } from "@mantine/core";
-import { IconArrowLeft } from "@tabler/icons-react";
+import {
+  IconFileText,
+  IconMail,
+  IconUser,
+  IconAlertTriangle,
+} from "@tabler/icons-react";
+import { LegalHeader } from "./LegalHeader";
 
 export default function Impressum() {
   return (
-    <Container size="md" py={80}>
-      <Stack gap="xl">
-        <Group>
-          <Button
-            component={Link}
-            to="/"
-            variant="subtle"
-            leftSection={<IconArrowLeft size={16} />}
-          >
-            Zurück zur Startseite
-          </Button>
-        </Group>
+    <Box
+      style={{
+        minHeight: "100vh",
+        background:
+          "linear-gradient(135deg, rgba(20, 184, 166, 0.05) 0%, rgba(13, 148, 136, 0.08) 100%)",
+      }}
+    >
+      <Box py={40}>
+        <LegalHeader />
+      </Box>
 
-        <Box>
-          <Title order={1} mb="md">
-            Impressum
-          </Title>
-          <Text size="sm" c="dimmed" mb="xl">
-            Angaben gemäß § 5 TMG
-          </Text>
-        </Box>
-
-        <Stack gap="md">
-          <Box>
-            <Title order={3} size="h4" mb="xs">
-              Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:
+      <Container size="md" py={60}>
+        <Stack gap="xl">
+          <Box ta="center" mb="xl">
+            <ThemeIcon
+              size={64}
+              radius="md"
+              variant="gradient"
+              gradient={{ from: "teal", to: "cyan", deg: 135 }}
+              mb="md"
+            >
+              <IconFileText size={32} />
+            </ThemeIcon>
+            <Title order={1} mb="xs">
+              Impressum
             </Title>
-            <Text>
-              Gwydion Braunsdorf
-              <br />
-              Marktplatz 7
-              <br />
-              87724 Ottobeuren
+            <Text size="sm" c="dimmed">
+              Angaben gemäß § 5 TMG
             </Text>
           </Box>
 
-          <Box>
-            <Title order={3} size="h4" mb="xs">
-              Kontakt:
-            </Title>
-            <Text>E-Mail: gwydie@googlemail.com</Text>
-          </Box>
-
-          <Box>
-            <Title order={3} size="h4" mb="xs">
-              Haftungsausschluss:
-            </Title>
-            <Stack gap="sm">
+          <Card shadow="sm" padding="xl" radius="md" withBorder>
+            <Stack gap="lg">
               <Box>
-                <Title order={4} size="h5" mb="xs">
-                  Haftung für Inhalte
-                </Title>
-                <Text size="sm">
-                  Die Inhalte unserer Seiten wurden mit größter Sorgfalt
-                  erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität
-                  der Inhalte können wir jedoch keine Gewähr übernehmen. Als
-                  Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene
-                  Inhalte auf diesen Seiten nach den allgemeinen Gesetzen
-                  verantwortlich.
+                <Group gap="xs" mb="xs">
+                  <IconUser size={20} color="var(--mantine-color-teal-6)" />
+                  <Title order={3} size="h4">
+                    Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:
+                  </Title>
+                </Group>
+                <Text pl={28}>
+                  Gwydion Braunsdorf
+                  <br />
+                  Marktplatz 7
+                  <br />
+                  87724 Ottobeuren
                 </Text>
               </Box>
 
+              <Divider />
+
               <Box>
-                <Title order={4} size="h5" mb="xs">
-                  Haftung für Links
-                </Title>
-                <Text size="sm">
-                  Unser Angebot enthält Links zu externen Webseiten Dritter, auf
-                  deren Inhalte wir keinen Einfluss haben. Deshalb können wir
-                  für diese fremden Inhalte auch keine Gewähr übernehmen. Für
-                  die Inhalte der verlinkten Seiten ist stets der jeweilige
-                  Anbieter oder Betreiber der Seiten verantwortlich.
-                </Text>
+                <Group gap="xs" mb="xs">
+                  <IconMail size={20} color="var(--mantine-color-teal-6)" />
+                  <Title order={3} size="h4">
+                    Kontakt:
+                  </Title>
+                </Group>
+                <Text pl={28}>E-Mail: gwydie@googlemail.com</Text>
+              </Box>
+
+              <Divider />
+
+              <Box>
+                <Group gap="xs" mb="md">
+                  <IconAlertTriangle
+                    size={20}
+                    color="var(--mantine-color-teal-6)"
+                  />
+                  <Title order={3} size="h4">
+                    Haftungsausschluss:
+                  </Title>
+                </Group>
+                <Stack gap="md" pl={28}>
+                  <Box>
+                    <Title order={4} size="h5" mb="xs">
+                      Haftung für Inhalte
+                    </Title>
+                    <Text size="sm" c="dimmed">
+                      Die Inhalte unserer Seiten wurden mit größter Sorgfalt
+                      erstellt. Für die Richtigkeit, Vollständigkeit und
+                      Aktualität der Inhalte können wir jedoch keine Gewähr
+                      übernehmen. Als Diensteanbieter sind wir gemäß § 7 Abs.1
+                      TMG für eigene Inhalte auf diesen Seiten nach den
+                      allgemeinen Gesetzen verantwortlich.
+                    </Text>
+                  </Box>
+
+                  <Box>
+                    <Title order={4} size="h5" mb="xs">
+                      Haftung für Links
+                    </Title>
+                    <Text size="sm" c="dimmed">
+                      Unser Angebot enthält Links zu externen Webseiten Dritter,
+                      auf deren Inhalte wir keinen Einfluss haben. Deshalb
+                      können wir für diese fremden Inhalte auch keine Gewähr
+                      übernehmen. Für die Inhalte der verlinkten Seiten ist
+                      stets der jeweilige Anbieter oder Betreiber der Seiten
+                      verantwortlich.
+                    </Text>
+                  </Box>
+                </Stack>
               </Box>
             </Stack>
-          </Box>
+          </Card>
         </Stack>
-      </Stack>
-    </Container>
+      </Container>
+    </Box>
   );
 }
