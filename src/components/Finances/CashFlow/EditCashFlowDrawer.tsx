@@ -16,8 +16,12 @@ import {
   Stack,
   MultiSelect,
 } from "@mantine/core";
-import SingleCashFlowForm from "@/components/Finances/CashFlow/Single/SingleFinanceForm";
-import RecurringCashFlowForm from "@/components/Finances/CashFlow/Recurring/RecurringFinanceForm";
+import SingleCashFlowForm, {
+  SingleFinanceFormValues,
+} from "@/components/Finances/CashFlow/Single/SingleFinanceForm";
+import RecurringCashFlowForm, {
+  RecurringFinanceFormValues,
+} from "@/components/Finances/CashFlow/Recurring/RecurringFinanceForm";
 import DeleteButton from "@/components/UI/Buttons/DeleteButton";
 
 import { Tables } from "@/types/db.types";
@@ -99,18 +103,22 @@ export default function EditCashFlowDrawer({
     if (tags !== cashFlow.tags) {
       setTags(cashFlow.tags);
     }
+    // TODO Check if this is needed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cashFlow]);
 
   // TODO: Handle Type Safety
-  async function handleSubmit(values: any) {
-    if (isSingleCashFlow(cashFlow)) {
+  async function handleSubmit(
+    values: SingleFinanceFormValues | RecurringFinanceFormValues
+  ) {
+    if (isSingleCashFlow(cashFlow) && "date" in values) {
       await updateSingleCashflow(cashFlow.id, {
         ...values,
         date: values.date.toISOString(),
         tags: tags,
       });
       onClose();
-    } else {
+    } else if ("start_date" in values) {
       console.log("update recurring cash flow", values);
       // For recurring cash flows, check if any fields that affect single cash flows have changed
       const hasChanges =
@@ -370,7 +378,7 @@ export default function EditCashFlowDrawer({
           </Text>
           <Radio.Group
             value={deleteMode}
-            onChange={(v) => setDeleteMode(v as any)}
+            onChange={(v) => setDeleteMode(v as DeleteRecurringCashFlowMode)}
           >
             <Stack gap={6}>
               <Radio

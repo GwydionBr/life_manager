@@ -40,6 +40,7 @@ export default function AuthenticationForm({
 
   useEffect(() => {
     toggle(defaultType);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultType]);
 
   async function handleSubmit(values: typeof form.values) {

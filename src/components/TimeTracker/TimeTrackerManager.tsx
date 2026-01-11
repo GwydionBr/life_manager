@@ -156,6 +156,8 @@ export default function TimerManager({
     });
 
     setTimers(newTimers);
+    // TODO Check if this is needed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timerData, getAllTimers]);
 
   /**

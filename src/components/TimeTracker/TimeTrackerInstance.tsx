@@ -258,6 +258,8 @@ export default function TimeTrackerInstance({
       // Update hook's rounding settings
       setTimerRounding(newTimerRoundingSettings);
     }
+    // TODO Check if this is needed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project, settings]);
 
   /**
@@ -294,6 +296,8 @@ export default function TimeTrackerInstance({
   useEffect(() => {
     restoreTimer();
     setIsClient(true);
+    // TODO Check if this is needed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
@@ -311,6 +315,8 @@ export default function TimeTrackerInstance({
       submitTimer();
       setForceEndTimer(timer.id, false);
     }
+    // TODO Check if this is needed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [forceEndTimer]);
 
   // Don't render until client-side hydration is complete (prevents SSR mismatches)

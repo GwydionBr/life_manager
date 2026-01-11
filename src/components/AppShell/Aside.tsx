@@ -1,6 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useHotkeys } from "@mantine/hooks";
-import { useGroupStore } from "@/stores/groupStore";
 
 import {
   ActionIcon,
@@ -34,26 +33,15 @@ export default function Aside({
 }: AsideProps) {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isTimeTrackerMinimized, setIsTimeTrackerMinimized] = useState(false);
-  const [currentSelectedDate, setCurrentSelectedDate] = useState<Date | null>(
-    null
-  );
 
   useHotkeys([["mod + B", () => toggleAside()]]);
 
-  const { selectedDate, isDateChanged } = useGroupStore();
 
   const theme = useMantineTheme();
   const backgroundColor = useMemo(() => {
     return alpha(getThemeColor(currentAppColor, theme), 0.4);
   }, [currentAppColor, theme]);
 
-  useEffect(() => {
-    if (isDateChanged && selectedDate !== currentSelectedDate) {
-      setCurrentSelectedDate(selectedDate);
-      setIsTimeTrackerMinimized(true);
-      setIsNotificationOpen(false);
-    }
-  }, [selectedDate, isDateChanged]);
 
   return (
     <Stack py="md" h="100%" gap={0} align="center" bg={backgroundColor}>
