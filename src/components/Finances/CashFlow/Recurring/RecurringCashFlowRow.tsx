@@ -53,7 +53,7 @@ export default function RecurringCashFlowRow({
   const nextDate = useMemo(() => {
     if (!showNextDate) return null;
     return getNextDate(cashflow.interval, new Date(cashflow.start_date));
-  }, [cashflow.interval, cashflow.start_date]);
+  }, [cashflow.interval, cashflow.start_date, showNextDate]);
 
   const handleTagClose = async (updatedTags: Tables<"tag">[] | null) => {
     if (isUpdating) return;

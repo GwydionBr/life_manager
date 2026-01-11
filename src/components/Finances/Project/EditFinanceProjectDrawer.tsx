@@ -47,6 +47,7 @@ export default function EditFinanceProjectDrawer({
     } else {
       drawerStack.closeAll();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened]);
 
   const handleDelete = async () => {

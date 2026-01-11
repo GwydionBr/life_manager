@@ -80,6 +80,7 @@ export default function SingleFinanceForm({
     } else {
       form.setFieldValue("amount", Math.abs(form.values.amount));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
 
   function handleFormSubmit(values: SingleFinanceFormValues) {

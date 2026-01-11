@@ -69,7 +69,6 @@ export default function FinanceSettingsList<T>({
 
   const {
     selectedIds,
-    itemIdList,
     toggleAll,
     toggleSelection,
     isAllSelected,

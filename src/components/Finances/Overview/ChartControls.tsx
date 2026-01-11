@@ -111,9 +111,10 @@ export default function ChartControls({
           month: "long",
           year: "numeric",
         });
-      case "quarter":
+      case "quarter": {
         const quarter = Math.floor(month / 3) + 1;
         return `Q${quarter} ${year}`;
+      }
       case "year":
         return year.toString();
       case "custom":
@@ -121,7 +122,7 @@ export default function ChartControls({
       default:
         return "";
     }
-  }, [navigationMode, currentDate]);
+  }, [navigationMode, currentDate, locale, getLocalizedText]);
 
   /**
    * Navigate to previous period
@@ -249,7 +250,7 @@ export default function ChartControls({
         setInterval(optimalInterval);
       }
     }
-  }, [dateRange, navigationMode]);
+  }, [dateRange, navigationMode, setInterval]);
 
   return (
     <Grid w="100%" columns={12}>

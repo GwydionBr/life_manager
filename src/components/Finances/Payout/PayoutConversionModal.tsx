@@ -60,11 +60,8 @@ export default function PayoutConversionModal({
       "endCurrency",
       settings?.default_finance_currency || "USD"
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings?.default_finance_currency]);
-
-  useEffect(() => {
-    form.setFieldValue("endValue", Math.round(startValue * 100) / 100);
-  }, [startValue]);
 
   const startValueString = formatMoney(startValue ?? 0, startCurrency);
 

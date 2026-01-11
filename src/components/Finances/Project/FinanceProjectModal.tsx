@@ -34,6 +34,7 @@ export default function FinanceProjectFormModal({
       setContact(null);
       setTags([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened]);
 
   return (

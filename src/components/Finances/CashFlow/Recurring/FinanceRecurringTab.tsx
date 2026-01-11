@@ -80,6 +80,7 @@ export default function FinanceRecurringTab() {
     } else if (recurringCashFlows.length > 0 && selectedCashFlow === null) {
       setSelectedCashFlow(recurringCashFlows[0]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recurringCashFlows]);
 
   // Filter active and completed recurring cash flows

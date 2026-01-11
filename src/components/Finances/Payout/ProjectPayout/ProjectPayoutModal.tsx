@@ -13,7 +13,6 @@ import {
   Select,
   Stack,
   Text,
-  Alert,
 } from "@mantine/core";
 import { IconArrowDown, IconBrandCashapp } from "@tabler/icons-react";
 import { currencies } from "@/constants/settings";
@@ -42,7 +41,6 @@ export default function ProjectModalForm({
   tagId: _tagId,
 }: ProjectModalFormProps) {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const form = useForm<ProjectPayoutFormValues>({
     initialValues: {
       endValue: startValue,
@@ -55,7 +53,7 @@ export default function ProjectModalForm({
   // const { addExistingSingleCashFlow } = useFinanceStore();
   const { getLocalizedText, formatMoney } = useIntl();
 
-  async function onSubmit(values: z.infer<typeof schema>) {
+  async function onSubmit(_values: z.infer<typeof schema>) {
     setIsProcessing(true);
     // const payoutResult = await payoutProjectSalary(
     //   project.id,
@@ -122,13 +120,6 @@ export default function ProjectModalForm({
         >
           {getLocalizedText("Auszahlen", "Payout")}
         </Button>
-        <Alert
-          title={getLocalizedText("Fehler", "Error")}
-          color="red"
-          hidden={!error}
-        >
-          {error}
-        </Alert>
       </Stack>
     </form>
   );

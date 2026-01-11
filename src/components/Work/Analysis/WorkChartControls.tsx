@@ -252,7 +252,7 @@ export default function WorkChartControls({
         setInterval(optimalInterval);
       }
     }
-  }, [dateRange, navigationMode]);
+  }, [dateRange, navigationMode, setInterval]);
 
   return (
     <Grid w="100%" columns={12}>

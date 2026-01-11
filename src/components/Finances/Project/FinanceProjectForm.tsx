@@ -100,6 +100,7 @@ export default function FinanceProjectForm({
         tags.map((c) => c.id)
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contact, tags]);
 
   const handleSubmit = async (values: z.infer<typeof projectSchema>) => {

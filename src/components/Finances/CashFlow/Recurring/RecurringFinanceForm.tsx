@@ -87,6 +87,7 @@ export default function RecurringFinanceForm({
     } else {
       form.setFieldValue("amount", Math.abs(form.values.amount));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
 
   function handleFormSubmit(values: RecurringFinanceFormValues) {

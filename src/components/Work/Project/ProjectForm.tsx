@@ -60,22 +60,6 @@ interface ProjectFormProps {
   onOpenTagForm?: () => void;
 }
 
-const schema = z.object({
-  color: z.string().nullable().optional(),
-  title: z.string().min(1, { message: "Title is required" }),
-  description: z.string().optional(),
-  salary: z.number().min(0, { message: "Salary must be positive" }),
-  hourly_payment: z.boolean(),
-  currency: z.enum(Constants.public.Enums.currency),
-  tag_ids: z.array(z.string()),
-  rounding_interval: z.number(),
-  rounding_direction: z.enum(Constants.public.Enums.roundingDirection),
-  round_in_time_fragments: z.boolean(),
-  time_fragment_interval: z.number(),
-});
-
-type ProjectFormValues = z.infer<typeof schema>;
-
 export default function ProjectForm({
   project,
   onSuccess,
@@ -113,7 +97,28 @@ export default function ProjectForm({
     project?.hourly_payment === false && project?.salary === 0 ? true : false
   );
 
-  const form = useForm<ProjectFormValues>({
+  const schema = z.object({
+    color: z.string().nullable().optional(),
+    title: z.string().min(1, {
+      message: getLocalizedText("Titel ist erforderlich", "Title is required"),
+    }),
+    description: z.string().optional(),
+    salary: z.number().min(0, {
+      message: getLocalizedText(
+        "Gehalt muss positiv sein",
+        "Salary must be positive"
+      ),
+    }),
+    hourly_payment: z.boolean(),
+    currency: z.enum(Constants.public.Enums.currency),
+    tag_ids: z.array(z.string()),
+    rounding_interval: z.number(),
+    rounding_direction: z.enum(Constants.public.Enums.roundingDirection),
+    round_in_time_fragments: z.boolean(),
+    time_fragment_interval: z.number(),
+  });
+
+  const form = useForm<z.infer<typeof schema>>({
     initialValues: {
       color: project?.color || null,
       title: project?.title || "",
@@ -142,10 +147,12 @@ export default function ProjectForm({
     validate: zodResolver(schema),
   });
 
+  // sync tagIds with form
   useEffect(() => {
     if (tagIds) {
       form.setFieldValue("tag_ids", tagIds);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tagIds]);
 
   // Handle hobby toggle
@@ -186,7 +193,10 @@ export default function ProjectForm({
   };
 
   // Update previous work values when user changes work-related fields
-  const handleWorkFieldChange = (field: string, value: any) => {
+  const handleWorkFieldChange = (
+    field: string,
+    value: string | number | boolean
+  ) => {
     form.setFieldValue(field, value);
     if (!isHobby) {
       setPreviousWorkValues((prev) => ({

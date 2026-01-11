@@ -201,12 +201,15 @@ export class SupabaseConnector
       for (const op of transaction.crud) {
         lastOp = op;
         const table = this.client.from(op.table);
-        let result: any;
+        let result: {
+          error?: { message?: string; code?: string } | null;
+        } | null;
         switch (op.op) {
-          case UpdateType.PUT:
+          case UpdateType.PUT: {
             const record = { ...op.opData, id: op.id };
             result = await table.upsert(record);
             break;
+          }
           case UpdateType.PATCH:
             result = await table.update(op.opData).eq("id", op.id);
             break;
@@ -223,11 +226,18 @@ export class SupabaseConnector
       }
 
       await transaction.complete();
-    } catch (ex: any) {
+    } catch (ex: unknown) {
       console.debug(ex);
+      const errorCode =
+        ex &&
+        typeof ex === "object" &&
+        "code" in ex &&
+        typeof ex.code === "string"
+          ? ex.code
+          : null;
       if (
-        typeof ex.code == "string" &&
-        FATAL_RESPONSE_CODES.some((regex) => regex.test(ex.code))
+        errorCode &&
+        FATAL_RESPONSE_CODES.some((regex) => regex.test(errorCode))
       ) {
         /**
          * Instead of blocking the queue with these errors,

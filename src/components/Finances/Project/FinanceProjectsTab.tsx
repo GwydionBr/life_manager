@@ -1,9 +1,8 @@
-import { useCallback, useMemo, useState, useEffect } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useFinanceProjects } from "@/db/collections/finance/finance-project/use-finance-project-query";
 import { useFinanceProjectMutations } from "@/db/collections/finance/finance-project/use-finance-project-mutations";
-import { useContacts } from "@/db/collections/finance/contacts/use-contact-query";
 import { useIntl } from "@/hooks/useIntl";
 
 import {
@@ -50,18 +49,15 @@ import FinancesNavbarToolbar from "@/components/Finances/FinancesNavbar/Finances
 
 export default function FinanceProjectTab() {
   const { getLocalizedText, formatDate, formatMoney } = useIntl();
-  const { data: contacts } = useContacts();
-  const { data: financeProjects = [], isLoading: isLoadingFinanceProjects } =
+  const { data: financeProjects, isLoading: isLoadingFinanceProjects } =
     useFinanceProjects();
   const { deleteFinanceProject } = useFinanceProjectMutations();
 
   const { setIsModalOpen, setSelectedTab } = useSettingsStore();
 
   // Bulk selection
-  const [
-    selectedModeActive,
-    { toggle: toggleSelectedMode, close: closeSelectedMode },
-  ] = useDisclosure(false);
+  const [selectedModeActive, { toggle: toggleSelectedMode }] =
+    useDisclosure(false);
   const [selectedFinanceProjects, setSelectedFinanceProjects] = useState<
     string[]
   >([]);
@@ -87,27 +83,15 @@ export default function FinanceProjectTab() {
     FinanceProjectNavbarTab.All
   );
 
-  const formattedFinanceProjects = useMemo(() => {
-    return financeProjects.map((project) => {
-      const { tags, ...rest } = project;
-      return {
-        ...rest,
-        contact:
-          contacts.find((contact) => contact.id === project.contact_id) || null,
-        tags: tags.filter((tag) => tags.map((c) => c.id).includes(tag.id)),
-      };
-    });
-  }, [financeProjects, contacts]);
-
-  useEffect(() => {
-    if (formattedFinanceProjects.length === 0) {
-      setTab(FinanceProjectNavbarTab.All);
-      setSelectedFinanceProjects([]);
-      closeSelectedMode();
-    } else if (editProject === null) {
-      setEditProject(formattedFinanceProjects[0]);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (financeProjects.length === 0) {
+  //     setTab(FinanceProjectNavbarTab.All);
+  //     setSelectedFinanceProjects([]);
+  //     closeSelectedMode();
+  //   } else if (editProject === null) {
+  //     setEditProject(financeProjects[0]);
+  //   }
+  // }, []);
 
   const navbarItems = useMemo<FinanceNavbarItems>(() => {
     const items: FinanceNavbarItems = {
@@ -118,7 +102,7 @@ export default function FinanceProjectTab() {
     };
 
     // All
-    const totalAmount = formattedFinanceProjects.reduce((acc, project) => {
+    const totalAmount = financeProjects.reduce((acc, project) => {
       return (
         acc +
         project.adjustments.reduce((acc, adjustment) => {
@@ -126,18 +110,16 @@ export default function FinanceProjectTab() {
         }, project.start_amount)
       );
     }, 0);
-    items.all = { totalAmount, projectCount: formattedFinanceProjects.length };
+    items.all = { totalAmount, projectCount: financeProjects.length };
 
     // Upcoming
-    const upcomingFilteredProjects = formattedFinanceProjects.filter(
-      (project) => {
-        return (
-          (project.due_date && project.due_date > new Date().toISOString()) ||
-          !project.due_date ||
-          isToday(new Date(project.due_date))
-        );
-      }
-    );
+    const upcomingFilteredProjects = financeProjects.filter((project) => {
+      return (
+        (project.due_date && project.due_date > new Date().toISOString()) ||
+        !project.due_date ||
+        isToday(new Date(project.due_date))
+      );
+    });
     const upcomingTotalAmount = upcomingFilteredProjects.reduce(
       (acc, project) => {
         return (
@@ -155,15 +137,13 @@ export default function FinanceProjectTab() {
     };
 
     // Overdue
-    const overdueFilteredProjects = formattedFinanceProjects.filter(
-      (project) => {
-        return (
-          project.due_date &&
-          project.due_date < new Date().toISOString() &&
-          !isToday(new Date(project.due_date))
-        );
-      }
-    );
+    const overdueFilteredProjects = financeProjects.filter((project) => {
+      return (
+        project.due_date &&
+        project.due_date < new Date().toISOString() &&
+        !isToday(new Date(project.due_date))
+      );
+    });
 
     const overdueTotalAmount = overdueFilteredProjects.reduce(
       (acc, project) => {
@@ -182,7 +162,7 @@ export default function FinanceProjectTab() {
     };
 
     // Paid
-    const paidFilteredProjects = formattedFinanceProjects.filter((project) => {
+    const paidFilteredProjects = financeProjects.filter((project) => {
       return project.single_cashflow_id;
     });
 
@@ -200,10 +180,10 @@ export default function FinanceProjectTab() {
     };
 
     return items;
-  }, [formattedFinanceProjects]);
+  }, [financeProjects]);
 
   const sortedFinanceProjects = useMemo(() => {
-    return [...formattedFinanceProjects].sort((a, b) => {
+    return [...financeProjects].sort((a, b) => {
       const aHasDueDate = Boolean(a.due_date);
       const bHasDueDate = Boolean(b.due_date);
       const aIsOverdue =
@@ -227,7 +207,7 @@ export default function FinanceProjectTab() {
         new Date(b.due_date as string).getTime()
       );
     });
-  }, [formattedFinanceProjects]);
+  }, [financeProjects]);
 
   const filteredFinanceProjects = useMemo(() => {
     return sortedFinanceProjects.filter((project) => {

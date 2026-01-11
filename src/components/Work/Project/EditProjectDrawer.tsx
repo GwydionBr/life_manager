@@ -33,12 +33,13 @@ export default function EditProjectDrawer({
   const { data: projects } = useWorkProjects();
   const { deleteWorkProject } = useWorkProjectMutations();
 
+  const [tagIds, setTagIds] = useState<string[]>([]);
+  
   const activeProject = useMemo(
     () => projects.find((p) => p.id === lastActiveProjectId),
     [projects, lastActiveProjectId]
   );
 
-  const [tagIds, setTagIds] = useState<string[]>([]);
   const drawersStack = useDrawersStack([
     "edit-project",
     "delete-project",
