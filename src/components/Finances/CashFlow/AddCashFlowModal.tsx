@@ -29,6 +29,7 @@ export default function CashFlowModal({
     } else {
       modalStack.closeAll();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened]);
 
   const handleClose = () => {

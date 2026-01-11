@@ -28,6 +28,8 @@ export const addAppointment = async (
     work_project_id: newAppointment.work_project_id || null,
     is_all_day: newAppointment.is_all_day || false,
     type: newAppointment.type || "work",
+    status: "upcoming",
+    work_time_entry_id: null,
   };
 
   try {

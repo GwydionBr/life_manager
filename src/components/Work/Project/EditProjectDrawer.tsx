@@ -59,6 +59,7 @@ export default function EditProjectDrawer({
     } else {
       drawersStack.closeAll();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened]);
 
   async function handleDelete() {

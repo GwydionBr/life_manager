@@ -28,6 +28,7 @@ export default function NewProjectModal({
     } else {
       stack.closeAll();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened]);
 
   const handleSuccess = (project: WorkProject) => {

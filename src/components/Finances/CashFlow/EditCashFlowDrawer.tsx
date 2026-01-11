@@ -92,6 +92,7 @@ export default function EditCashFlowDrawer({
     } else {
       drawerStack.closeAll();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened]);
 
   useEffect(() => {

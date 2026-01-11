@@ -228,7 +228,6 @@ export default function CalendarHeader() {
         <Group justify="flex-end" pr="md">
           <ActionIcon.Group>
             <ActionIcon
-              variant="light"
               color="red"
               size="lg"
               radius="md"
@@ -237,7 +236,7 @@ export default function CalendarHeader() {
               }}
               disabled={zoomIndex === 0}
             >
-              <IconMinus color="var(--mantine-color-red-text)" />
+              <IconMinus />
             </ActionIcon>
             <ActionIcon.GroupSection
               variant="default"
@@ -250,7 +249,6 @@ export default function CalendarHeader() {
               {zoomLabels[zoomIndex]}
             </ActionIcon.GroupSection>
             <ActionIcon
-              variant="light"
               size="lg"
               radius="md"
               onClick={() => {
@@ -258,7 +256,7 @@ export default function CalendarHeader() {
               }}
               disabled={zoomIndex === 4}
             >
-              <IconPlus color="var(--mantine-color-teal-text)" />
+              <IconPlus />
             </ActionIcon>
           </ActionIcon.Group>
         </Group>

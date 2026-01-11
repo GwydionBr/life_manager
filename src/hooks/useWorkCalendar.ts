@@ -1,4 +1,4 @@
-import { useMemo, useRef, useCallback, useLayoutEffect } from "react";
+import { useMemo, useRef, useCallback, useLayoutEffect, useState } from "react";
 import { useDisclosure, usePrevious, useDidUpdate } from "@mantine/hooks";
 
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
@@ -15,7 +15,7 @@ import {
   CalendarEvent,
   ViewMode,
 } from "@/types/workCalendar.types";
-import { WorkProject, WorkTimeEntry } from "@/types/work.types";
+import { WorkProject, WorkTimeEntry, Appointment } from "@/types/work.types";
 
 // Zoom levels for hour height multiplier
 const ZOOM_LEVELS = [1, 2, 4, 6, 12] as const;
@@ -32,7 +32,10 @@ interface UseWorkCalendarReturn {
 
   // State
   drawerOpened: boolean;
+  appointmentDrawerOpened: boolean;
+  newAppointmentModalOpened: boolean;
   selectedSession: WorkTimeEntry | null;
+  selectedAppointment: Appointment | null;
   selectedProject: WorkProject | null;
   addingMode: boolean;
   viewMode: ViewMode;
@@ -46,6 +49,11 @@ interface UseWorkCalendarReturn {
   // Actions
   openDrawer: () => void;
   closeDrawer: () => void;
+  openAppointmentDrawer: () => void;
+  closeAppointmentDrawer: () => void;
+  openNewAppointmentModal: () => void;
+  closeNewAppointmentModal: () => void;
+  handleCreateAppointment: () => void;
   handleReferenceDateChange: (date: Date) => void;
   handleNextAndPrev: (delta?: number) => void;
   handleSessionClick: (sessionId: string) => void;
@@ -83,12 +91,23 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
     zoomIndex,
   } = useCalendarStore();
 
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
+
   const { data: projects } = useWorkProjects();
   const { data: timeEntries } = useWorkTimeEntries();
   const { data: appointments } = useAppointments();
 
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
+  const [
+    appointmentDrawerOpened,
+    { open: openAppointmentDrawer, close: closeAppointmentDrawer },
+  ] = useDisclosure(false);
+  const [
+    newAppointmentModalOpened,
+    { open: openNewAppointmentModal, close: closeNewAppointmentModal },
+  ] = useDisclosure(false);
   const viewport = useRef<HTMLDivElement>(null);
   const previousZoomIndex = usePrevious(zoomIndex);
 
@@ -374,17 +393,16 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
 
   /**
    * Handle appointment click to open edit drawer
-   * TODO: Implement appointment edit drawer
    */
   const handleAppointmentClick = useCallback(
     (appointmentId: string) => {
       const appointment = appointments.find((a) => a.id === appointmentId);
       if (appointment) {
-        // TODO: Implement appointment editing
-        console.log("Appointment clicked:", appointment);
+        setSelectedAppointment(appointment);
+        openAppointmentDrawer();
       }
     },
-    [appointments]
+    [appointments, openAppointmentDrawer]
   );
 
   /**
@@ -408,6 +426,22 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
     setSelectedSession(null);
     setSelectedProject(null);
   }, [closeDrawer, setSelectedSession, setSelectedProject]);
+
+  /**
+   * Close appointment drawer and clear selection
+   */
+  const handleCloseAppointmentDrawer = useCallback(() => {
+    closeAppointmentDrawer();
+    setSelectedAppointment(null);
+  }, [closeAppointmentDrawer]);
+
+  /**
+   * Open appointment modal for creating a new appointment
+   */
+  const handleCreateAppointment = useCallback(() => {
+    setSelectedAppointment(null);
+    openNewAppointmentModal();
+  }, [openNewAppointmentModal]);
 
   // Scroll to current time on initial mount
   // Uses useLayoutEffect to run before paint, with a small delay to ensure DOM is ready
@@ -444,7 +478,10 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
 
     // State
     drawerOpened,
+    appointmentDrawerOpened,
+    newAppointmentModalOpened,
     selectedSession,
+    selectedAppointment,
     selectedProject,
     addingMode,
     viewMode,
@@ -458,6 +495,11 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
     // Actions
     openDrawer,
     closeDrawer: handleCloseDrawer,
+    openAppointmentDrawer,
+    closeAppointmentDrawer: handleCloseAppointmentDrawer,
+    openNewAppointmentModal,
+    closeNewAppointmentModal,
+    handleCreateAppointment,
     handleReferenceDateChange,
     handleNextAndPrev,
     handleSessionClick,

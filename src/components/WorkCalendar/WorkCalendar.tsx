@@ -4,6 +4,8 @@ import { useWorkCalendar } from "@/hooks/useWorkCalendar";
 import { ScrollArea, Stack } from "@mantine/core";
 import CalendarGrid from "./Calendar/CalendarGrid";
 import EditTimeEntryDrawer from "@/components/Work/WorkTimeEntry/EditTimeEntryDrawer";
+import EditAppointmentDrawer from "./Appointment/EditAppointmentDrawer";
+import NewAppointmentModal from "./Appointment/NewAppointmentModal";
 import CalendarLegend from "./Calendar/CalendarLegend";
 
 export default function WorkCalendar() {
@@ -14,7 +16,10 @@ export default function WorkCalendar() {
 
     // State
     drawerOpened,
+    appointmentDrawerOpened,
+    newAppointmentModalOpened,
     selectedSession,
+    selectedAppointment,
     selectedProject,
     addingMode,
     rasterHeight,
@@ -25,6 +30,9 @@ export default function WorkCalendar() {
 
     // Actions
     closeDrawer,
+    closeAppointmentDrawer,
+    closeNewAppointmentModal,
+    handleCreateAppointment,
     handleReferenceDateChange,
     handleNextAndPrev,
     handleSessionClick,
@@ -48,6 +56,12 @@ export default function WorkCalendar() {
         if (!addingMode) {
           setAddingMode(true);
         }
+      },
+    ],
+    [
+      "mod + Shift + A",
+      () => {
+        handleCreateAppointment();
       },
     ],
   ]);
@@ -75,6 +89,7 @@ export default function WorkCalendar() {
       <CalendarLegend
         visibleProjects={visibleProjects}
         handleScrollToNow={handleScrollToNow}
+        onCreateAppointment={handleCreateAppointment}
       />
       {selectedSession && selectedProject && (
         <EditTimeEntryDrawer
@@ -84,6 +99,24 @@ export default function WorkCalendar() {
           onClose={closeDrawer}
         />
       )}
+      {selectedAppointment && (
+        <EditAppointmentDrawer
+          appointment={selectedAppointment}
+          project={
+            selectedAppointment.work_project_id
+              ? visibleProjects.find(
+                  (p) => p.id === selectedAppointment.work_project_id
+                )
+              : undefined
+          }
+          opened={appointmentDrawerOpened}
+          onClose={closeAppointmentDrawer}
+        />
+      )}
+      <NewAppointmentModal
+        opened={newAppointmentModalOpened}
+        onClose={closeNewAppointmentModal}
+      />
     </ScrollArea>
   );
 }

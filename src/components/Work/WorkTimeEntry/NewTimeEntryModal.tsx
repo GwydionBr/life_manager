@@ -47,6 +47,7 @@ export default function NewTimeEntryModal({
     } else {
       stack.closeAll();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened]);
 
   const handleClose = () => {

@@ -3,7 +3,7 @@ import { useCalendarStore } from "@/stores/calendarStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 
 import { Group, ActionIcon, Text, Grid, SegmentedControl } from "@mantine/core";
-import { IconArrowsSort } from "@tabler/icons-react";
+import { IconArrowsSort, IconCalendarPlus } from "@tabler/icons-react";
 import DelayedTooltip from "@/components/UI/DelayedTooltip";
 import CalendarLegendButton from "./CalendarLegendButton";
 
@@ -13,11 +13,13 @@ import { WorkProject } from "@/types/work.types";
 interface CalendarLegendProps {
   visibleProjects: WorkProject[];
   handleScrollToNow: () => void;
+  onCreateAppointment?: () => void;
 }
 
 export default function CalendarLegend({
   visibleProjects,
   handleScrollToNow,
+  onCreateAppointment,
 }: CalendarLegendProps) {
   const { getLocalizedText } = useIntl();
   const { viewMode, setViewMode } = useCalendarStore();
@@ -39,7 +41,7 @@ export default function CalendarLegend({
       }}
     >
       <Grid.Col span={{ base: 3, md: 2 }}>
-        <Group justify="flex-start" pl="md">
+        <Group justify="flex-start" pl="md" gap="xs">
           <DelayedTooltip
             label={getLocalizedText(
               "Springe zur aktuellen Zeit",
@@ -55,6 +57,24 @@ export default function CalendarLegend({
               <IconArrowsSort color="var(--mantine-color-teal-text)" />
             </ActionIcon>
           </DelayedTooltip>
+          {onCreateAppointment && (
+            <DelayedTooltip
+              label={getLocalizedText(
+                "Termin hinzufügen (Cmd/Ctrl + Shift + A)",
+                "Add appointment (Cmd/Ctrl + Shift + A)"
+              )}
+            >
+              <ActionIcon
+                variant="light"
+                size="lg"
+                radius="md"
+                onClick={onCreateAppointment}
+                color="blue"
+              >
+                <IconCalendarPlus />
+              </ActionIcon>
+            </DelayedTooltip>
+          )}
         </Group>
       </Grid.Col>
       <Grid.Col span={{ base: 6, md: 8 }}>
