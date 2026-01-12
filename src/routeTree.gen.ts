@@ -16,6 +16,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
+import { Route as ApiVersionRouteImport } from './routes/api/version'
 import { Route as AppWorkRouteImport } from './routes/_app/work'
 import { Route as AppHabbitTrackerRouteImport } from './routes/_app/habbit-tracker'
 import { Route as AppFinanceRouteImport } from './routes/_app/finance'
@@ -56,6 +57,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiVersionRoute = ApiVersionRouteImport.update({
+  id: '/api/version',
+  path: '/api/version',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppWorkRoute = AppWorkRouteImport.update({
   id: '/work',
   path: '/work',
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/finance': typeof AppFinanceRoute
   '/habbit-tracker': typeof AppHabbitTrackerRoute
   '/work': typeof AppWorkRoute
+  '/api/version': typeof ApiVersionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth': typeof AuthIndexRoute
 }
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/finance': typeof AppFinanceRoute
   '/habbit-tracker': typeof AppHabbitTrackerRoute
   '/work': typeof AppWorkRoute
+  '/api/version': typeof ApiVersionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth': typeof AuthIndexRoute
 }
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/_app/finance': typeof AppFinanceRoute
   '/_app/habbit-tracker': typeof AppHabbitTrackerRoute
   '/_app/work': typeof AppWorkRoute
+  '/api/version': typeof ApiVersionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/': typeof AuthIndexRoute
 }
@@ -135,6 +144,7 @@ export interface FileRouteTypes {
     | '/finance'
     | '/habbit-tracker'
     | '/work'
+    | '/api/version'
     | '/auth/callback'
     | '/auth'
   fileRoutesByTo: FileRoutesByTo
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/finance'
     | '/habbit-tracker'
     | '/work'
+    | '/api/version'
     | '/auth/callback'
     | '/auth'
   id:
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/_app/finance'
     | '/_app/habbit-tracker'
     | '/_app/work'
+    | '/api/version'
     | '/auth/callback'
     | '/auth/'
   fileRoutesById: FileRoutesById
@@ -172,6 +184,7 @@ export interface RootRouteChildren {
   DatenschutzRoute: typeof DatenschutzRoute
   ImpressumRoute: typeof ImpressumRoute
   NewUserRoute: typeof NewUserRoute
+  ApiVersionRoute: typeof ApiVersionRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   AuthIndexRoute: typeof AuthIndexRoute
 }
@@ -225,6 +238,13 @@ declare module '@tanstack/react-router' {
       path: '/auth/callback'
       fullPath: '/auth/callback'
       preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/version': {
+      id: '/api/version'
+      path: '/api/version'
+      fullPath: '/api/version'
+      preLoaderRoute: typeof ApiVersionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/work': {
@@ -289,6 +309,7 @@ const rootRouteChildren: RootRouteChildren = {
   DatenschutzRoute: DatenschutzRoute,
   ImpressumRoute: ImpressumRoute,
   NewUserRoute: NewUserRoute,
+  ApiVersionRoute: ApiVersionRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   AuthIndexRoute: AuthIndexRoute,
 }
