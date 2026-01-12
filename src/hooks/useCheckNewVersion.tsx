@@ -1,22 +1,18 @@
 // src/hooks/useCheckNewVersion.ts
-import { useEffect, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useProfile } from "@/db/collections/profile/use-profile-query";
 import { useIntl } from "@/hooks/useIntl";
 import { useNetwork, useIdle } from "@mantine/hooks";
-import {
-  addNotificationSilent,
-  checkNotificationExists,
-} from "@/db/collections/notification/notification-mutations";
 
-/**
- * Hook that checks for new app versions and creates a notification
- * when a new version is available.
- *
- * Creates a high priority notification in the database.
- * The actual display is handled by useNotificationHandler.
- */
+import { Group, Text, Stack, Button } from "@mantine/core";
+import { IconRefresh, IconInfoCircle } from "@tabler/icons-react";
+
+import { notifications } from "@mantine/notifications";
+
+const NOTIFICATION_ID = "new-version";
 
 export function useCheckNewVersion(interval = 1000 * 60 * 2) {
+  const [newVersion, setNewVersion] = useState<string | null>(null);
   const { online } = useNetwork();
   const { getLocalizedText } = useIntl();
   const { data: profile } = useProfile();
@@ -31,7 +27,10 @@ export function useCheckNewVersion(interval = 1000 * 60 * 2) {
 
   useEffect(() => {
     // Skip checks when there is no authenticated user/profile or offline
-    if (!profile?.id || !online || isIdle) {
+    if (!profile || !online || isIdle) {
+      setNewVersion(null);
+      // Hide notification when going offline or logging out
+      notifications.hide(NOTIFICATION_ID);
       return;
     }
 
@@ -60,50 +59,21 @@ export function useCheckNewVersion(interval = 1000 * 60 * 2) {
 
         const data = await res.json();
         const serverVersion = data?.version;
-        console.log("serverVersion", serverVersion);
-        console.log("currentVersion", currentVersion);
 
         // Early return if versions are missing
         if (!currentVersion || !serverVersion) {
+          setNewVersion(null);
           return;
         }
 
-        // Check if versions differ AND server version is different from ignored version
+        // Update if versions differ AND server version is different from ignored version
         if (
           serverVersion !== currentVersion &&
           serverVersion !== ignoredVersionRef.current
         ) {
-          // Check if we already have a notification for this version
-          const notificationId = `version-${serverVersion}`;
-          const exists = await checkNotificationExists(
-            notificationId,
-            "system.version"
-          );
-
-
-          if (!exists && profile?.id) {
-            // Create notification in database
-            await addNotificationSilent(
-              {
-                type: "system.version",
-                title: getLocalizedText(
-                  "Neue Version verfügbar",
-                  "New Version available"
-                ),
-                body: getLocalizedText(
-                  "Aktualisiere um die neuesten Änderungen zu sehen.",
-                  "Refresh to see the latest changes."
-                ),
-                priority: "low",
-                resource_type: null,
-                resource_id: notificationId,
-              },
-              profile.id
-            );
-
-            // Remember the version so we don't create another notification
-            ignoredVersionRef.current = serverVersion;
-          }
+          setNewVersion(serverVersion);
+        } else {
+          setNewVersion(null);
         }
       } catch (err) {
         // Ignore abort errors (expected when component unmounts or dependencies change)
@@ -142,5 +112,62 @@ export function useCheckNewVersion(interval = 1000 * 60 * 2) {
         abortControllerRef.current = null;
       }
     };
-  }, [interval, profile?.id, online, currentVersion, isIdle, getLocalizedText]);
+  }, [interval, profile, online, currentVersion, isIdle]);
+
+  useEffect(() => {
+    if (newVersion) {
+      notifications.show({
+        id: NOTIFICATION_ID,
+        title: (
+          <Group gap="xs">
+            <IconInfoCircle size={16} />
+            <Text fw={600}>
+              {getLocalizedText(
+                "Neue Version verfügbar",
+                "New Version available"
+              )}
+            </Text>
+          </Group>
+        ),
+        message: (
+          <Stack>
+            <Text ml={26} c="dimmed" size="sm">
+              {getLocalizedText(
+                "Aktualisiere um die neuesten Änderungen zu sehen.",
+                "Refresh to see the latest changes."
+              )}
+            </Text>
+            <Group justify="flex-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  notifications.hide(NOTIFICATION_ID);
+                  // Remember the ignored version so we don't show it again
+                  if (newVersion) {
+                    ignoredVersionRef.current = newVersion;
+                  }
+                  setNewVersion(null);
+                }}
+              >
+                {getLocalizedText("Nicht jetzt", "Not now")}
+              </Button>
+              <Button
+                onClick={() => window.location.reload()}
+                leftSection={<IconRefresh />}
+              >
+                {getLocalizedText("Aktualisieren", "Refresh")}
+              </Button>
+            </Group>
+          </Stack>
+        ),
+        color: "yellow",
+        autoClose: false,
+        withBorder: true,
+        withCloseButton: false,
+      });
+    } else {
+      // Hide notification when version is cleared
+      notifications.hide(NOTIFICATION_ID);
+    }
+  }, [newVersion, getLocalizedText]);
 }
