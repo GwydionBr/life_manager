@@ -59,6 +59,8 @@ export function useCheckNewVersion(interval = 1000 * 60 * 2) {
 
         const data = await res.json();
         const serverVersion = data?.version;
+        console.log("serverVersion", serverVersion);
+        console.log("currentVersion", currentVersion);
 
         // Early return if versions are missing
         if (!currentVersion || !serverVersion) {
@@ -77,7 +79,7 @@ export function useCheckNewVersion(interval = 1000 * 60 * 2) {
             "system.version"
           );
 
-          
+
           if (!exists && profile?.id) {
             // Create notification in database
             await addNotificationSilent(
