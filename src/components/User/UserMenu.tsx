@@ -2,7 +2,6 @@ import { useRouter } from "@tanstack/react-router";
 import { useProfile } from "@/db/collections/profile/use-profile-query";
 import { useIntl } from "@/hooks/useIntl";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { useNetwork } from "@mantine/hooks";
 
 import {
   Menu,
@@ -14,7 +13,6 @@ import {
   Badge,
   Box,
   useMantineColorScheme,
-  Indicator,
 } from "@mantine/core";
 import {
   IconSettings,
@@ -22,8 +20,6 @@ import {
   IconDashboard,
   IconKeyboard,
   IconHelp,
-  IconWifi,
-  IconWifiOff,
   IconFileText,
   IconShield,
 } from "@tabler/icons-react";
@@ -37,7 +33,6 @@ import { cleanupOnLogout } from "@/lib/cleanupOnLogout";
 
 export function UserMenu() {
   const router = useRouter();
-  const { online } = useNetwork();
   const { getLocalizedText, locale } = useIntl();
   const { setIsModalOpen } = useSettingsStore();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
@@ -73,23 +68,16 @@ export function UserMenu() {
       transitionProps={{ transition: "fade-down", duration: 200 }}
     >
       <Menu.Target>
-        <Indicator
-          offset={10}
-          position="top-end"
-          color={online ? "lime" : "red"}
-          size={10}
-        >
-          <Button variant="transparent" style={{ padding: "0 8px" }}>
-            <Avatar
-              src={profile?.avatar_url || undefined}
-              color="violet"
-              radius="xl"
-              size="sm"
-            >
-              {profile?.full_name?.charAt(0).toUpperCase() || "U"}
-            </Avatar>
-          </Button>
-        </Indicator>
+        <Button variant="transparent" style={{ padding: "0 8px" }}>
+          <Avatar
+            src={profile?.avatar_url || undefined}
+            color="violet"
+            radius="xl"
+            size="sm"
+          >
+            {profile?.full_name?.charAt(0).toUpperCase() || "U"}
+          </Avatar>
+        </Button>
       </Menu.Target>
 
       <Menu.Dropdown>
@@ -105,15 +93,6 @@ export function UserMenu() {
               {profile?.full_name?.charAt(0).toUpperCase() || "U"}
             </Avatar>
             <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
-              <Badge
-                size="xs"
-                color={online ? "teal" : "red"}
-                rightSection={
-                  online ? <IconWifi size={16} /> : <IconWifiOff size={16} />
-                }
-              >
-                {online ? "Online" : "Offline"}
-              </Badge>
               <Text size="sm" fw={600} truncate>
                 {profile?.full_name || profile?.username || "User"}
               </Text>

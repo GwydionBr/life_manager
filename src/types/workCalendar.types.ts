@@ -1,4 +1,10 @@
-import { Tables, TablesInsert, TablesUpdate } from "./db.types";
+import {
+  Constants,
+  Database,
+  Tables,
+  TablesInsert,
+  TablesUpdate,
+} from "./db.types";
 import { Currency } from "./settings.types";
 
 export type ViewMode = "day" | "week";
@@ -6,6 +12,25 @@ export type ViewMode = "day" | "week";
 export type Appointment = Tables<"appointment">;
 export type InsertAppointment = TablesInsert<"appointment">;
 export type UpdateAppointment = TablesUpdate<"appointment">;
+
+// Enum-like object derived from database Constants - automatically synced with db.types.ts
+// Use like: AppointmentStatus.UPCOMING (runtime access)
+// The values are extracted from Constants to ensure they match the database enum
+const appointmentStatusValues = Constants.public.Enums.appointmentStatus;
+export const AppointmentStatus = {
+  UPCOMING: appointmentStatusValues[0],
+  ACTIVE: appointmentStatusValues[1],
+  COMPLETED: appointmentStatusValues[2],
+  MISSED: appointmentStatusValues[3],
+  CONVERTED: appointmentStatusValues[4],
+} as const satisfies Record<
+  string,
+  Database["public"]["Enums"]["appointmentStatus"]
+>;
+
+// Type alias for the appointment status enum
+export type AppointmentStatusType =
+  Database["public"]["Enums"]["appointmentStatus"];
 
 export type VisibleProject = {
   id: string;

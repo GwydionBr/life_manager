@@ -13,7 +13,6 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { IconArrowBarLeft } from "@tabler/icons-react";
-import NotificationAside from "@/components/Notification/NotificationAside";
 import TimeTrackerManager from "@/components/TimeTracker/TimeTrackerManager";
 
 import TransitionDivider from "@/components/UI/TransitionDivider";
@@ -31,52 +30,41 @@ export default function Aside({
   isAsideOpen,
   currentAppColor,
 }: AsideProps) {
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isTimeTrackerMinimized, setIsTimeTrackerMinimized] = useState(false);
 
   useHotkeys([["mod + B", () => toggleAside()]]);
-
 
   const theme = useMantineTheme();
   const backgroundColor = useMemo(() => {
     return alpha(getThemeColor(currentAppColor, theme), 0.4);
   }, [currentAppColor, theme]);
 
-
   return (
-    <Stack py="md" h="100%" gap={0} align="center" bg={backgroundColor}>
-      <Stack align="flex-start" w="100%" gap="lg">
-        <Group pl="xs" justify="flex-start">
-          <DelayedTooltip
-            label={
-              <Stack align="center">
-                <Text>Toggle Sidebar</Text>
-                <Shortcut keys={["mod", "B"]} />
-              </Stack>
-            }
+    <Stack h="100%" gap={0} align="center" bg={backgroundColor}>
+      <Group pl="xs" justify="flex-start" w="100%">
+        <DelayedTooltip
+          label={
+            <Stack align="center">
+              <Text>Toggle Sidebar</Text>
+              <Shortcut keys={["mod", "B"]} />
+            </Stack>
+          }
+        >
+          <ActionIcon
+            onClick={toggleAside}
+            aria-label="Toggle Sidebar"
+            variant="transparent"
+            h={50}
           >
-            <ActionIcon
-              onClick={toggleAside}
-              aria-label="Toggle Sidebar"
-              variant="transparent"
-            >
-              <IconArrowBarLeft
-                style={{
-                  transform: isAsideOpen ? "rotate(180deg)" : "none",
-                  transition: "transform 0.4s linear",
-                }}
-              />
-            </ActionIcon>
-          </DelayedTooltip>
-        </Group>
-        <Group pl="xs">
-          <NotificationAside
-            isNotificationOpen={isNotificationOpen}
-            asideOpened={isAsideOpen}
-            setIsNotificationOpen={setIsNotificationOpen}
-          />
-        </Group>
-      </Stack>
+            <IconArrowBarLeft
+              style={{
+                transform: isAsideOpen ? "rotate(180deg)" : "none",
+                transition: "transform 0.4s linear",
+              }}
+            />
+          </ActionIcon>
+        </DelayedTooltip>
+      </Group>
       <TransitionDivider
         mounted={isAsideOpen}
         transition="fade"
