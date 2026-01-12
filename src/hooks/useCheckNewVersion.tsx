@@ -36,33 +36,33 @@ export function useCheckNewVersion(interval = 60000) {
       notifications.hide(NOTIFICATION_ID);
       return;
     }
-    console.log("currentVersion", currentVersion);
-
+    
     // Abort any pending requests
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
-
+    
     const check = async () => {
       // Create new abort controller for this request
       const abortController = new AbortController();
       abortControllerRef.current = abortController;
-
+      
       
       try {
         const res = await fetch("/api/version", {
           cache: "no-store",
           signal: abortController.signal,
         });
-
+        
         const contentType = res.headers.get("content-type") || "";
         if (!res.ok || !contentType.includes("application/json")) {
           throw new Error(
             `Unexpected response: ${res.status} ${res.statusText}`
           );
         }
-
+        
         const data = await res.json();
+        console.log("currentVersion", currentVersion);
         console.log("data", data);
         const serverVersion = data?.version;
 
