@@ -2,13 +2,12 @@
 import { useEffect, useState, useRef } from "react";
 import { useProfile } from "@/db/collections/profile/use-profile-query";
 import { useIntl } from "@/hooks/useIntl";
-import { useNetwork } from "@mantine/hooks";
+import { useNetwork, useIdle } from "@mantine/hooks";
 
 import { Group, Text, Stack, Button } from "@mantine/core";
 import { IconRefresh, IconInfoCircle } from "@tabler/icons-react";
 
 import { notifications } from "@mantine/notifications";
-
 
 const NOTIFICATION_ID = "new-version";
 
@@ -19,59 +18,55 @@ export function useCheckNewVersion(interval = 60000) {
   const { data: profile } = useProfile();
   const abortControllerRef = useRef<AbortController | null>(null);
   const intervalRef = useRef<number | undefined>(undefined);
+  const isIdle = useIdle(1000 * 60); // 2 minutes
 
-  // Get current version from environment
-  // Try multiple env var names for compatibility
+  // Get current version from window object (set in root layout)
   const currentVersion =
-    import.meta.env.VITE_COMMIT_SHA ||
-    import.meta.env.NEXT_PUBLIC_COMMIT_SHA ||
-    import.meta.env.COMMIT_SHA ||
-    null;
+    typeof window !== "undefined" ? (window.__BUILD_VERSION__ ?? null) : null;
 
   useEffect(() => {
     // Skip checks when there is no authenticated user/profile or offline
-    if (!profile || !online) {
+    if (!profile || !online || isIdle) {
       setNewVersion(null);
       // Hide notification when going offline or logging out
       notifications.hide(NOTIFICATION_ID);
       return;
     }
-    
+
     // Abort any pending requests
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
-    
+
     const check = async () => {
       // Create new abort controller for this request
       const abortController = new AbortController();
       abortControllerRef.current = abortController;
-      
-      
+
       try {
         const res = await fetch("/api/version", {
           cache: "no-store",
           signal: abortController.signal,
         });
-        
+
         const contentType = res.headers.get("content-type") || "";
         if (!res.ok || !contentType.includes("application/json")) {
           throw new Error(
             `Unexpected response: ${res.status} ${res.statusText}`
           );
         }
-        
+
         const data = await res.json();
-        console.log("currentVersion", currentVersion);
-        console.log("data", data);
         const serverVersion = data?.version;
 
-        // Only update if we have both versions and they differ
-        if (
-          serverVersion &&
-          currentVersion &&
-          serverVersion !== currentVersion
-        ) {
+        // Early return if versions are missing
+        if (!currentVersion || !serverVersion) {
+          setNewVersion(null);
+          return;
+        }
+
+        // Update if versions differ
+        if (serverVersion !== currentVersion) {
           setNewVersion(serverVersion);
         } else {
           setNewVersion(null);
@@ -113,7 +108,7 @@ export function useCheckNewVersion(interval = 60000) {
         abortControllerRef.current = null;
       }
     };
-  }, [interval, profile, online, currentVersion]);
+  }, [interval, profile, online, currentVersion, isIdle]);
 
   useEffect(() => {
     if (newVersion) {

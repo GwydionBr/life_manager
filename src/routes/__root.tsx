@@ -26,6 +26,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/NotFound";
 import { getAuthUser } from "@/actions/auth/getAuth";
+import { BUILD_VERSION } from "@/version";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -133,6 +134,11 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <head>
         <ColorSchemeScript defaultColorScheme="auto" />
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.__BUILD_VERSION__ = "${BUILD_VERSION}";`,
+          }}
+        />
       </head>
       <body>
         <MantineProvider theme={theme} defaultColorScheme="auto">
