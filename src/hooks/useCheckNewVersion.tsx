@@ -9,6 +9,7 @@ import { IconRefresh, IconInfoCircle } from "@tabler/icons-react";
 
 import { notifications } from "@mantine/notifications";
 
+
 const NOTIFICATION_ID = "new-version";
 
 export function useCheckNewVersion(interval = 60000) {
