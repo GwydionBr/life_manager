@@ -15,6 +15,7 @@ import {
  * Creates a high priority notification in the database.
  * The actual display is handled by useNotificationHandler.
  */
+
 export function useCheckNewVersion(interval = 1000 * 60 * 2) {
   const { online } = useNetwork();
   const { getLocalizedText } = useIntl();
