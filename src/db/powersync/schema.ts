@@ -35,6 +35,24 @@ const appointment = new Table(
   { indexes: {} }
 );
 
+const notification = new Table(
+  {
+    // id column (text) is automatically included
+    created_at: column.text,
+    user_id: column.text,
+    type: column.text,
+    dismissed_at: column.text,
+    title: column.text,
+    body: column.text,
+    priority: column.text,
+    resource_type: column.text,
+    resource_id: column.text,
+    read_at: column.text,
+    scheduled_for: column.text,
+  },
+  { indexes: {} }
+);
+
 const bank_account = new Table(
   {
     // id column (text) is automatically included
@@ -291,6 +309,7 @@ const settings = new Table(
 export const AppSchema = new Schema({
   profiles,
   appointment,
+  notification,
   bank_account,
   tag,
   contact,

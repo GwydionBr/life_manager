@@ -22,6 +22,7 @@ import { AppOptions } from "@/types/settings.types";
 import { UserMenu } from "../User/UserMenu";
 import SchemeToggle from "../Scheme/SchemeToggle";
 import { DatabaseMenu } from "../Database/DatabaseMenu";
+import { NotificationBell } from "../Notification";
 
 interface NavbarProps {
   currentApp: AppOptions | null;
@@ -102,6 +103,7 @@ export default function Navbar({ currentApp }: NavbarProps) {
       </Stack>
 
       <Stack pb="md">
+        <NotificationBell />
         <DatabaseMenu />
         <UserMenu />
         <SchemeToggle />

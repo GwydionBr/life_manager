@@ -22,6 +22,7 @@ import {
 import SchemeToggle from "@/components/Scheme/SchemeToggle";
 import { UserMenu } from "@/components/User/UserMenu";
 import { DatabaseMenu } from "@/components/Database/DatabaseMenu";
+import { NotificationBell } from "@/components/Notification/NotificationBell";
 
 export default function DashboardHeader() {
   const {
@@ -93,6 +94,7 @@ export default function DashboardHeader() {
         </Button> */}
       </Group>
       <Group gap="xs">
+        <NotificationBell />
         <DatabaseMenu />
         <UserMenu />
         <SchemeToggle />

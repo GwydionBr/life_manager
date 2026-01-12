@@ -482,35 +482,54 @@ export type Database = {
       }
       notification: {
         Row: {
-          appointment_id: string | null
+          body: string | null
           created_at: string
+          dismissed_at: string | null
           id: string
+          priority: Database["public"]["Enums"]["priority"]
+          read_at: string | null
+          resource_id: string | null
+          resource_type:
+            | Database["public"]["Enums"]["notificationResourceType"]
+            | null
+          scheduled_for: string | null
+          title: string
           type: Database["public"]["Enums"]["notificationType"]
           user_id: string
         }
         Insert: {
-          appointment_id?: string | null
+          body?: string | null
           created_at?: string
+          dismissed_at?: string | null
           id?: string
+          priority: Database["public"]["Enums"]["priority"]
+          read_at?: string | null
+          resource_id?: string | null
+          resource_type?:
+            | Database["public"]["Enums"]["notificationResourceType"]
+            | null
+          scheduled_for?: string | null
+          title: string
           type: Database["public"]["Enums"]["notificationType"]
           user_id?: string
         }
         Update: {
-          appointment_id?: string | null
+          body?: string | null
           created_at?: string
+          dismissed_at?: string | null
           id?: string
+          priority?: Database["public"]["Enums"]["priority"]
+          read_at?: string | null
+          resource_id?: string | null
+          resource_type?:
+            | Database["public"]["Enums"]["notificationResourceType"]
+            | null
+          scheduled_for?: string | null
+          title?: string
           type?: Database["public"]["Enums"]["notificationType"]
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "notification_appointment_id_fkey"
-            columns: ["appointment_id"]
-            isOneToOne: false
-            referencedRelation: "appointment"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       payout: {
         Row: {
@@ -1254,7 +1273,12 @@ export type Database = {
         | "1/2 year"
         | "year"
       locales: "en-US" | "de-DE"
-      notificationType: "appointment-reminder" | "appointment-start"
+      notificationResourceType: "appointment"
+      notificationType:
+        | "appointment.reminder"
+        | "appointment.start"
+        | "system.version"
+      priority: "high" | "medium" | "low"
       roundingAmount: "s" | "min" | "1/4h" | "1/2h" | "h" | "custom"
       roundingDirection: "up" | "down" | "nearest"
       status: "pending" | "accepted" | "declined"
@@ -1418,7 +1442,13 @@ export const Constants = {
         "year",
       ],
       locales: ["en-US", "de-DE"],
-      notificationType: ["appointment-reminder", "appointment-start"],
+      notificationResourceType: ["appointment"],
+      notificationType: [
+        "appointment.reminder",
+        "appointment.start",
+        "system.version",
+      ],
+      priority: ["high", "medium", "low"],
       roundingAmount: ["s", "min", "1/4h", "1/2h", "h", "custom"],
       roundingDirection: ["up", "down", "nearest"],
       status: ["pending", "accepted", "declined"],
