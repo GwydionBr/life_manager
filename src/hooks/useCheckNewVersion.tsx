@@ -11,7 +11,7 @@ import { notifications } from "@mantine/notifications";
 
 const NOTIFICATION_ID = "new-version";
 
-export function useCheckNewVersion(interval = 60000) {
+export function useCheckNewVersion(interval = 1000 * 10) {
   const [newVersion, setNewVersion] = useState<string | null>(null);
   const { online } = useNetwork();
   const { getLocalizedText } = useIntl();
@@ -58,6 +58,9 @@ export function useCheckNewVersion(interval = 60000) {
 
         const data = await res.json();
         const serverVersion = data?.version;
+
+        console.log("currentVersion", currentVersion)
+        console.log("serverVersion", serverVersion)
 
         // Early return if versions are missing
         if (!currentVersion || !serverVersion) {
