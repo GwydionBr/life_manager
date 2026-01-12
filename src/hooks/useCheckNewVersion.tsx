@@ -59,6 +59,7 @@ export function useCheckNewVersion(interval = 1000 * 10) {
         const data = await res.json();
         const serverVersion = data?.version;
 
+        
         console.log("currentVersion", currentVersion)
         console.log("serverVersion", serverVersion)
 
