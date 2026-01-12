@@ -11,14 +11,15 @@ import { notifications } from "@mantine/notifications";
 
 const NOTIFICATION_ID = "new-version";
 
-export function useCheckNewVersion(interval = 1000 * 10) {
+export function useCheckNewVersion(interval = 1000 * 60 * 2) {
   const [newVersion, setNewVersion] = useState<string | null>(null);
   const { online } = useNetwork();
   const { getLocalizedText } = useIntl();
   const { data: profile } = useProfile();
   const abortControllerRef = useRef<AbortController | null>(null);
   const intervalRef = useRef<number | undefined>(undefined);
-  const isIdle = useIdle(1000 * 60); // 2 minutes
+  const ignoredVersionRef = useRef<string | null>(null);
+  const isIdle = useIdle(1000 * 60 * 3); // 3 minutes
 
   // Get current version from window object (set in root layout)
   const currentVersion =
@@ -59,18 +60,17 @@ export function useCheckNewVersion(interval = 1000 * 10) {
         const data = await res.json();
         const serverVersion = data?.version;
 
-        
-        console.log("currentVersion", currentVersion)
-        console.log("serverVersion", serverVersion)
-
         // Early return if versions are missing
         if (!currentVersion || !serverVersion) {
           setNewVersion(null);
           return;
         }
 
-        // Update if versions differ
-        if (serverVersion !== currentVersion) {
+        // Update if versions differ AND server version is different from ignored version
+        if (
+          serverVersion !== currentVersion &&
+          serverVersion !== ignoredVersionRef.current
+        ) {
           setNewVersion(serverVersion);
         } else {
           setNewVersion(null);
@@ -142,6 +142,10 @@ export function useCheckNewVersion(interval = 1000 * 10) {
                 variant="outline"
                 onClick={() => {
                   notifications.hide(NOTIFICATION_ID);
+                  // Remember the ignored version so we don't show it again
+                  if (newVersion) {
+                    ignoredVersionRef.current = newVersion;
+                  }
                   setNewVersion(null);
                 }}
               >
