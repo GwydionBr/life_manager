@@ -77,6 +77,7 @@ export function useCheckNewVersion(interval = 1000 * 60 * 2) {
             "system.version"
           );
 
+          
           if (!exists && profile?.id) {
             // Create notification in database
             await addNotificationSilent(
