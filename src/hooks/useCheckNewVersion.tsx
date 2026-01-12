@@ -48,6 +48,7 @@ export function useCheckNewVersion(interval = 60000) {
       const abortController = new AbortController();
       abortControllerRef.current = abortController;
 
+      
       try {
         const res = await fetch("/api/version", {
           cache: "no-store",
