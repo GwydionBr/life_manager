@@ -36,6 +36,7 @@ export function useCheckNewVersion(interval = 60000) {
       notifications.hide(NOTIFICATION_ID);
       return;
     }
+    console.log("currentVersion", currentVersion);
 
     // Abort any pending requests
     if (abortControllerRef.current) {
@@ -61,6 +62,7 @@ export function useCheckNewVersion(interval = 60000) {
         }
 
         const data = await res.json();
+        console.log("data", data);
         const serverVersion = data?.version;
 
         // Only update if we have both versions and they differ
