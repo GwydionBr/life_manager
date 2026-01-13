@@ -23,6 +23,7 @@ interface SettingsState extends Settings {
   currentAppColor: MantineColor;
   isAsideOpen: boolean;
   mainBackgroundColor: string;
+  browserNotificationsEnabled: boolean;
 }
 
 interface SettingsActions {
@@ -38,6 +39,7 @@ interface SettingsActions {
   setCurrentAppColor: (color: MantineColor) => void;
   setSettingState: (adjustment: Partial<SettingsState>) => void;
   toggleAside: () => void;
+  setBrowserNotificationsEnabled: (enabled: boolean) => void;
   resetStore: () => void;
 }
 
@@ -55,6 +57,7 @@ const initialState: SettingsState = {
   isAsideOpen: false,
   mainBackgroundColor:
     "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%)",
+  browserNotificationsEnabled: true,
 
   // Settings
   locale: "en-US",
@@ -118,6 +121,9 @@ export const useSettingsStore = create<SettingsState & SettingsActions>()(
       },
       toggleAside: () => {
         set({ isAsideOpen: !get().isAsideOpen });
+      },
+      setBrowserNotificationsEnabled: (enabled: boolean) => {
+        set({ browserNotificationsEnabled: enabled });
       },
       resetStore: () => {
         set(initialState);

@@ -4,6 +4,7 @@ import { useRouter } from "@tanstack/react-router";
 import { useNotifications } from "@/db/collections/notification/use-notification-query";
 import { useNotificationMutations } from "@/db/collections/notification/use-notification-mutations";
 import { type Notification as NotificationData } from "@/types/system.types";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 import { notifications } from "@mantine/notifications";
 import { Group, Text } from "@mantine/core";
@@ -70,6 +71,7 @@ export function useNotificationHandler() {
   const { data: allNotifications } = useNotifications();
   const router = useRouter();
   const { updateNotification, markAsRead } = useNotificationMutations();
+  const { browserNotificationsEnabled } = useSettingsStore();
 
   // Track which notifications we've already shown as toasts
   const shownNotificationsRef = useRef<Set<string>>(new Set());
@@ -107,6 +109,9 @@ export function useNotificationHandler() {
       if (!isBrowserNotificationSupported()) return;
       if (browserPermission !== "granted") return;
 
+      // Check if user has enabled browser notifications in settings
+      if (!browserNotificationsEnabled) return;
+
       // Only show browser notifications for high and medium priority
       if (notification.priority === "low") return;
 
@@ -137,7 +142,7 @@ export function useNotificationHandler() {
         browserNotification.close();
       };
     },
-    [browserPermission, router, updateNotification]
+    [browserPermission, browserNotificationsEnabled, router, updateNotification]
   );
 
   /**

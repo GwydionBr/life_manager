@@ -5,6 +5,7 @@ import SchemeButtonGroup from "@/components/Settings/General/SchemeSettings";
 import SettingsRow from "@/components/Settings/SettingsRow";
 import LocaleSettings from "@/components/Settings/General/LocaleSettings";
 import PrimaryColorSettings from "@/components/Settings/General/PrimaryColorSettings";
+import NotificationPermissionSettings from "@/components/Settings/General/NotificationPermissionSettings";
 
 export default function DefaultSettings() {
   const { getLocalizedText } = useIntl();
@@ -20,6 +21,11 @@ export default function DefaultSettings() {
         title={getLocalizedText("Sprache & Format", "Language & Format")}
       >
         <LocaleSettings />
+      </SettingsRow>
+      <SettingsRow
+        title={getLocalizedText("Benachrichtigungen", "Notifications")}
+      >
+        <NotificationPermissionSettings />
       </SettingsRow>
     </Stack>
   );
