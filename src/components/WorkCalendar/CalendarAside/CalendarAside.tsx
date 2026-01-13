@@ -22,8 +22,7 @@ import {
   IconCalendarTime,
   IconCircleFilled,
 } from "@tabler/icons-react";
-import { format, isToday, isTomorrow, isThisWeek, parseISO } from "date-fns";
-import { de } from "date-fns/locale";
+import { isToday, isTomorrow, isThisWeek, parseISO } from "date-fns";
 import { useDisclosure } from "@mantine/hooks";
 
 import { useAppointments } from "@/db/collections/work/appointment/use-appointment-query";
@@ -37,7 +36,7 @@ interface CalendarAsideProps {
 }
 
 export default function CalendarAside({ isBig }: CalendarAsideProps) {
-  const { getLocalizedText } = useIntl();
+  const { getLocalizedText, formatDateRange, formatDate, formatTimeSpan } = useIntl();
   const [isMinimized, setIsMinimized] = useState(false);
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);
@@ -97,18 +96,19 @@ export default function CalendarAside({ isBig }: CalendarAsideProps) {
   }, [appointments]);
 
   // Format date with relative labels
-  const formatAppointmentDate = (dateString: string) => {
-    const date = parseISO(dateString);
-    if (isToday(date)) {
-      return `Heute, ${format(date, "HH:mm", { locale: de })}`;
+  const formatAppointmentDate = (startDate: string, endDate: string) => {
+    const start = parseISO(startDate);
+    const end = parseISO(endDate);
+    if (isToday(start)) {
+      return `${getLocalizedText("Heute", "Today")}, ${formatTimeSpan(start, end)}`;
     }
-    if (isTomorrow(date)) {
-      return `Morgen, ${format(date, "HH:mm", { locale: de })}`;
+    if (isTomorrow(start)) {
+      return `${getLocalizedText("Morgen", "Tomorrow")}, ${formatTimeSpan(start, end)}`;
     }
-    if (isThisWeek(date)) {
-      return format(date, "EEEE, HH:mm", { locale: de });
+    if (isThisWeek(start)) {
+      return formatDate(start);
     }
-    return format(date, "dd.MM.yyyy, HH:mm", { locale: de });
+    return formatDateRange(start, end);
   };
 
   // Get project color
@@ -247,7 +247,10 @@ export default function CalendarAside({ isBig }: CalendarAsideProps) {
                           </Text>
                         </Group>
                         <Text size="xs" c="dimmed">
-                          {formatAppointmentDate(appointment.start_date)}
+                          {formatAppointmentDate(
+                            appointment.start_date,
+                            appointment.end_date
+                          )}
                         </Text>
                       </Stack>
                     </Paper>
