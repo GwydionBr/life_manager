@@ -226,7 +226,7 @@ export default function ProjectForm({
       }
 
       // Use the mutation hook
-      const result = await updateWorkProject(project.id, updates);
+      const result = await updateWorkProject(project.id, updates, true);
       if (result) {
         onSuccess?.({
           ...project,
@@ -257,7 +257,7 @@ export default function ProjectForm({
       };
 
       // Use the mutation hook
-      const newProject = await addWorkProject(projectData);
+      const newProject = await addWorkProject(projectData, true);
 
       // Return the complete WorkProject to onSuccess
       if (newProject) {

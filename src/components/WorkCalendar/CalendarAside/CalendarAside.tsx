@@ -22,7 +22,13 @@ import {
   IconCalendarTime,
   IconCircleFilled,
 } from "@tabler/icons-react";
-import { isToday, isTomorrow, isThisWeek, parseISO } from "date-fns";
+import {
+  isToday,
+  isTomorrow,
+  isThisWeek,
+  parseISO,
+  startOfDay,
+} from "date-fns";
 import { useDisclosure } from "@mantine/hooks";
 
 import { useAppointments } from "@/db/collections/work/appointment/use-appointment-query";
@@ -31,12 +37,15 @@ import { AppointmentStatus, Appointment } from "@/types/workCalendar.types";
 import NewAppointmentModal from "../Appointment/NewAppointmentModal";
 import EditAppointmentDrawer from "../Appointment/EditAppointmentDrawer";
 
+import { AppointmentStatusBadge } from "../Appointment/AppointmentStatusBadge";
+
 interface CalendarAsideProps {
   isBig: boolean;
 }
 
 export default function CalendarAside({ isBig }: CalendarAsideProps) {
-  const { getLocalizedText, formatDateRange, formatDate, formatTimeSpan } = useIntl();
+  const { getLocalizedText, formatDateRange, formatDate, formatTimeSpan } =
+    useIntl();
   const [isMinimized, setIsMinimized] = useState(false);
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);
@@ -73,11 +82,11 @@ export default function CalendarAside({ isBig }: CalendarAsideProps) {
 
   // Get upcoming appointments sorted by start date
   const upcomingAppointments = useMemo(() => {
-    const now = new Date();
+    const startOfToday = startOfDay(new Date());
     return appointments
       .filter((apt) => {
         const startDate = parseISO(apt.start_date);
-        return apt.status === AppointmentStatus.UPCOMING && startDate >= now;
+        return startDate >= startOfToday;
       })
       .sort((a, b) => {
         return (
@@ -91,7 +100,11 @@ export default function CalendarAside({ isBig }: CalendarAsideProps) {
   const todayAppointments = useMemo(() => {
     return appointments.filter((apt) => {
       const startDate = parseISO(apt.start_date);
-      return isToday(startDate) && apt.status === AppointmentStatus.UPCOMING;
+      return (
+        isToday(startDate) &&
+        (apt.status === AppointmentStatus.UPCOMING ||
+          apt.status === AppointmentStatus.ACTIVE)
+      );
     });
   }, [appointments]);
 
@@ -176,11 +189,9 @@ export default function CalendarAside({ isBig }: CalendarAsideProps) {
             </Text>
           </Group>
           <Group gap={4} wrap="nowrap">
-            {todayAppointments.length > 0 && (
-              <Badge size="sm" variant="filled" color="blue">
-                {todayAppointments.length} {getLocalizedText("heute", "today")}
-              </Badge>
-            )}
+            <Badge size="sm" variant="filled" color={todayAppointments.length > 0 ? "blue" : "gray"}>
+              {todayAppointments.length} {getLocalizedText("heute", "today")}
+            </Badge>
             <ActionIcon
               size="sm"
               variant="subtle"
@@ -218,11 +229,12 @@ export default function CalendarAside({ isBig }: CalendarAsideProps) {
                   )}
                 </Text>
               ) : (
-                <ScrollArea.Autosize mah={150} type="auto">
+                <ScrollArea.Autosize mah={150} type="auto" >
                   {upcomingAppointments.map((appointment) => (
                     <Paper
                       key={appointment.id}
                       p="xs"
+                      mr="xs"
                       withBorder
                       style={{
                         cursor: "pointer",
@@ -236,23 +248,28 @@ export default function CalendarAside({ isBig }: CalendarAsideProps) {
                         e.currentTarget.style.transform = "translateX(0)";
                       }}
                     >
-                      <Stack gap={4}>
-                        <Group gap={6} wrap="nowrap">
-                          <IconCircleFilled
-                            size={8}
-                            color={getProjectColor(appointment.work_project_id)}
-                          />
-                          <Text size="xs" fw={500} lineClamp={1}>
-                            {appointment.title}
+                      <Group gap={4} wrap="nowrap" justify="space-between">
+                        <Stack gap={4}>
+                          <Group gap={6} wrap="nowrap">
+                            <IconCircleFilled
+                              size={8}
+                              color={getProjectColor(
+                                appointment.work_project_id
+                              )}
+                            />
+                            <Text size="xs" fw={500} lineClamp={1}>
+                              {appointment.title}
+                            </Text>
+                          </Group>
+                          <Text size="xs" c="dimmed">
+                            {formatAppointmentDate(
+                              appointment.start_date,
+                              appointment.end_date
+                            )}
                           </Text>
-                        </Group>
-                        <Text size="xs" c="dimmed">
-                          {formatAppointmentDate(
-                            appointment.start_date,
-                            appointment.end_date
-                          )}
-                        </Text>
-                      </Stack>
+                        </Stack>
+                        <AppointmentStatusBadge status={appointment.status} />
+                      </Group>
                     </Paper>
                   ))}
                 </ScrollArea.Autosize>
