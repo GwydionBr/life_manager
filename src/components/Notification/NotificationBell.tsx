@@ -33,7 +33,7 @@ export function NotificationBell() {
         >
           <ActionIcon
             size="xl"
-            variant="subtle"
+            variant="transparent"
             onClick={toggle}
             aria-label={getLocalizedText("Benachrichtigungen", "Notifications")}
           >

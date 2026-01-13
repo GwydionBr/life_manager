@@ -3,7 +3,6 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { useLocation } from "@tanstack/react-router";
 import { useProcessRecurringCashflows } from "@/hooks/useProcessRecurringCashflows";
 import { useCheckNewVersion } from "@/hooks/useCheckNewVersion";
-import { useAppointmentNotifications } from "@/hooks/useAppointmentNofifications";
 import { useNotificationHandler } from "@/hooks/useNotificationHandler";
 
 import { AppShell, alpha, getThemeColor, useMantineTheme } from "@mantine/core";
@@ -33,7 +32,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const theme = useMantineTheme();
   useProcessRecurringCashflows();
   useCheckNewVersion();
-  useAppointmentNotifications();
   useNotificationHandler();
 
   // Determine the current app based on the location pathname

@@ -82,43 +82,6 @@ export const deleteNotification = async (id: string | string[]) => {
 };
 
 /**
- * Adds a notification silently without showing any UI feedback.
- * Used for automated notifications (e.g., appointment reminders).
- *
- * @param newNotification - The data of the new notification
- * @param userId - The user ID
- * @returns The new Notification or undefined if an error occurs
- */
-export const addNotificationSilent = async (
-  newNotification: InsertNotification,
-  userId: string
-): Promise<Notification | undefined> => {
-  const notificationToInsert: Notification = {
-    id: newNotification.id || crypto.randomUUID(),
-    created_at: newNotification.created_at || new Date().toISOString(),
-    user_id: userId,
-    type: newNotification.type,
-    dismissed_at: newNotification.dismissed_at || null,
-    title: newNotification.title,
-    body: newNotification.body || null,
-    priority: newNotification.priority,
-    resource_type: newNotification.resource_type || null,
-    resource_id: newNotification.resource_id || null,
-    read_at: newNotification.read_at || null,
-    scheduled_for: newNotification.scheduled_for || null,
-  };
-
-  try {
-    const transaction = notificationsCollection.insert(notificationToInsert);
-    await transaction.isPersisted.promise;
-    return notificationToInsert;
-  } catch (error) {
-    console.error("Error creating silent notification:", error);
-    return undefined;
-  }
-};
-
-/**
  * Checks if a notification already exists for a given resource and type.
  *
  * @param resourceId - The resource ID to check

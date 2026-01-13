@@ -1,6 +1,6 @@
-import { useEffect, useRef, useCallback, useState } from "react";
-import { useUnreadNotifications } from "@/db/collections/notification/use-notification-query";
-import { updateNotification } from "@/db/collections/notification/notification-mutations";
+import { useEffect, useRef, useCallback, useState, useMemo } from "react";
+import { useNotifications } from "@/db/collections/notification/use-notification-query";
+import { useNotificationMutations } from "@/db/collections/notification/use-notification-mutations";
 import { useIntl } from "@/hooks/useIntl";
 import { useRouter } from "@tanstack/react-router";
 import { type Notification as NotificationData } from "@/types/system.types";
@@ -13,6 +13,9 @@ import {
   IconAlertCircle,
   IconX,
 } from "@tabler/icons-react";
+
+// Check interval for scheduled notifications (10 seconds)
+const CHECK_INTERVAL = 1000 * 10;
 
 /**
  * Returns an icon component based on the notification type.
@@ -56,11 +59,12 @@ const isBrowserNotificationSupported = (): boolean => {
 /**
  * Central hook for handling and displaying all notifications.
  *
- * This hook monitors unread notifications from the database and displays
- * them as toast notifications. It handles:
- * - Displaying new notifications as toasts
+ * This hook monitors notifications from the database and displays
+ * them as toast notifications when their scheduled_for time is reached. It handles:
+ * - Checking for notifications whose scheduled_for time has passed
+ * - Displaying notifications as toasts
  * - High priority notifications don't auto-close
- * - Medium/low priority notifications auto-close after 10 seconds
+ * - Medium/low priority notifications auto-close after 3 seconds
  * - Marking notifications as read when interacted with
  * - Navigation to related resources on click
  * - Browser/system notifications when page is not visible (high priority only)
@@ -68,12 +72,18 @@ const isBrowserNotificationSupported = (): boolean => {
  * Should be called once at the app level (e.g., in Shell.tsx)
  */
 export function useNotificationHandler() {
-  const { data: unreadNotifications } = useUnreadNotifications();
+  const { data: allNotifications } = useNotifications();
   const { getLocalizedText } = useIntl();
   const router = useRouter();
+  const { updateNotification } = useNotificationMutations();
 
   // Track which notifications we've already shown as toasts
   const shownNotificationsRef = useRef<Set<string>>(new Set());
+
+  // Track the current time for checking scheduled notifications
+  const [currentTime, setCurrentTime] = useState(() =>
+    new Date().toISOString()
+  );
 
   // Track browser notification permission
   const [browserPermission, setBrowserPermission] =
@@ -145,7 +155,7 @@ export function useNotificationHandler() {
         browserNotification.close();
       };
     },
-    [browserPermission, router]
+    [browserPermission, router, updateNotification]
   );
 
   /**
@@ -166,18 +176,21 @@ export function useNotificationHandler() {
       // Hide the toast
       notifications.hide(notification.id);
     },
-    [router]
+    [router, updateNotification]
   );
 
   /**
    * Handle dismissing a notification.
    */
-  const handleDismiss = useCallback((notificationId: string) => {
-    updateNotification(notificationId, {
-      dismissed_at: new Date().toISOString(),
-    });
-    notifications.hide(notificationId);
-  }, []);
+  const handleDismiss = useCallback(
+    (notificationId: string) => {
+      updateNotification(notificationId, {
+        dismissed_at: new Date().toISOString(),
+      });
+      notifications.hide(notificationId);
+    },
+    [updateNotification]
+  );
 
   /**
    * Show a toast notification for a database notification.
@@ -230,17 +243,49 @@ export function useNotificationHandler() {
         },
       });
     },
-    [getLocalizedText, handleNotificationClick, handleDismiss]
+    [
+      getLocalizedText,
+      handleNotificationClick,
+      handleDismiss,
+      updateNotification,
+    ]
   );
 
-  // Watch for new unread notifications and show toasts
+  // Set up interval to check for scheduled notifications
   useEffect(() => {
-    if (!unreadNotifications) return;
+    const interval = setInterval(() => {
+      setCurrentTime(new Date().toISOString());
+    }, CHECK_INTERVAL);
 
-    unreadNotifications.forEach((notification) => {
+    return () => clearInterval(interval);
+  }, []);
+
+  // Get notifications that should be shown now
+  const notificationsToShow = useMemo(() => {
+    if (!allNotifications) return [];
+
+    return allNotifications.filter((notification) => {
+      // Skip if already read or dismissed
+      if (notification.read_at || notification.dismissed_at) return false;
+
+      // Skip if scheduled for the future
+      if (
+        notification.scheduled_for &&
+        notification.scheduled_for > currentTime
+      ) {
+        return false;
+      }
+
       // Skip if we've already shown this notification
-      if (shownNotificationsRef.current.has(notification.id)) return;
+      if (shownNotificationsRef.current.has(notification.id)) return false;
 
+      return true;
+    });
+  }, [allNotifications, currentTime]);
+
+  // Watch for notifications that should be shown and display them
+  useEffect(() => {
+    notificationsToShow.forEach((notification) => {
       // Mark as shown
       shownNotificationsRef.current.add(notification.id);
 
@@ -250,21 +295,25 @@ export function useNotificationHandler() {
       // Show browser notification if page is not visible
       showBrowserNotification(notification);
     });
-  }, [unreadNotifications, showNotificationToast, showBrowserNotification]);
+  }, [notificationsToShow, showNotificationToast, showBrowserNotification]);
 
   // Clean up shown notifications set when notifications are dismissed/read
   useEffect(() => {
-    if (!unreadNotifications) return;
+    if (!allNotifications) return;
 
-    const currentUnreadIds = new Set(unreadNotifications.map((n) => n.id));
+    const activeNotificationIds = new Set(
+      allNotifications
+        .filter((n) => !n.read_at && !n.dismissed_at)
+        .map((n) => n.id)
+    );
 
-    // Remove from shown set any notifications that are no longer unread
+    // Remove from shown set any notifications that are no longer active
     shownNotificationsRef.current.forEach((id) => {
-      if (!currentUnreadIds.has(id)) {
+      if (!activeNotificationIds.has(id)) {
         shownNotificationsRef.current.delete(id);
       }
     });
-  }, [unreadNotifications]);
+  }, [allNotifications]);
 }
 
 /**

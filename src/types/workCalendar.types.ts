@@ -13,6 +13,8 @@ export type Appointment = Tables<"appointment">;
 export type InsertAppointment = TablesInsert<"appointment">;
 export type UpdateAppointment = TablesUpdate<"appointment">;
 
+export type NotificationType = Database["public"]["Enums"]["notificationType"];
+
 // Enum-like object derived from database Constants - automatically synced with db.types.ts
 // Use like: AppointmentStatus.UPCOMING (runtime access)
 // The values are extracted from Constants to ensure they match the database enum

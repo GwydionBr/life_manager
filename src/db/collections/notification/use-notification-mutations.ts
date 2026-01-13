@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { useProfile } from "@/db/collections/profile/use-profile-query";
+import { useNotifications } from "./use-notification-query";
 import {
   addNotification,
   updateNotification,
@@ -10,6 +11,7 @@ import {
   UpdateNotification,
   Notification,
 } from "@/types/system.types";
+import { NotificationType } from "@/types/workCalendar.types";
 
 /**
  * Hook for Notification operations with automatic notifications.
@@ -21,6 +23,7 @@ import {
  */
 export const useNotificationMutations = () => {
   const { data: profile } = useProfile();
+  const { data: existingNotifications } = useNotifications();
 
   /**
    * Adds a new Notification with automatic notification.
@@ -102,11 +105,25 @@ export const useNotificationMutations = () => {
     [handleUpdateNotification]
   );
 
+  /**
+   * Find an existing notification for a given resource and type.
+   */
+  const findNotification = useCallback(
+    (resourceId: string, type: NotificationType) => {
+      if (!existingNotifications) return null;
+      return existingNotifications.find(
+        (n) => n.resource_id === resourceId && n.type === type
+      );
+    },
+    [existingNotifications]
+  );
+
   return {
     addNotification: handleAddNotification,
     updateNotification: handleUpdateNotification,
     deleteNotification: handleDeleteNotification,
     markAsRead: handleMarkAsRead,
     dismiss: handleDismiss,
+    findNotification,
   };
 };

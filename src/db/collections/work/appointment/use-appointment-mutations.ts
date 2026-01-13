@@ -15,21 +15,127 @@ import {
   UpdateAppointment,
   Appointment,
 } from "@/types/work.types";
+import { useNotificationMutations } from "@/db/collections/notification/use-notification-mutations";
+import { useNotifications } from "@/db/collections/notification/use-notification-query";
+import { NotificationType } from "@/types/workCalendar.types";
 
 /**
  * Hook for Appointment operations with automatic notifications.
  *
  * This hook provides a user-friendly API for CRUD operations
  * on Appointments with integrated error handling and notifications.
+ * Also manages appointment-related system notifications (reminders and start notifications).
  *
  * @returns Object with mutation functions
  */
 export const useAppointmentMutations = () => {
   const { data: profile } = useProfile();
-  const { getLocalizedText } = useIntl();
+  const { getLocalizedText, formatDateTime } = useIntl();
+  const {
+    addNotification,
+    updateNotification,
+    deleteNotification,
+    findNotification,
+  } = useNotificationMutations();
+  const { data: existingNotifications } = useNotifications();
+
+  /**
+   * Create or update a notification for an appointment event.
+   */
+  const syncAppointmentNotification = useCallback(
+    async (
+      appointmentId: string,
+      appointmentTitle: string,
+      type: NotificationType,
+      scheduledTime: string
+    ) => {
+      const isReminder = type === "appointment.reminder";
+      const title = isReminder
+        ? getLocalizedText("Terminerinnerung", "Appointment Reminder")
+        : getLocalizedText("Termin beginnt", "Appointment Starting");
+
+      const startTime = scheduledTime;
+      const body = isReminder
+        ? getLocalizedText(
+            `"${appointmentTitle}" beginnt um ${formatDateTime(new Date(startTime))}`,
+            `"${appointmentTitle}" starts at ${formatDateTime(new Date(startTime))}`
+          )
+        : getLocalizedText(
+            `"${appointmentTitle}" beginnt jetzt`,
+            `"${appointmentTitle}" is starting now`
+          );
+
+      // Check if notification already exists
+      const existingNotification = findNotification(appointmentId, type);
+
+      if (existingNotification) {
+        // Update if scheduled_for changed
+        if (existingNotification.scheduled_for !== scheduledTime) {
+          try {
+            await updateNotification(existingNotification.id, {
+              scheduled_for: scheduledTime,
+              title,
+              body,
+            });
+          } catch (error) {
+            console.error("Failed to update appointment notification:", error);
+          }
+        }
+      } else {
+        // Create new notification with scheduled_for
+        try {
+          await addNotification({
+            type,
+            title,
+            body,
+            priority: isReminder ? "medium" : "high",
+            resource_type: "appointment",
+            resource_id: appointmentId,
+            scheduled_for: scheduledTime,
+          });
+        } catch (error) {
+          console.error("Failed to create appointment notification:", error);
+        }
+      }
+    },
+    [
+      findNotification,
+      getLocalizedText,
+      formatDateTime,
+      addNotification,
+      updateNotification,
+    ]
+  );
+
+  /**
+   * Delete all notifications for a given appointment.
+   */
+  const deleteAppointmentNotifications = useCallback(
+    async (appointmentId: string) => {
+      if (!existingNotifications) return;
+
+      const notificationsToDelete = existingNotifications.filter(
+        (n) => n.resource_id === appointmentId
+      );
+
+      for (const notification of notificationsToDelete) {
+        try {
+          await deleteNotification(notification.id);
+        } catch (error) {
+          console.error(
+            "Failed to delete appointment notification:",
+            notification.id,
+            error
+          );
+        }
+      }
+    },
+    [existingNotifications, deleteNotification]
+  );
 
   /**
    * Adds a new Appointment with automatic notification.
+   * Also creates appointment notifications (reminder and start).
    */
   const handleAddAppointment = useCallback(
     async (
@@ -58,6 +164,23 @@ export const useAppointmentMutations = () => {
           return;
         }
 
+        // Create notifications for this appointment
+        if (result.reminder) {
+          await syncAppointmentNotification(
+            result.id,
+            result.title,
+            "appointment.reminder",
+            result.reminder
+          );
+        }
+
+        await syncAppointmentNotification(
+          result.id,
+          result.title,
+          "appointment.start",
+          result.start_date
+        );
+
         showActionSuccessNotification(
           getLocalizedText(
             "Termin erfolgreich erstellt",
@@ -76,14 +199,19 @@ export const useAppointmentMutations = () => {
         );
       }
     },
-    [profile?.id, getLocalizedText]
+    [profile?.id, getLocalizedText, syncAppointmentNotification]
   );
 
   /**
    * Updates an Appointment with automatic notification.
+   * Also updates appointment notifications if times change.
    */
   const handleUpdateAppointment = useCallback(
-    async (id: string, item: UpdateAppointment): Promise<boolean> => {
+    async (
+      id: string,
+      item: UpdateAppointment,
+      currentAppointment?: Appointment
+    ): Promise<boolean> => {
       try {
         const result = await updateAppointment(id, item);
 
@@ -95,6 +223,44 @@ export const useAppointmentMutations = () => {
             )
           );
           return false;
+        }
+
+        // Update notifications if relevant fields changed
+        // We need the current appointment data to determine if we should update notifications
+        if (currentAppointment) {
+          const title = item.title ?? currentAppointment.title;
+          const startDate = item.start_date ?? currentAppointment.start_date;
+          const reminder =
+            item.reminder !== undefined
+              ? item.reminder
+              : currentAppointment.reminder;
+
+          // Update or delete reminder notification
+          if (reminder) {
+            await syncAppointmentNotification(
+              id,
+              title,
+              "appointment.reminder",
+              reminder
+            );
+          } else if (currentAppointment.reminder && !reminder) {
+            // Delete reminder notification if reminder was removed
+            const reminderNotification = findNotification(
+              id,
+              "appointment.reminder"
+            );
+            if (reminderNotification) {
+              await deleteNotification(reminderNotification.id);
+            }
+          }
+
+          // Update start notification
+          await syncAppointmentNotification(
+            id,
+            title,
+            "appointment.start",
+            startDate
+          );
         }
 
         showActionSuccessNotification(
@@ -116,11 +282,17 @@ export const useAppointmentMutations = () => {
         return false;
       }
     },
-    [getLocalizedText]
+    [
+      getLocalizedText,
+      syncAppointmentNotification,
+      findNotification,
+      deleteNotification,
+    ]
   );
 
   /**
    * Deletes an Appointment with automatic notification.
+   * Also deletes all related appointment notifications.
    */
   const handleDeleteAppointment = useCallback(
     async (id: string | string[]): Promise<boolean> => {
@@ -135,6 +307,12 @@ export const useAppointmentMutations = () => {
             )
           );
           return false;
+        }
+
+        // Delete all notifications for this appointment(s)
+        const idsToDelete = Array.isArray(id) ? id : [id];
+        for (const appointmentId of idsToDelete) {
+          await deleteAppointmentNotifications(appointmentId);
         }
 
         showActionSuccessNotification(
@@ -156,7 +334,7 @@ export const useAppointmentMutations = () => {
         return false;
       }
     },
-    [getLocalizedText]
+    [getLocalizedText, deleteAppointmentNotifications]
   );
 
   return {
