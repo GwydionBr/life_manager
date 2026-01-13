@@ -24,14 +24,20 @@ export const useTagsMutations = () => {
    * Adds a new Tag with automatic notification.
    */
   const handleAddTag = useCallback(
-    async (newTag: InsertTag): Promise<Tag | undefined> => {
+    async (
+      newTag: InsertTag,
+      showNotification: boolean = false
+    ): Promise<Tag | undefined> => {
       if (!profile?.id) {
-        showActionErrorNotification(
-          getLocalizedText(
-            "Kein Benutzerprofil gefunden",
-            "No user profile found"
-          )
-        );
+        console.error("No profile found");
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Kein Benutzerprofil gefunden",
+              "No user profile found"
+            )
+          );
+        }
         return;
       }
 
@@ -39,31 +45,38 @@ export const useTagsMutations = () => {
         const result = await addTag(newTag, profile.id);
 
         if (!result) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Fehler beim Erstellen des Tags",
-              "Error creating tag"
-            )
-          );
+          console.error("Failed to create tag:", newTag);
+          if (showNotification) {
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Erstellen des Tags",
+                "Error creating tag"
+              )
+            );
+          }
           return;
         }
 
-        showActionSuccessNotification(
-          getLocalizedText(
-            "Tag erfolgreich erstellt",
-            "Tag successfully created"
-          )
-        );
+        if (showNotification) {
+          showActionSuccessNotification(
+            getLocalizedText(
+              "Tag erfolgreich erstellt",
+              "Tag successfully created"
+            )
+          );
+        }
 
         return result;
       } catch (error) {
         console.error(error);
-        showActionErrorNotification(
-          getLocalizedText(
-            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-          )
-        );
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+            )
+          );
+        }
       }
     },
     [profile?.id, getLocalizedText]
@@ -73,36 +86,43 @@ export const useTagsMutations = () => {
    * Updates a Tag with automatic notification.
    */
   const handleUpdateTag = useCallback(
-    async (id: string, item: UpdateTag) => {
+    async (id: string, item: UpdateTag, showNotification: boolean = false) => {
       try {
         const result = await updateTag(id, item);
 
         if (!result) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Fehler beim Aktualisieren des Tags",
-              "Error updating tag"
-            )
-          );
+          console.error("Failed to update tag:", id, item);
+          if (showNotification) {
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Aktualisieren des Tags",
+                "Error updating tag"
+              )
+            );
+          }
           return;
         }
 
-        showActionSuccessNotification(
-          getLocalizedText(
-            "Tag erfolgreich aktualisiert",
-            "Tag successfully updated"
-          )
-        );
+        if (showNotification) {
+          showActionSuccessNotification(
+            getLocalizedText(
+              "Tag erfolgreich aktualisiert",
+              "Tag successfully updated"
+            )
+          );
+        }
 
         return true;
       } catch (error) {
         console.error(error);
-        showActionErrorNotification(
-          getLocalizedText(
-            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-          )
-        );
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+            )
+          );
+        }
       }
     },
     [getLocalizedText]
@@ -112,36 +132,43 @@ export const useTagsMutations = () => {
    * Deletes a Tag with automatic notification.
    */
   const handleDeleteTag = useCallback(
-    async (id: string | string[]) => {
+    async (id: string | string[], showNotification: boolean = false) => {
       try {
         const result = await deleteTag(id);
 
         if (!result) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Fehler beim Löschen des Tags",
-              "Error deleting tag"
-            )
-          );
+          console.error("Failed to delete tag:", id);
+          if (showNotification) {
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Löschen des Tags",
+                "Error deleting tag"
+              )
+            );
+          }
           return;
         }
 
-        showActionSuccessNotification(
-          getLocalizedText(
-            "Tag erfolgreich gelöscht",
-            "Tag successfully deleted"
-          )
-        );
+        if (showNotification) {
+          showActionSuccessNotification(
+            getLocalizedText(
+              "Tag erfolgreich gelöscht",
+              "Tag successfully deleted"
+            )
+          );
+        }
 
         return result;
       } catch (error) {
         console.error(error);
-        showActionErrorNotification(
-          getLocalizedText(
-            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-          )
-        );
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+            )
+          );
+        }
       }
     },
     [getLocalizedText]

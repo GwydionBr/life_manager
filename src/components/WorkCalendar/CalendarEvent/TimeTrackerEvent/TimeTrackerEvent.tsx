@@ -73,11 +73,11 @@ export default function TimeTrackerEvent({
         bg="light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-7))"
         style={{
           position: "absolute",
-          top: toY(currentTime),
+          top: toY(currentTime) - 20,
           left: 0,
           right: 0,
           zIndex: 15,
-          borderTop: "2px solid var(--mantine-color-red-6)",
+          borderBottom: "2px solid var(--mantine-color-red-6)",
         }}
       >
         <Text size="xs" c="red" ta="center" fw={600}>

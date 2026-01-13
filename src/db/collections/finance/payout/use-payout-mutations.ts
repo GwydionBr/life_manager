@@ -40,20 +40,25 @@ export const usePayoutMutations = () => {
    * Handles the payout of a finance project adjustment.
    * @param projectAdjustment - The project adjustment to payout
    * @param financeProject - The finance project to payout
+   * @param showNotification - Whether to show notification messages
    * @returns True if the payout was successful, false if an error occurs
    */
   const handleFinanceProjectAdjustmentPayout = useCallback(
     async (
       projectAdjustment: ProjectAdjustment,
-      financeProject: FinanceProject
+      financeProject: FinanceProject,
+      showNotification: boolean = false
     ): Promise<boolean> => {
       if (!profile?.id) {
-        showActionErrorNotification(
-          getLocalizedText(
-            "Kein Benutzerprofil gefunden",
-            "No user profile found"
-          )
-        );
+        console.error("No profile found");
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Kein Benutzerprofil gefunden",
+              "No user profile found"
+            )
+          );
+        }
         return false;
       }
 
@@ -70,12 +75,15 @@ export const usePayoutMutations = () => {
         );
 
         if (!singleCashflowResult) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Fehler beim Erstellen der Auszahlung",
-              "Error creating payout"
-            )
-          );
+          console.error("Failed to create single cashflow:", projectAdjustment);
+          if (showNotification) {
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Erstellen der Auszahlung",
+                "Error creating payout"
+              )
+            );
+          }
           return false;
         }
 
@@ -86,29 +94,42 @@ export const usePayoutMutations = () => {
           }
         );
         if (!adjustmentResult) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Fehler beim Erstellen der Projektanpassung",
-              "Error creating project adjustment"
-            )
+          console.error(
+            "Failed to update project adjustment:",
+            projectAdjustment.id,
+            {
+              single_cashflow_id: singleCashflowResult[0].id,
+            }
           );
+          if (showNotification) {
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Erstellen der Projektanpassung",
+                "Error creating project adjustment"
+              )
+            );
+          }
           return false;
         }
-        showActionSuccessNotification(
-          getLocalizedText(
-            "Auszahlung erfolgreich erstellt",
-            "Payout successfully created"
-          )
-        );
+        if (showNotification) {
+          showActionSuccessNotification(
+            getLocalizedText(
+              "Auszahlung erfolgreich erstellt",
+              "Payout successfully created"
+            )
+          );
+        }
         return true;
       } catch (error) {
         console.error(error);
-        showActionErrorNotification(
-          getLocalizedText(
-            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-          )
-        );
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+            )
+          );
+        }
         return false;
       }
     },
@@ -119,20 +140,25 @@ export const usePayoutMutations = () => {
    * Handles the payout of a finance project.
    * @param financeProject - The finance project to payout
    * @param payoutWholeProject - Whether to payout the whole project
+   * @param showNotification - Whether to show notification messages
    * @returns True if the payout was successful, false if an error occurs
    */
   const handleFinanceProjectPayout = useCallback(
     async (
       financeProject: FinanceProject,
-      payoutWholeProject: boolean
+      payoutWholeProject: boolean,
+      showNotification: boolean = false
     ): Promise<boolean> => {
       if (!profile?.id) {
-        showActionErrorNotification(
-          getLocalizedText(
-            "Kein Benutzerprofil gefunden",
-            "No user profile found"
-          )
-        );
+        console.error("No profile found");
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Kein Benutzerprofil gefunden",
+              "No user profile found"
+            )
+          );
+        }
         return false;
       }
 
@@ -148,12 +174,15 @@ export const usePayoutMutations = () => {
           profile.id
         );
         if (!singleCashflowResult) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Fehler beim Erstellen der Auszahlung",
-              "Error creating payout"
-            )
-          );
+          console.error("Failed to create single cashflow:", financeProject);
+          if (showNotification) {
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Erstellen der Auszahlung",
+                "Error creating payout"
+              )
+            );
+          }
           return false;
         }
 
@@ -168,12 +197,21 @@ export const usePayoutMutations = () => {
           profile.id
         );
         if (!financeProjectResult) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Fehler beim Erstellen der Projektanpassung",
-              "Error creating project adjustment"
-            )
-          );
+          if (showNotification) {
+            console.error(
+              "Failed to update finance project:",
+              financeProject.id,
+              {
+                single_cashflow_id: singleCashflowResult[0].id,
+              }
+            );
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Erstellen der Projektanpassung",
+                "Error creating project adjustment"
+              )
+            );
+          }
           return false;
         }
 
@@ -183,26 +221,31 @@ export const usePayoutMutations = () => {
             .forEach(async (adjustment) => {
               await handleFinanceProjectAdjustmentPayout(
                 adjustment,
-                financeProject
+                financeProject,
+                showNotification
               );
             });
         }
 
-        showActionSuccessNotification(
-          getLocalizedText(
-            "Auszahlung erfolgreich erstellt",
-            "Payout successfully created"
-          )
-        );
+        if (showNotification) {
+          showActionSuccessNotification(
+            getLocalizedText(
+              "Auszahlung erfolgreich erstellt",
+              "Payout successfully created"
+            )
+          );
+        }
         return true;
       } catch (error) {
         console.error(error);
-        showActionErrorNotification(
-          getLocalizedText(
-            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-          )
-        );
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+            )
+          );
+        }
         return false;
       }
     },
@@ -216,6 +259,7 @@ export const usePayoutMutations = () => {
    * @param timeEntries - The time entries to add the payout for
    * @param endCurrency - The currency of the payout
    * @param endValue - The value of the payout
+   * @param showNotification - Whether to show notification messages
    * @returns The payout or undefined if an error occurs
    */
   const handleAddHourlyPayout = useCallback(
@@ -224,15 +268,19 @@ export const usePayoutMutations = () => {
       title: string,
       timeEntries: WorkTimeEntry[],
       endCurrency?: Currency,
-      endValue?: number
+      endValue?: number,
+      showNotification: boolean = false
     ): Promise<Payout | undefined> => {
       if (!profile?.id) {
-        showActionErrorNotification(
-          getLocalizedText(
-            "Kein Benutzerprofil gefunden",
-            "No user profile found"
-          )
-        );
+        console.error("No profile found");
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Kein Benutzerprofil gefunden",
+              "No user profile found"
+            )
+          );
+        }
         return;
       }
 
@@ -274,6 +322,19 @@ export const usePayoutMutations = () => {
           profile.id
         );
 
+        if (!singleCashflowResult) {
+          console.error("Failed to create single cashflow:", singleCashflowResult);
+          if (showNotification) {
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Erstellen der Auszahlung",
+                "Error creating payout"
+              )
+            );
+          }
+          return;
+        }
+
         // Update work time entries
         const workTimeEntryResult = await updateWorkTimeEntry(
           timeEntries.map((timeEntry) => timeEntry.id),
@@ -284,27 +345,45 @@ export const usePayoutMutations = () => {
           }
         );
 
-        console.log(singleCashflowResult);
-        console.log(workTimeEntryResult);
-
-        if (result.error) {
-          showActionErrorNotification(result.error.message);
+        if (!workTimeEntryResult) {
+          console.error("Failed to update work time entries:", timeEntries.map((timeEntry) => timeEntry.id));
+          if (showNotification) {
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Aktualisieren der Arbeitszeiten",
+                "Error updating work time entries"
+              )
+            );
+          }
           return;
         }
 
-        showActionSuccessNotification(
-          getLocalizedText(
-            "Auszahlung erfolgreich erstellt",
-            "Payout successfully created"
-          )
-        );
+        if (result.error) {
+          console.error("Failed to add payout:", payoutData);
+          if (showNotification) {
+            showActionErrorNotification(result.error.message);
+          }
+          return;
+        }
+
+        if (showNotification) {
+          showActionSuccessNotification(
+            getLocalizedText(
+              "Auszahlung erfolgreich erstellt",
+              "Payout successfully created"
+            )
+          );
+        }
       } catch (error) {
-        showActionErrorNotification(
-          getLocalizedText(
-            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-          )
-        );
+        console.error(error);
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+            )
+          );
+        }
       }
     },
     [profile?.id, getLocalizedText]
@@ -314,20 +393,25 @@ export const usePayoutMutations = () => {
    * Updates a Payout with automatic notification and side effects.
    * @param id - The ID of the payout to update
    * @param item - The item to update
+   * @param showNotification - Whether to show notification messages
    * @returns The payout or undefined if an error occurs
    */
   const handleUpdatePayout = useCallback(
     async (
       id: string | string[],
-      item: TablesUpdate<"payout">
+      item: TablesUpdate<"payout">,
+      showNotification: boolean = false
     ): Promise<Payout | undefined> => {
       if (!profile?.id) {
-        showActionErrorNotification(
-          getLocalizedText(
-            "Kein Benutzerprofil gefunden",
-            "No user profile found"
-          )
-        );
+        console.error("No profile found");
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Kein Benutzerprofil gefunden",
+              "No user profile found"
+            )
+          );
+        }
         return;
       }
 
@@ -336,26 +420,33 @@ export const usePayoutMutations = () => {
         const result = await transaction.isPersisted.promise;
 
         if (result.error) {
-          showActionErrorNotification(result.error.message);
+          console.error("Failed to update payout:", id, item);
+          if (showNotification) {
+            showActionErrorNotification(result.error.message);
+          }
           return;
         }
 
         // Wait a bit for side effects to complete
         await new Promise((resolve) => setTimeout(resolve, 100));
 
-        showActionSuccessNotification(
-          getLocalizedText(
-            "Auszahlung erfolgreich aktualisiert",
-            "Payout successfully updated"
-          )
-        );
+        if (showNotification) {
+          showActionSuccessNotification(
+            getLocalizedText(
+              "Auszahlung erfolgreich aktualisiert",
+              "Payout successfully updated"
+            )
+          );
+        }
       } catch (error) {
-        showActionErrorNotification(
-          getLocalizedText(
-            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-          )
-        );
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+            )
+          );
+        }
       }
     },
     [profile?.id, getLocalizedText]
@@ -364,17 +455,24 @@ export const usePayoutMutations = () => {
   /**
    * Deletes a Payout with automatic notification and side effects.
    * @param id - The ID of the payout to delete
+   * @param showNotification - Whether to show notification messages
    * @returns True if the payout was deleted, false if an error occurs
    */
-  const handleDeletePayout = useCallback(async (id: string | string[]) => {
-    const transaction = deletePayout(id);
-    const result = await transaction.isPersisted.promise;
+  const handleDeletePayout = useCallback(
+    async (id: string | string[], showNotification: boolean = false) => {
+      const transaction = deletePayout(id);
+      const result = await transaction.isPersisted.promise;
 
-    if (result.error) {
-      showActionErrorNotification(result.error.message);
-      return;
-    }
-  }, []);
+      if (result.error) {
+        console.error("Failed to delete payout:", id);
+        if (showNotification) {
+          showActionErrorNotification(result.error.message);
+        }
+        return;
+      }
+    },
+    []
+  );
 
   return {
     addHourlyPayout: handleAddHourlyPayout,

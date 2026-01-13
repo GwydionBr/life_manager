@@ -34,15 +34,19 @@ export const useFinanceProjectMutations = () => {
    */
   const handleAddFinanceProject = useCallback(
     async (
-      newFinanceProject: InsertFinanceProject
+      newFinanceProject: InsertFinanceProject,
+      showNotification: boolean = false
     ): Promise<FinanceProject | undefined> => {
       if (!profile?.id) {
-        showActionErrorNotification(
-          getLocalizedText(
-            "Kein Benutzerprofil gefunden",
-            "No user profile found"
-          )
-        );
+        console.error("No profile found");
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Kein Benutzerprofil gefunden",
+              "No user profile found"
+            )
+          );
+        }
         return;
       }
 
@@ -50,30 +54,38 @@ export const useFinanceProjectMutations = () => {
         const result = await addFinanceProject(newFinanceProject, profile.id);
 
         if (!result) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Fehler beim Erstellen des Finanzprojekts",
-              "Error creating finance project"
-            )
-          );
+          console.error("Failed to create finance project:", newFinanceProject);
+          if (showNotification) {
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Erstellen des Finanzprojekts",
+                "Error creating finance project"
+              )
+            );
+          }
           return;
         }
 
-        showActionSuccessNotification(
-          getLocalizedText(
-            "Finanzprojekt erfolgreich erstellt",
-            "Finance project successfully created"
-          )
-        );
+        if (showNotification) {
+          showActionSuccessNotification(
+            getLocalizedText(
+              "Finanzprojekt erfolgreich erstellt",
+              "Finance project successfully created"
+            )
+          );
+        }
 
         return result;
       } catch (error) {
-        showActionErrorNotification(
-          getLocalizedText(
-            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-          )
-        );
+        console.error(error);
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+            )
+          );
+        }
       }
     },
     [profile?.id, getLocalizedText]
@@ -83,14 +95,21 @@ export const useFinanceProjectMutations = () => {
    * Updates a Finance Project with automatic notification.
    */
   const handleUpdateFinanceProject = useCallback(
-    async (id: string | string[], item: UpdateFinanceProject) => {
+    async (
+      id: string | string[],
+      item: UpdateFinanceProject,
+      showNotification: boolean = false
+    ) => {
       if (!profile?.id) {
-        showActionErrorNotification(
-          getLocalizedText(
-            "Kein Benutzerprofil gefunden",
-            "No user profile found"
-          )
-        );
+        console.error("No profile found");
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Kein Benutzerprofil gefunden",
+              "No user profile found"
+            )
+          );
+        }
 
         return;
       }
@@ -99,31 +118,38 @@ export const useFinanceProjectMutations = () => {
         const result = await updateFinanceProject(id, item, profile.id);
 
         if (!result) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Fehler beim Aktualisieren des Finanzprojekts",
-              "Error updating finance project"
-            )
-          );
+          console.error("Failed to update finance project:", id, item);
+          if (showNotification) {
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Aktualisieren des Finanzprojekts",
+                "Error updating finance project"
+              )
+            );
+          }
           return;
         }
 
-        showActionSuccessNotification(
-          getLocalizedText(
-            "Finanzprojekt erfolgreich aktualisiert",
-            "Finance project successfully updated"
-          )
-        );
+        if (showNotification) {
+          showActionSuccessNotification(
+            getLocalizedText(
+              "Finanzprojekt erfolgreich aktualisiert",
+              "Finance project successfully updated"
+            )
+          );
+        }
 
         return true;
       } catch (error) {
         console.log(error);
-        showActionErrorNotification(
-          getLocalizedText(
-            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-          )
-        );
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+            )
+          );
+        }
       }
     },
     [profile?.id, getLocalizedText]
@@ -133,35 +159,43 @@ export const useFinanceProjectMutations = () => {
    * Deletes a Finance Project with automatic notification.
    */
   const handleDeleteFinanceProject = useCallback(
-    async (id: string | string[]) => {
+    async (id: string | string[], showNotification: boolean = false) => {
       try {
         const result = await deleteFinanceProject(id);
 
         if (!result) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Fehler beim Löschen des Finanzprojekts",
-              "Error deleting finance project"
-            )
-          );
+          console.error("Failed to delete finance project:", id);
+          if (showNotification) {
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Löschen des Finanzprojekts",
+                "Error deleting finance project"
+              )
+            );
+          }
           return;
         }
 
-        showActionSuccessNotification(
-          getLocalizedText(
-            "Finanzprojekt erfolgreich gelöscht",
-            "Finance project successfully deleted"
-          )
-        );
+        if (showNotification) {
+          showActionSuccessNotification(
+            getLocalizedText(
+              "Finanzprojekt erfolgreich gelöscht",
+              "Finance project successfully deleted"
+            )
+          );
+        }
 
         return true;
       } catch (error) {
-        showActionErrorNotification(
-          getLocalizedText(
-            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-          )
-        );
+        console.error(error);
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+            )
+          );
+        }
       }
     },
     [getLocalizedText]

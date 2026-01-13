@@ -42,8 +42,10 @@ export default function ColumnHeader({
   visibleProjects,
 }: ColumnHeaderProps) {
   const { hovered, ref } = useHover();
-  const { formatDate, formatMoney, formatDuration, getLocalizedText } = useIntl();
+  const { formatDate, formatMoney, formatDuration, getLocalizedText } =
+    useIntl();
   const { isTimerRunning, timers } = useTimeTrackerManager();
+
   const timer = useMemo(
     () => Object.values(timers).find((t) => t.state === TimerState.Running),
     [timers]
@@ -177,9 +179,18 @@ export default function ColumnHeader({
                     : acc,
                 0
               ) ?? 0;
-            const earnings = (p.salary * totalTime) / 3600;
+            const totalTimeWithTimer =
+              totalTime +
+              (day &&
+              isToday(day.day) &&
+              isTimerRunning &&
+              timer?.projectId === p.id
+                ? (timer?.activeSeconds ?? 0)
+                : 0);
 
-            if (totalTime === 0) return null;
+            const earnings = (p.salary * totalTimeWithTimer) / 3600;
+
+            if (totalTimeWithTimer === 0) return null;
             return (
               <Card
                 key={p.id}
@@ -210,17 +221,17 @@ export default function ColumnHeader({
                       </Text>
                       <Group gap="md" mt={4}>
                         <Group gap={4}>
-                          <IconHourglass size={14} strokeWidth={1.5}/>
+                          <IconHourglass size={14} strokeWidth={1.5} />
                           <Text size="xs" c="dimmed" fw={500}>
-                            {formatDuration(totalTime)}
+                            {formatDuration(totalTimeWithTimer)}
                           </Text>
                         </Group>
                         {earnings > 0 && (
                           <Group gap={4}>
                             {p.currency === "EUR" ? (
-                              <IconCurrencyEuro size={14} strokeWidth={1.5}/>
+                              <IconCurrencyEuro size={14} strokeWidth={1.5} />
                             ) : (
-                              <IconCurrencyDollar size={14} strokeWidth={1.5}/>
+                              <IconCurrencyDollar size={14} strokeWidth={1.5} />
                             )}
                             <Text size="xs" c="dimmed" fw={500}>
                               {formatMoney(earnings, p.currency)}
@@ -244,13 +255,18 @@ export default function ColumnHeader({
                 <Stack gap="xs">
                   <Group gap="md" justify="space-between">
                     <Group gap={4}>
-                      <IconHourglass size={16} strokeWidth={1.5}/>
+                      <IconHourglass size={16} strokeWidth={1.5} />
                       <Text size="sm" fw={600}>
                         {getLocalizedText("Gesamt", "Total")}
                       </Text>
                     </Group>
                     <Text size="sm" fw={600}>
-                      {formatDuration(totalTime)}
+                      {formatDuration(
+                        totalTime +
+                          (day && isToday(day.day) && isTimerRunning
+                            ? (timer?.activeSeconds ?? 0)
+                            : 0)
+                      )}
                     </Text>
                   </Group>
                   {(() => {

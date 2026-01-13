@@ -22,36 +22,47 @@ export const useProfileMutations = () => {
    * Updates a Profile with automatic notification.
    */
   const handleUpdateProfile = useCallback(
-    async (id: string, item: ProfileUpdate) => {
+    async (
+      id: string,
+      item: ProfileUpdate,
+      showNotification: boolean = false
+    ) => {
       try {
         const result = await updateProfile(id, item);
 
         if (!result) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Fehler beim Aktualisieren des Profils",
-              "Error updating profile"
-            )
-          );
+          console.error("Failed to update profile:", id, item);
+          if (showNotification) {
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Aktualisieren des Profils",
+                "Error updating profile"
+              )
+            );
+          }
           return;
         }
 
-        showActionSuccessNotification(
-          getLocalizedText(
-            "Profil erfolgreich aktualisiert",
-            "Profile successfully updated"
-          )
-        );
+        if (showNotification) {
+          showActionSuccessNotification(
+            getLocalizedText(
+              "Profil erfolgreich aktualisiert",
+              "Profile successfully updated"
+            )
+          );
+        }
 
         return true;
       } catch (error) {
         console.error(error);
-        showActionErrorNotification(
-          getLocalizedText(
-            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-          )
-        );
+        if (showNotification) {
+          showActionErrorNotification(
+            getLocalizedText(
+              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+            )
+          );
+        }
       }
     },
     [getLocalizedText]
