@@ -14,6 +14,7 @@ import {
 } from "@mantine/core";
 import { IconArrowBarLeft } from "@tabler/icons-react";
 import TimeTrackerManager from "@/components/TimeTracker/TimeTrackerManager";
+import CalendarAside from "@/components/WorkCalendar/CalendarAside/CalendarAside";
 
 import TransitionDivider from "@/components/UI/TransitionDivider";
 import DelayedTooltip from "@/components/UI/DelayedTooltip";
@@ -71,19 +72,19 @@ export default function Aside({
         duration={200}
         enterDelay={200}
       />
+      <CalendarAside isBig={isAsideOpen} />
+      <TransitionDivider
+        mounted={isAsideOpen}
+        transition="fade"
+        duration={200}
+        enterDelay={200}
+      />
       <ScrollArea type="never">
         <TimeTrackerManager
           isBig={isAsideOpen}
           isTimeTrackerMinimized={isTimeTrackerMinimized}
           setIsTimeTrackerMinimized={setIsTimeTrackerMinimized}
         />
-        <TransitionDivider
-          mounted={isAsideOpen}
-          transition="fade"
-          duration={200}
-          enterDelay={200}
-        />
-        {/* <CalendarAside isBig={isAsideOpen} /> */}
       </ScrollArea>
     </Stack>
   );

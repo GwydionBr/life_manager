@@ -111,17 +111,6 @@ export default function AppointmentForm({
   const handleAllDayToggle = (checked: boolean) => {
     setIsAllDay(checked);
     form.setFieldValue("is_all_day", checked);
-
-    if (checked) {
-      // When switching to all-day, set times to start/end of day
-      const startDate = new Date(form.values.start_date || new Date());
-      startDate.setHours(0, 0, 0, 0);
-      form.setFieldValue("start_date", startDate.toISOString());
-
-      const endDate = new Date(form.values.end_date || new Date());
-      endDate.setHours(23, 59, 59, 999);
-      form.setFieldValue("end_date", endDate.toISOString());
-    }
   };
 
   // Handle start date change - accepts both Date and string (for compatibility)
@@ -134,16 +123,12 @@ export default function AppointmentForm({
     const endDate = new Date(form.values.end_date || new Date());
     if (endDate < dateValue) {
       const newEndDate = new Date(dateValue);
-      if (isAllDay) {
-        newEndDate.setHours(23, 59, 59, 999);
-      } else {
-        newEndDate.setHours(
-          dateValue.getHours() + 1,
-          dateValue.getMinutes(),
-          0,
-          0
-        );
-      }
+      newEndDate.setHours(
+        dateValue.getHours() + 1,
+        dateValue.getMinutes(),
+        0,
+        0
+      );
       form.setFieldValue("end_date", newEndDate.toISOString());
     }
   };
@@ -158,16 +143,12 @@ export default function AppointmentForm({
     const startDate = new Date(form.values.start_date || new Date());
     if (dateValue < startDate) {
       const newStartDate = new Date(dateValue);
-      if (isAllDay) {
-        newStartDate.setHours(0, 0, 0, 0);
-      } else {
-        newStartDate.setHours(
-          dateValue.getHours() - 1,
-          dateValue.getMinutes(),
-          0,
-          0
-        );
-      }
+      newStartDate.setHours(
+        dateValue.getHours() - 1,
+        dateValue.getMinutes(),
+        0,
+        0
+      );
       form.setFieldValue("start_date", newStartDate.toISOString());
     }
   };
@@ -213,6 +194,7 @@ export default function AppointmentForm({
         >
           <TextInput
             withAsterisk
+            data-autofocus
             label={getLocalizedText("Titel", "Title")}
             placeholder={getLocalizedText("Titel eingeben", "Enter title")}
             {...form.getInputProps("title")}

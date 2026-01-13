@@ -4,7 +4,7 @@ import { useWorkProjects } from "@/db/collections/work/work-project/use-work-pro
 import { useAppointmentMutations } from "@/db/collections/work/appointment/use-appointment-mutations";
 
 import { Drawer, Flex, Group, Text, useDrawersStack, Box } from "@mantine/core";
-import { IconExclamationCircle, IconCalendarPlus } from "@tabler/icons-react";
+import { IconExclamationCircle } from "@tabler/icons-react";
 import AppointmentForm from "@/components/WorkCalendar/Appointment/AppointmentForm";
 import DeleteActionIcon from "@/components/UI/ActionIcons/DeleteActionIcon";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
@@ -20,7 +20,7 @@ import {
 import { WorkProject } from "@/types/work.types";
 
 interface EditAppointmentDrawerProps {
-  appointment?: Appointment;
+  appointment: Appointment;
   project?: WorkProject;
   opened: boolean;
   onClose: () => void;
@@ -42,8 +42,7 @@ export default function EditAppointmentDrawer({
     project
   );
   const { data: workProjects } = useWorkProjects();
-  const { updateAppointment, addAppointment, deleteAppointment } =
-    useAppointmentMutations();
+  const { updateAppointment, deleteAppointment } = useAppointmentMutations();
 
   const drawerStack = useDrawersStack([
     "edit-appointment",
@@ -51,8 +50,6 @@ export default function EditAppointmentDrawer({
     "add-project",
     "tag-form",
   ]);
-
-  const isNewAppointment = !appointment;
 
   // Sync external opened state with internal drawer stack
   useEffect(() => {
@@ -83,14 +80,7 @@ export default function EditAppointmentDrawer({
           : null,
     };
 
-    if (isNewAppointment) {
-      await addAppointment(cleanedValues as InsertAppointment);
-    } else {
-      await updateAppointment(
-        appointment.id,
-        cleanedValues as UpdateAppointment
-      );
-    }
+    await updateAppointment(appointment.id, cleanedValues as UpdateAppointment);
     handleClose();
   }
 
@@ -143,29 +133,18 @@ export default function EditAppointmentDrawer({
           onClose={handleClose}
           title={
             <Group>
-              {!isNewAppointment && (
-                <DeleteActionIcon
-                  tooltipLabel={getLocalizedText(
-                    "Termin löschen",
-                    "Delete Appointment"
-                  )}
-                  onClick={() => {
-                    drawerStack.open("delete-appointment");
-                  }}
-                />
-              )}
-              {isNewAppointment ? (
-                <>
-                  <IconCalendarPlus size={20} />
-                  <Text>
-                    {getLocalizedText("Termin hinzufügen", "Add Appointment")}
-                  </Text>
-                </>
-              ) : (
-                <Text>
-                  {getLocalizedText("Termin bearbeiten", "Edit Appointment")}
-                </Text>
-              )}
+              <DeleteActionIcon
+                tooltipLabel={getLocalizedText(
+                  "Termin löschen",
+                  "Delete Appointment"
+                )}
+                onClick={() => {
+                  drawerStack.open("delete-appointment");
+                }}
+              />
+              <Text>
+                {getLocalizedText("Termin bearbeiten", "Edit Appointment")}
+              </Text>
             </Group>
           }
           size="lg"
@@ -178,7 +157,7 @@ export default function EditAppointmentDrawer({
               onSubmit={handleSubmit}
               onOpenProjectForm={() => drawerStack.open("add-project")}
               onProjectChange={setCurrentProject}
-              newAppointment={isNewAppointment}
+              newAppointment={false}
               project={currentProject}
             />
           </Flex>
@@ -217,38 +196,36 @@ export default function EditAppointmentDrawer({
             onSuccess={(tag) => setTagIds([...tagIds, tag.id])}
           />
         </Drawer>
-        {!isNewAppointment && (
-          <Drawer
-            {...drawerStack.register("delete-appointment")}
-            onClose={() => drawerStack.close("delete-appointment")}
-            title={
-              <Group>
-                <IconExclamationCircle size={25} color="red" />
-                <Text>
-                  {getLocalizedText("Termin löschen", "Delete Appointment")}
-                </Text>
-              </Group>
-            }
-            size="md"
-          >
-            <Text>
-              {getLocalizedText(
-                "Bist du dir sicher, dass du diesen Termin löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden. ",
-                "Are you sure you want to delete this appointment? This action cannot be undone. "
-              )}
-            </Text>
-            <Group mt="md" justify="flex-end" gap="sm">
-              <CancelButton onClick={handleClose} color="teal" />
-              <DeleteButton
-                onClick={handleDelete}
-                tooltipLabel={getLocalizedText(
-                  "Termin löschen",
-                  "Delete Appointment"
-                )}
-              />
+        <Drawer
+          {...drawerStack.register("delete-appointment")}
+          onClose={() => drawerStack.close("delete-appointment")}
+          title={
+            <Group>
+              <IconExclamationCircle size={25} color="red" />
+              <Text>
+                {getLocalizedText("Termin löschen", "Delete Appointment")}
+              </Text>
             </Group>
-          </Drawer>
-        )}
+          }
+          size="md"
+        >
+          <Text>
+            {getLocalizedText(
+              "Bist du dir sicher, dass du diesen Termin löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden. ",
+              "Are you sure you want to delete this appointment? This action cannot be undone. "
+            )}
+          </Text>
+          <Group mt="md" justify="flex-end" gap="sm">
+            <CancelButton onClick={handleClose} color="teal" />
+            <DeleteButton
+              onClick={handleDelete}
+              tooltipLabel={getLocalizedText(
+                "Termin löschen",
+                "Delete Appointment"
+              )}
+            />
+          </Group>
+        </Drawer>
       </Drawer.Stack>
     </Box>
   );
