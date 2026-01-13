@@ -94,9 +94,9 @@ export default function DashboardHeader() {
         </Button> */}
       </Group>
       <Group gap="xs">
-        <NotificationBell />
-        <DatabaseMenu />
-        <UserMenu />
+        <NotificationBell isNavbar={false} />
+        <DatabaseMenu isNavbar={false} />
+        <UserMenu isNavbar={false} />
         <SchemeToggle />
         <ActionIcon
           size="xl"

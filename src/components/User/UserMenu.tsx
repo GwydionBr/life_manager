@@ -31,7 +31,7 @@ import { LightSchemeIcon } from "@/components/Scheme/LightScheme";
 import { connector } from "@/db/powersync/db";
 import { cleanupOnLogout } from "@/lib/cleanupOnLogout";
 
-export function UserMenu() {
+export function UserMenu({ isNavbar = true }: { isNavbar?: boolean }) {
   const router = useRouter();
   const { getLocalizedText, locale } = useIntl();
   const { setIsModalOpen } = useSettingsStore();
@@ -64,8 +64,12 @@ export function UserMenu() {
     <Menu
       shadow="md"
       width={280}
-      position="bottom-end"
-      transitionProps={{ transition: "fade-down", duration: 200 }}
+      position={isNavbar ? "right" : "bottom"}
+      transitionProps={{
+        transition: isNavbar ? "fade-right" : "fade-down",
+        duration: 200,
+      }}
+      withArrow
     >
       <Menu.Target>
         <Button variant="transparent" style={{ padding: "0 8px" }}>

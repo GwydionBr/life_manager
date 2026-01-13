@@ -7,7 +7,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconBell } from "@tabler/icons-react";
 import { NotificationDropdown } from "./NotificationDropdown";
 
-export function NotificationBell() {
+export function NotificationBell({ isNavbar = true }: { isNavbar?: boolean }) {
   const { getLocalizedText } = useIntl();
   const [opened, { toggle, close }] = useDisclosure(false);
   const { data: unreadNotifications } = useUnreadNotifications();
@@ -21,11 +21,12 @@ export function NotificationBell() {
     <Popover
       opened={opened}
       onChange={toggle}
-      position="right-start"
-      offset={12}
+      position={isNavbar ? "right" : "bottom"}
+      offset={5}
       shadow="lg"
       radius="md"
-      transitionProps={{ transition: "fade-down", duration: 200 }}
+      withArrow
+      transitionProps={{ transition: isNavbar ? "fade-right" : "fade-down", duration: 200 }}
     >
       <Popover.Target>
         <Indicator

@@ -52,7 +52,7 @@ type AppModuleStats = {
 };
 
 // TODO: Check if AI implementation is correct
-export function DatabaseMenu() {
+export function DatabaseMenu({ isNavbar = true }: { isNavbar?: boolean }) {
   const { online } = useNetwork();
   const { getLocalizedText, formatDate } = useIntl();
 
@@ -247,8 +247,12 @@ export function DatabaseMenu() {
     <Menu
       shadow="lg"
       width={420}
-      position="bottom-end"
-      transitionProps={{ transition: "fade-down", duration: 200 }}
+      position={isNavbar ? "right" : "bottom"}
+      transitionProps={{
+        transition: isNavbar ? "fade-right" : "fade-down",
+        duration: 200,
+      }}
+      withArrow
     >
       <Menu.Target>
         <Indicator

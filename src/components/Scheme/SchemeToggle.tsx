@@ -6,7 +6,11 @@ import { LightSchemeActionIcon, LightSchemeIcon } from "./LightScheme";
 import { DarkSchemeActionIcon, DarkSchemeIcon } from "./DarkScheme";
 import { SystemSchemeActionIcon, SystemSchemeIcon } from "./SystemScheme";
 
-export default function SchemeToggleButton() {
+export default function SchemeToggleButton({
+  isNavbar = true,
+}: {
+  isNavbar?: boolean;
+}) {
   const { getLocalizedText } = useIntl();
   const { setColorScheme, colorScheme } = useMantineColorScheme();
   const [mounted, setMounted] = useState(false);
@@ -20,8 +24,12 @@ export default function SchemeToggleButton() {
     <Menu
       shadow="md"
       width={180}
-      position="bottom"
-      transitionProps={{ transition: "fade-down", duration: 200 }}
+      position={isNavbar ? "right" : "bottom"}
+      transitionProps={{
+        transition: isNavbar ? "fade-right" : "fade-down",
+        duration: 200,
+      }}
+      withArrow
     >
       <Menu.Target>
         {colorScheme === "dark" ? (

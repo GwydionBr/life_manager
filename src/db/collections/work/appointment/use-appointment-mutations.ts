@@ -287,6 +287,7 @@ export const useAppointmentMutations = () => {
       syncAppointmentNotification,
       findNotification,
       deleteNotification,
+      appointments,
     ]
   );
 
