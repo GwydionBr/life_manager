@@ -2,9 +2,6 @@ import { useIntl } from "@/hooks/useIntl";
 import {
   IconClock,
   IconCheck,
-  IconX,
-  IconClockPlay,
-  IconCalendarEvent,
   IconFolder,
   IconTag,
   IconNote,
@@ -35,74 +32,11 @@ import {
   showActionSuccessNotification,
   showActionErrorNotification,
 } from "@/lib/notificationFunctions";
+import { AppointmentStatusBadge } from "../Appointment/AppointmentStatusBadge";
 
 interface AppointmentHoverCardProps {
   appointment: CalendarAppointment;
   color: string;
-}
-
-/**
- * Get status icon for hover card
- */
-function getStatusIcon(status: CalendarAppointment["status"]) {
-  const iconSize = 16;
-  switch (status) {
-    case "upcoming":
-      return <IconClock size={iconSize} />;
-    case "active":
-      return <IconClockPlay size={iconSize} />;
-    case "completed":
-      return <IconCheck size={iconSize} />;
-    case "missed":
-      return <IconX size={iconSize} />;
-    case "converted":
-      return <IconCalendarEvent size={iconSize} />;
-    default:
-      return <IconCalendarEvent size={iconSize} />;
-  }
-}
-
-/**
- * Get status badge color
- */
-function getStatusBadgeColor(status: CalendarAppointment["status"]) {
-  switch (status) {
-    case "upcoming":
-      return "blue";
-    case "active":
-      return "teal";
-    case "completed":
-      return "green";
-    case "missed":
-      return "red";
-    case "converted":
-      return "violet";
-    default:
-      return "gray";
-  }
-}
-
-/**
- * Get localized status text
- */
-function getStatusText(
-  status: CalendarAppointment["status"],
-  getLocalizedText: (de: string, en: string) => string
-) {
-  switch (status) {
-    case "upcoming":
-      return getLocalizedText("Bevorstehend", "Upcoming");
-    case "active":
-      return getLocalizedText("Aktiv", "Active");
-    case "completed":
-      return getLocalizedText("Abgeschlossen", "Completed");
-    case "missed":
-      return getLocalizedText("Verpasst", "Missed");
-    case "converted":
-      return getLocalizedText("Konvertiert", "Converted");
-    default:
-      return status;
-  }
 }
 
 /**
@@ -208,14 +142,7 @@ export default function AppointmentHoverCard({
           >
             {appointment.title}
           </Text>
-          <Badge
-            size="sm"
-            variant="light"
-            color={getStatusBadgeColor(appointment.status)}
-            leftSection={getStatusIcon(appointment.status)}
-          >
-            {getStatusText(appointment.status, getLocalizedText)}
-          </Badge>
+          <AppointmentStatusBadge status={appointment.status} />
         </Group>
       </Card.Section>
       <Stack pt="sm" pb="xs" gap="sm" px="sm">

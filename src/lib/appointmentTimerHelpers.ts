@@ -112,7 +112,7 @@ export function shouldShowConversionPrompt(appointment: Appointment): boolean {
   // - Status is missed or active
   return (
     now > appointment.end_date &&
-    (appointment.status === "missed" || appointment.status === "active")
+    (appointment.status === "finished" || appointment.status === "active")
   );
 }
 

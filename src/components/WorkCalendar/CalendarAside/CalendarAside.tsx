@@ -145,16 +145,14 @@ export default function CalendarAside({ isBig }: CalendarAsideProps) {
               <IconCalendarPlus size={20} />
             </ActionIcon>
           </Tooltip>
-          {todayAppointments.length > 0 && (
-            <Badge
-              size="xs"
-              variant="filled"
-              color="blue"
-              style={{ marginTop: rem(8) }}
-            >
-              {todayAppointments.length}
-            </Badge>
-          )}
+          <Badge
+            size="xs"
+            variant="filled"
+            color={todayAppointments.length > 0 ? "blue" : "gray"}
+            style={{ marginTop: rem(8) }}
+          >
+            {todayAppointments.length}
+          </Badge>
         </Box>
         <NewAppointmentModal
           opened={newAppointmentModalOpened}
@@ -189,7 +187,11 @@ export default function CalendarAside({ isBig }: CalendarAsideProps) {
             </Text>
           </Group>
           <Group gap={4} wrap="nowrap">
-            <Badge size="sm" variant="filled" color={todayAppointments.length > 0 ? "blue" : "gray"}>
+            <Badge
+              size="sm"
+              variant="filled"
+              color={todayAppointments.length > 0 ? "blue" : "gray"}
+            >
               {todayAppointments.length} {getLocalizedText("heute", "today")}
             </Badge>
             <ActionIcon
@@ -229,7 +231,7 @@ export default function CalendarAside({ isBig }: CalendarAsideProps) {
                   )}
                 </Text>
               ) : (
-                <ScrollArea.Autosize mah={150} type="auto" >
+                <ScrollArea.Autosize mah={150} type="auto">
                   {upcomingAppointments.map((appointment) => (
                     <Paper
                       key={appointment.id}

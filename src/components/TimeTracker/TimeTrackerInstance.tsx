@@ -3,6 +3,7 @@ import { useTimeTracker } from "@/hooks/useTimeTracker";
 import { useSettings } from "@/db/collections/settings/use-settings-query";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { useWorkTimeEntryMutations } from "@/db/collections/work/work-time-entry/use-work-time-entry-mutations";
+import { useAppointmentMutations } from "@/db/collections/work/appointment/use-appointment-mutations";
 import {
   useTimeTrackerManager,
   TimerData,
@@ -14,6 +15,7 @@ import TimeTrackerComponentSmall from "./Small/TimeTrackerComponentSmall";
 
 import { TimerState } from "@/types/timeTracker.types";
 import { InsertWorkTimeEntry } from "@/types/work.types";
+import { AppointmentStatus } from "@/types/workCalendar.types";
 
 /**
  * Props for the TimeTrackerInstance component.
@@ -72,7 +74,7 @@ export default function TimeTrackerInstance({
   );
 
   const { addWorkTimeEntry } = useWorkTimeEntryMutations();
-
+  const { updateAppointment } = useAppointmentMutations();
   // Commented out: Future mutation hook for creating work time entries
   // const {
   //   mutate: createWorkTimeEntryMutation,
@@ -139,6 +141,8 @@ export default function TimeTrackerInstance({
     storedPausedSeconds,
     timerRoundingSettings,
     tempTimerRoundingSettings,
+    appointmentId,
+    appointmentTitle,
     modifyActiveSeconds,
     modifyPausedSeconds,
     getCurrentSession,
@@ -170,6 +174,8 @@ export default function TimeTrackerInstance({
     storedActiveSeconds: timer.storedActiveSeconds,
     storedPausedSeconds: timer.storedPausedSeconds,
     memo: timer.memo,
+    appointmentId: timer.appointmentId,
+    appointmentTitle: timer.appointmentTitle,
   });
 
   /**
@@ -351,10 +357,18 @@ export default function TimeTrackerInstance({
       memo: memo === "" ? null : memo,
     };
 
-    await addWorkTimeEntry(
+    const newTimeEntry = await addWorkTimeEntry(
       newSession,
       tempTimerRoundingSettings ?? timerRoundingSettings
     );
+
+    console.log("Updating appointment", appointmentId, newTimeEntry);
+    if (appointmentId && newTimeEntry) {
+      await updateAppointment(appointmentId, {
+        work_time_entry_id: newTimeEntry[0].id,
+        status: AppointmentStatus.CONVERTED,
+      });
+    }
 
     // Reset timer state after submission
     stopTimer();

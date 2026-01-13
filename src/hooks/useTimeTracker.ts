@@ -43,6 +43,8 @@ interface TimeTrackerState {
   storedActiveSeconds: number; // Accumulated active seconds before current running period
   storedPausedSeconds: number; // Accumulated paused seconds before current pause period
   memo: string | null;
+  appointmentId?: string;
+  appointmentTitle?: string;
 }
 
 /**
@@ -392,6 +394,8 @@ export function useTimeTracker(initialState: TimeTrackerState) {
       storedActiveSeconds: 0,
       storedPausedSeconds: 0,
       memo: null, // Clear memo
+      appointmentId: undefined,
+      appointmentTitle: undefined,
     }));
   }, []);
 

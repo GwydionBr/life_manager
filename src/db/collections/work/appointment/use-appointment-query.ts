@@ -14,6 +14,14 @@ import { startOfDay, endOfDay } from "date-fns";
 export const useAppointments = () =>
   useLiveQuery((q) => q.from({ appointments: appointmentsCollection }));
 
+export const useAppointmentById = (id: string) =>
+  useLiveQuery((q) =>
+    q
+      .from({ appointments: appointmentsCollection })
+      .where(({ appointments }) => eq(appointments.id, id))
+      .findOne()
+  );
+
 export const useCalendarAppointments = () =>
   useLiveQuery((q) =>
     q

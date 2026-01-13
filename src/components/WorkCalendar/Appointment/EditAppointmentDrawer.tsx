@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useIntl } from "@/hooks/useIntl";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { useAppointmentMutations } from "@/db/collections/work/appointment/use-appointment-mutations";
+import { useAppointmentById } from "@/db/collections/work/appointment/use-appointment-query";
 
 import {
   Drawer,
@@ -10,17 +11,10 @@ import {
   Text,
   useDrawersStack,
   Box,
-  Alert,
-  Button,
-  Stack,
   ActionIcon,
   Tooltip,
 } from "@mantine/core";
-import {
-  IconExclamationCircle,
-  IconTransform,
-  IconAlertTriangle,
-} from "@tabler/icons-react";
+import { IconExclamationCircle, IconTransform } from "@tabler/icons-react";
 import AppointmentForm from "@/components/WorkCalendar/Appointment/AppointmentForm";
 import DeleteActionIcon from "@/components/UI/ActionIcons/DeleteActionIcon";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
@@ -29,6 +23,9 @@ import ProjectForm from "@/components/Work/Project/ProjectForm";
 import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 import { ConvertToTimeEntryForm } from "./ConvertToTimeEntryForm";
 import { AppointmentStatusBadge } from "./AppointmentStatusBadge";
+import { AppointmentConversionPromptAlert } from "./AppointmentConversionPromptAlert";
+import { AppointmentNoProjectAlert } from "./AppointmentNoProjectAlert";
+import { AppointmentStatusAlert } from "./AppointmentStatusAlert";
 import {
   canConvertAppointmentToTimeEntry,
   shouldShowConversionPrompt,
@@ -40,6 +37,7 @@ import {
   UpdateAppointment,
 } from "@/types/work.types";
 import { WorkProject } from "@/types/work.types";
+import { AppointmentStatus } from "@/types/workCalendar.types";
 
 interface EditAppointmentDrawerProps {
   appointment: Appointment;
@@ -51,13 +49,14 @@ interface EditAppointmentDrawerProps {
 }
 
 export default function EditAppointmentDrawer({
-  appointment,
+  appointment: initialAppointment,
   opened,
   onClose,
   project,
   initialStartDate,
   initialEndDate,
 }: EditAppointmentDrawerProps) {
+  const { data: appointmentData } = useAppointmentById(initialAppointment.id);
   const { getLocalizedText } = useIntl();
   const [tagIds, setTagIds] = useState<string[]>([]);
   const [currentProject, setCurrentProject] = useState<WorkProject | undefined>(
@@ -65,6 +64,10 @@ export default function EditAppointmentDrawer({
   );
   const { data: workProjects } = useWorkProjects();
   const { updateAppointment, deleteAppointment } = useAppointmentMutations();
+
+  const appointment = useMemo(() => {
+    return appointmentData ?? initialAppointment;
+  }, [appointmentData, initialAppointment]);
 
   const drawerStack = useDrawersStack([
     "edit-appointment",
@@ -74,20 +77,55 @@ export default function EditAppointmentDrawer({
     "convert-to-time-entry",
   ]);
 
-  const [showPrompt, setShowPrompt] = useState(false);
+  const [showConversionPrompt, setShowConversionPrompt] = useState(false);
+  const [showNoProjectAlert, setShowNoProjectAlert] = useState(false);
+  const [showStatusAlert, setShowStatusAlert] = useState(false);
+
+  // Determine which alert to show based on appointment state
+  const determineAlertsToShow = useCallback(() => {
+    const now = new Date();
+    const endDate = new Date(appointment.end_date);
+    const isPast = endDate < now;
+    const hasProject = appointment.work_project_id !== null;
+    const status = appointment.status;
+
+    // Reset all alerts
+    setShowConversionPrompt(false);
+    setShowNoProjectAlert(false);
+    setShowStatusAlert(false);
+
+    // Priority 1: Show status alert if appointment is already marked as missed or completed
+    if (
+      status === AppointmentStatus.MISSED ||
+      status === AppointmentStatus.COMPLETED
+    ) {
+      setShowStatusAlert(true);
+      return;
+    }
+
+    // Priority 2: Show no project alert if finished/past and no project
+    if ((status === AppointmentStatus.FINISHED || isPast) && !hasProject) {
+      setShowNoProjectAlert(true);
+      return;
+    }
+
+    // Priority 3: Show conversion prompt if past and has project
+    if (isPast && hasProject && shouldShowConversionPrompt(appointment)) {
+      setShowConversionPrompt(true);
+      return;
+    }
+  }, [appointment]);
 
   // Sync external opened state with internal drawer stack
   useEffect(() => {
     if (opened) {
       drawerStack.open("edit-appointment");
-      // Check if we should show the conversion prompt
-      setShowPrompt(shouldShowConversionPrompt(appointment));
+      determineAlertsToShow();
     } else {
       drawerStack.closeAll();
-      setShowPrompt(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [opened]);
+  }, [opened, determineAlertsToShow]);
 
   useEffect(() => {
     setCurrentProject(project);
@@ -121,12 +159,34 @@ export default function EditAppointmentDrawer({
 
   function handleOpenConvertModal() {
     drawerStack.open("convert-to-time-entry");
-    setShowPrompt(false);
+    setShowConversionPrompt(false);
+    setShowStatusAlert(false);
   }
 
   async function handleMarkAsMissed() {
-    await updateAppointment(appointment.id, { status: "missed" });
-    setShowPrompt(false);
+    await updateAppointment(appointment.id, {
+      status: AppointmentStatus.MISSED,
+    });
+    // After marking as missed, re-evaluate which alerts to show
+    setTimeout(() => determineAlertsToShow(), 100);
+  }
+
+  async function handleMarkAsCompleted() {
+    await updateAppointment(appointment.id, {
+      status: AppointmentStatus.COMPLETED,
+    });
+    // After marking as completed, re-evaluate which alerts to show
+    setTimeout(() => determineAlertsToShow(), 100);
+  }
+
+  async function handleProjectAssigned(projectId: string) {
+    await updateAppointment(appointment.id, { work_project_id: projectId });
+    const selectedProject = workProjects.find((p) => p.id === projectId);
+    if (selectedProject) {
+      setCurrentProject(selectedProject);
+    }
+    // After assigning project, re-evaluate which alerts to show
+    setTimeout(() => determineAlertsToShow(), 100);
   }
 
   const canConvert = canConvertAppointmentToTimeEntry(appointment);
@@ -210,55 +270,35 @@ export default function EditAppointmentDrawer({
           padding="md"
         >
           <Flex direction="column" gap="xl">
-            {showPrompt && (
-              <Alert
-                icon={<IconAlertTriangle size={16} />}
-                title={getLocalizedText(
-                  "Termin ist vorbei",
-                  "Appointment has passed"
-                )}
-                color="orange"
-                variant="light"
-              >
-                <Stack gap="sm">
-                  <Text size="sm">
-                    {getLocalizedText(
-                      "Dieser Termin ist bereits vorbei. Möchten Sie ihn in einen Zeiteintrag umwandeln?",
-                      "This appointment has already passed. Would you like to convert it to a time entry?"
-                    )}
-                  </Text>
-                  <Group gap="sm">
-                    <Button
-                      size="xs"
-                      variant="light"
-                      color="teal"
-                      leftSection={<IconTransform size={14} />}
-                      onClick={handleOpenConvertModal}
-                    >
-                      {getLocalizedText("Umwandeln", "Convert")}
-                    </Button>
-                    <Button
-                      size="xs"
-                      variant="light"
-                      color="red"
-                      onClick={handleMarkAsMissed}
-                    >
-                      {getLocalizedText(
-                        "Als verpasst markieren",
-                        "Mark as Missed"
-                      )}
-                    </Button>
-                    <Button
-                      size="xs"
-                      variant="subtle"
-                      color="gray"
-                      onClick={() => setShowPrompt(false)}
-                    >
-                      {getLocalizedText("Abbrechen", "Cancel")}
-                    </Button>
-                  </Group>
-                </Stack>
-              </Alert>
+            {showConversionPrompt && (
+              <AppointmentConversionPromptAlert
+                appointment={appointment}
+                onConvert={handleOpenConvertModal}
+                onMarkAsMissed={handleMarkAsMissed}
+                onDismiss={() => setShowConversionPrompt(false)}
+              />
+            )}
+
+            {showNoProjectAlert && (
+              <AppointmentNoProjectAlert
+                appointment={appointment}
+                workProjects={workProjects}
+                onMarkAsCompleted={handleMarkAsCompleted}
+                onMarkAsMissed={handleMarkAsMissed}
+                onProjectSelected={handleProjectAssigned}
+                onOpenProjectForm={() => drawerStack.open("add-project")}
+                onDismiss={() => setShowNoProjectAlert(false)}
+              />
+            )}
+
+            {showStatusAlert && (
+              <AppointmentStatusAlert
+                appointment={appointment}
+                onMarkAsCompleted={handleMarkAsCompleted}
+                onMarkAsMissed={handleMarkAsMissed}
+                onConvert={handleOpenConvertModal}
+                onDismiss={() => setShowStatusAlert(false)}
+              />
             )}
 
             <AppointmentForm

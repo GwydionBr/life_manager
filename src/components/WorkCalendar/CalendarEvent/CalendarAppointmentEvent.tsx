@@ -13,6 +13,7 @@ import AppointmentHoverCard from "./AppointmentHoverCard";
 import { getStatusStyles, getStatusIcon, getStatusText } from "@/lib/appointmentStatusHelpers";
 
 import { CalendarAppointment } from "@/types/workCalendar.types";
+import { AppointmentStatusBadge } from "../Appointment/AppointmentStatusBadge";
 
 interface CalendarAppointmentEventProps {
   a: CalendarAppointment;
@@ -87,24 +88,7 @@ export default function CalendarAppointmentEvent({
               </Text>
             )}
             {height > 30 && (
-              <Badge
-                size="xs"
-                variant="light"
-                color={
-                  a.status === "active"
-                    ? "teal"
-                    : a.status === "completed"
-                      ? "green"
-                      : a.status === "missed"
-                        ? "red"
-                        : a.status === "converted"
-                          ? "violet"
-                          : "blue"
-                }
-                style={{ alignSelf: "flex-start" }}
-              >
-                {getStatusText(a.status, getLocalizedText)}
-              </Badge>
+              <AppointmentStatusBadge status={a.status} />
             )}
           </Stack>
         </Card>

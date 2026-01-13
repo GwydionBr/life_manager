@@ -351,7 +351,7 @@ export const useAppointmentMutations = () => {
   const handleDeleteAppointment = useCallback(
     async (
       id: string | string[],
-      showNotification: boolean = true
+      showNotification: boolean = false
     ): Promise<boolean> => {
       try {
         const result = await deleteAppointment(id);

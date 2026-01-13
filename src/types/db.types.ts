@@ -1250,6 +1250,7 @@ export type Database = {
       appointmentStatus:
         | "upcoming"
         | "active"
+        | "finished"
         | "completed"
         | "missed"
         | "converted"
@@ -1416,6 +1417,7 @@ export const Constants = {
       appointmentStatus: [
         "upcoming",
         "active",
+        "finished",
         "completed",
         "missed",
         "converted",

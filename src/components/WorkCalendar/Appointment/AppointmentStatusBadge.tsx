@@ -1,6 +1,18 @@
 import { Badge } from "@mantine/core";
 import { useIntl } from "@/hooks/useIntl";
 import { Appointment } from "@/types/work.types";
+import {
+  AppointmentStatus,
+  CalendarAppointment,
+} from "@/types/workCalendar.types";
+import {
+  IconCalendarEvent,
+  IconClock,
+  IconClockPlay,
+  IconCheck,
+  IconX,
+  IconClockQuestion,
+} from "@tabler/icons-react";
 
 interface AppointmentStatusBadgeProps {
   status: Appointment["status"];
@@ -23,43 +35,84 @@ export function AppointmentStatusBadge({
 }: AppointmentStatusBadgeProps) {
   const { getLocalizedText } = useIntl();
 
-  const getStatusColor = (status: Appointment["status"]) => {
+  /**
+   * Get status icon for hover card
+   */
+  function getStatusIcon(status: CalendarAppointment["status"]) {
+    const iconSize = 16;
     switch (status) {
-      case "upcoming":
+      case AppointmentStatus.UPCOMING:
+        return <IconClock size={iconSize} />;
+      case AppointmentStatus.ACTIVE:
+        return <IconClockPlay size={iconSize} />;
+      case AppointmentStatus.FINISHED:
+        return <IconClockQuestion size={iconSize} />;
+      case AppointmentStatus.COMPLETED:
+        return <IconCheck size={iconSize} />;
+      case AppointmentStatus.MISSED:
+        return <IconX size={iconSize} />;
+      case AppointmentStatus.CONVERTED:
+        return <IconCalendarEvent size={iconSize} />;
+      default:
+        return <IconCalendarEvent size={iconSize} />;
+    }
+  }
+
+  /**
+   * Get status badge color
+   */
+  function getStatusBadgeColor(status: CalendarAppointment["status"]) {
+    switch (status) {
+      case AppointmentStatus.UPCOMING:
         return "blue";
-      case "active":
-        return "orange";
-      case "completed":
-        return "green";
-      case "missed":
-        return "red";
-      case "converted":
+      case AppointmentStatus.ACTIVE:
         return "teal";
+      case AppointmentStatus.FINISHED:
+        return "lime";
+      case AppointmentStatus.COMPLETED:
+        return "green";
+      case AppointmentStatus.MISSED:
+        return "red";
+      case AppointmentStatus.CONVERTED:
+        return "violet";
       default:
         return "gray";
     }
-  };
+  }
 
-  const getStatusLabel = (status: Appointment["status"]) => {
+  /**
+   * Get localized status text
+   */
+  function getStatusText(
+    status: CalendarAppointment["status"],
+    getLocalizedText: (de: string, en: string) => string
+  ) {
     switch (status) {
-      case "upcoming":
+      case AppointmentStatus.UPCOMING:
         return getLocalizedText("Anstehend", "Upcoming");
-      case "active":
+      case AppointmentStatus.ACTIVE:
         return getLocalizedText("Aktiv", "Active");
-      case "completed":
+      case AppointmentStatus.FINISHED:
+        return getLocalizedText("Vorbei", "Finished");
+      case AppointmentStatus.COMPLETED:
         return getLocalizedText("Abgeschlossen", "Completed");
-      case "missed":
+      case AppointmentStatus.MISSED:
         return getLocalizedText("Verpasst", "Missed");
-      case "converted":
+      case AppointmentStatus.CONVERTED:
         return getLocalizedText("Umgewandelt", "Converted");
       default:
         return status;
     }
-  };
+  }
 
   return (
-    <Badge color={getStatusColor(status)} size={size} variant="light">
-      {getStatusLabel(status)}
+    <Badge
+      size="sm"
+      variant="light"
+      color={getStatusBadgeColor(status)}
+      leftSection={getStatusIcon(status)}
+    >
+      {getStatusText(status, getLocalizedText)}
     </Badge>
   );
 }

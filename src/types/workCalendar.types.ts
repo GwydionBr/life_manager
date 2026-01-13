@@ -22,9 +22,10 @@ const appointmentStatusValues = Constants.public.Enums.appointmentStatus;
 export const AppointmentStatus = {
   UPCOMING: appointmentStatusValues[0],
   ACTIVE: appointmentStatusValues[1],
-  COMPLETED: appointmentStatusValues[2],
-  MISSED: appointmentStatusValues[3],
-  CONVERTED: appointmentStatusValues[4],
+  FINISHED: appointmentStatusValues[2],
+  COMPLETED: appointmentStatusValues[3],
+  MISSED: appointmentStatusValues[4],
+  CONVERTED: appointmentStatusValues[5],
 } as const satisfies Record<
   string,
   Database["public"]["Enums"]["appointmentStatus"]
