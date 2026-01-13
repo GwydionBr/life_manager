@@ -11,7 +11,7 @@ import { createTransaction } from "@tanstack/react-db";
  * @returns The new time entry or an array of time entries or undefined if the operation failed
  */
 export const addWorkTimeEntry = async (
-  newWorkTimeEntry: WorkTimeEntry[] | WorkTimeEntry
+  newWorkTimeEntry: WorkTimeEntry[]
 ) => {
   try {
     const transaction = workTimeEntriesCollection.insert(newWorkTimeEntry);

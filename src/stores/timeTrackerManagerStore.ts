@@ -41,6 +41,8 @@ export interface TimerData {
   forceEndTimer: boolean; // Flag to force end timer (e.g., when max timers reached)
   createdAt: number; // Timestamp when timer was created
   memo: string | null;
+  appointmentId?: string; // Optional appointment ID if timer was started from an appointment
+  appointmentTitle?: string; // Optional appointment title for reference
 }
 
 /**
@@ -70,11 +72,13 @@ interface TimeTrackerManagerState {
    *
    * @param project - Project data from database
    * @param roundingSettings - Default rounding settings (used if project doesn't have specific settings)
+   * @param appointmentMetadata - Optional metadata if timer is started from an appointment
    * @returns Success status, timer ID if successful, or error message
    */
   addTimer: (
     project: Tables<"work_project">,
-    roundingSettings: TimerRoundingSettings
+    roundingSettings: TimerRoundingSettings,
+    appointmentMetadata?: { appointmentId: string; appointmentTitle: string }
   ) => {
     success: boolean;
     timerId?: string;
@@ -133,7 +137,7 @@ export const useTimeTrackerManager = create(
        * Improvement suggestion: Consider extracting validation logic
        * into separate functions for better testability and readability.
        */
-      addTimer: (project, roundingSettings) => {
+      addTimer: (project, roundingSettings, appointmentMetadata) => {
         // Build timer data structure from project and settings
         // Project-specific rounding settings override defaults
         const timerData = {
@@ -159,11 +163,17 @@ export const useTimeTrackerManager = create(
               roundingSettings.timeFragmentInterval,
           },
           // Initialize timer in stopped state with zero values
-          state: TimerState.Stopped,
+          state: appointmentMetadata?.appointmentId
+            ? TimerState.Running
+            : TimerState.Stopped,
           activeSeconds: 0,
           pausedSeconds: 0,
-          startTime: null,
-          tempStartTime: null,
+          startTime: appointmentMetadata?.appointmentId
+            ? new Date().getTime()
+            : null,
+          tempStartTime: appointmentMetadata?.appointmentId
+            ? new Date().getTime()
+            : null,
           storedActiveSeconds: 0,
           storedPausedSeconds: 0,
           moneyEarned: "0.00",
@@ -173,6 +183,9 @@ export const useTimeTrackerManager = create(
           forceEndTimer: false,
           createdAt: new Date().getTime(),
           memo: null,
+          // Add appointment metadata if provided
+          appointmentId: appointmentMetadata?.appointmentId,
+          appointmentTitle: appointmentMetadata?.appointmentTitle,
         };
 
         const currentTimers = get().timers;

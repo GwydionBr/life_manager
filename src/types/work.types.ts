@@ -41,3 +41,9 @@ export interface TimeSpan {
   start_time: number;
   end_time: number;
 }
+
+// Appointment Timer Integration
+export interface AppointmentTimerMetadata {
+  appointmentId: string;
+  appointmentTitle: string;
+}

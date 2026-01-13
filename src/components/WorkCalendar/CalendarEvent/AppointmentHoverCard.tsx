@@ -8,10 +8,33 @@ import {
   IconFolder,
   IconTag,
   IconNote,
+  IconPlayerPlay,
 } from "@tabler/icons-react";
 
 import { CalendarAppointment } from "@/types/workCalendar.types";
-import { alpha, Card, Stack, Text, Badge, Group, Divider } from "@mantine/core";
+import {
+  alpha,
+  Card,
+  Stack,
+  Text,
+  Badge,
+  Group,
+  Divider,
+  Button,
+} from "@mantine/core";
+import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
+import { useAppointmentMutations } from "@/db/collections/work/appointment/use-appointment-mutations";
+import { useTimeTrackerManager } from "@/stores/timeTrackerManagerStore";
+import {
+  canStartTimerFromAppointment,
+  shouldShowTimerButton,
+  getProjectRoundingSettings,
+} from "@/lib/appointmentTimerHelpers";
+import {
+  showActionSuccessNotification,
+  showActionErrorNotification,
+} from "@/lib/notificationFunctions";
 
 interface AppointmentHoverCardProps {
   appointment: CalendarAppointment;
@@ -111,6 +134,62 @@ export default function AppointmentHoverCard({
   const start = new Date(appointment.start_date);
   const end = new Date(appointment.end_date);
 
+  // Timer integration
+  const { data: projects } = useWorkProjects();
+  const { data: settings } = useSettings();
+  const { updateAppointment } = useAppointmentMutations();
+  const { addTimer, getAllTimers } = useTimeTrackerManager();
+
+  // Check if we should show the timer button
+  const existingTimers = getAllTimers();
+  const showTimer =
+    canStartTimerFromAppointment(appointment) &&
+    shouldShowTimerButton(appointment, existingTimers);
+
+  const handleStartTimer = async () => {
+    // Find the project
+    const project = projects?.find((p) => p.id === appointment.work_project_id);
+
+    if (!project) {
+      showActionErrorNotification(
+        getLocalizedText("Projekt nicht gefunden", "Project not found")
+      );
+      return;
+    }
+
+    // Get rounding settings
+    const roundingSettings = getProjectRoundingSettings(project, {
+      roundingInterval: settings?.rounding_interval ?? 0,
+      roundingDirection: settings?.rounding_direction ?? "up",
+      roundInTimeFragments: settings?.round_in_time_sections ?? false,
+      timeFragmentInterval: settings?.time_section_interval ?? 15,
+    });
+
+    // Add timer with appointment metadata
+    const result = addTimer(project, roundingSettings, {
+      appointmentId: appointment.id,
+      appointmentTitle: appointment.title,
+    });
+
+    if (result.success) {
+      // Update appointment status to active
+      await updateAppointment(appointment.id, { status: "active" });
+
+      showActionSuccessNotification(
+        getLocalizedText("Timer gestartet", "Timer started")
+      );
+    } else {
+      showActionErrorNotification(
+        result.error
+          ? getLocalizedText(result.error.german, result.error.english)
+          : getLocalizedText(
+              "Timer konnte nicht gestartet werden",
+              "Failed to start timer"
+            )
+      );
+    }
+  };
+
   return (
     <Card
       withBorder
@@ -165,6 +244,21 @@ export default function AppointmentHoverCard({
             </Text>
           </Stack>
         </Group>
+        {showTimer && (
+          <Button
+            size="xs"
+            variant="light"
+            color="teal"
+            leftSection={<IconPlayerPlay size={14} />}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleStartTimer();
+            }}
+            fullWidth
+          >
+            {getLocalizedText("Timer starten", "Start Timer")}
+          </Button>
+        )}
       </Stack>
       {appointment.description && (
         <>

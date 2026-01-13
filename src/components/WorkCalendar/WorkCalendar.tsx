@@ -1,5 +1,6 @@
 import { useHotkeys } from "@mantine/hooks";
 import { useWorkCalendar } from "@/hooks/useWorkCalendar";
+import { useAppointmentStatusManager } from "@/hooks/useAppointmentStatusManager";
 
 import { ScrollArea, Stack } from "@mantine/core";
 import CalendarGrid from "./Calendar/CalendarGrid";
@@ -9,6 +10,8 @@ import NewAppointmentModal from "./Appointment/NewAppointmentModal";
 import CalendarLegend from "./Calendar/CalendarLegend";
 
 export default function WorkCalendar() {
+  // Run appointment status manager in the background
+  useAppointmentStatusManager();
   const {
     // Data
     calendarDays,

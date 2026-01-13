@@ -3,14 +3,36 @@ import { useIntl } from "@/hooks/useIntl";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { useAppointmentMutations } from "@/db/collections/work/appointment/use-appointment-mutations";
 
-import { Drawer, Flex, Group, Text, useDrawersStack, Box } from "@mantine/core";
-import { IconExclamationCircle } from "@tabler/icons-react";
+import {
+  Drawer,
+  Flex,
+  Group,
+  Text,
+  useDrawersStack,
+  Box,
+  Alert,
+  Button,
+  Stack,
+  ActionIcon,
+  Tooltip,
+} from "@mantine/core";
+import {
+  IconExclamationCircle,
+  IconTransform,
+  IconAlertTriangle,
+} from "@tabler/icons-react";
 import AppointmentForm from "@/components/WorkCalendar/Appointment/AppointmentForm";
 import DeleteActionIcon from "@/components/UI/ActionIcons/DeleteActionIcon";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
 import DeleteButton from "@/components/UI/Buttons/DeleteButton";
 import ProjectForm from "@/components/Work/Project/ProjectForm";
 import FinanceTagForm from "@/components/Finances/Tag/TagForm";
+import { ConvertToTimeEntryForm } from "./ConvertToTimeEntryForm";
+import { AppointmentStatusBadge } from "./AppointmentStatusBadge";
+import {
+  canConvertAppointmentToTimeEntry,
+  shouldShowConversionPrompt,
+} from "@/lib/appointmentTimerHelpers";
 
 import {
   Appointment,
@@ -49,14 +71,20 @@ export default function EditAppointmentDrawer({
     "delete-appointment",
     "add-project",
     "tag-form",
+    "convert-to-time-entry",
   ]);
+
+  const [showPrompt, setShowPrompt] = useState(false);
 
   // Sync external opened state with internal drawer stack
   useEffect(() => {
     if (opened) {
       drawerStack.open("edit-appointment");
+      // Check if we should show the conversion prompt
+      setShowPrompt(shouldShowConversionPrompt(appointment));
     } else {
       drawerStack.closeAll();
+      setShowPrompt(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened]);
@@ -90,6 +118,18 @@ export default function EditAppointmentDrawer({
       handleClose();
     }
   }
+
+  function handleOpenConvertModal() {
+    drawerStack.open("convert-to-time-entry");
+    setShowPrompt(false);
+  }
+
+  async function handleMarkAsMissed() {
+    await updateAppointment(appointment.id, { status: "missed" });
+    setShowPrompt(false);
+  }
+
+  const canConvert = canConvertAppointmentToTimeEntry(appointment);
 
   // Prepare initial values
   const getInitialValues = (): InsertAppointment | UpdateAppointment => {
@@ -132,25 +172,95 @@ export default function EditAppointmentDrawer({
           {...drawerStack.register("edit-appointment")}
           onClose={handleClose}
           title={
-            <Group>
-              <DeleteActionIcon
-                tooltipLabel={getLocalizedText(
-                  "Termin löschen",
-                  "Delete Appointment"
+            <Group justify="space-between" w="100%">
+              <Group>
+                <DeleteActionIcon
+                  tooltipLabel={getLocalizedText(
+                    "Termin löschen",
+                    "Delete Appointment"
+                  )}
+                  onClick={() => {
+                    drawerStack.open("delete-appointment");
+                  }}
+                />
+                {canConvert && (
+                  <Tooltip
+                    label={getLocalizedText(
+                      "In Zeiteintrag umwandeln",
+                      "Convert to Time Entry"
+                    )}
+                  >
+                    <ActionIcon
+                      variant="light"
+                      color="teal"
+                      onClick={handleOpenConvertModal}
+                    >
+                      <IconTransform size={18} />
+                    </ActionIcon>
+                  </Tooltip>
                 )}
-                onClick={() => {
-                  drawerStack.open("delete-appointment");
-                }}
-              />
-              <Text>
-                {getLocalizedText("Termin bearbeiten", "Edit Appointment")}
-              </Text>
+                <Text>
+                  {getLocalizedText("Termin bearbeiten", "Edit Appointment")}
+                </Text>
+              </Group>
+              <AppointmentStatusBadge status={appointment.status} />
             </Group>
           }
           size="lg"
           padding="md"
         >
           <Flex direction="column" gap="xl">
+            {showPrompt && (
+              <Alert
+                icon={<IconAlertTriangle size={16} />}
+                title={getLocalizedText(
+                  "Termin ist vorbei",
+                  "Appointment has passed"
+                )}
+                color="orange"
+                variant="light"
+              >
+                <Stack gap="sm">
+                  <Text size="sm">
+                    {getLocalizedText(
+                      "Dieser Termin ist bereits vorbei. Möchten Sie ihn in einen Zeiteintrag umwandeln?",
+                      "This appointment has already passed. Would you like to convert it to a time entry?"
+                    )}
+                  </Text>
+                  <Group gap="sm">
+                    <Button
+                      size="xs"
+                      variant="light"
+                      color="teal"
+                      leftSection={<IconTransform size={14} />}
+                      onClick={handleOpenConvertModal}
+                    >
+                      {getLocalizedText("Umwandeln", "Convert")}
+                    </Button>
+                    <Button
+                      size="xs"
+                      variant="light"
+                      color="red"
+                      onClick={handleMarkAsMissed}
+                    >
+                      {getLocalizedText(
+                        "Als verpasst markieren",
+                        "Mark as Missed"
+                      )}
+                    </Button>
+                    <Button
+                      size="xs"
+                      variant="subtle"
+                      color="gray"
+                      onClick={() => setShowPrompt(false)}
+                    >
+                      {getLocalizedText("Abbrechen", "Cancel")}
+                    </Button>
+                  </Group>
+                </Stack>
+              </Alert>
+            )}
+
             <AppointmentForm
               initialValues={getInitialValues()}
               onCancel={handleClose}
@@ -225,6 +335,20 @@ export default function EditAppointmentDrawer({
               )}
             />
           </Group>
+        </Drawer>
+        <Drawer
+          {...drawerStack.register("convert-to-time-entry")}
+          onClose={() => drawerStack.close("convert-to-time-entry")}
+          title={getLocalizedText(
+            "In Zeiteintrag umwandeln",
+            "Convert to Time Entry"
+          )}
+          size="lg"
+        >
+          <ConvertToTimeEntryForm
+            appointment={appointment}
+            onClose={handleClose}
+          />
         </Drawer>
       </Drawer.Stack>
     </Box>

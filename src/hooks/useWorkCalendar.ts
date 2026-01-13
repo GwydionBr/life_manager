@@ -3,7 +3,7 @@ import { useDisclosure, usePrevious, useDidUpdate } from "@mantine/hooks";
 
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { useWorkTimeEntries } from "@/db/collections/work/work-time-entry/use-work-time-entry-query";
-import { useAppointments } from "@/db/collections/work/appointment/use-appointment-query";
+import { useCalendarAppointments } from "@/db/collections/work/appointment/use-appointment-query";
 import { useCalendarStore } from "@/stores/calendarStore";
 
 import { addDays, differenceInCalendarDays, startOfDay } from "date-fns";
@@ -96,7 +96,7 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
 
   const { data: projects } = useWorkProjects();
   const { data: timeEntries } = useWorkTimeEntries();
-  const { data: appointments } = useAppointments();
+  const { data: appointments } = useCalendarAppointments();
 
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);

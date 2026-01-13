@@ -3,12 +3,31 @@ import { useIntl } from "@/hooks/useIntl";
 import { useRouter } from "@tanstack/react-router";
 import { useNotifications } from "@/db/collections/notification/use-notification-query";
 import { useNotificationMutations } from "@/db/collections/notification/use-notification-mutations";
+import { useAppointments } from "@/db/collections/work/appointment/use-appointment-query";
+import { useAppointmentMutations } from "@/db/collections/work/appointment/use-appointment-mutations";
+import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
+import { useTimeTrackerManager } from "@/stores/timeTrackerManagerStore";
 import { type Notification as NotificationData } from "@/types/system.types";
 import { useSettingsStore } from "@/stores/settingsStore";
+import {
+  canStartTimerFromAppointment,
+  shouldShowTimerButton,
+  getProjectRoundingSettings,
+} from "@/lib/appointmentTimerHelpers";
+import {
+  showActionSuccessNotification,
+  showActionErrorNotification,
+} from "@/lib/notificationFunctions";
 
 import { notifications } from "@mantine/notifications";
-import { Group, Text } from "@mantine/core";
-import { IconBell, IconCalendar, IconAlertCircle } from "@tabler/icons-react";
+import { Group, Text, Button } from "@mantine/core";
+import {
+  IconBell,
+  IconCalendar,
+  IconAlertCircle,
+  IconPlayerPlay,
+} from "@tabler/icons-react";
 
 // Check interval for scheduled notifications (10 seconds)
 const CHECK_INTERVAL = 1000 * 10;
@@ -72,6 +91,12 @@ export function useNotificationHandler() {
   const router = useRouter();
   const { updateNotification, markAsRead } = useNotificationMutations();
   const { browserNotificationsEnabled } = useSettingsStore();
+  const { data: appointments } = useAppointments();
+  const { updateAppointment } = useAppointmentMutations();
+  const { data: projects } = useWorkProjects();
+  const { data: settings } = useSettings();
+  const { addTimer, getAllTimers } = useTimeTrackerManager();
+  const { getLocalizedText } = useIntl();
 
   // Track which notifications we've already shown as toasts
   const shownNotificationsRef = useRef<Set<string>>(new Set());
@@ -126,7 +151,9 @@ export function useNotificationHandler() {
       browserNotification.onclick = () => {
         // Focus the window
         window.focus();
-        notifications.hide(notification.id);
+        if (notification.priority !== "high") {
+          notifications.hide(notification.id);
+        }
 
         // Mark as read
         updateNotification(notification.id, {
@@ -165,11 +192,126 @@ export function useNotificationHandler() {
   );
 
   /**
+   * Handle starting a timer from an appointment notification.
+   */
+  // TODO If a Timer ist opened ist should also start it, not just adding a new timer
+  const handleStartTimerFromNotification = useCallback(
+    async (notification: NotificationData) => {
+      // Find the appointment associated with this notification
+      const appointment = appointments?.find(
+        (a) => a.id === notification.resource_id
+      );
+
+      if (!appointment) {
+        showActionErrorNotification(
+          getLocalizedText("Termin nicht gefunden", "Appointment not found")
+        );
+        return;
+      }
+
+      // Check if appointment can start a timer
+      if (!canStartTimerFromAppointment(appointment)) {
+        showActionErrorNotification(
+          getLocalizedText(
+            "Timer kann nicht gestartet werden",
+            "Cannot start timer"
+          )
+        );
+        return;
+      }
+
+      // Find the project
+      const project = projects?.find(
+        (p) => p.id === appointment.work_project_id
+      );
+
+      if (!project) {
+        showActionErrorNotification(
+          getLocalizedText("Projekt nicht gefunden", "Project not found")
+        );
+        return;
+      }
+
+      // Check if timer already exists
+      const existingTimers = getAllTimers();
+      if (!shouldShowTimerButton(appointment, existingTimers)) {
+        showActionErrorNotification(
+          getLocalizedText(
+            "Timer für dieses Projekt existiert bereits",
+            "Timer for this project already exists"
+          )
+        );
+        return;
+      }
+
+      // Get rounding settings
+      const roundingSettings = getProjectRoundingSettings(project, {
+        roundingInterval: settings?.rounding_interval ?? 0,
+        roundingDirection: settings?.rounding_direction ?? "up",
+        roundInTimeFragments: settings?.round_in_time_sections ?? false,
+        timeFragmentInterval: settings?.time_section_interval ?? 15,
+      });
+
+      // Add timer with appointment metadata
+      const result = addTimer(project, roundingSettings, {
+        appointmentId: appointment.id,
+        appointmentTitle: appointment.title,
+      });
+
+      if (result.success) {
+        // Update appointment status to active
+        await updateAppointment(appointment.id, { status: "active" });
+
+        showActionSuccessNotification(
+          getLocalizedText("Timer gestartet", "Timer started")
+        );
+
+        // Mark notification as read
+        markAsRead(notification.id);
+
+        // Navigate to calendar
+        router.navigate({ to: "/calendar" });
+      } else {
+        showActionErrorNotification(
+          result.error
+            ? getLocalizedText(result.error.german, result.error.english)
+            : getLocalizedText(
+                "Timer konnte nicht gestartet werden",
+                "Failed to start timer"
+              )
+        );
+      }
+    },
+    [
+      appointments,
+      projects,
+      settings,
+      getAllTimers,
+      addTimer,
+      updateAppointment,
+      markAsRead,
+      router,
+      getLocalizedText,
+    ]
+  );
+
+  /**
    * Show a toast notification for a database notification.
    */
   const showNotificationToast = useCallback(
     (notification: NotificationData) => {
       const isHighPriority = notification.priority === "high";
+      const isAppointmentStart = notification.type === "appointment.start";
+
+      // Check if we should show timer button for appointment.start notifications
+      const appointment = appointments?.find(
+        (a) => a.id === notification.resource_id
+      );
+      const showTimerButton =
+        isAppointmentStart &&
+        appointment &&
+        canStartTimerFromAppointment(appointment) &&
+        shouldShowTimerButton(appointment, getAllTimers());
 
       notifications.show({
         id: notification.id,
@@ -180,10 +322,26 @@ export function useNotificationHandler() {
             </Text>
           </Group>
         ),
-        message: notification.body && (
-          <Text size="sm" c="dimmed">
-            {notification.body}
-          </Text>
+        message: (
+          <>
+            {notification.body && (
+              <Text size="sm" c="dimmed" mb={showTimerButton ? "xs" : 0}>
+                {notification.body}
+              </Text>
+            )}
+            {showTimerButton && (
+              <Button
+                size="xs"
+                variant="light"
+                color="teal"
+                leftSection={<IconPlayerPlay size={14} />}
+                onClick={() => handleStartTimerFromNotification(notification)}
+                mt="xs"
+              >
+                {getLocalizedText("Timer starten", "Start Timer")}
+              </Button>
+            )}
+          </>
         ),
         color: getNotificationColor(notification.type),
         icon: getNotificationIcon(notification.type),
@@ -194,7 +352,13 @@ export function useNotificationHandler() {
         onClick: () => handleNotificationClick(notification),
       });
     },
-    [handleNotificationClick]
+    [
+      handleNotificationClick,
+      handleStartTimerFromNotification,
+      appointments,
+      getAllTimers,
+      getLocalizedText,
+    ]
   );
 
   // Set up interval to check for scheduled notifications

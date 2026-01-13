@@ -1,10 +1,25 @@
-import { eq, useLiveQuery, and, or, gte, lte } from "@tanstack/react-db";
+import {
+  eq,
+  useLiveQuery,
+  and,
+  or,
+  gte,
+  lte,
+  isNull,
+} from "@tanstack/react-db";
 import { appointmentsCollection } from "./appointment-collection";
 import { AppointmentStatus } from "@/types/workCalendar.types";
 import { startOfDay, endOfDay } from "date-fns";
 
 export const useAppointments = () =>
   useLiveQuery((q) => q.from({ appointments: appointmentsCollection }));
+
+export const useCalendarAppointments = () =>
+  useLiveQuery((q) =>
+    q
+      .from({ appointments: appointmentsCollection })
+      .where(({ appointments }) => isNull(appointments.work_time_entry_id))
+  );
 
 export const useUpcomingAppointments = () => {
   return useLiveQuery((q) => {
