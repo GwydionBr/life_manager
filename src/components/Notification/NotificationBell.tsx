@@ -1,5 +1,6 @@
-import { useUnreadNotifications } from "@/db/collections/notification/use-notification-query";
+import { useMemo } from "react";
 import { useIntl } from "@/hooks/useIntl";
+import { useUnreadNotifications } from "@/db/collections/notification/use-notification-query";
 
 import { ActionIcon, Indicator, Popover } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -11,7 +12,10 @@ export function NotificationBell() {
   const [opened, { toggle, close }] = useDisclosure(false);
   const { data: unreadNotifications } = useUnreadNotifications();
 
-  const unreadCount = unreadNotifications?.length ?? 0;
+  const unreadCount = useMemo(
+    () => unreadNotifications?.length ?? 0,
+    [unreadNotifications]
+  );
 
   return (
     <Popover

@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { useProfile } from "@/db/collections/profile/use-profile-query";
+import { useAppointments } from "./use-appointment-query";
 import {
   showActionSuccessNotification,
   showActionErrorNotification,
@@ -38,6 +39,7 @@ export const useAppointmentMutations = () => {
     findNotification,
   } = useNotificationMutations();
   const { data: existingNotifications } = useNotifications();
+  const { data: appointments } = useAppointments();
 
   /**
    * Create or update a notification for an appointment event.
@@ -207,11 +209,7 @@ export const useAppointmentMutations = () => {
    * Also updates appointment notifications if times change.
    */
   const handleUpdateAppointment = useCallback(
-    async (
-      id: string,
-      item: UpdateAppointment,
-      currentAppointment?: Appointment
-    ): Promise<boolean> => {
+    async (id: string, item: UpdateAppointment): Promise<boolean> => {
       try {
         const result = await updateAppointment(id, item);
 
@@ -224,6 +222,8 @@ export const useAppointmentMutations = () => {
           );
           return false;
         }
+
+        const currentAppointment = appointments?.find((a) => a.id === id);
 
         // Update notifications if relevant fields changed
         // We need the current appointment data to determine if we should update notifications

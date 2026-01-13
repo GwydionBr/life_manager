@@ -1,4 +1,4 @@
-import { useLiveQuery, and, isNull, eq } from "@tanstack/react-db";
+import { useLiveQuery, and, isNull, eq, lt } from "@tanstack/react-db";
 import { notificationsCollection } from "./notification-collection";
 import { Database } from "@/types/db.types";
 
@@ -12,7 +12,11 @@ export const useUnreadNotifications = () => {
     return q
       .from({ notifications: notificationsCollection })
       .where(({ notifications }) =>
-        and(isNull(notifications.read_at), isNull(notifications.dismissed_at))
+        and(
+          isNull(notifications.read_at),
+          isNull(notifications.dismissed_at),
+          lt(notifications.scheduled_for, new Date().toISOString())
+        )
       );
   });
 };
@@ -50,7 +54,12 @@ export const useRecentNotifications = (limit: number = 20) => {
   return useLiveQuery((q) => {
     return q
       .from({ notifications: notificationsCollection })
-      .where(({ notifications }) => isNull(notifications.dismissed_at))
+      .where(({ notifications }) =>
+        and(
+          isNull(notifications.dismissed_at),
+          lt(notifications.scheduled_for, new Date().toISOString())
+        )
+      )
       .orderBy(({ notifications }) => notifications.created_at, "desc")
       .limit(limit);
   });

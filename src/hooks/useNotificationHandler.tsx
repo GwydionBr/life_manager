@@ -1,18 +1,13 @@
 import { useEffect, useRef, useCallback, useState, useMemo } from "react";
-import { useNotifications } from "@/db/collections/notification/use-notification-query";
-import { useNotificationMutations } from "@/db/collections/notification/use-notification-mutations";
 import { useIntl } from "@/hooks/useIntl";
 import { useRouter } from "@tanstack/react-router";
+import { useNotifications } from "@/db/collections/notification/use-notification-query";
+import { useNotificationMutations } from "@/db/collections/notification/use-notification-mutations";
 import { type Notification as NotificationData } from "@/types/system.types";
 
 import { notifications } from "@mantine/notifications";
-import { ActionIcon, Group, Text } from "@mantine/core";
-import {
-  IconBell,
-  IconCalendar,
-  IconAlertCircle,
-  IconX,
-} from "@tabler/icons-react";
+import { Group, Text } from "@mantine/core";
+import { IconBell, IconCalendar, IconAlertCircle } from "@tabler/icons-react";
 
 // Check interval for scheduled notifications (10 seconds)
 const CHECK_INTERVAL = 1000 * 10;
@@ -73,9 +68,8 @@ const isBrowserNotificationSupported = (): boolean => {
  */
 export function useNotificationHandler() {
   const { data: allNotifications } = useNotifications();
-  const { getLocalizedText } = useIntl();
   const router = useRouter();
-  const { updateNotification } = useNotificationMutations();
+  const { updateNotification, markAsRead } = useNotificationMutations();
 
   // Track which notifications we've already shown as toasts
   const shownNotificationsRef = useRef<Set<string>>(new Set());
@@ -110,22 +104,11 @@ export function useNotificationHandler() {
    */
   const showBrowserNotification = useCallback(
     (notification: NotificationData) => {
-      if (!isBrowserNotificationSupported()) {
-        console.log("Browser notifications not supported");
-        return;
-      }
-      if (browserPermission !== "granted") {
-        console.log("Browser notifications not granted");
-        return;
-      }
+      if (!isBrowserNotificationSupported()) return;
+      if (browserPermission !== "granted") return;
 
       // Only show browser notifications for high and medium priority
-      if (notification.priority === "low") {
-        console.log("Notification is low priority");
-        return;
-      }
-
-      console.log("Showing browser notification", notification);
+      if (notification.priority === "low") return;
 
       const browserNotification = new window.Notification(notification.title, {
         body: notification.body || undefined,
@@ -134,12 +117,11 @@ export function useNotificationHandler() {
         requireInteraction: notification.priority === "high", // High priority requires interaction
       });
 
-      console.log("Browser notification", browserNotification);
-
       // Handle click on browser notification
       browserNotification.onclick = () => {
         // Focus the window
         window.focus();
+        notifications.hide(notification.id);
 
         // Mark as read
         updateNotification(notification.id, {
@@ -164,9 +146,7 @@ export function useNotificationHandler() {
   const handleNotificationClick = useCallback(
     (notification: NotificationData) => {
       // Mark as read
-      updateNotification(notification.id, {
-        read_at: new Date().toISOString(),
-      });
+      markAsRead(notification.id);
 
       // Navigate based on resource type
       if (notification.resource_type === "appointment") {
@@ -176,20 +156,7 @@ export function useNotificationHandler() {
       // Hide the toast
       notifications.hide(notification.id);
     },
-    [router, updateNotification]
-  );
-
-  /**
-   * Handle dismissing a notification.
-   */
-  const handleDismiss = useCallback(
-    (notificationId: string) => {
-      updateNotification(notificationId, {
-        dismissed_at: new Date().toISOString(),
-      });
-      notifications.hide(notificationId);
-    },
-    [updateNotification]
+    [router, markAsRead]
   );
 
   /**
@@ -206,20 +173,6 @@ export function useNotificationHandler() {
             <Text fw={600} lineClamp={1}>
               {notification.title}
             </Text>
-            {isHighPriority && (
-              <ActionIcon
-                size="sm"
-                variant="subtle"
-                color="gray"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDismiss(notification.id);
-                }}
-                aria-label={getLocalizedText("Schließen", "Dismiss")}
-              >
-                <IconX size={14} />
-              </ActionIcon>
-            )}
           </Group>
         ),
         message: notification.body && (
@@ -231,24 +184,12 @@ export function useNotificationHandler() {
         icon: getNotificationIcon(notification.type),
         autoClose: isHighPriority ? false : 3000,
         withBorder: true,
-        withCloseButton: !isHighPriority,
+        withCloseButton: true,
+        position: "top-center",
         onClick: () => handleNotificationClick(notification),
-        onClose: () => {
-          // Mark as read when closed via close button (medium/low priority)
-          if (!isHighPriority) {
-            updateNotification(notification.id, {
-              read_at: new Date().toISOString(),
-            });
-          }
-        },
       });
     },
-    [
-      getLocalizedText,
-      handleNotificationClick,
-      handleDismiss,
-      updateNotification,
-    ]
+    [handleNotificationClick]
   );
 
   // Set up interval to check for scheduled notifications
@@ -292,7 +233,7 @@ export function useNotificationHandler() {
       // Show in-app toast notification
       showNotificationToast(notification);
 
-      // Show browser notification if page is not visible
+      // Show browser notification
       showBrowserNotification(notification);
     });
   }, [notificationsToShow, showNotificationToast, showBrowserNotification]);

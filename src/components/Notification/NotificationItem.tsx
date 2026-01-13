@@ -1,15 +1,7 @@
 import { useIntl } from "@/hooks/useIntl";
 import { Notification } from "@/types/system.types";
 
-import {
-  ActionIcon,
-  Box,
-  Group,
-  Stack,
-  Text,
-  ThemeIcon,
-  UnstyledButton,
-} from "@mantine/core";
+import { ActionIcon, Box, Group, Stack, Text, ThemeIcon } from "@mantine/core";
 import {
   IconBell,
   IconCalendar,
@@ -65,7 +57,9 @@ export function NotificationItem({
   const { formatRelativeTime, getLocalizedText } = useIntl();
 
   const isUnread = !notification.read_at;
-  const createdAt = new Date(notification.created_at);
+  const createdAt = new Date(
+    notification.scheduled_for || notification.created_at
+  );
 
   const handleClick = () => {
     if (isUnread) {

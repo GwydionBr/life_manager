@@ -59,7 +59,6 @@ export default function AppointmentForm({
     start_date: z.string().transform((str) => new Date(str).toISOString()),
     end_date: z.string().transform((str) => new Date(str).toISOString()),
     type: z.enum(["work", "private", "meeting", "blocked"]),
-    status: z.enum(["upcoming", "active", "completed", "missed", "converted"]),
     is_all_day: z.boolean(),
     work_project_id: z.string().nullable().optional(),
     reminder: z.string().nullable().optional(),
@@ -82,7 +81,7 @@ export default function AppointmentForm({
       })(),
       is_all_day: initialValues.is_all_day ?? false,
       type: initialValues.type || "work",
-      status: initialValues.status || "upcoming",
+      reminder: initialValues.reminder || null,
     },
     validate: zodResolver(schema),
   });
@@ -206,29 +205,6 @@ export default function AppointmentForm({
     },
   ];
 
-  const statusOptions = [
-    {
-      value: "upcoming",
-      label: getLocalizedText("Bevorstehend", "Upcoming"),
-    },
-    {
-      value: "active",
-      label: getLocalizedText("Aktiv", "Active"),
-    },
-    {
-      value: "completed",
-      label: getLocalizedText("Abgeschlossen", "Completed"),
-    },
-    {
-      value: "missed",
-      label: getLocalizedText("Verpasst", "Missed"),
-    },
-    {
-      value: "converted",
-      label: getLocalizedText("Konvertiert", "Converted"),
-    },
-  ];
-
   return (
     <form onSubmit={form.onSubmit(onSubmit)}>
       <Stack>
@@ -308,6 +284,17 @@ export default function AppointmentForm({
               />
             </Group>
           )}
+          <LocaleDateTimePicker
+            label={getLocalizedText("Erinnerung", "Reminder")}
+            value={form.values.reminder ? new Date(form.values.reminder) : null}
+            onChange={(value) =>
+              form.setFieldValue(
+                "reminder",
+                value ? new Date(value).toISOString() : null
+              )
+            }
+            error={form.errors.reminder}
+          />
         </Fieldset>
 
         <Fieldset
@@ -318,12 +305,6 @@ export default function AppointmentForm({
             label={getLocalizedText("Typ", "Type")}
             data={typeOptions}
             {...form.getInputProps("type")}
-          />
-          <Select
-            withAsterisk
-            label={getLocalizedText("Status", "Status")}
-            data={statusOptions}
-            {...form.getInputProps("status")}
           />
         </Fieldset>
 
