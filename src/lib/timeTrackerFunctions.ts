@@ -42,8 +42,7 @@ export const getRoundingLabel = (
 export function calculateSessionTimeValues(
   activeSeconds: number,
   startTime: number | null,
-  timerRoundingSettings: TimerRoundingSettings,
-  tempTimerRoundingSettings?: TimerRoundingSettings
+  timerRoundingSettings: TimerRoundingSettings
 ) {
   // Determine final active seconds based on rounding mode
   // If using time fragments, use raw seconds; otherwise apply rounding
@@ -51,10 +50,8 @@ export function calculateSessionTimeValues(
     ? activeSeconds
     : getRoundedSeconds(
         activeSeconds,
-        tempTimerRoundingSettings?.roundingInterval ??
-          timerRoundingSettings.roundingInterval,
-        tempTimerRoundingSettings?.roundingDirection ??
-          timerRoundingSettings.roundingDirection
+        timerRoundingSettings.roundingInterval,
+        timerRoundingSettings.roundingDirection
       );
 
   // Normalize start time to beginning of minute (for cleaner database records)

@@ -13,6 +13,7 @@ import { Currency } from "@/types/settings.types";
 import { InsertWorkTimeEntry } from "@/types/work.types";
 import { getProjectRoundingSettings } from "@/lib/appointmentTimerHelpers";
 import { TimerRoundingSettings, TimerState } from "@/types/timeTracker.types";
+import { calculateSessionTimeValues } from "@/lib/timeTrackerFunctions";
 
 interface TimeTrackerStateData extends Timer {
   // Timer data
@@ -208,16 +209,17 @@ export function useTimeTracker(timer: Timer): TimeTrackerReturn {
       ? timer.startTime + timer.deltaStartTime * 1000
       : Date.now();
 
-    const actualEndTime =
-      timer.state === TimerState.Running
-        ? Date.now()
-        : (timer.startTime ?? Date.now());
-    const effectiveEndTime = actualEndTime + timer.deltaEndTime * 1000;
+    const { finalActiveSeconds, normalizedStartTime, calculatedEndTime } =
+      calculateSessionTimeValues(
+        timerState.activeSeconds,
+        effectiveStartTime,
+        timerRoundingSettings
+      );
 
     const timeEntry: InsertWorkTimeEntry = {
-      start_time: new Date(effectiveStartTime).toISOString(),
-      end_time: new Date(effectiveEndTime).toISOString(),
-      active_seconds: timerState.activeSeconds,
+      start_time: normalizedStartTime.toISOString(),
+      end_time: calculatedEndTime.toISOString(),
+      active_seconds: finalActiveSeconds,
       currency: project?.currency ?? "USD",
       salary: project?.salary ?? 0,
       hourly_payment: project?.hourly_payment ?? false,
@@ -225,10 +227,10 @@ export function useTimeTracker(timer: Timer): TimeTrackerReturn {
       work_project_id: timer.projectId,
       id: timer.id,
       created_at: new Date().toISOString(),
-      true_end_time: new Date(actualEndTime).toISOString(),
+      true_end_time: new Date().toISOString(),
     };
     return timeEntry;
-  }, [timer, project, timerState.activeSeconds]);
+  }, [timer, project, timerState.activeSeconds, timerRoundingSettings]);
 
   return {
     timerState: {

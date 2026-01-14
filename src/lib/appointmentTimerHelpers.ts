@@ -1,5 +1,4 @@
 import { Appointment, WorkProject } from "@/types/work.types";
-import { Timer } from "@/stores/timeTrackerManagerStore";
 import { TimerRoundingSettings } from "@/types/timeTracker.types";
 
 /**

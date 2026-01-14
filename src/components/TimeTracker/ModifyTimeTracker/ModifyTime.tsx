@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useIntl } from "@/hooks/useIntl";
 import { useTimeTrackerManager } from "@/stores/timeTrackerManagerStore";
 
@@ -8,20 +8,24 @@ import {
   Box,
   Group,
   Button,
-  Alert,
-  TextInput,
-  Select,
   Card,
   Title,
-  Paper,
+  NumberInput,
+  Divider,
+  Badge,
+  SimpleGrid,
+  RangeSlider,
+  rem,
 } from "@mantine/core";
 import {
-  IconAlertCircle,
   IconClock,
   IconPlayerPlay,
+  IconPlayerStop,
   IconPlus,
   IconMinus,
-  IconSettings,
+  IconCalendarTime,
+  IconArrowRight,
+  IconTimeline,
 } from "@tabler/icons-react";
 import TimeTrackerTimeRow from "../TimeTrackerRow/TimeTrackerTimeRow";
 import { TimeTrackerState } from "@/hooks/useTimeTracker";
@@ -32,70 +36,121 @@ interface ModifyTimeProps {
 
 export default function ModifyTime({ timerState }: ModifyTimeProps) {
   const { getLocalizedText } = useIntl();
-  const [activeTimeInput, setActiveTimeInput] = useState("");
-  const [timeUnit, setTimeUnit] = useState<"seconds" | "minutes" | "hours">(
-    "minutes"
-  );
-  const [errorMessage, setErrorMessage] = useState("");
+  const [startTimeMinutes, setStartTimeMinutes] = useState<number>(0);
+  const [endTimeMinutes, setEndTimeMinutes] = useState<number>(0);
   const { updateTimer } = useTimeTrackerManager();
 
-  const handleActiveTimeChange = (change: number) => {
+  // Format timestamp to readable time
+  const formatTime = (timestamp: number | null | undefined): string => {
+    if (!timestamp) return "--:--";
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
+
+  // Calculate slider values and range
+  const sliderData = useMemo(() => {
+    const originalStartTime = timerState.startTime || Date.now();
+    const originalEndTime = Date.now();
+    const effectiveStartTime =
+      timerState.effectiveStartTime || originalStartTime;
+    const effectiveEndTime = timerState.effectiveEndTime || originalEndTime;
+
+    // Calculate total time range in minutes
+    const totalRangeMs = originalEndTime - originalStartTime;
+    const totalRangeMinutes = Math.max(
+      Math.ceil(totalRangeMs / (60 * 1000)),
+      60
+    ); // Minimum 60 minutes
+
+    // Add buffer for adjustments (30% on each side)
+    const buffer = Math.ceil(totalRangeMinutes * 0.3);
+    const minValue = -buffer;
+    const maxValue = totalRangeMinutes + buffer;
+
+    // Calculate current positions relative to original start
+    const startPosition = Math.round(
+      (effectiveStartTime - originalStartTime) / (60 * 1000)
+    );
+    const endPosition = Math.round(
+      (effectiveEndTime - originalStartTime) / (60 * 1000)
+    );
+
+    return {
+      minValue,
+      maxValue,
+      startPosition,
+      endPosition,
+      originalStartTime,
+      originalEndTime,
+    };
+  }, [timerState]);
+
+  // Handle start time adjustment
+  const handleStartTimeChange = (minutes: number) => {
+    // To add more active time, we need to subtract from start time (shift it backward)
+    // So we negate the change
+    const deltaChange = -minutes * 60;
     updateTimer(timerState.id, {
-      deltaStartTime: timerState.deltaStartTime + change,
+      deltaStartTime: timerState.deltaStartTime + deltaChange,
     });
   };
 
-  const parseTimeInput = (
-    input: string,
-    unit: "seconds" | "minutes" | "hours"
-  ): number => {
-    const value = parseFloat(input);
-    if (isNaN(value)) return 0;
+  // Handle end time adjustment
+  const handleEndTimeChange = (minutes: number) => {
+    // To add more active time, we add to end time (shift it forward)
+    const deltaChange = minutes * 60;
+    updateTimer(timerState.id, {
+      deltaEndTime: timerState.deltaEndTime + deltaChange,
+    });
+  };
 
-    switch (unit) {
-      case "seconds":
-        return value;
-      case "minutes":
-        return value * 60;
-      case "hours":
-        return value * 3600;
-      default:
-        return value;
+  // Handle slider change
+  const handleSliderChange = (value: [number, number]) => {
+    const [newStartPos, newEndPos] = value;
+
+    // Calculate the difference from current position
+    const startDiff = newStartPos - sliderData.startPosition;
+    const endDiff = newEndPos - sliderData.endPosition;
+
+    // Convert to seconds and apply
+    const newDeltaStartTime = timerState.deltaStartTime - startDiff * 60;
+    const newDeltaEndTime = timerState.deltaEndTime + endDiff * 60;
+
+    updateTimer(timerState.id, {
+      deltaStartTime: newDeltaStartTime,
+      deltaEndTime: newDeltaEndTime,
+    });
+  };
+
+  // Apply custom start time change
+  const handleApplyStartTime = () => {
+    if (startTimeMinutes !== 0) {
+      handleStartTimeChange(startTimeMinutes);
+      setStartTimeMinutes(0);
     }
   };
 
-  const getLocalizedTimeUnit = (
-    unit: "seconds" | "minutes" | "hours"
-  ): string => {
-    switch (unit) {
-      case "seconds":
-        return getLocalizedText("Wert in Sekunden", "Value in Seconds");
-      case "minutes":
-        return getLocalizedText("Wert in Minuten", "Value in Minutes");
-      case "hours":
-        return getLocalizedText("Wert in Stunden", "Value in Hours");
-      default:
-        return getLocalizedText(`Wert in ${unit}`, `Value in ${unit}`);
+  // Apply custom end time change
+  const handleApplyEndTime = () => {
+    if (endTimeMinutes !== 0) {
+      handleEndTimeChange(endTimeMinutes);
+      setEndTimeMinutes(0);
     }
   };
 
-  const handleCustomActiveTimeChange = () => {
-    const seconds = parseTimeInput(activeTimeInput, timeUnit);
-    if (seconds !== 0) {
-      updateTimer(timerState.id, {
-        deltaStartTime: timerState.deltaStartTime + seconds,
-      });
-      setActiveTimeInput("");
-      setErrorMessage("");
-    }
-  };
   return (
     <Stack gap="lg">
-      {/* Aktuelle Zeiten anzeigen */}
-      <Card withBorder shadow="sm" radius="md" p="lg">
+      {/* Current Times Overview */}
+      <Card
+        withBorder
+        shadow="sm"
+        radius="md"
+        p="lg"
+        bg="light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-8))"
+      >
         <Group justify="space-between" mb="md">
-          <Title order={4} c="dimmed">
-            <IconClock size={18} style={{ marginRight: "8px" }} />
+          <Title order={4}>
+            <IconClock size={20} style={{ marginRight: "8px" }} />
             {getLocalizedText("Aktuelle Zeiten", "Current Times")}
           </Title>
         </Group>
@@ -110,22 +165,272 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
         </Group>
       </Card>
 
-      {/* Schnelle Anpassungen */}
+      {/* Start and End Times */}
       <Card withBorder shadow="sm" radius="md" p="lg">
-        <Title order={4} mb="md" c="dimmed">
-          <IconClock size={18} style={{ marginRight: "8px" }} />
-          {getLocalizedText("Schnelle Anpassungen", "Quick Adjustments")}
-        </Title>
+        <Group justify="space-between" mb="md">
+          <Title order={4}>
+            <IconCalendarTime size={20} style={{ marginRight: "8px" }} />
+            {getLocalizedText("Zeitpunkte", "Time Points")}
+          </Title>
+        </Group>
 
-        <Stack gap="md">
-          {/* Aktive Zeit */}
+        <SimpleGrid cols={2} spacing="md">
+          {/* Start Time */}
           <Box>
-            <Group mb="xs" gap="xs">
-              <IconPlayerPlay size={16} color="var(--mantine-color-blue-6)" />
-              <Text size="sm" fw={600} c="blue.7">
-                {getLocalizedText("Aktive Zeit", "Active Time")}
+            <Group gap="xs" mb="xs">
+              <IconPlayerPlay size={16} color="var(--mantine-color-green-6)" />
+              <Text
+                size="sm"
+                fw={600}
+                c="light-dark(var(--mantine-color-green-7), var(--mantine-color-green-4))"
+              >
+                {getLocalizedText("Startzeit", "Start Time")}
               </Text>
             </Group>
+            <Card
+              withBorder
+              p="sm"
+              bg="light-dark(var(--mantine-color-green-0), var(--mantine-color-dark-8))"
+            >
+              <Stack gap="xs">
+                <Group gap="xs" justify="space-between">
+                  <Text size="xs" c="dimmed">
+                    {getLocalizedText("Original:", "Original:")}
+                  </Text>
+                  <Text size="sm" fw={500}>
+                    {formatTime(timerState.startTime)}
+                  </Text>
+                </Group>
+                {timerState.deltaStartTime !== 0 && (
+                  <>
+                    <Divider />
+                    <Group gap="xs" justify="space-between">
+                      <Text size="xs" c="dimmed">
+                        {getLocalizedText("Anpassung:", "Adjustment:")}
+                      </Text>
+                      <Badge
+                        size="sm"
+                        color={timerState.deltaStartTime < 0 ? "green" : "red"}
+                      >
+                        {timerState.deltaStartTime > 0 ? "+" : ""}
+                        {Math.round(timerState.deltaStartTime / 60)} min
+                      </Badge>
+                    </Group>
+                    <Divider />
+                    <Group gap="xs" justify="space-between">
+                      <Text size="xs" c="dimmed" fw={600}>
+                        {getLocalizedText("Effektiv:", "Effective:")}
+                      </Text>
+                      <Text
+                        size="sm"
+                        fw={700}
+                        c="light-dark(var(--mantine-color-green-8), var(--mantine-color-green-3))"
+                      >
+                        {formatTime(timerState.effectiveStartTime)}
+                      </Text>
+                    </Group>
+                  </>
+                )}
+              </Stack>
+            </Card>
+          </Box>
+
+          {/* End Time */}
+          <Box>
+            <Group gap="xs" mb="xs">
+              <IconPlayerStop size={16} color="var(--mantine-color-red-6)" />
+              <Text
+                size="sm"
+                fw={600}
+                c="light-dark(var(--mantine-color-red-7), var(--mantine-color-red-4))"
+              >
+                {getLocalizedText("Endzeit", "End Time")}
+              </Text>
+            </Group>
+            <Card
+              withBorder
+              p="sm"
+              bg="light-dark(var(--mantine-color-red-0), var(--mantine-color-dark-8))"
+            >
+              <Stack gap="xs">
+                <Group gap="xs" justify="space-between">
+                  <Text size="xs" c="dimmed">
+                    {getLocalizedText("Original:", "Original:")}
+                  </Text>
+                  <Text size="sm" fw={500}>
+                    {timerState.state === "running"
+                      ? getLocalizedText("Läuft...", "Running...")
+                      : formatTime(Date.now())}
+                  </Text>
+                </Group>
+                {timerState.deltaEndTime !== 0 && (
+                  <>
+                    <Divider />
+                    <Group gap="xs" justify="space-between">
+                      <Text size="xs" c="dimmed">
+                        {getLocalizedText("Anpassung:", "Adjustment:")}
+                      </Text>
+                      <Badge
+                        size="sm"
+                        color={timerState.deltaEndTime > 0 ? "green" : "red"}
+                      >
+                        {timerState.deltaEndTime > 0 ? "+" : ""}
+                        {Math.round(timerState.deltaEndTime / 60)} min
+                      </Badge>
+                    </Group>
+                    <Divider />
+                    <Group gap="xs" justify="space-between">
+                      <Text size="xs" c="dimmed" fw={600}>
+                        {getLocalizedText("Effektiv:", "Effective:")}
+                      </Text>
+                      <Text
+                        size="sm"
+                        fw={700}
+                        c="light-dark(var(--mantine-color-red-8), var(--mantine-color-red-3))"
+                      >
+                        {formatTime(timerState.effectiveEndTime)}
+                      </Text>
+                    </Group>
+                  </>
+                )}
+              </Stack>
+            </Card>
+          </Box>
+        </SimpleGrid>
+      </Card>
+
+      {/* Visual Timeline Slider */}
+      <Card
+        withBorder
+        shadow="sm"
+        radius="md"
+        p="lg"
+        bg="light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-7))"
+      >
+        <Group justify="space-between" mb="md">
+          <Title order={4}>
+            <IconTimeline size={20} style={{ marginRight: "8px" }} />
+            {getLocalizedText("Visueller Zeitstrahl", "Visual Timeline")}
+          </Title>
+        </Group>
+
+        <Text size="sm" c="dimmed" mb="lg">
+          {getLocalizedText(
+            "Verschieben Sie die Markierungen um Start- und Endzeit anzupassen",
+            "Move the markers to adjust start and end time"
+          )}
+        </Text>
+
+        <Box px="md" pb="md">
+          <Stack gap="xs">
+            {/* Time labels above slider */}
+            <Group justify="space-between" mb="xs">
+              <Group gap={4}>
+                <IconPlayerPlay
+                  size={14}
+                  color="var(--mantine-color-green-6)"
+                />
+                <Text
+                  size="xs"
+                  fw={600}
+                  c="light-dark(var(--mantine-color-green-7), var(--mantine-color-green-4))"
+                >
+                  {formatTime(timerState.effectiveStartTime)}
+                </Text>
+              </Group>
+              <Group gap={4}>
+                <IconPlayerStop size={14} color="var(--mantine-color-red-6)" />
+                <Text
+                  size="xs"
+                  fw={600}
+                  c="light-dark(var(--mantine-color-red-7), var(--mantine-color-red-4))"
+                >
+                  {formatTime(timerState.effectiveEndTime)}
+                </Text>
+              </Group>
+            </Group>
+
+            {/* The actual slider */}
+            <RangeSlider
+              value={[sliderData.startPosition, sliderData.endPosition]}
+              onChange={handleSliderChange}
+              min={sliderData.minValue}
+              max={sliderData.maxValue}
+              step={1}
+              minRange={1}
+              size="lg"
+              color="blue"
+              thumbSize={24}
+              marks={[
+                {
+                  value: 0,
+                  label: formatTime(sliderData.originalStartTime),
+                },
+                {
+                  value: Math.round(
+                    (sliderData.originalEndTime -
+                      sliderData.originalStartTime) /
+                      (60 * 1000)
+                  ),
+                  label: formatTime(sliderData.originalEndTime),
+                },
+              ]}
+              styles={{
+                thumb: {
+                  borderWidth: rem(2),
+                  padding: rem(3),
+                },
+                label: {
+                  fontSize: rem(11),
+                  fontWeight: 600,
+                },
+                markLabel: {
+                  fontSize: rem(10),
+                  marginTop: rem(8),
+                },
+              }}
+            />
+
+            {/* Duration display */}
+            <Group justify="center" mt="md">
+              <Badge size="lg" variant="light" color="blue">
+                <Group gap={4}>
+                  <IconClock size={14} />
+                  <Text size="sm">
+                    {getLocalizedText("Dauer:", "Duration:")}{" "}
+                    {timerState.activeTime}
+                  </Text>
+                </Group>
+              </Badge>
+            </Group>
+          </Stack>
+        </Box>
+      </Card>
+
+      {/* Start Time Adjustments */}
+      <Card withBorder shadow="sm" radius="md" p="lg">
+        <Title
+          order={4}
+          mb="md"
+          c="light-dark(var(--mantine-color-green-7), var(--mantine-color-green-4))"
+        >
+          <IconPlayerPlay size={18} style={{ marginRight: "8px" }} />
+          {getLocalizedText("Startzeit anpassen", "Adjust Start Time")}
+        </Title>
+
+        <Text size="sm" c="dimmed" mb="md">
+          {getLocalizedText(
+            "Zeit hinzufügen verschiebt die Startzeit nach hinten (mehr Arbeitszeit)",
+            "Adding time shifts start time backward (more work time)"
+          )}
+        </Text>
+
+        <Stack gap="md">
+          {/* Quick Adjustments */}
+          <Box>
+            <Text size="sm" fw={600} mb="xs">
+              {getLocalizedText("Schnelle Anpassungen", "Quick Adjustments")}
+            </Text>
             <Group gap="xs" justify="center">
               <Button.Group>
                 <Button
@@ -133,7 +438,7 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
                   color="red"
                   size="sm"
                   leftSection={<IconMinus size={14} />}
-                  onClick={() => handleActiveTimeChange(-300)}
+                  onClick={() => handleStartTimeChange(-5)}
                 >
                   5 Min
                 </Button>
@@ -142,7 +447,7 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
                   color="red"
                   size="sm"
                   leftSection={<IconMinus size={14} />}
-                  onClick={() => handleActiveTimeChange(-60)}
+                  onClick={() => handleStartTimeChange(-1)}
                 >
                   1 Min
                 </Button>
@@ -151,7 +456,7 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
                   color="green"
                   size="sm"
                   leftSection={<IconPlus size={14} />}
-                  onClick={() => handleActiveTimeChange(60)}
+                  onClick={() => handleStartTimeChange(1)}
                 >
                   1 Min
                 </Button>
@@ -160,125 +465,151 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
                   color="green"
                   size="sm"
                   leftSection={<IconPlus size={14} />}
-                  onClick={() => handleActiveTimeChange(300)}
+                  onClick={() => handleStartTimeChange(5)}
                 >
                   5 Min
                 </Button>
               </Button.Group>
             </Group>
           </Box>
-        </Stack>
-      </Card>
 
-      {/* Benutzerdefinierte Anpassungen */}
-      <Card withBorder shadow="sm" radius="md" p="lg">
-        <Title order={4} mb="md" c="dimmed">
-          <IconSettings size={18} style={{ marginRight: "8px" }} />
-          {getLocalizedText(
-            "Benutzerdefinierte Anpassungen",
-            "Custom Adjustments"
-          )}
-        </Title>
-
-        <Stack gap="md">
-          <Select
-            label={getLocalizedText("Zeit-Einheit", "Time Unit")}
-            value={timeUnit}
-            onChange={(value) =>
-              setTimeUnit(value as "seconds" | "minutes" | "hours")
-            }
-            data={[
-              {
-                value: "seconds",
-                label: getLocalizedText("Sekunden", "Seconds"),
-              },
-              {
-                value: "minutes",
-                label: getLocalizedText("Minuten", "Minutes"),
-              },
-              {
-                value: "hours",
-                label: getLocalizedText("Stunden", "Hours"),
-              },
-            ]}
-            styles={{
-              label: {
-                fontWeight: 600,
-                marginBottom: "0.5rem",
-              },
-            }}
-          />
-
+          {/* Custom Adjustment */}
           <Box>
+            <Text size="sm" fw={600} mb="xs">
+              {getLocalizedText(
+                "Benutzerdefinierte Anpassung",
+                "Custom Adjustment"
+              )}
+            </Text>
             <Group gap="xs" align="end">
-              <TextInput
-                label={getLocalizedText(
-                  "Aktive Zeit ändern",
-                  "Change Active Time"
-                )}
-                placeholder={getLocalizedTimeUnit(timeUnit)}
-                value={activeTimeInput}
-                onChange={(event) =>
-                  setActiveTimeInput(event.currentTarget.value)
-                }
+              <NumberInput
+                placeholder={getLocalizedText("Minuten", "Minutes")}
+                value={startTimeMinutes}
+                onChange={(value) => setStartTimeMinutes(Number(value) || 0)}
                 style={{ flex: 1 }}
-                leftSection={
-                  <IconPlayerPlay
-                    size={16}
-                    color="var(--mantine-color-blue-6)"
-                  />
-                }
-                styles={{
-                  label: {
-                    fontWeight: 600,
-                    marginBottom: "0.5rem",
-                  },
-                }}
+                leftSection={<IconClock size={16} />}
+                allowNegative
+                description={getLocalizedText(
+                  "Positive Werte = mehr Zeit, Negative = weniger Zeit",
+                  "Positive values = more time, Negative = less time"
+                )}
               />
               <Button
                 variant="filled"
-                color="blue"
+                color="green"
                 size="md"
-                onClick={handleCustomActiveTimeChange}
-                disabled={!activeTimeInput}
-                leftSection={<IconPlus size={16} />}
+                onClick={handleApplyStartTime}
+                disabled={startTimeMinutes === 0}
+                leftSection={<IconArrowRight size={16} />}
               >
                 {getLocalizedText("Anwenden", "Apply")}
               </Button>
             </Group>
           </Box>
-
-          {errorMessage && (
-            <Alert
-              icon={<IconAlertCircle size="1rem" />}
-              color="red"
-              variant="light"
-              radius="md"
-            >
-              {errorMessage}
-            </Alert>
-          )}
         </Stack>
       </Card>
 
-      <Paper
-        p="md"
-        radius="md"
-        bg="light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-8))"
-        withBorder
-      >
-        <Text size="xs" c="dimmed" ta="center" style={{ lineHeight: 1.4 }}>
-          <IconAlertCircle
-            size={12}
-            color="red"
-            style={{ marginRight: "4px", verticalAlign: "middle" }}
-          />
+      {/* End Time Adjustments */}
+      <Card withBorder shadow="sm" radius="md" p="lg">
+        <Title
+          order={4}
+          mb="md"
+          c="light-dark(var(--mantine-color-red-7), var(--mantine-color-red-4))"
+        >
+          <IconPlayerStop size={18} style={{ marginRight: "8px" }} />
+          {getLocalizedText("Endzeit anpassen", "Adjust End Time")}
+        </Title>
+
+        <Text size="sm" c="dimmed" mb="md">
           {getLocalizedText(
-            "Hinweis: Negative Werte reduzieren die Zeit. Die Zeit kann nicht unter 0 fallen.",
-            "Note: Negative values reduce time. Time cannot fall below 0."
+            "Zeit hinzufügen verschiebt die Endzeit nach vorne (mehr Arbeitszeit)",
+            "Adding time shifts end time forward (more work time)"
           )}
         </Text>
-      </Paper>
+
+        <Stack gap="md">
+          {/* Quick Adjustments */}
+          <Box>
+            <Text size="sm" fw={600} mb="xs">
+              {getLocalizedText("Schnelle Anpassungen", "Quick Adjustments")}
+            </Text>
+            <Group gap="xs" justify="center">
+              <Button.Group>
+                <Button
+                  variant="light"
+                  color="red"
+                  size="sm"
+                  leftSection={<IconMinus size={14} />}
+                  onClick={() => handleEndTimeChange(-5)}
+                >
+                  5 Min
+                </Button>
+                <Button
+                  variant="light"
+                  color="red"
+                  size="sm"
+                  leftSection={<IconMinus size={14} />}
+                  onClick={() => handleEndTimeChange(-1)}
+                >
+                  1 Min
+                </Button>
+                <Button
+                  variant="light"
+                  color="green"
+                  size="sm"
+                  leftSection={<IconPlus size={14} />}
+                  onClick={() => handleEndTimeChange(1)}
+                >
+                  1 Min
+                </Button>
+                <Button
+                  variant="light"
+                  color="green"
+                  size="sm"
+                  leftSection={<IconPlus size={14} />}
+                  onClick={() => handleEndTimeChange(5)}
+                >
+                  5 Min
+                </Button>
+              </Button.Group>
+            </Group>
+          </Box>
+
+          {/* Custom Adjustment */}
+          <Box>
+            <Text size="sm" fw={600} mb="xs">
+              {getLocalizedText(
+                "Benutzerdefinierte Anpassung",
+                "Custom Adjustment"
+              )}
+            </Text>
+            <Group gap="xs" align="end">
+              <NumberInput
+                placeholder={getLocalizedText("Minuten", "Minutes")}
+                value={endTimeMinutes}
+                onChange={(value) => setEndTimeMinutes(Number(value) || 0)}
+                style={{ flex: 1 }}
+                leftSection={<IconClock size={16} />}
+                allowNegative
+                description={getLocalizedText(
+                  "Positive Werte = mehr Zeit, Negative = weniger Zeit",
+                  "Positive values = more time, Negative = less time"
+                )}
+              />
+              <Button
+                variant="filled"
+                color="red"
+                size="md"
+                onClick={handleApplyEndTime}
+                disabled={endTimeMinutes === 0}
+                leftSection={<IconArrowRight size={16} />}
+              >
+                {getLocalizedText("Anwenden", "Apply")}
+              </Button>
+            </Group>
+          </Box>
+        </Stack>
+      </Card>
     </Stack>
   );
 }

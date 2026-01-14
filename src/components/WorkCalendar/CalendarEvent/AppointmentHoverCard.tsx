@@ -20,13 +20,9 @@ import {
   Button,
 } from "@mantine/core";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
-import { useSettings } from "@/db/collections/settings/use-settings-query";
 import { useAppointmentMutations } from "@/db/collections/work/appointment/use-appointment-mutations";
 import { useTimeTrackerManager } from "@/stores/timeTrackerManagerStore";
-import {
-  canStartTimerFromAppointment,
-  getProjectRoundingSettings,
-} from "@/lib/appointmentTimerHelpers";
+import { canStartTimerFromAppointment } from "@/lib/appointmentTimerHelpers";
 import {
   showActionSuccessNotification,
   showActionErrorNotification,
@@ -70,7 +66,6 @@ export default function AppointmentHoverCard({
 
   // Timer integration
   const { data: projects } = useWorkProjects();
-  const { data: settings } = useSettings();
   const { updateAppointment } = useAppointmentMutations();
   const { addTimer, timers, updateTimer } = useTimeTrackerManager();
 
