@@ -25,7 +25,6 @@ interface TimeTrackerComponentSmallProps {
   roundedActiveTime: string;
   state: TimerState;
   activeTime: string;
-  pausedTime: string;
   activeSeconds: number;
   timerRoundingSettings: TimerRoundingSettings;
   projectTitle: string;
@@ -33,17 +32,13 @@ interface TimeTrackerComponentSmallProps {
   currency: Currency;
   hourlyPayment: boolean;
   storedActiveSeconds: number;
-  storedPausedSeconds: number;
   color: string | null;
   backgroundColor: string;
   setShowSmall: (showSmall: boolean) => void;
   submitTimer: () => void;
   startTimer: () => void;
-  pauseTimer: () => void;
-  resumeTimer: () => void;
   cancelTimer: () => void;
   modifyActiveSeconds: (delta: number) => void;
-  modifyPausedSeconds: (delta: number) => void;
   setTempTimerRounding: (timerRoundingSettings: TimerRoundingSettings) => void;
 }
 
@@ -53,7 +48,6 @@ export default function TimeTrackerComponentSmall({
   roundedActiveTime,
   state,
   activeTime,
-  pausedTime,
   activeSeconds,
   timerRoundingSettings,
   projectTitle,
@@ -64,14 +58,10 @@ export default function TimeTrackerComponentSmall({
   backgroundColor,
   setShowSmall: _setShowSmall,
   storedActiveSeconds,
-  storedPausedSeconds,
   submitTimer,
   startTimer,
-  pauseTimer: _pauseTimer,
-  resumeTimer: _resumeTimer,
   cancelTimer,
   modifyActiveSeconds,
-  modifyPausedSeconds,
   setTempTimerRounding,
 }: TimeTrackerComponentSmallProps) {
   const { getLocalizedText } = useIntl();
@@ -96,15 +86,12 @@ export default function TimeTrackerComponentSmall({
             <Stack gap={0}>
               <ModifyTimeTrackerModal
                 modifyActiveSeconds={modifyActiveSeconds}
-                modifyPausedSeconds={modifyPausedSeconds}
                 setTempTimerRounding={setTempTimerRounding}
                 activeTime={activeTime}
-                pausedTime={pausedTime}
                 state={state}
                 activeSeconds={activeSeconds}
                 timerRoundingSettings={timerRoundingSettings}
                 storedActiveSeconds={storedActiveSeconds}
-                storedPausedSeconds={storedPausedSeconds}
               />
               <TimeTrackerInfoHoverCard
                 currency={currency}
@@ -140,42 +127,11 @@ export default function TimeTrackerComponentSmall({
                 {roundedActiveTime}
               </Text>
             </Card>
-            {/* {!roundInTimeSections && (
-            <Card
-              w={47}
-              shadow="sm"
-              padding={0}
-              py={8}
-              mr={1}
-              radius="md"
-              withBorder
-              style={{
-                borderColor:
-                  state === TimerState.Paused
-                    ? "var(--mantine-color-orange-6)"
-                    : "",
-              }}
-            >
-              <Text fz={11} c="dimmed" ta="center">
-                {getLocalizedText("Pausiert", "Paused")}
-              </Text>
-              <Text fz={11} fw={state === "paused" ? 700 : 400} ta="center">
-                {pausedTime}
-              </Text>
-            </Card>
-          )} */}
-            {state === "stopped" && <StartActionIcon startTimer={startTimer} />}
-            {/* {state === "running" && !roundInTimeSections && (
-            <PauseActionIcon pauseTimer={pauseTimer} disabled={isSubmitting} />
-          )}
-          {state === "paused" && (
-            <ResumeActionIcon
-              resumeTimer={resumeTimer}
-              disabled={isSubmitting}
-            />
-          )} */}
+            {state === TimerState.Stopped && (
+              <StartActionIcon startTimer={startTimer} />
+            )}
             <Collapse
-              in={state === "running" || state === "paused"}
+              in={state === TimerState.Running}
               transitionDuration={400}
             >
               <Stack gap="xs" align="center" justify="center">

@@ -15,12 +15,11 @@ import ProjectForm from "@/components/Work/Project/ProjectForm";
 import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 
 import { Currency } from "@/types/settings.types";
-import { Tables } from "@/types/db.types";
 import { TimerRoundingSettings } from "@/types/timeTracker.types";
-import { WorkProject } from "@/types/work.types";
+import { WorkProject, WorkTimeEntry } from "@/types/work.types";
 
 interface EditTimeEntryModalProps {
-  timeEntry: Tables<"work_time_entry">;
+  timeEntry: WorkTimeEntry;
   project: WorkProject;
   opened: boolean;
   onClose: () => void;
@@ -70,13 +69,12 @@ export default function EditTimeEntryDrawer({
     salary: number;
     memo?: string;
   }) {
-    const newTimeEntry: Tables<"work_time_entry"> = {
+    const newTimeEntry: WorkTimeEntry = {
       ...timeEntry,
       ...values,
       start_time: new Date(values.start_time).toISOString(),
       end_time: new Date(values.end_time).toISOString(),
       true_end_time: new Date(values.end_time).toISOString(),
-      paused_seconds: 0,
       memo: values.memo || null,
     };
 
@@ -143,7 +141,6 @@ export default function EditTimeEntryDrawer({
                 start_time: timeEntry.start_time,
                 end_time: timeEntry.end_time,
                 active_seconds: timeEntry.active_seconds,
-                paused_seconds: timeEntry.paused_seconds,
                 currency: timeEntry.currency,
                 salary: timeEntry.salary,
                 memo: timeEntry.memo || undefined,

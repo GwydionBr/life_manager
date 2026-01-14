@@ -29,15 +29,12 @@ export interface TimerData {
   timerRoundingSettings: TimerRoundingSettings;
   state: TimerState;
   activeSeconds: number;
-  pausedSeconds: number;
   startTime: number | null;
   tempStartTime: number | null;
   storedActiveSeconds: number;
-  storedPausedSeconds: number;
   moneyEarned: string;
   activeTime: string;
   roundedActiveTime: string;
-  pausedTime: string;
   forceEndTimer: boolean; // Flag to force end timer (e.g., when max timers reached)
   createdAt: number; // Timestamp when timer was created
   memo: string | null;
@@ -167,7 +164,6 @@ export const useTimeTrackerManager = create(
             ? TimerState.Running
             : TimerState.Stopped,
           activeSeconds: 0,
-          pausedSeconds: 0,
           startTime: appointmentMetadata?.appointmentId
             ? new Date().getTime()
             : null,
@@ -175,11 +171,9 @@ export const useTimeTrackerManager = create(
             ? new Date().getTime()
             : null,
           storedActiveSeconds: 0,
-          storedPausedSeconds: 0,
           moneyEarned: "0.00",
           activeTime: "00:00",
           roundedActiveTime: "00:00",
-          pausedTime: "00:00",
           forceEndTimer: false,
           createdAt: new Date().getTime(),
           memo: null,

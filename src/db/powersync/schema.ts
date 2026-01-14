@@ -264,7 +264,6 @@ const work_time_entry = new Table(
     currency: column.text,
     start_time: column.text,
     active_seconds: column.integer,
-    paused_seconds: column.integer,
     work_project_id: column.text,
     user_id: column.text,
     created_at: column.text,

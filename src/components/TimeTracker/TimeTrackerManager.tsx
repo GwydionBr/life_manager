@@ -239,27 +239,20 @@ export default function TimerManager({
    * These computed values determine the status and count shown in the
    * TimeTrackerActionIcon. The priority is:
    * 1. Running (if any timer is running)
-   * 2. Paused (if any timer is paused but none running)
    * 3. Stopped (if all timers are stopped)
    */
   const isOneTimerRunning = timers.some(
     (timer) => timer.state === TimerState.Running
   );
-  const isOneTimerPaused = timers.some(
-    (timer) => timer.state === TimerState.Paused
-  );
 
-  // Determine main status: Running > Paused > Stopped
+  // Determine main status: Running > Stopped
   const mainTimerStatus = isOneTimerRunning
     ? TimerState.Running
-    : isOneTimerPaused
-      ? TimerState.Paused
-      : TimerState.Stopped;
+    : TimerState.Stopped;
 
-  // Count active timers (running or paused) for the indicator badge
+  // Count active timers (running) for the indicator badge
   const activeTimerCount = timers.filter(
-    (timer) =>
-      timer.state === TimerState.Running || timer.state === TimerState.Paused
+    (timer) => timer.state === TimerState.Running
   ).length;
 
   /**

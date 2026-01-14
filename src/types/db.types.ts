@@ -1162,7 +1162,6 @@ export type Database = {
           id: string
           memo: string | null
           paid: boolean
-          paused_seconds: number
           payout_id: string | null
           real_start_time: string | null
           salary: number
@@ -1182,7 +1181,6 @@ export type Database = {
           id?: string
           memo?: string | null
           paid?: boolean
-          paused_seconds?: number
           payout_id?: string | null
           real_start_time?: string | null
           salary: number
@@ -1202,7 +1200,6 @@ export type Database = {
           id?: string
           memo?: string | null
           paid?: boolean
-          paused_seconds?: number
           payout_id?: string | null
           real_start_time?: string | null
           salary?: number

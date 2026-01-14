@@ -11,27 +11,21 @@ import { TimerRoundingSettings, TimerState } from "@/types/timeTracker.types";
 
 interface ModifyTimeTrackerModalProps {
   modifyActiveSeconds: (delta: number) => void;
-  modifyPausedSeconds: (delta: number) => void;
   setTempTimerRounding: (timerRoundingSettings: TimerRoundingSettings) => void;
   activeTime: string;
-  pausedTime: string;
   state: TimerState;
   activeSeconds: number;
   storedActiveSeconds: number;
-  storedPausedSeconds: number;
   timerRoundingSettings: TimerRoundingSettings;
 }
 
 export default function ModifyTimeTrackerModal({
   modifyActiveSeconds,
-  modifyPausedSeconds,
   setTempTimerRounding,
   activeTime,
-  pausedTime,
   state,
   activeSeconds,
   storedActiveSeconds,
-  storedPausedSeconds,
   timerRoundingSettings,
 }: ModifyTimeTrackerModalProps) {
   const { getLocalizedText } = useIntl();
@@ -86,12 +80,9 @@ export default function ModifyTimeTrackerModal({
           <Tabs.Panel value="time">
             <ModifyTime
               modifyActiveSeconds={modifyActiveSeconds}
-              modifyPausedSeconds={modifyPausedSeconds}
               activeTime={activeTime}
-              pausedTime={pausedTime}
               state={state}
               storedActiveSeconds={storedActiveSeconds}
-              storedPausedSeconds={storedPausedSeconds}
             />
           </Tabs.Panel>
           <Tabs.Panel value="rounding">

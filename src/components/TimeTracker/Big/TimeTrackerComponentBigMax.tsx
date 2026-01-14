@@ -29,25 +29,20 @@ interface TimeTrackerComponentBigMaxProps {
   state: TimerState;
   activeSeconds: number;
   activeTime: string;
-  pausedTime: string;
   roundedActiveTime: string;
   isSubmitting: boolean;
   moneyEarned: string;
   storedActiveSeconds: number;
-  storedPausedSeconds: number;
   timerRoundingSettings: TimerRoundingSettings;
   memo: string;
   color: string | null;
   backgroundColor: string;
   startTimer: () => void;
-  pauseTimer: () => void;
-  resumeTimer: () => void;
   submitTimer: () => void;
   cancelTimer: () => void;
   removeTimer: () => void;
   setTempTimerRounding: (timerRoundingSettings: TimerRoundingSettings) => void;
   modifyActiveSeconds: (delta: number) => void;
-  modifyPausedSeconds: (delta: number) => void;
   setMemo: (memo: string) => void;
 }
 
@@ -56,12 +51,10 @@ export default function TimeTrackerComponentBigMax({
   state,
   activeSeconds,
   activeTime,
-  pausedTime,
   roundedActiveTime,
   isSubmitting,
   moneyEarned,
   storedActiveSeconds,
-  storedPausedSeconds,
   timerRoundingSettings,
   memo,
   color,
@@ -70,7 +63,6 @@ export default function TimeTrackerComponentBigMax({
   submitTimer,
   cancelTimer,
   modifyActiveSeconds,
-  modifyPausedSeconds,
   setTempTimerRounding,
   removeTimer,
   setMemo,
@@ -81,8 +73,6 @@ export default function TimeTrackerComponentBigMax({
   const getLocaleState = () => {
     if (state === TimerState.Running) {
       return getLocalizedText("Aktiv", "Running");
-    } else if (state === TimerState.Paused) {
-      return getLocalizedText("Pausiert", "Paused");
     } else if (state === TimerState.Stopped) {
       return getLocalizedText("Gestoppt", "Stopped");
     }
@@ -109,14 +99,11 @@ export default function TimeTrackerComponentBigMax({
             <Stack gap={0}>
               <ModifyTimeTrackerModal
                 activeTime={activeTime}
-                pausedTime={pausedTime}
                 state={state}
                 timerRoundingSettings={timerRoundingSettings}
                 activeSeconds={activeSeconds}
                 storedActiveSeconds={storedActiveSeconds}
-                storedPausedSeconds={storedPausedSeconds}
                 modifyActiveSeconds={modifyActiveSeconds}
-                modifyPausedSeconds={modifyPausedSeconds}
                 setTempTimerRounding={setTempTimerRounding}
               />
               <TimeTrackerInfoHoverCard
@@ -172,25 +159,11 @@ export default function TimeTrackerComponentBigMax({
               state={state}
               color={color}
             />
-            {/* {!roundInTimeSections && (
-            <TimeTrackerRow
-              icon={
-                <IconPlayerPause
-                  size={20}
-                  color="var(--mantine-color-orange-6)"
-                />
-              }
-              value={pausedTime}
-              state={state}
-              activationState={TimerState.Paused}
-              color="var(--mantine-color-orange-6)"
-            />
-          )} */}
           </Stack>
 
           {/* Buttons */}
           <Stack gap="md" w="100%" align="center">
-            {state === "stopped" && (
+            {state === TimerState.Stopped && (
               <Button
                 w="60%"
                 onClick={startTimer}
@@ -198,35 +171,11 @@ export default function TimeTrackerComponentBigMax({
                 leftSection={<IconPlayerPlay size={20} />}
                 size="md"
               >
-                Start
+                {getLocalizedText("Starten", "Start")}
               </Button>
             )}
-            {/* {state === "running" && !roundInTimeSections && (
-            <Button
-              w="60%"
-              onClick={pauseTimer}
-              color="yellow"
-              leftSection={<IconPlayerPause size={20} />}
-              size="md"
-              disabled={isSubmitting}
-            >
-              Pause
-            </Button>
-          )} */}
-            {/* {state === "paused" && (
-            <Button
-              w="60%"
-              onClick={resumeTimer}
-              color="blue"
-              leftSection={<IconPlayerPlay size={20} />}
-              size="md"
-              disabled={isSubmitting}
-            >
-              Resume
-            </Button>
-          )} */}
 
-            <Collapse in={state !== "stopped"} transitionDuration={400} w="60%">
+            <Collapse in={state !== TimerState.Stopped} transitionDuration={400} w="60%">
               <Stack gap="md" align="center">
                 <Button
                   fullWidth
@@ -236,7 +185,7 @@ export default function TimeTrackerComponentBigMax({
                   size="md"
                   disabled={isSubmitting}
                 >
-                  Stop
+                  {getLocalizedText("Stoppen", "Stop")}
                 </Button>
                 <Button
                   fullWidth
@@ -246,7 +195,7 @@ export default function TimeTrackerComponentBigMax({
                   size="md"
                   disabled={isSubmitting}
                 >
-                  Cancel
+                  {getLocalizedText("Abbrechen", "Cancel")}
                 </Button>
               </Stack>
             </Collapse>

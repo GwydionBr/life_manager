@@ -29,26 +29,19 @@ import TimeTrackerTimeRow from "../TimeTrackerRow/TimeTrackerTimeRow";
 
 interface ModifyTimeProps {
   modifyActiveSeconds: (delta: number) => void;
-  modifyPausedSeconds: (delta: number) => void;
   activeTime: string;
-  pausedTime: string;
   state: TimerState;
   storedActiveSeconds: number;
-  storedPausedSeconds: number;
 }
 
 export default function ModifyTime({
   modifyActiveSeconds,
-  modifyPausedSeconds,
   activeTime,
-  pausedTime: _pausedTime,
   state,
   storedActiveSeconds,
-  storedPausedSeconds,
 }: ModifyTimeProps) {
   const { getLocalizedText } = useIntl();
   const [activeTimeInput, setActiveTimeInput] = useState("");
-  const [pausedTimeInput, setPausedTimeInput] = useState("");
   const [timeUnit, setTimeUnit] = useState<"seconds" | "minutes" | "hours">(
     "minutes"
   );
@@ -56,10 +49,6 @@ export default function ModifyTime({
 
   const handleActiveTimeChange = (change: number) => {
     modifyActiveSeconds(change);
-  };
-
-  const handlePausedTimeChange = (change: number) => {
-    modifyPausedSeconds(change);
   };
 
   const parseTimeInput = (
@@ -109,23 +98,6 @@ export default function ModifyTime({
 
       modifyActiveSeconds(seconds);
       setActiveTimeInput("");
-      setErrorMessage("");
-    }
-  };
-
-  const handleCustomPausedTimeChange = () => {
-    const seconds = parseTimeInput(pausedTimeInput, timeUnit);
-    if (seconds !== 0) {
-      // Berechne die neue pausierte Zeit basierend auf den aktuellen storedPausedSeconds
-      const newStoredPausedSeconds = storedPausedSeconds + seconds;
-
-      if (newStoredPausedSeconds < 0) {
-        setErrorMessage("Paused time cannot fall below 0.");
-        return;
-      }
-
-      modifyPausedSeconds(seconds);
-      setPausedTimeInput("");
       setErrorMessage("");
     }
   };
@@ -207,61 +179,6 @@ export default function ModifyTime({
               </Button.Group>
             </Group>
           </Box>
-
-          <Divider />
-
-          {/* Pausierte Zeit */}
-          <Box>
-            <Group mb="xs" gap="xs">
-              <IconPlayerPause
-                size={16}
-                color="var(--mantine-color-orange-6)"
-              />
-              <Text size="sm" fw={600} c="orange.7">
-                {getLocalizedText("Pausierte Zeit", "Paused Time")}
-              </Text>
-            </Group>
-            <Group gap="xs" justify="center">
-              <Button.Group>
-                <Button
-                  variant="light"
-                  color="red"
-                  size="sm"
-                  leftSection={<IconMinus size={14} />}
-                  onClick={() => handlePausedTimeChange(-300)}
-                >
-                  5 Min
-                </Button>
-                <Button
-                  variant="light"
-                  color="red"
-                  size="sm"
-                  leftSection={<IconMinus size={14} />}
-                  onClick={() => handlePausedTimeChange(-60)}
-                >
-                  1 Min
-                </Button>
-                <Button
-                  variant="light"
-                  color="green"
-                  size="sm"
-                  leftSection={<IconPlus size={14} />}
-                  onClick={() => handlePausedTimeChange(60)}
-                >
-                  1 Min
-                </Button>
-                <Button
-                  variant="light"
-                  color="green"
-                  size="sm"
-                  leftSection={<IconPlus size={14} />}
-                  onClick={() => handlePausedTimeChange(300)}
-                >
-                  5 Min
-                </Button>
-              </Button.Group>
-            </Group>
-          </Box>
         </Stack>
       </Card>
 
@@ -336,45 +253,6 @@ export default function ModifyTime({
                 size="md"
                 onClick={handleCustomActiveTimeChange}
                 disabled={!activeTimeInput}
-                leftSection={<IconPlus size={16} />}
-              >
-                {getLocalizedText("Anwenden", "Apply")}
-              </Button>
-            </Group>
-          </Box>
-
-          <Box>
-            <Group gap="xs" align="end">
-              <TextInput
-                label={getLocalizedText(
-                  "Pausierte Zeit ändern",
-                  "Change Paused Time"
-                )}
-                placeholder={getLocalizedTimeUnit(timeUnit)}
-                value={pausedTimeInput}
-                onChange={(event) =>
-                  setPausedTimeInput(event.currentTarget.value)
-                }
-                style={{ flex: 1 }}
-                leftSection={
-                  <IconPlayerPause
-                    size={16}
-                    color="var(--mantine-color-orange-6)"
-                  />
-                }
-                styles={{
-                  label: {
-                    fontWeight: 600,
-                    marginBottom: "0.5rem",
-                  },
-                }}
-              />
-              <Button
-                variant="filled"
-                color="orange"
-                size="md"
-                onClick={handleCustomPausedTimeChange}
-                disabled={!pausedTimeInput}
                 leftSection={<IconPlus size={16} />}
               >
                 {getLocalizedText("Anwenden", "Apply")}

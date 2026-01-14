@@ -16,7 +16,6 @@ export interface NewWorkTimeEntry {
   start_time: string;
   end_time: string;
   active_seconds: number;
-  paused_seconds: number;
   currency: Currency;
   salary: number;
   memo?: string;

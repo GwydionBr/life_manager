@@ -28,13 +28,12 @@ export const getRoundingLabel = (
  * This function:
  * 1. Calculates the final active seconds (applying rounding if not using time fragments)
  * 2. Normalizes the start time to the beginning of the minute (removes seconds/milliseconds)
- * 3. Calculates the end time based on active + paused seconds
+ * 3. Calculates the end time based on active
  *
  * Note: The distinction between `true_end_time` (actual end) and `end_time`
  * (calculated end based on rounded time) allows tracking of actual vs billed time.
  *
  * @param activeSeconds - Raw active seconds from the timer
- * @param pausedSeconds - Total paused seconds
  * @param startTime - Original start timestamp (can be null)
  * @param timerRoundingSettings - Permanent rounding settings
  * @param tempTimerRoundingSettings - Optional temporary rounding settings override
@@ -42,7 +41,6 @@ export const getRoundingLabel = (
  */
 export function calculateSessionTimeValues(
   activeSeconds: number,
-  pausedSeconds: number,
   startTime: number | null,
   timerRoundingSettings: TimerRoundingSettings,
   tempTimerRoundingSettings?: TimerRoundingSettings
@@ -64,9 +62,9 @@ export function calculateSessionTimeValues(
   normalizedStartTime.setSeconds(0);
   normalizedStartTime.setMilliseconds(0);
 
-  // Calculate end time: start time + (active seconds + paused seconds)
+  // Calculate end time: start time + active seconds
   const calculatedEndTime = new Date(
-    normalizedStartTime.getTime() + (finalActiveSeconds + pausedSeconds) * 1000
+    normalizedStartTime.getTime() + finalActiveSeconds * 1000
   );
 
   return {

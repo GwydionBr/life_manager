@@ -47,7 +47,6 @@ export function getTimeFragmentSession(
     start_time: blockStart.toISOString(),
     end_time: blockEnd.toISOString(),
     active_seconds: (blockEnd.getTime() - blockStart.getTime()) / 1000,
-    paused_seconds: 0,
     time_fragments_interval: timeFragmentInterval,
   };
 

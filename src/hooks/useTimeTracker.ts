@@ -13,13 +13,13 @@ import { TablesInsert } from "@/types/db.types";
  *
  * This represents the complete state of one timer, including:
  * - Project information (id, title, payment details)
- * - Timer state (running, paused, stopped)
- * - Time tracking (active seconds, paused seconds, formatted times)
+ * - Timer state (running, stopped)
+ * - Time tracking (active seconds, formatted times)
  * - Rounding settings (permanent and temporary overrides)
  * - Financial calculations (money earned based on time and salary)
  *
  * Note: The distinction between `startTime` and `tempStartTime` is used to handle
- * timer resumptions and modifications. `storedActiveSeconds` and `storedPausedSeconds`
+ * timer resumptions and modifications. `storedActiveSeconds`
  * are used to accumulate time across pause/resume cycles.
  */
 interface TimeTrackerState {
@@ -34,14 +34,11 @@ interface TimeTrackerState {
   moneyEarned: string;
   activeTime: string; // Formatted as "HH:MM:SS"
   roundedActiveTime: string; // Active time after applying rounding rules
-  pausedTime: string; // Formatted as "HH:MM:SS"
   state: TimerState;
   activeSeconds: number; // Total active seconds (not rounded)
-  pausedSeconds: number; // Total paused seconds
   startTime: number | null; // Original start timestamp (used for session calculation)
   tempStartTime: number | null; // Current reference point for time calculations (updated on pause/resume)
   storedActiveSeconds: number; // Accumulated active seconds before current running period
-  storedPausedSeconds: number; // Accumulated paused seconds before current pause period
   memo: string | null;
   appointmentId?: string;
   appointmentTitle?: string;
@@ -79,10 +76,6 @@ export function useTimeTracker(initialState: TimeTrackerState) {
    *
    * The update loop handles two states:
    * - Running: Calculates active time, rounded time, and money earned
-   * - Paused: Calculates paused time
-   *
-   * Note: The loop continues even when paused to keep the paused time display updated.
-   * This might be optimized to only run when needed (running or paused state).
    */
   const startLoop = useCallback(() => {
     // Clear any existing interval to prevent memory leaks and duplicate intervals
@@ -94,11 +87,11 @@ export function useTimeTracker(initialState: TimeTrackerState) {
      * Update function called every second.
      *
      * Calculates current time based on:
-     * - tempStartTime: The reference point for the current running/paused period
-     * - storedActiveSeconds/storedPausedSeconds: Accumulated time from previous periods
+     * - tempStartTime: The reference point for the current running period
+     * - storedActiveSeconds: Accumulated time from previous periods
      *
      * This approach allows the timer to accurately track time across multiple
-     * pause/resume cycles.
+     * running/stopped cycles.
      */
     const updateLoop = () => {
       setState((prevState) => {
@@ -144,19 +137,6 @@ export function useTimeTracker(initialState: TimeTrackerState) {
                 3600) *
               prevState.salary
             ).toFixed(2),
-          };
-        } else if (prevState.state === TimerState.Paused) {
-          // Calculate total paused seconds: time since tempStartTime + previously stored paused seconds
-          const newPausedSeconds =
-            Math.floor((Date.now() - (prevState.tempStartTime ?? 0)) / 1000) +
-            prevState.storedPausedSeconds;
-
-          const newPausedTime = secondsToTimerFormat(newPausedSeconds);
-
-          return {
-            ...prevState,
-            pausedSeconds: newPausedSeconds,
-            pausedTime: newPausedTime,
           };
         }
         // If stopped, no updates needed
@@ -208,39 +188,6 @@ export function useTimeTracker(initialState: TimeTrackerState) {
     [state.activeSeconds]
   );
 
-  /**
-   * Modifies the paused seconds by a delta amount (positive or negative).
-   *
-   * Similar to modifyActiveSeconds but for paused time tracking.
-   * Used when user manually adjusts the paused time.
-   *
-   * @param delta - Number of seconds to add (positive) or subtract (negative)
-   */
-  const modifyPausedSeconds = useCallback(
-    (delta: number) => {
-      // Ensure paused seconds never go below 0
-      const newPausedSeconds = Math.max(0, state.pausedSeconds + delta);
-      const now = new Date().getTime();
-      // Recalculate start time accounting for both active and paused seconds
-      const newStartTime = new Date(
-        now - newPausedSeconds * 1000 - state.activeSeconds * 1000
-      );
-
-      // Update both stored and current values
-      // Reset temp start time only when paused to maintain consistency
-      setState((prev) => ({
-        ...prev,
-        startTime: newStartTime.getTime(),
-        pausedSeconds: newPausedSeconds,
-        pausedTime: secondsToTimerFormat(newPausedSeconds),
-        storedPausedSeconds: newPausedSeconds,
-        ...(prev.state === TimerState.Paused && {
-          tempStartTime: Date.now(),
-        }),
-      }));
-    },
-    [state.pausedSeconds, state.activeSeconds]
-  );
 
   /**
    * Restores/resumes the timer update loop.
@@ -318,46 +265,6 @@ export function useTimeTracker(initialState: TimeTrackerState) {
   }, [state.state, state.projectTitle, startLoop]);
 
   /**
-   * Pauses the timer.
-   *
-   * Can only be called when timer is Running.
-   *
-   * Stores the current active seconds and resets tempStartTime so that
-   * paused time tracking can begin from this point.
-   */
-  const pauseTimer = useCallback(() => {
-    if (state.state !== TimerState.Running) return;
-
-    setState((prev) => ({
-      ...prev,
-      state: TimerState.Paused,
-      storedActiveSeconds: prev.activeSeconds, // Save current active seconds
-      tempStartTime: Date.now(), // Reset reference point for paused time tracking
-    }));
-    startLoop(); // Continue loop to track paused time
-  }, [state.state, startLoop]);
-
-  /**
-   * Resumes the timer from paused state.
-   *
-   * Can only be called when timer is Paused.
-   *
-   * Stores the current paused seconds and resets tempStartTime so that
-   * active time tracking can resume from this point.
-   */
-  const resumeTimer = useCallback(() => {
-    if (state.state !== TimerState.Paused) return;
-
-    setState((prev) => ({
-      ...prev,
-      state: TimerState.Running,
-      storedPausedSeconds: prev.pausedSeconds, // Save current paused seconds
-      tempStartTime: Date.now(), // Reset reference point for active time tracking
-    }));
-    startLoop(); // Continue loop to track active time
-  }, [state.state, startLoop]);
-
-  /**
    * Stops the timer and resets all values to initial state.
    *
    * This:
@@ -385,14 +292,11 @@ export function useTimeTracker(initialState: TimeTrackerState) {
       moneyEarned: "0.00",
       activeTime: "00:00",
       roundedActiveTime: "00:00",
-      pausedTime: "00:00",
       activeSeconds: 0,
-      pausedSeconds: 0,
       tempTimerRoundingSettings: undefined, // Clear temporary rounding overrides
       startTime: null,
       tempStartTime: null,
       storedActiveSeconds: 0,
-      storedPausedSeconds: 0,
       memo: null, // Clear memo
       appointmentId: undefined,
       appointmentTitle: undefined,
@@ -476,7 +380,6 @@ export function useTimeTracker(initialState: TimeTrackerState) {
     const { finalActiveSeconds, normalizedStartTime, calculatedEndTime } =
       calculateSessionTimeValues(
         state.activeSeconds,
-        state.pausedSeconds,
         state.startTime,
         state.timerRoundingSettings,
         state.tempTimerRoundingSettings
@@ -491,7 +394,6 @@ export function useTimeTracker(initialState: TimeTrackerState) {
       end_time: calculatedEndTime.toISOString(), // Calculated end time (based on rounded time)
       hourly_payment: state.hourlyPayment,
       active_seconds: finalActiveSeconds, // Rounded active seconds
-      paused_seconds: state.pausedSeconds,
       salary: state.salary,
       currency: state.currency,
       memo: state.memo,
@@ -508,7 +410,6 @@ export function useTimeTracker(initialState: TimeTrackerState) {
     state.projectId,
     state.startTime,
     state.activeSeconds,
-    state.pausedSeconds,
     state.memo,
   ]);
 
@@ -524,13 +425,10 @@ export function useTimeTracker(initialState: TimeTrackerState) {
     configureProject,
     restoreTimer,
     startTimer,
-    pauseTimer,
-    resumeTimer,
     stopTimer,
     cancelTimer,
     getCurrentSession,
     modifyActiveSeconds,
-    modifyPausedSeconds,
     setTempTimerRounding,
     setTimerRounding,
   };

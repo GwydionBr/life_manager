@@ -23,20 +23,15 @@ interface TimeTrackerComponentBigMinProps {
   state: TimerState;
   activeSeconds: number;
   activeTime: string;
-  pausedTime: string;
   roundedActiveTime: string;
   isSubmitting: boolean;
   timerRoundingSettings: TimerRoundingSettings; 
   storedActiveSeconds: number;
-  storedPausedSeconds: number;
   color: string | null;
   backgroundColor: string;
   modifyActiveSeconds: (delta: number) => void;
-  modifyPausedSeconds: (delta: number) => void;
   setTempTimerRounding: (timerRoundingSettings: TimerRoundingSettings) => void;
   startTimer: () => void;
-  pauseTimer: () => void;
-  resumeTimer: () => void;
   submitTimer: () => void;
   cancelTimer: () => void;
   removeTimer: () => void;
@@ -47,14 +42,11 @@ export default function TimeTrackerComponentBigMin({
   state,
   activeSeconds,
   activeTime,
-  pausedTime,
   roundedActiveTime,
   isSubmitting,
   storedActiveSeconds,
-  storedPausedSeconds,
   timerRoundingSettings,
   modifyActiveSeconds,
-  modifyPausedSeconds,
   setTempTimerRounding,
   startTimer,
   submitTimer,
@@ -83,14 +75,11 @@ export default function TimeTrackerComponentBigMin({
         <Group justify="center" align="center">
           <ModifyTimeTrackerModal
             activeTime={activeTime}
-            pausedTime={pausedTime}
             state={state}
             timerRoundingSettings={timerRoundingSettings}
             activeSeconds={activeSeconds}
             storedActiveSeconds={storedActiveSeconds}
-            storedPausedSeconds={storedPausedSeconds}
             modifyActiveSeconds={modifyActiveSeconds}
-            modifyPausedSeconds={modifyPausedSeconds}
             setTempTimerRounding={setTempTimerRounding}
           />
           <TimeTrackerInfoHoverCard
@@ -124,7 +113,7 @@ export default function TimeTrackerComponentBigMin({
               </Text>
               {!timerRoundingSettings?.roundInTimeFragments ? (
                 <Stack>
-                  <Text size="xs" fw={state === "running" ? 700 : 400}>
+                  <Text size="xs" fw={state === TimerState.Running ? 700 : 400}>
                     {activeTime}
                   </Text>
                   <Text size="xs" c="dimmed">
@@ -133,7 +122,7 @@ export default function TimeTrackerComponentBigMin({
                 </Stack>
               ) : (
                 <Group>
-                  <Text size="xs" fw={state === "running" ? 700 : 400}>
+                  <Text size="xs" fw={state === TimerState.Running ? 700 : 400}>
                     {activeTime}
                   </Text>
                   <Text size="xs" c="dimmed">
@@ -143,31 +132,8 @@ export default function TimeTrackerComponentBigMin({
               )}
             </Stack>
           </Card>
-          {/* {!roundInTimeSections && (
-          <Card
-            shadow="sm"
-            padding="xs"
-            radius="md"
-            withBorder
-            style={{
-              borderColor:
-                state === TimerState.Paused
-                  ? "var(--mantine-color-orange-6)"
-                  : "",
-            }}
-          >
-            <Stack>
-              <Text size="xs" c="dimmed">
-                {locale === "de-DE" ? "Pausiert" : "Paused"}
-              </Text>
-              <Text size="xs" fw={state === "paused" ? 700 : 400}>
-                {pausedTime}
-              </Text>
-            </Stack>
-          </Card>
-        )} */}
           <Transition
-            mounted={state === "stopped"}
+            mounted={state === TimerState.Stopped}
             transition="fade-left"
             duration={400}
           >
@@ -177,14 +143,8 @@ export default function TimeTrackerComponentBigMin({
               </Box>
             )}
           </Transition>
-          {/* {state === "running" && !roundInTimeSections && (
-          <PauseActionIcon pauseTimer={pauseTimer} disabled={isSubmitting} />
-        )}
-        {state === "paused" && (
-          <ResumeActionIcon resumeTimer={resumeTimer} disabled={isSubmitting} />
-        )} */}
           <Transition
-            mounted={state === "running" || state === "paused"}
+            mounted={state === TimerState.Running}
             transition="fade-left"
             duration={400}
           >

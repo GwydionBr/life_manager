@@ -13,11 +13,9 @@ interface TimeTrackerComponentBigProps {
   roundedActiveTime: string;
   state: TimerState;
   activeTime: string;
-  pausedTime: string;
   activeSeconds: number;
   timerRoundingSettings: TimerRoundingSettings;
   storedActiveSeconds: number;
-  storedPausedSeconds: number;
   memo: string;
   color: string | null;
   backgroundColor: string;
@@ -25,11 +23,8 @@ interface TimeTrackerComponentBigProps {
   submitTimer: () => void;
   setIsTimeTrackerMinimized: (value: boolean) => void;
   startTimer: () => void;
-  pauseTimer: () => void;
-  resumeTimer: () => void;
   cancelTimer: () => void;
   modifyActiveSeconds: (delta: number) => void;
-  modifyPausedSeconds: (delta: number) => void;
   setTempTimerRounding: (timerRoundingSettings: TimerRoundingSettings) => void;
   setMemo: (memo: string) => void;
 }
@@ -38,13 +33,11 @@ export default function TimeTrackerComponentBig({
   timer,
   state,
   activeTime,
-  pausedTime,
   activeSeconds,
   roundedActiveTime,
   isTimeTrackerMinimized,
   isSubmitting,
   storedActiveSeconds,
-  storedPausedSeconds,
   timerRoundingSettings,
   moneyEarned,
   memo,
@@ -53,11 +46,8 @@ export default function TimeTrackerComponentBig({
   removeTimer,
   submitTimer,
   startTimer,
-  pauseTimer,
-  resumeTimer,
   cancelTimer,
   modifyActiveSeconds,
-  modifyPausedSeconds,
   setTempTimerRounding,
   setMemo,
 }: TimeTrackerComponentBigProps) {
@@ -68,21 +58,16 @@ export default function TimeTrackerComponentBig({
           timer={timer}
           state={state}
           activeTime={activeTime}
-          pausedTime={pausedTime}
           roundedActiveTime={roundedActiveTime}
           isSubmitting={isSubmitting}
           activeSeconds={activeSeconds}
           storedActiveSeconds={storedActiveSeconds}
-          storedPausedSeconds={storedPausedSeconds}
           timerRoundingSettings={timerRoundingSettings}
           startTimer={startTimer}
-          pauseTimer={pauseTimer}
-          resumeTimer={resumeTimer}
           submitTimer={submitTimer}
           cancelTimer={cancelTimer}
           removeTimer={removeTimer}
           modifyActiveSeconds={modifyActiveSeconds}
-          modifyPausedSeconds={modifyPausedSeconds}
           setTempTimerRounding={setTempTimerRounding}
           color={color}
           backgroundColor={backgroundColor}
@@ -95,22 +80,17 @@ export default function TimeTrackerComponentBig({
           memo={memo}
           activeSeconds={activeSeconds}
           activeTime={activeTime}
-          pausedTime={pausedTime}
           roundedActiveTime={roundedActiveTime}
           isSubmitting={isSubmitting}
           moneyEarned={moneyEarned}
           storedActiveSeconds={storedActiveSeconds}
-          storedPausedSeconds={storedPausedSeconds}
           timerRoundingSettings={timerRoundingSettings}
           color={color}
           backgroundColor={backgroundColor}
           startTimer={startTimer}
-          pauseTimer={pauseTimer}
-          resumeTimer={resumeTimer}
           submitTimer={submitTimer}
           cancelTimer={cancelTimer}
           modifyActiveSeconds={modifyActiveSeconds}
-          modifyPausedSeconds={modifyPausedSeconds}
           setTempTimerRounding={setTempTimerRounding}
           removeTimer={removeTimer}
           setMemo={setMemo}

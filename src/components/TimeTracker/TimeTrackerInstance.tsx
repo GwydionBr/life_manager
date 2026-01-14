@@ -130,25 +130,19 @@ export default function TimeTrackerInstance({
   const {
     state,
     activeTime,
-    pausedTime,
     moneyEarned,
     roundedActiveTime,
     activeSeconds,
-    pausedSeconds,
     startTime,
     tempStartTime,
     storedActiveSeconds,
-    storedPausedSeconds,
     timerRoundingSettings,
     tempTimerRoundingSettings,
     appointmentId,
     appointmentTitle,
     modifyActiveSeconds,
-    modifyPausedSeconds,
     getCurrentSession,
     startTimer,
-    pauseTimer,
-    resumeTimer,
     stopTimer,
     cancelTimer,
     restoreTimer,
@@ -165,14 +159,11 @@ export default function TimeTrackerInstance({
     moneyEarned: timer.moneyEarned,
     activeTime: timer.activeTime,
     roundedActiveTime: timer.roundedActiveTime,
-    pausedTime: timer.pausedTime,
     state: timer.state,
     activeSeconds: timer.activeSeconds,
-    pausedSeconds: timer.pausedSeconds,
     startTime: timer.startTime,
     tempStartTime: timer.tempStartTime,
     storedActiveSeconds: timer.storedActiveSeconds,
-    storedPausedSeconds: timer.storedPausedSeconds,
     memo: timer.memo,
     appointmentId: timer.appointmentId,
     appointmentTitle: timer.appointmentTitle,
@@ -200,14 +191,11 @@ export default function TimeTrackerInstance({
     updateTimer(timer.id, {
       state,
       activeTime,
-      pausedTime,
       moneyEarned,
       activeSeconds,
-      pausedSeconds,
       startTime,
       tempStartTime,
       storedActiveSeconds,
-      storedPausedSeconds,
       memo,
     });
   }, [
@@ -215,14 +203,11 @@ export default function TimeTrackerInstance({
     updateTimer,
     state,
     activeTime,
-    pausedTime,
     moneyEarned,
     activeSeconds,
-    pausedSeconds,
     startTime,
     tempStartTime,
     storedActiveSeconds,
-    storedPausedSeconds,
     memo,
   ]);
 
@@ -415,16 +400,12 @@ export default function TimeTrackerInstance({
               state={state}
               memo={memo}
               activeTime={activeTime}
-              pausedTime={pausedTime}
               activeSeconds={activeSeconds}
               timerRoundingSettings={
                 tempTimerRoundingSettings ?? timerRoundingSettings
               }
               storedActiveSeconds={storedActiveSeconds}
-              storedPausedSeconds={storedPausedSeconds}
               startTimer={startTimerWithStopOthers}
-              pauseTimer={pauseTimer}
-              resumeTimer={resumeTimer}
               cancelTimer={cancelTimer}
               isTimeTrackerMinimized={isTimeTrackerMinimized}
               setIsTimeTrackerMinimized={setIsTimeTrackerMinimized}
@@ -432,7 +413,6 @@ export default function TimeTrackerInstance({
               setMemo={setMemo}
               submitTimer={submitTimer}
               modifyActiveSeconds={modifyActiveSeconds}
-              modifyPausedSeconds={modifyPausedSeconds}
               setTempTimerRounding={setTempTimerRounding}
             />
           </div>
@@ -458,7 +438,6 @@ export default function TimeTrackerInstance({
               roundedActiveTime={roundedActiveTime}
               state={state}
               activeTime={activeTime}
-              pausedTime={pausedTime}
               activeSeconds={activeSeconds}
               timerRoundingSettings={
                 tempTimerRoundingSettings ?? timerRoundingSettings
@@ -468,17 +447,13 @@ export default function TimeTrackerInstance({
               currency={timer.currency}
               hourlyPayment={timer.hourlyPayment}
               storedActiveSeconds={storedActiveSeconds}
-              storedPausedSeconds={storedPausedSeconds}
               modifyActiveSeconds={modifyActiveSeconds}
-              modifyPausedSeconds={modifyPausedSeconds}
               setTempTimerRounding={setTempTimerRounding}
               showSmall={showSmall}
               setShowSmall={setShowSmall}
               isSubmitting={false}
               submitTimer={submitTimer}
               startTimer={startTimerWithStopOthers}
-              pauseTimer={pauseTimer}
-              resumeTimer={resumeTimer}
               cancelTimer={cancelTimer}
             />
           </div>

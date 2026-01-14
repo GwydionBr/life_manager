@@ -7,8 +7,6 @@ export function getStatusColor(state: TimerState) {
   switch (state) {
     case TimerState.Running:
       return "lime";
-    case TimerState.Paused:
-      return "yellow";
     case TimerState.Stopped:
       return "teal.6";
     default:
@@ -124,7 +122,6 @@ export function getTimeSectionSessions(
       end_time: singleBlockEnd.toISOString(),
       true_end_time: end.toISOString(),
       active_seconds: timeSectionInterval * 60,
-      paused_seconds: 0,
       salary: originalSession.salary,
       work_project_id: originalSession.work_project_id,
       currency: originalSession.currency,
@@ -158,7 +155,6 @@ export function getTimeSectionSessions(
           ? end.toISOString()
           : currentBlockEnd.toISOString(),
       active_seconds: timeSectionInterval * 60,
-      paused_seconds: 0,
       salary: originalSession.salary,
       work_project_id: originalSession.work_project_id,
       currency: originalSession.currency,

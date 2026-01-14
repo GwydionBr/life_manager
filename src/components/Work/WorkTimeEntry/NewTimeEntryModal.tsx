@@ -73,7 +73,6 @@ export default function NewTimeEntryModal({
       start_time: new Date(values.start_time).toISOString(),
       end_time: new Date(values.end_time).toISOString(),
       true_end_time: new Date(values.end_time).toISOString(),
-      paused_seconds: 0,
       memo: values.memo || null,
       hourly_payment: currentProject.hourly_payment,
     };

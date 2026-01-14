@@ -94,7 +94,6 @@ export const useWorkTimeEntryMutations = () => {
           start_time: new Date(newWorkTimeEntry.start_time).toISOString(),
           end_time: new Date(newWorkTimeEntry.end_time).toISOString(),
           paid: newWorkTimeEntry.paid ?? false,
-          paused_seconds: newWorkTimeEntry.paused_seconds ?? 0,
           payout_id: newWorkTimeEntry.payout_id ?? null,
           work_project_id: newWorkTimeEntry.work_project_id ?? "",
           real_start_time: new Date(newWorkTimeEntry.start_time).toISOString(),
