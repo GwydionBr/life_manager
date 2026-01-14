@@ -38,14 +38,12 @@ export const useBankAccountMutations = () => {
     ): Promise<BankAccount | undefined> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
         return;
       }
 
@@ -54,14 +52,12 @@ export const useBankAccountMutations = () => {
 
         if (!result) {
           console.error("Failed to create bank account:", newBankAccount);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Erstellen des Bankkontos",
-                "Error creating bank account"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen des Bankkontos",
+              "Error creating bank account"
+            )
+          );
           return;
         }
 
@@ -77,14 +73,13 @@ export const useBankAccountMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return;
       }
     },
     [profile?.id, getLocalizedText]
@@ -98,21 +93,19 @@ export const useBankAccountMutations = () => {
       id: string,
       item: UpdateBankAccount,
       showNotification: boolean = false
-    ) => {
+    ): Promise<boolean> => {
       try {
         const result = await updateBankAccount(id, item);
 
         if (!result) {
           console.error("Failed to update bank account:", id, item);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Aktualisieren des Bankkontos",
-                "Error updating bank account"
-              )
-            );
-          }
-          return;
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Aktualisieren des Bankkontos",
+              "Error updating bank account"
+            )
+          );
+          return false;
         }
 
         if (showNotification) {
@@ -127,14 +120,13 @@ export const useBankAccountMutations = () => {
         return true;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return false;
       }
     },
     [getLocalizedText]
@@ -150,15 +142,13 @@ export const useBankAccountMutations = () => {
 
         if (!result) {
           console.error("Failed to delete bank account:", id);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Löschen des Bankkontos",
-                "Error deleting bank account"
-              )
-            );
-          }
-          return;
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Löschen des Bankkontos",
+              "Error deleting bank account"
+            )
+          );
+          return false;
         }
 
         if (showNotification) {
@@ -173,14 +163,13 @@ export const useBankAccountMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return false;
       }
     },
     [getLocalizedText]

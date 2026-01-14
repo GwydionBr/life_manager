@@ -51,14 +51,12 @@ export const usePayoutMutations = () => {
     ): Promise<boolean> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
         return false;
       }
 
@@ -76,14 +74,12 @@ export const usePayoutMutations = () => {
 
         if (!singleCashflowResult) {
           console.error("Failed to create single cashflow:", projectAdjustment);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Erstellen der Auszahlung",
-                "Error creating payout"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen der Auszahlung",
+              "Error creating payout"
+            )
+          );
           return false;
         }
 
@@ -101,14 +97,12 @@ export const usePayoutMutations = () => {
               single_cashflow_id: singleCashflowResult[0].id,
             }
           );
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Erstellen der Projektanpassung",
-                "Error creating project adjustment"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen der Projektanpassung",
+              "Error creating project adjustment"
+            )
+          );
           return false;
         }
         if (showNotification) {
@@ -122,14 +116,12 @@ export const usePayoutMutations = () => {
         return true;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
         return false;
       }
     },
@@ -151,14 +143,12 @@ export const usePayoutMutations = () => {
     ): Promise<boolean> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
         return false;
       }
 
@@ -175,14 +165,12 @@ export const usePayoutMutations = () => {
         );
         if (!singleCashflowResult) {
           console.error("Failed to create single cashflow:", financeProject);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Erstellen der Auszahlung",
-                "Error creating payout"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen der Auszahlung",
+              "Error creating payout"
+            )
+          );
           return false;
         }
 
@@ -197,21 +185,19 @@ export const usePayoutMutations = () => {
           profile.id
         );
         if (!financeProjectResult) {
-          if (showNotification) {
-            console.error(
-              "Failed to update finance project:",
-              financeProject.id,
-              {
-                single_cashflow_id: singleCashflowResult[0].id,
-              }
-            );
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Erstellen der Projektanpassung",
-                "Error creating project adjustment"
-              )
-            );
-          }
+          console.error(
+            "Failed to update finance project:",
+            financeProject.id,
+            {
+              single_cashflow_id: singleCashflowResult[0].id,
+            }
+          );
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen der Projektanpassung",
+              "Error creating project adjustment"
+            )
+          );
           return false;
         }
 
@@ -238,14 +224,12 @@ export const usePayoutMutations = () => {
         return true;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
         return false;
       }
     },
@@ -273,14 +257,12 @@ export const usePayoutMutations = () => {
     ): Promise<Payout | undefined> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
         return;
       }
 
@@ -323,15 +305,16 @@ export const usePayoutMutations = () => {
         );
 
         if (!singleCashflowResult) {
-          console.error("Failed to create single cashflow:", singleCashflowResult);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Erstellen der Auszahlung",
-                "Error creating payout"
-              )
-            );
-          }
+          console.error(
+            "Failed to create single cashflow:",
+            singleCashflowResult
+          );
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen der Auszahlung",
+              "Error creating payout"
+            )
+          );
           return;
         }
 
@@ -346,23 +329,27 @@ export const usePayoutMutations = () => {
         );
 
         if (!workTimeEntryResult) {
-          console.error("Failed to update work time entries:", timeEntries.map((timeEntry) => timeEntry.id));
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Aktualisieren der Arbeitszeiten",
-                "Error updating work time entries"
-              )
-            );
-          }
+          console.error(
+            "Failed to update work time entries:",
+            timeEntries.map((timeEntry) => timeEntry.id)
+          );
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Aktualisieren der Arbeitszeiten",
+              "Error updating work time entries"
+            )
+          );
           return;
         }
 
         if (result.error) {
           console.error("Failed to add payout:", payoutData);
-          if (showNotification) {
-            showActionErrorNotification(result.error.message);
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen der Auszahlung",
+              "Error creating payout"
+            )
+          );
           return;
         }
 
@@ -376,14 +363,13 @@ export const usePayoutMutations = () => {
         }
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return;
       }
     },
     [profile?.id, getLocalizedText]
@@ -401,18 +387,16 @@ export const usePayoutMutations = () => {
       id: string | string[],
       item: TablesUpdate<"payout">,
       showNotification: boolean = false
-    ): Promise<Payout | undefined> => {
+    ): Promise<boolean> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
-        return;
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
+        return false;
       }
 
       try {
@@ -421,10 +405,13 @@ export const usePayoutMutations = () => {
 
         if (result.error) {
           console.error("Failed to update payout:", id, item);
-          if (showNotification) {
-            showActionErrorNotification(result.error.message);
-          }
-          return;
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Aktualisieren der Auszahlung",
+              "Error updating payout"
+            )
+          );
+          return false;
         }
 
         // Wait a bit for side effects to complete
@@ -438,15 +425,15 @@ export const usePayoutMutations = () => {
             )
           );
         }
+        return true;
       } catch (error) {
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return false;
       }
     },
     [profile?.id, getLocalizedText]
@@ -459,19 +446,35 @@ export const usePayoutMutations = () => {
    * @returns True if the payout was deleted, false if an error occurs
    */
   const handleDeletePayout = useCallback(
-    async (id: string | string[], showNotification: boolean = false) => {
+    async (
+      id: string | string[],
+      showNotification: boolean = false
+    ): Promise<boolean> => {
       const transaction = deletePayout(id);
       const result = await transaction.isPersisted.promise;
 
       if (result.error) {
         console.error("Failed to delete payout:", id);
-        if (showNotification) {
-          showActionErrorNotification(result.error.message);
-        }
-        return;
+        showActionErrorNotification(
+          getLocalizedText(
+            "Fehler beim Löschen der Auszahlung",
+            "Error deleting payout"
+          )
+        );
+        return false;
       }
+
+      if (showNotification) {
+        showActionSuccessNotification(
+          getLocalizedText(
+            "Auszahlung erfolgreich gelöscht",
+            "Payout successfully deleted"
+          )
+        );
+      }
+      return true;
     },
-    []
+    [getLocalizedText]
   );
 
   return {

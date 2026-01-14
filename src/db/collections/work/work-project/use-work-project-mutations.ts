@@ -38,14 +38,12 @@ export const useWorkProjectMutations = () => {
     ): Promise<WorkProject | undefined> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
         return;
       }
 
@@ -53,14 +51,12 @@ export const useWorkProjectMutations = () => {
         const result = await addWorkProject(newWorkProject, profile.id);
 
         if (!result) {
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Erstellen des Projekts",
-                "Error creating project"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen des Projekts",
+              "Error creating project"
+            )
+          );
           return;
         }
 
@@ -76,14 +72,13 @@ export const useWorkProjectMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return;
       }
     },
     [profile?.id, getLocalizedText]
@@ -97,33 +92,29 @@ export const useWorkProjectMutations = () => {
       id: string,
       item: UpdateWorkProject,
       showNotification: boolean = false
-    ) => {
+    ): Promise<boolean> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
-        return;
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
+        return false;
       }
 
       try {
         const result = await updateWorkProject(id, item, profile.id);
 
         if (!result) {
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Aktualisieren des Projekts",
-                "Error updating project"
-              )
-            );
-          }
-          return;
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Aktualisieren des Projekts",
+              "Error updating project"
+            )
+          );
+          return false;
         }
 
         if (showNotification) {
@@ -135,17 +126,16 @@ export const useWorkProjectMutations = () => {
           );
         }
 
-        return true;
+        return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return false;
       }
     },
     [profile?.id, getLocalizedText]
@@ -155,20 +145,21 @@ export const useWorkProjectMutations = () => {
    * Deletes a Work Project with automatic notification.
    */
   const handleDeleteWorkProject = useCallback(
-    async (id: string | string[], showNotification: boolean = false) => {
+    async (
+      id: string | string[],
+      showNotification: boolean = false
+    ): Promise<boolean> => {
       try {
         const result = await deleteWorkProject(id);
 
         if (!result) {
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Löschen des Projekts",
-                "Error deleting project"
-              )
-            );
-          }
-          return;
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Löschen des Projekts",
+              "Error deleting project"
+            )
+          );
+          return false;
         }
 
         if (showNotification) {
@@ -183,14 +174,13 @@ export const useWorkProjectMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return false;
       }
     },
     [getLocalizedText]

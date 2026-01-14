@@ -26,21 +26,19 @@ export const useSettingsMutations = () => {
       id: string,
       item: SettingsUpdate,
       showNotification: boolean = false
-    ) => {
+    ): Promise<boolean> => {
       try {
         const result = await updateSettings(id, item);
 
         if (!result) {
           console.error("Failed to update settings:", id, item);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Aktualisieren der Einstellungen",
-                "Error updating settings"
-              )
-            );
-          }
-          return;
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Aktualisieren der Einstellungen",
+              "Error updating settings"
+            )
+          );
+          return false;
         }
 
         if (showNotification) {
@@ -55,14 +53,13 @@ export const useSettingsMutations = () => {
         return true;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return false;
       }
     },
     [getLocalizedText]

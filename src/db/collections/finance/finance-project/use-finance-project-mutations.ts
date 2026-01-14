@@ -39,14 +39,12 @@ export const useFinanceProjectMutations = () => {
     ): Promise<FinanceProject | undefined> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
         return;
       }
 
@@ -55,14 +53,12 @@ export const useFinanceProjectMutations = () => {
 
         if (!result) {
           console.error("Failed to create finance project:", newFinanceProject);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Erstellen des Finanzprojekts",
-                "Error creating finance project"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen des Finanzprojekts",
+              "Error creating finance project"
+            )
+          );
           return;
         }
 
@@ -78,14 +74,13 @@ export const useFinanceProjectMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return;
       }
     },
     [profile?.id, getLocalizedText]
@@ -99,19 +94,16 @@ export const useFinanceProjectMutations = () => {
       id: string | string[],
       item: UpdateFinanceProject,
       showNotification: boolean = false
-    ) => {
+    ): Promise<boolean> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
-
-        return;
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
+        return false;
       }
 
       try {
@@ -119,15 +111,13 @@ export const useFinanceProjectMutations = () => {
 
         if (!result) {
           console.error("Failed to update finance project:", id, item);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Aktualisieren des Finanzprojekts",
-                "Error updating finance project"
-              )
-            );
-          }
-          return;
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Aktualisieren des Finanzprojekts",
+              "Error updating finance project"
+            )
+          );
+          return false;
         }
 
         if (showNotification) {
@@ -142,14 +132,13 @@ export const useFinanceProjectMutations = () => {
         return true;
       } catch (error) {
         console.log(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return false;
       }
     },
     [profile?.id, getLocalizedText]
@@ -159,21 +148,22 @@ export const useFinanceProjectMutations = () => {
    * Deletes a Finance Project with automatic notification.
    */
   const handleDeleteFinanceProject = useCallback(
-    async (id: string | string[], showNotification: boolean = false) => {
+    async (
+      id: string | string[],
+      showNotification: boolean = false
+    ): Promise<boolean> => {
       try {
         const result = await deleteFinanceProject(id);
 
         if (!result) {
           console.error("Failed to delete finance project:", id);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Löschen des Finanzprojekts",
-                "Error deleting finance project"
-              )
-            );
-          }
-          return;
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Löschen des Finanzprojekts",
+              "Error deleting finance project"
+            )
+          );
+          return false;
         }
 
         if (showNotification) {
@@ -188,14 +178,13 @@ export const useFinanceProjectMutations = () => {
         return true;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return false;
       }
     },
     [getLocalizedText]

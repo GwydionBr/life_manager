@@ -47,14 +47,12 @@ export const useRecurringCashflowMutations = () => {
     ): Promise<RecurringCashFlow | undefined> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
         return;
       }
 
@@ -69,14 +67,12 @@ export const useRecurringCashflowMutations = () => {
             "Failed to create recurring cashflow:",
             newRecurringCashflow
           );
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Erstellen des wiederkehrenden Cashflows",
-                "Error creating recurring cashflow"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen des wiederkehrenden Cashflows",
+              "Error creating recurring cashflow"
+            )
+          );
           return;
         }
 
@@ -94,14 +90,13 @@ export const useRecurringCashflowMutations = () => {
         }
       } catch (error) {
         console.error("Error adding recurring cashflow try/catch", error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return;
       }
     },
     [profile?.id, getLocalizedText]
@@ -119,14 +114,12 @@ export const useRecurringCashflowMutations = () => {
     ): Promise<boolean> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
         return false;
       }
 
@@ -156,14 +149,12 @@ export const useRecurringCashflowMutations = () => {
 
         if (!result) {
           console.error("Failed to update recurring cashflow:", id, item);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Aktualisieren des wiederkehrenden Cashflows",
-                "Error updating recurring cashflow"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Aktualisieren des wiederkehrenden Cashflows",
+              "Error updating recurring cashflow"
+            )
+          );
           return false;
         }
 
@@ -179,14 +170,12 @@ export const useRecurringCashflowMutations = () => {
         return true;
       } catch (error) {
         console.error("Error updating recurring cashflow try/catch", error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
         return false;
       }
     },
@@ -208,14 +197,12 @@ export const useRecurringCashflowMutations = () => {
           const result = await deleteRecurringCashflowMutation(ids);
           if (!result) {
             console.error("Failed to delete recurring cashflow:", ids);
-            if (showNotification) {
-              showActionErrorNotification(
-                getLocalizedText(
-                  "Fehler beim Löschen des wiederkehrenden Cashflows",
-                  "Error deleting recurring cashflow"
-                )
-              );
-            }
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Löschen des wiederkehrenden Cashflows",
+                "Error deleting recurring cashflow"
+              )
+            );
             return false;
           }
           if (showNotification) {
@@ -234,14 +221,12 @@ export const useRecurringCashflowMutations = () => {
           const result = await deleteRecurringCashflowMutation(ids);
           if (!result) {
             console.error("Failed to delete recurring cashflow:", ids);
-            if (showNotification) {
-              showActionErrorNotification(
-                getLocalizedText(
-                  "Fehler beim Löschen des wiederkehrenden Cashflows",
-                  "Error deleting recurring cashflow"
-                )
-              );
-            }
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Löschen des wiederkehrenden Cashflows",
+                "Error deleting recurring cashflow"
+              )
+            );
             return false;
           }
           const singleCashflowResult = await deleteSingleCashflowMutation(
@@ -252,14 +237,12 @@ export const useRecurringCashflowMutations = () => {
               "Failed to delete linked single cashflows:",
               singleCashflowsToDelete.map((cashflow) => cashflow.id)
             );
-            if (showNotification) {
-              showActionErrorNotification(
-                getLocalizedText(
-                  "Fehler beim Löschen der verknüpften Einmal-Cashflows",
-                  "Error deleting linked single cashflows"
-                )
-              );
-            }
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Löschen der verknüpften Einmal-Cashflows",
+                "Error deleting linked single cashflows"
+              )
+            );
             return false;
           }
           if (showNotification) {
@@ -275,14 +258,12 @@ export const useRecurringCashflowMutations = () => {
         return false;
       } catch (error) {
         console.error("Error deleting recurring cashflow try/catch", error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
         return false;
       }
     },

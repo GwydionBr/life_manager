@@ -41,14 +41,12 @@ export const useNotificationMutations = () => {
     ): Promise<Notification | undefined> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Fehler beim Hinzufügen der Benachrichtigung",
-              "Error adding notification"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Fehler beim Hinzufügen der Benachrichtigung",
+            "Error adding notification"
+          )
+        );
         return;
       }
 
@@ -57,14 +55,13 @@ export const useNotificationMutations = () => {
 
         if (!result) {
           console.error("Failed to add notification:", newNotification);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Hinzufügen der Benachrichtigung",
-                "Error adding notification"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Hinzufügen der Benachrichtigung",
+              "Error adding notification"
+            )
+          );
+          return;
         }
         if (showNotification) {
           showActionSuccessNotification(
@@ -77,14 +74,13 @@ export const useNotificationMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Fehler beim Hinzufügen der Benachrichtigung",
-              "Error adding notification"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Fehler beim Hinzufügen der Benachrichtigung",
+            "Error adding notification"
+          )
+        );
+        return;
       }
     },
     [profile?.id, getLocalizedText]
@@ -104,14 +100,13 @@ export const useNotificationMutations = () => {
 
         if (!result) {
           console.error("Failed to update notification:", id);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Aktualisieren der Benachrichtigung",
-                "Error updating notification"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Aktualisieren der Benachrichtigung",
+              "Error updating notification"
+            )
+          );
+          return false;
         }
         if (showNotification) {
           showActionSuccessNotification(
@@ -124,14 +119,12 @@ export const useNotificationMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Fehler beim Aktualisieren der Benachrichtigung",
-              "Error updating notification"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Fehler beim Aktualisieren der Benachrichtigung",
+            "Error updating notification"
+          )
+        );
         return false;
       }
     },
@@ -150,14 +143,13 @@ export const useNotificationMutations = () => {
         const result = await deleteNotification(id);
         if (!result) {
           console.error("Failed to delete notification:", id);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Löschen der Benachrichtigung",
-                "Error deleting notification"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Löschen der Benachrichtigung",
+              "Error deleting notification"
+            )
+          );
+          return false;
         }
         if (showNotification) {
           showActionSuccessNotification(
@@ -170,14 +162,12 @@ export const useNotificationMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Fehler beim Löschen der Benachrichtigung",
-              "Error deleting notification"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Fehler beim Löschen der Benachrichtigung",
+            "Error deleting notification"
+          )
+        );
         return false;
       }
     },
@@ -220,8 +210,8 @@ export const useNotificationMutations = () => {
    * Find an existing notification for a given resource and type.
    */
   const findNotification = useCallback(
-    (resourceId: string, type: NotificationType) => {
-      if (!existingNotifications) return null;
+    (resourceId: string, type: NotificationType): Notification | undefined => {
+      if (!existingNotifications) return;
       return existingNotifications.find(
         (n) => n.resource_id === resourceId && n.type === type
       );

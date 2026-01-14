@@ -15,7 +15,7 @@ interface AppointmentNoProjectAlertProps {
 }
 
 export function AppointmentNoProjectAlert({
-  appointment,
+  appointment: _,
   workProjects,
   onMarkAsCompleted,
   onMarkAsMissed,

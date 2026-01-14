@@ -30,14 +30,12 @@ export const useTagsMutations = () => {
     ): Promise<Tag | undefined> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
         return;
       }
 
@@ -46,14 +44,12 @@ export const useTagsMutations = () => {
 
         if (!result) {
           console.error("Failed to create tag:", newTag);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Erstellen des Tags",
-                "Error creating tag"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen des Tags",
+              "Error creating tag"
+            )
+          );
           return;
         }
 
@@ -69,14 +65,13 @@ export const useTagsMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return;
       }
     },
     [profile?.id, getLocalizedText]
@@ -86,21 +81,23 @@ export const useTagsMutations = () => {
    * Updates a Tag with automatic notification.
    */
   const handleUpdateTag = useCallback(
-    async (id: string, item: UpdateTag, showNotification: boolean = false) => {
+    async (
+      id: string,
+      item: UpdateTag,
+      showNotification: boolean = false
+    ): Promise<boolean> => {
       try {
         const result = await updateTag(id, item);
 
         if (!result) {
           console.error("Failed to update tag:", id, item);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Aktualisieren des Tags",
-                "Error updating tag"
-              )
-            );
-          }
-          return;
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Aktualisieren des Tags",
+              "Error updating tag"
+            )
+          );
+          return false;
         }
 
         if (showNotification) {
@@ -115,14 +112,13 @@ export const useTagsMutations = () => {
         return true;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return false;
       }
     },
     [getLocalizedText]
@@ -132,21 +128,22 @@ export const useTagsMutations = () => {
    * Deletes a Tag with automatic notification.
    */
   const handleDeleteTag = useCallback(
-    async (id: string | string[], showNotification: boolean = false) => {
+    async (
+      id: string | string[],
+      showNotification: boolean = false
+    ): Promise<boolean> => {
       try {
         const result = await deleteTag(id);
 
         if (!result) {
           console.error("Failed to delete tag:", id);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Löschen des Tags",
-                "Error deleting tag"
-              )
-            );
-          }
-          return;
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Löschen des Tags",
+              "Error deleting tag"
+            )
+          );
+          return false;
         }
 
         if (showNotification) {
@@ -161,14 +158,13 @@ export const useTagsMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return false;
       }
     },
     [getLocalizedText]

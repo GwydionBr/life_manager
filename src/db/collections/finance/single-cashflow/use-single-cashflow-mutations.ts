@@ -41,14 +41,12 @@ export const useSingleCashflowMutations = () => {
       // Check if user is logged in
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
         return undefined;
       }
 
@@ -62,14 +60,12 @@ export const useSingleCashflowMutations = () => {
         // Check if transaction failed
         if (!result) {
           console.error("Failed to create single cashflow:", newSingleCashflow);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Erstellen des Einzel-Cashflows",
-                "Error creating single cashflow"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen des Einzel-Cashflows",
+              "Error creating single cashflow"
+            )
+          );
           return undefined;
         }
 
@@ -97,14 +93,13 @@ export const useSingleCashflowMutations = () => {
       } catch (error) {
         console.error("Error adding single cashflow try/catch", error);
         // Show total error notification
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return;
       }
     },
     [profile?.id, getLocalizedText]
@@ -121,14 +116,12 @@ export const useSingleCashflowMutations = () => {
     ): Promise<boolean> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
         return false;
       }
 
@@ -137,14 +130,12 @@ export const useSingleCashflowMutations = () => {
 
         if (!result) {
           console.error("Failed to update single cashflow:", id, item);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Aktualisieren des Einzel-Cashflows",
-                "Error updating single cashflow"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Aktualisieren des Einzel-Cashflows",
+              "Error updating single cashflow"
+            )
+          );
           return false;
         }
 
@@ -159,14 +150,12 @@ export const useSingleCashflowMutations = () => {
         return result;
       } catch (error) {
         console.error("Error updating single cashflow try/catch", error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
         return false;
       }
     },
@@ -183,14 +172,12 @@ export const useSingleCashflowMutations = () => {
 
         if (!result) {
           console.error("Failed to delete single cashflow:", id);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Löschen des Einzel-Cashflows",
-                "Error deleting single cashflow"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Löschen des Einzel-Cashflows",
+              "Error deleting single cashflow"
+            )
+          );
           return false;
         }
 
@@ -206,14 +193,12 @@ export const useSingleCashflowMutations = () => {
         return true;
       } catch (error) {
         console.error("Error deleting single cashflow try/catch", error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
         return false;
       }
     },

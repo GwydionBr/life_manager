@@ -67,17 +67,15 @@ export const useWorkTimeEntryMutations = () => {
       newWorkTimeEntry: InsertWorkTimeEntry,
       roundingSettings: TimerRoundingSettings,
       showNotification: boolean = false
-    ) => {
+    ): Promise<WorkTimeEntry[] | undefined> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
         return;
       }
 
@@ -125,19 +123,15 @@ export const useWorkTimeEntryMutations = () => {
           return;
         }
 
-        console.log(adjustedTimeEntries);
-
         const result = await addWorkTimeEntry(adjustedTimeEntries);
 
         if (!result) {
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Erstellen der Arbeitszeit",
-                "Error creating work time"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen der Arbeitszeit",
+              "Error creating work time"
+            )
+          );
           return;
         } else if (overlappingTimeEntries.length > 0) {
           showOverlapNotification(
@@ -159,14 +153,13 @@ export const useWorkTimeEntryMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return;
       }
     },
     [profile?.id, getLocalizedText]
@@ -180,7 +173,7 @@ export const useWorkTimeEntryMutations = () => {
       id: string | string[],
       item: UpdateWorkTimeEntry,
       showNotification: boolean = false
-    ) => {
+    ): Promise<boolean> => {
       try {
         const transaction = customTransaction();
 
@@ -189,15 +182,13 @@ export const useWorkTimeEntryMutations = () => {
         );
 
         if (!oldTimeEntry) {
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Arbeitszeit nicht gefunden",
-                "Work time not found"
-              )
-            );
-          }
-          return;
+          showActionErrorNotification(
+            getLocalizedText(
+              "Arbeitszeit nicht gefunden",
+              "Work time not found"
+            )
+          );
+          return false;
         }
 
         const updatedTimeEntry: WorkTimeEntry = {
@@ -218,7 +209,7 @@ export const useWorkTimeEntryMutations = () => {
 
         if (!adjustedTimeEntries) {
           showCompleteOverlapNotification();
-          return;
+          return false;
         } else if (overlappingTimeEntries.length > 0) {
           if (adjustedTimeEntries.length > 1) {
             transaction.mutate(() => {
@@ -233,15 +224,13 @@ export const useWorkTimeEntryMutations = () => {
               })
             );
           } else {
-            if (showNotification) {
-              showActionErrorNotification(
-                getLocalizedText(
-                  "Fehler beim Aktualisieren der Arbeitszeit",
-                  "Error updating work time"
-                )
-              );
-            }
-            return;
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Aktualisieren der Arbeitszeit",
+                "Error updating work time"
+              )
+            );
+            return false;
           }
           transaction.commit();
           showOverlapNotification(
@@ -261,19 +250,18 @@ export const useWorkTimeEntryMutations = () => {
           }
         }
 
-        const result = await transaction.isPersisted.promise;
+        await transaction.isPersisted.promise;
 
-        return result;
+        return true;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return false;
       }
     },
     [getLocalizedText]
@@ -283,20 +271,21 @@ export const useWorkTimeEntryMutations = () => {
    * Deletes a Work Time Entry with automatic notification.
    */
   const handleDeleteWorkTimeEntry = useCallback(
-    async (id: string | string[], showNotification: boolean = false) => {
+    async (
+      id: string | string[],
+      showNotification: boolean = false
+    ): Promise<boolean> => {
       try {
         const result = await deleteWorkTimeEntry(id);
 
         if (!result) {
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Löschen der Arbeitszeit",
-                "Error deleting work time"
-              )
-            );
-          }
-          return;
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Löschen der Arbeitszeit",
+              "Error deleting work time"
+            )
+          );
+          return false;
         }
 
         if (showNotification) {
@@ -311,14 +300,13 @@ export const useWorkTimeEntryMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return false;
       }
     },
     [getLocalizedText]

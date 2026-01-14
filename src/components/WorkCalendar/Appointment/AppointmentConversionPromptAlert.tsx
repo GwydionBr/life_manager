@@ -11,7 +11,7 @@ interface AppointmentConversionPromptAlertProps {
 }
 
 export function AppointmentConversionPromptAlert({
-  appointment,
+  appointment: _,
   onConvert,
   onMarkAsMissed,
   onDismiss,

@@ -38,14 +38,12 @@ export const useWorkFolderMutations = () => {
     ): Promise<WorkFolder | undefined> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
         return;
       }
 
@@ -54,14 +52,12 @@ export const useWorkFolderMutations = () => {
 
         if (!result) {
           console.error("Failed to create work folder:", newWorkFolder);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Erstellen des Ordners",
-                "Error creating folder"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen des Ordners",
+              "Error creating folder"
+            )
+          );
           return;
         }
 
@@ -77,14 +73,13 @@ export const useWorkFolderMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return;
       }
     },
     [profile?.id, getLocalizedText]
@@ -98,21 +93,19 @@ export const useWorkFolderMutations = () => {
       id: string,
       item: UpdateWorkFolder,
       showNotification: boolean = false
-    ) => {
+    ): Promise<boolean> => {
       try {
         const result = await updateWorkFolder(id, item);
 
         if (!result) {
           console.error("Failed to update work folder:", id, item);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Aktualisieren des Ordners",
-                "Error updating folder"
-              )
-            );
-          }
-          return;
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Aktualisieren des Ordners",
+              "Error updating folder"
+            )
+          );
+          return false;
         }
 
         if (showNotification) {
@@ -124,17 +117,16 @@ export const useWorkFolderMutations = () => {
           );
         }
 
-        return true;
+        return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return false;
       }
     },
     [getLocalizedText]
@@ -144,21 +136,22 @@ export const useWorkFolderMutations = () => {
    * Deletes a Work Folder with automatic notification.
    */
   const handleDeleteWorkFolder = useCallback(
-    async (id: string | string[], showNotification: boolean = false) => {
+    async (
+      id: string | string[],
+      showNotification: boolean = false
+    ): Promise<boolean> => {
       try {
         const result = await deleteWorkFolder(id);
 
         if (!result) {
           console.error("Failed to delete work folder:", id);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Löschen des Ordners",
-                "Error deleting folder"
-              )
-            );
-          }
-          return;
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Löschen des Ordners",
+              "Error deleting folder"
+            )
+          );
+          return false;
         }
 
         if (showNotification) {
@@ -173,14 +166,13 @@ export const useWorkFolderMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return false;
       }
     },
     [getLocalizedText]

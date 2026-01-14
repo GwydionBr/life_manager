@@ -38,14 +38,12 @@ export const useProjectAdjustmentMutations = () => {
     ): Promise<ProjectAdjustment | undefined> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
         return;
       }
 
@@ -60,14 +58,12 @@ export const useProjectAdjustmentMutations = () => {
             "Failed to create project adjustment:",
             newProjectAdjustment
           );
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Erstellen der Projektanpassung",
-                "Error creating project adjustment"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen der Projektanpassung",
+              "Error creating project adjustment"
+            )
+          );
           return;
         }
 
@@ -83,14 +79,13 @@ export const useProjectAdjustmentMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return;
       }
     },
     [profile?.id, getLocalizedText]
@@ -104,21 +99,19 @@ export const useProjectAdjustmentMutations = () => {
       id: string,
       item: UpdateProjectAdjustment,
       showNotification: boolean = false
-    ) => {
+    ): Promise<boolean> => {
       try {
         const result = await updateProjectAdjustment(id, item);
 
         if (!result) {
           console.error("Failed to update project adjustment:", id, item);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Aktualisieren der Projektanpassung",
-                "Error updating project adjustment"
-              )
-            );
-          }
-          return;
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Aktualisieren der Projektanpassung",
+              "Error updating project adjustment"
+            )
+          );
+          return false;
         }
 
         if (showNotification) {
@@ -133,14 +126,13 @@ export const useProjectAdjustmentMutations = () => {
         return true;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return false;
       }
     },
     [getLocalizedText]
@@ -150,21 +142,22 @@ export const useProjectAdjustmentMutations = () => {
    * Deletes a Project Adjustment with automatic notification.
    */
   const handleDeleteProjectAdjustment = useCallback(
-    async (id: string | string[], showNotification: boolean = false) => {
+    async (
+      id: string | string[],
+      showNotification: boolean = false
+    ): Promise<boolean> => {
       try {
         const result = await deleteProjectAdjustment(id);
 
         if (!result) {
           console.error("Failed to delete project adjustment:", id);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Löschen der Projektanpassung",
-                "Error deleting project adjustment"
-              )
-            );
-          }
-          return;
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Löschen der Projektanpassung",
+              "Error deleting project adjustment"
+            )
+          );
+          return false;
         }
 
         if (showNotification) {
@@ -179,14 +172,13 @@ export const useProjectAdjustmentMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
+        return false;
       }
     },
     [getLocalizedText]

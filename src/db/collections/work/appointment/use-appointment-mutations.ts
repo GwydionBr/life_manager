@@ -51,7 +51,7 @@ export const useAppointmentMutations = () => {
       type: NotificationType,
       scheduledTime: string,
       showNotification: boolean = false
-    ) => {
+    ): Promise<void> => {
       const isReminder = type === "appointment.reminder";
       const title = isReminder
         ? getLocalizedText("Terminerinnerung", "Appointment Reminder")
@@ -86,14 +86,12 @@ export const useAppointmentMutations = () => {
             );
           } catch (error) {
             console.error("Failed to update appointment notification:", error);
-            if (showNotification) {
-              showActionErrorNotification(
-                getLocalizedText(
-                  "Fehler beim Aktualisieren der Terminerinnerung",
-                  "Error updating appointment reminder notification"
-                )
-              );
-            }
+            showActionErrorNotification(
+              getLocalizedText(
+                "Fehler beim Aktualisieren der Terminerinnerung",
+                "Error updating appointment reminder notification"
+              )
+            );
           }
         }
       } else {
@@ -113,14 +111,12 @@ export const useAppointmentMutations = () => {
           );
         } catch (error) {
           console.error("Failed to create appointment notification:", error);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Erstellen der Terminerinnerung",
-                "Error creating appointment reminder notification"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen der Terminerinnerung",
+              "Error creating appointment reminder notification"
+            )
+          );
         }
       }
     },
@@ -137,7 +133,10 @@ export const useAppointmentMutations = () => {
    * Delete all notifications for a given appointment.
    */
   const deleteAppointmentNotifications = useCallback(
-    async (appointmentId: string, showNotification: boolean = false) => {
+    async (
+      appointmentId: string,
+      showNotification: boolean = false
+    ): Promise<void> => {
       if (!existingNotifications) return;
 
       const notificationsToDelete = existingNotifications.filter(
@@ -170,30 +169,38 @@ export const useAppointmentMutations = () => {
     ): Promise<Appointment | undefined> => {
       if (!profile?.id) {
         console.error("No profile found");
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              "Kein Benutzerprofil gefunden",
-              "No user profile found"
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            "Kein Benutzerprofil gefunden",
+            "No user profile found"
+          )
+        );
         return;
       }
 
       try {
+        if (
+          newAppointment.start_date &&
+          newAppointment.start_date < new Date().toISOString()
+        ) {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Termin kann nicht in der Vergangenheit erstellt werden",
+              "Appointment cannot be created in the past"
+            )
+          );
+          return;
+        }
         const result = await addAppointment(newAppointment, profile.id);
 
         if (!result) {
           console.error("Failed to create appointment:", newAppointment);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Erstellen des Termins",
-                "Error creating appointment"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Erstellen des Termins",
+              "Error creating appointment"
+            )
+          );
           return;
         }
 
@@ -228,14 +235,12 @@ export const useAppointmentMutations = () => {
         return result;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
       }
     },
     [profile?.id, getLocalizedText, syncAppointmentNotification]
@@ -256,14 +261,12 @@ export const useAppointmentMutations = () => {
 
         if (!result) {
           console.error("Failed to update appointment:", id);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Aktualisieren des Termins",
-                "Error updating appointment"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Aktualisieren des Termins",
+              "Error updating appointment"
+            )
+          );
           return false;
         }
 
@@ -324,14 +327,12 @@ export const useAppointmentMutations = () => {
         return true;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
         return false;
       }
     },
@@ -358,14 +359,12 @@ export const useAppointmentMutations = () => {
 
         if (!result) {
           console.error("Failed to delete appointment:", id);
-          if (showNotification) {
-            showActionErrorNotification(
-              getLocalizedText(
-                "Fehler beim Löschen des Termins",
-                "Error deleting appointment"
-              )
-            );
-          }
+          showActionErrorNotification(
+            getLocalizedText(
+              "Fehler beim Löschen des Termins",
+              "Error deleting appointment"
+            )
+          );
           return false;
         }
 
@@ -387,14 +386,12 @@ export const useAppointmentMutations = () => {
         return true;
       } catch (error) {
         console.error(error);
-        if (showNotification) {
-          showActionErrorNotification(
-            getLocalizedText(
-              `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
-              `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-            )
-          );
-        }
+        showActionErrorNotification(
+          getLocalizedText(
+            `Fehler: ${error instanceof Error ? error.message : "Unbekannter Fehler"}`,
+            `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+          )
+        );
         return false;
       }
     },
