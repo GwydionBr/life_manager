@@ -11,6 +11,7 @@ import {
   Button,
   Collapse,
   Box,
+  ThemeIcon,
 } from "@mantine/core";
 import { TimerState } from "@/types/timeTracker.types";
 import {
@@ -80,14 +81,16 @@ export default function TimeTrackerComponentBigMax({
         <LoadingOverlay visible={false} overlayProps={{ blur: 2 }} />
         <Stack gap="md" align="center">
           {/* State Badge */}
-          <Group justify="space-between" align="center" w="100%">
+          <Group justify="space-between" align="center" w="100%" wrap="nowrap">
             <Stack gap={0}>
               <ModifyTimeTrackerModal timerState={timerState} />
               <TimeTrackerInfoHoverCard timerState={timerState} />
             </Stack>
-            <Badge size="lg" color={getStatusColor(timerState.state)}>
-              {getLocaleState()}
-            </Badge>
+            <Stack align="center">
+              <Badge size="lg" color={getStatusColor(timerState.state)}>
+                {getLocaleState()}
+              </Badge>
+            </Stack>
             <Stack>
               <XActionIcon onClick={removeTimer} />
               <ExternalLinkActionIcon
@@ -107,16 +110,32 @@ export default function TimeTrackerComponentBigMax({
             </Stack>
           </Group>
           {/* Project Title */}
-          <Stack gap="xs">
+          <Stack gap={5} align="center">
             <Group justify="space-between" align="center">
               <Text size="xl" fw={700}>
                 {timerState.projectTitle}
               </Text>
             </Group>
             {timerState.appointmentTitle && (
-              <Group justify="center" align="center" gap="xs">
-                <IconCalendar size={20} />
-                <Text size="md" fw={500}>
+              <Group
+                justify="center"
+                align="center"
+                gap="xs"
+                wrap="nowrap"
+              >
+                <ThemeIcon size="xs" variant="transparent">
+                  <IconCalendar size={18} />
+                </ThemeIcon>
+                <Text
+                  size="xs"
+                  fw={500}
+                  maw={200}
+                  style={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   {timerState.appointmentTitle}
                 </Text>
               </Group>

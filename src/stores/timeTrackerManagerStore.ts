@@ -124,7 +124,7 @@ export const useTimeTrackerManager = create(
           const timer = state.timers[timerId];
           if (!timer) return state;
           return {
-            runningTimerCount: state.runningTimerCount + 1,
+            runningTimerCount: Math.min(state.runningTimerCount + 1, 10),
             timers: {
               ...state.timers,
               [timerId]: {
@@ -142,6 +142,9 @@ export const useTimeTrackerManager = create(
           const timer = state.timers[timerId];
           if (!timer) return state;
           return {
+            runningTimerCount: timer.startTime
+              ? state.runningTimerCount
+              : Math.min(state.runningTimerCount + 1, 10),
             timers: {
               ...state.timers,
               [timerId]: {
@@ -160,7 +163,7 @@ export const useTimeTrackerManager = create(
           const timer = state.timers[timerId];
           if (!timer) return state;
           return {
-            runningTimerCount: state.runningTimerCount - 1,
+            runningTimerCount: Math.max(0, state.runningTimerCount - 1),
             timers: {
               ...state.timers,
               [timerId]: {
@@ -195,6 +198,9 @@ export const useTimeTrackerManager = create(
             get().stopTimer(timerId);
           }
           return {
+            runningTimerCount: timer.startTime
+              ? Math.max(0, state.runningTimerCount - 1)
+              : state.runningTimerCount,
             timers: testTimers,
             activeTimerData: restActiveTimerData,
           };
