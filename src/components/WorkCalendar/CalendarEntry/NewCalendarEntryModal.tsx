@@ -15,8 +15,7 @@ import {
 } from "@/types/work.types";
 import { useWorkTimeEntryMutations } from "@/db/collections/work/work-time-entry/use-work-time-entry-mutations";
 import { useAppointmentMutations } from "@/db/collections/work/appointment/use-appointment-mutations";
-import { CalendarEntryFormData } from "./CalendarEntryForm";
-import { getProjectRoundingSettings } from "@/lib/appointmentTimerHelpers";
+import { Currency } from "@/types/settings.types";
 
 interface NewCalendarEntryModalProps {
   opened: boolean;
@@ -69,61 +68,58 @@ export default function NewCalendarEntryModal({
     setTagIds([]);
   };
 
-  async function handleSubmit(
-    values: CalendarEntryFormData,
-    entryType: "appointment" | "time-entry"
-  ) {
-    if (entryType === "time-entry") {
-      if (
-        !currentProject ||
-        !values.active_seconds ||
-        !values.currency ||
-        !values.salary
-      ) {
-        return;
-      }
+  async function handleAppointmentSubmit(values: InsertAppointment) {
+    // Convert empty strings to null for database compatibility
+    const cleanedValues = {
+      ...values,
+      description:
+        values.description && values.description.trim() !== ""
+          ? values.description
+          : null,
+    };
+    await addAppointment(cleanedValues);
+    onClose();
+  }
 
-      const newTimeEntry: InsertWorkTimeEntry = {
-        start_time: new Date(values.start_time).toISOString(),
-        end_time: new Date(values.end_time).toISOString(),
-        true_end_time: new Date(values.end_time).toISOString(),
-        active_seconds: values.active_seconds,
-        memo: values.description || null,
-        hourly_payment: currentProject.hourly_payment,
-        currency: values.currency,
-        salary: values.salary,
-        work_project_id: currentProject.id
-      };
-
-      const roundingSettings: TimerRoundingSettings =
-        getProjectRoundingSettings(currentProject, {
-          roundingInterval: settings?.rounding_interval ?? 0,
-          roundingDirection: settings?.rounding_direction ?? "up",
-          roundInTimeFragments: settings?.round_in_time_sections ?? false,
-          timeFragmentInterval: settings?.time_section_interval ?? 15,
-        });
-
-      await addWorkTimeEntry(newTimeEntry, roundingSettings);
-    } else {
-      // Appointment
-      const cleanedValues: InsertAppointment = {
-        title: values.title || "",
-        description:
-          values.description && values.description.trim() !== ""
-            ? values.description
-            : null,
-        start_date: new Date(values.start_time).toISOString(),
-        end_date: new Date(values.end_time).toISOString(),
-        type: values.type || "work",
-        status: "upcoming",
-        is_all_day: values.is_all_day ?? false,
-        work_project_id: values.work_project_id || null,
-        reminder: values.reminder || null,
-      };
-
-      await addAppointment(cleanedValues);
+  async function handleTimeEntrySubmit(values: {
+    start_time: string;
+    end_time: string;
+    active_seconds: number;
+    currency: Currency;
+    salary: number;
+    memo?: string;
+  }) {
+    if (!currentProject) {
+      return;
     }
 
+    let newTimeEntry: InsertWorkTimeEntry = {
+      ...values,
+      start_time: new Date(values.start_time).toISOString(),
+      end_time: new Date(values.end_time).toISOString(),
+      true_end_time: new Date(values.end_time).toISOString(),
+      memo: values.memo || null,
+      hourly_payment: currentProject.hourly_payment,
+    };
+
+    const roundingSettings: TimerRoundingSettings = {
+      roundInTimeFragments:
+        currentProject.round_in_time_fragments !== null
+          ? currentProject.round_in_time_fragments
+          : (settings?.round_in_time_sections ?? false),
+      timeFragmentInterval:
+        currentProject.time_fragment_interval ??
+        settings?.time_section_interval ??
+        10,
+      roundingInterval:
+        currentProject.rounding_interval ?? settings?.rounding_interval ?? 1,
+      roundingDirection:
+        currentProject.rounding_direction ??
+        settings?.rounding_direction ??
+        "up",
+    };
+
+    await addWorkTimeEntry(newTimeEntry, roundingSettings);
     onClose();
   }
 
@@ -198,14 +194,12 @@ export default function NewCalendarEntryModal({
       >
         <CalendarEntryForm
           initialValues={getInitialValues()}
-          isNew={true}
-          onSubmit={handleSubmit}
+          onAppointmentSubmit={handleAppointmentSubmit}
+          onTimeEntrySubmit={handleTimeEntrySubmit}
           onProjectChange={setCurrentProject}
           onOpenProjectForm={() => stack.open("project-form")}
           onCancel={handleClose}
           project={currentProject}
-          defaultCurrency={settings?.default_currency ?? "USD"}
-          defaultSalary={settings?.default_salary_amount ?? 0}
         />
       </Modal>
 
