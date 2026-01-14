@@ -12,6 +12,7 @@ import {
   Collapse,
   Box,
   ThemeIcon,
+  Divider,
 } from "@mantine/core";
 import { TimerState } from "@/types/timeTracker.types";
 import {
@@ -112,33 +113,31 @@ export default function TimeTrackerComponentBigMax({
           {/* Project Title */}
           <Stack gap={5} align="center">
             <Group justify="space-between" align="center">
-              <Text size="xl" fw={700}>
+              <Text size="xl" fw={700} lineClamp={2}>
                 {timerState.projectTitle}
               </Text>
             </Group>
             {timerState.appointmentTitle && (
-              <Group
-                justify="center"
-                align="center"
-                gap="xs"
-                wrap="nowrap"
-              >
-                <ThemeIcon size="xs" variant="transparent">
-                  <IconCalendar size={18} />
-                </ThemeIcon>
-                <Text
-                  size="xs"
-                  fw={500}
-                  maw={200}
-                  style={{
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {timerState.appointmentTitle}
-                </Text>
-              </Group>
+              <Stack gap={5} align="center">
+                <Divider w="100%" />
+                <Group justify="center" align="center" gap="xs" wrap="nowrap">
+                  <ThemeIcon size="xs" variant="transparent">
+                    <IconCalendar size={18} />
+                  </ThemeIcon>
+                  <Text
+                    size="xs"
+                    fw={500}
+                    maw={200}
+                    style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {timerState.appointmentTitle}
+                  </Text>
+                </Group>
+              </Stack>
             )}
           </Stack>
 

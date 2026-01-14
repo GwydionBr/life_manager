@@ -222,6 +222,7 @@ export default function AppointmentForm({
           {isAllDay ? (
             <Group grow>
               <LocaleDatePickerInput
+                minDate={new Date()}
                 withAsterisk
                 label={getLocalizedText("Startdatum", "Start Date")}
                 value={
@@ -233,6 +234,7 @@ export default function AppointmentForm({
                 error={form.errors.start_date}
               />
               <LocaleDatePickerInput
+                minDate={new Date()}
                 withAsterisk
                 label={getLocalizedText("Enddatum", "End Date")}
                 value={
@@ -246,6 +248,7 @@ export default function AppointmentForm({
             <Group grow>
               <LocaleDateTimePicker
                 withAsterisk
+                minDate={new Date()}
                 label={getLocalizedText("Startzeit", "Start Time")}
                 value={
                   form.values.start_date
@@ -257,6 +260,7 @@ export default function AppointmentForm({
               />
               <LocaleDateTimePicker
                 withAsterisk
+                minDate={new Date()}
                 label={getLocalizedText("Endzeit", "End Time")}
                 value={
                   form.values.end_date ? new Date(form.values.end_date) : null
@@ -267,6 +271,7 @@ export default function AppointmentForm({
             </Group>
           )}
           <LocaleDateTimePicker
+            minDate={new Date()}
             label={getLocalizedText("Erinnerung", "Reminder")}
             value={form.values.reminder ? new Date(form.values.reminder) : null}
             onChange={(value) =>

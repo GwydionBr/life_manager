@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useHotkeys } from "@mantine/hooks";
+import { useIntl } from "@/hooks/useIntl";
 
 import {
   ActionIcon,
@@ -36,6 +37,7 @@ export default function Aside({
   useHotkeys([["mod + B", () => toggleAside()]]);
 
   const theme = useMantineTheme();
+  const { getLocalizedText } = useIntl();
   const backgroundColor = useMemo(() => {
     return alpha(getThemeColor(currentAppColor, theme), 0.4);
   }, [currentAppColor, theme]);
@@ -46,7 +48,7 @@ export default function Aside({
         <DelayedTooltip
           label={
             <Stack align="center">
-              <Text>Toggle Sidebar</Text>
+              <Text>{getLocalizedText("Seitenleiste umschalten", "Toggle Sidebar")}</Text>
               <Shortcut keys={["mod", "B"]} />
             </Stack>
           }

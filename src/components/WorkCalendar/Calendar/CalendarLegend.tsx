@@ -2,13 +2,14 @@ import { useIntl } from "@/hooks/useIntl";
 import { useCalendarStore } from "@/stores/calendarStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 
-import { Group, ActionIcon, Text, Grid, SegmentedControl } from "@mantine/core";
+import { Group, ActionIcon, Text, Grid, SegmentedControl, Stack } from "@mantine/core";
 import { IconArrowsSort, IconCalendarPlus } from "@tabler/icons-react";
 import DelayedTooltip from "@/components/UI/DelayedTooltip";
 import CalendarLegendButton from "./CalendarLegendButton";
 
 import { ViewMode } from "@/types/workCalendar.types";
 import { WorkProject } from "@/types/work.types";
+import Shortcut from "@/components/UI/Shortcut";
 
 interface CalendarLegendProps {
   visibleProjects: WorkProject[];
@@ -59,10 +60,12 @@ export default function CalendarLegend({
           </DelayedTooltip>
           {onCreateAppointment && (
             <DelayedTooltip
-              label={getLocalizedText(
-                "Termin hinzufügen (Cmd/Ctrl + Shift + A)",
-                "Add appointment (Cmd/Ctrl + Shift + A)"
-              )}
+              label={
+                <Stack align="center">
+                  <Text>{getLocalizedText("Termin hinzufügen", "Add appointment")}</Text>
+                  <Shortcut keys={["mod", "Shift", "A"]} />
+                </Stack>
+              }
             >
               <ActionIcon
                 variant="light"

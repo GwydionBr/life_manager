@@ -114,6 +114,7 @@ export default function AppointmentHoverCard({
       bg={alpha(color, 0.15)}
       style={{ borderColor: color, borderTop: `6px solid ${color}` }}
       miw={200}
+      maw={400}
       radius="md"
     >
       <Card.Section p="sm" style={{ borderBottom: `1px solid ${color}` }}>

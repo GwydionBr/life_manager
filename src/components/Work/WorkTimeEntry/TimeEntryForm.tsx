@@ -265,6 +265,7 @@ export default function TimeEntryForm({
             <Group grow>
               <LocaleDateTimePicker
                 withAsterisk
+                maxDate={new Date()}
                 label={getLocalizedText("Startzeit", "Start Time")}
                 value={form.values.start_time}
                 onChange={handleStartTimeChange}
