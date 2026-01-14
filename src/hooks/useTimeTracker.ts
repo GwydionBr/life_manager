@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState, useMemo } from "react";
-import { useAppointmentById } from "@/db/collections/work/appointment/use-appointment-query";
+import { useAppointments } from "@/db/collections/work/appointment/use-appointment-query";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { useSettings } from "@/db/collections/settings/use-settings-query";
 
@@ -44,7 +44,7 @@ interface TimeTrackerReturn {
 }
 
 export function useTimeTracker(timer: Timer): TimeTrackerReturn {
-  const { data: appointment } = useAppointmentById(timer.appointmentId ?? "");
+  const { data: appointments } = useAppointments();
   const { data: workProjects } = useWorkProjects();
   const { data: settings } = useSettings();
   const { updateTimerData } = useTimeTrackerManager();
@@ -52,6 +52,11 @@ export function useTimeTracker(timer: Timer): TimeTrackerReturn {
   const project = useMemo(
     () => workProjects.find((p) => p.id === timer.projectId),
     [workProjects, timer.projectId]
+  );
+
+  const appointment = useMemo(
+    () => appointments?.find((a) => a.id === timer.appointmentId),
+    [appointments, timer.appointmentId]
   );
 
   const [timerState, setTimerState] = useState<TimeTrackerStateData>({
@@ -96,13 +101,13 @@ export function useTimeTracker(timer: Timer): TimeTrackerReturn {
       moneyEarned: undefined,
       effectiveStartTime: undefined,
       effectiveEndTime: undefined,
-      appointmentTitle: appointment?.title,
+      appointmentTitle: undefined,
       projectTitle: project?.title ?? "",
       currency: project?.currency ?? "USD",
       salary: project?.salary ?? 0,
       hourlyPayment: project?.hourly_payment ?? false,
     });
-  }, [timer, appointment, project]);
+  }, [timer, project]);
 
   // Calculate timer values based on current state
   const calculateTimerValues = useCallback(() => {
@@ -125,10 +130,6 @@ export function useTimeTracker(timer: Timer): TimeTrackerReturn {
     const effectiveStartTime = timer.startTime + timer.deltaStartTime * 1000;
     const actualEndTime = isRunning ? Date.now() : timer.startTime;
     const effectiveEndTime = actualEndTime + timer.deltaEndTime * 1000;
-
-    console.log("effectiveStartTime", effectiveStartTime);
-    console.log("actualEndTime", actualEndTime);
-    console.log("effectiveEndTime", effectiveEndTime);
 
     // Calculate active seconds
     const activeSeconds = Math.max(
@@ -173,16 +174,13 @@ export function useTimeTracker(timer: Timer): TimeTrackerReturn {
   // Update timer state when running
   useEffect(() => {
     if (timer.state !== TimerState.Running) {
-      console.log("resetting timer");
       resetTimer();
       return;
     }
-    console.log("timer.state", timer.state);
 
     // Update immediately when starting
     const updateTimer = () => {
       const values = calculateTimerValues();
-      console.log("values", values);
       setTimerState((prev) => ({
         ...prev,
         ...timer,

@@ -14,7 +14,6 @@ import {
   showActionSuccessNotification,
   showActionErrorNotification,
 } from "@/lib/notificationFunctions";
-import { TimerState } from "@/types/timeTracker.types";
 
 import { notifications } from "@mantine/notifications";
 import { Group, Text, Button } from "@mantine/core";
@@ -90,7 +89,7 @@ export function useNotificationHandler() {
   const { data: appointments } = useAppointments();
   const { updateAppointment } = useAppointmentMutations();
   const { data: projects } = useWorkProjects();
-  const { addTimer, timers, updateTimer } = useTimeTrackerManager();
+  const { addTimer, timers, startAppointmentTimer } = useTimeTrackerManager();
   const { getLocalizedText } = useIntl();
 
   // Track which notifications we've already shown as toasts
@@ -229,10 +228,7 @@ export function useNotificationHandler() {
         (t) => t.projectId === appointment.work_project_id
       );
       if (existingTimer) {
-        updateTimer(existingTimer.id, {
-          appointmentId: appointment.id,
-          state: TimerState.Running,
-        });
+        startAppointmentTimer(appointment.id, existingTimer.id);
       } else {
         // Add timer with appointment metadata
         const result = addTimer(project, undefined, appointment.id);
@@ -263,7 +259,7 @@ export function useNotificationHandler() {
       appointments,
       projects,
       addTimer,
-      updateTimer,
+      startAppointmentTimer,
       updateAppointment,
       markAsRead,
       router,

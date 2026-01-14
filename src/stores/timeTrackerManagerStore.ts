@@ -37,6 +37,7 @@ interface TimeTrackerManagerActions {
     appointmentId?: string
   ) => { timerId: string } | { error: "limit" | "duplicate" };
   startTimer: (timerId: string) => void;
+  startAppointmentTimer: (appointmentId: string, timerId: string) => void;
   stopTimer: (timerId: string) => void;
   removeTimer: (timerId: string) => void;
   updateTimer: (timerId: string, updates: Partial<Timer>) => void;
@@ -126,7 +127,29 @@ export const useTimeTrackerManager = create(
             runningTimerCount: state.runningTimerCount + 1,
             timers: {
               ...state.timers,
-              [timerId]: { ...timer, state: TimerState.Running, startTime: Date.now() },
+              [timerId]: {
+                ...timer,
+                state: TimerState.Running,
+                startTime: Date.now(),
+              },
+            },
+          };
+        });
+      },
+
+      startAppointmentTimer: (appointmentId, timerId) => {
+        set((state) => {
+          const timer = state.timers[timerId];
+          if (!timer) return state;
+          return {
+            timers: {
+              ...state.timers,
+              [timerId]: {
+                ...timer,
+                appointmentId,
+                state: TimerState.Running,
+                startTime: timer.startTime ?? Date.now(),
+              },
             },
           };
         });

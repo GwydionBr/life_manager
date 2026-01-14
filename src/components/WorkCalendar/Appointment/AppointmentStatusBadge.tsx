@@ -107,7 +107,7 @@ export function AppointmentStatusBadge({
 
   return (
     <Badge
-      size="sm"
+      size={size}
       variant="light"
       color={getStatusBadgeColor(status)}
       leftSection={getStatusIcon(status)}

@@ -13,7 +13,12 @@ import {
   Box,
 } from "@mantine/core";
 import { TimerState } from "@/types/timeTracker.types";
-import { IconPlayerPlay, IconPlayerStop, IconX } from "@tabler/icons-react";
+import {
+  IconCalendar,
+  IconPlayerPlay,
+  IconPlayerStop,
+  IconX,
+} from "@tabler/icons-react";
 import { getStatusColor } from "@/lib/workHelperFunctions";
 import ModifyTimeTrackerModal from "../ModifyTimeTracker/ModifyTimeTrackerModal";
 import TimeTrackerInfoHoverCard from "../TimeTrackerInfoHoverCard";
@@ -77,12 +82,8 @@ export default function TimeTrackerComponentBigMax({
           {/* State Badge */}
           <Group justify="space-between" align="center" w="100%">
             <Stack gap={0}>
-              <ModifyTimeTrackerModal
-                timerState={timerState}
-              />
-              <TimeTrackerInfoHoverCard
-                timerState={timerState}
-              />
+              <ModifyTimeTrackerModal timerState={timerState} />
+              <TimeTrackerInfoHoverCard timerState={timerState} />
             </Stack>
             <Badge size="lg" color={getStatusColor(timerState.state)}>
               {getLocaleState()}
@@ -106,11 +107,21 @@ export default function TimeTrackerComponentBigMax({
             </Stack>
           </Group>
           {/* Project Title */}
-          <Group justify="space-between" align="center">
-            <Text size="xl" fw={700}>
-              {timerState.projectTitle}
-            </Text>
-          </Group>
+          <Stack gap="xs">
+            <Group justify="space-between" align="center">
+              <Text size="xl" fw={700}>
+                {timerState.projectTitle}
+              </Text>
+            </Group>
+            {timerState.appointmentTitle && (
+              <Group justify="center" align="center" gap="xs">
+                <IconCalendar size={20} />
+                <Text size="md" fw={500}>
+                  {timerState.appointmentTitle}
+                </Text>
+              </Group>
+            )}
+          </Stack>
 
           {/* Time Tracker Rows */}
           <Stack gap="md">
@@ -145,7 +156,11 @@ export default function TimeTrackerComponentBigMax({
               </Button>
             )}
 
-            <Collapse in={timerState.state !== TimerState.Stopped} transitionDuration={400} w="60%">
+            <Collapse
+              in={timerState.state !== TimerState.Stopped}
+              transitionDuration={400}
+              w="60%"
+            >
               <Stack gap="md" align="center">
                 <Button
                   fullWidth

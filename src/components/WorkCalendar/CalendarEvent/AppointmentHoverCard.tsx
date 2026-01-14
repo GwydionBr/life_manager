@@ -28,7 +28,6 @@ import {
   showActionErrorNotification,
 } from "@/lib/notificationFunctions";
 import { AppointmentStatusBadge } from "../Appointment/AppointmentStatusBadge";
-import { TimerState } from "@/types/timeTracker.types";
 
 interface AppointmentHoverCardProps {
   appointment: CalendarAppointment;
@@ -67,7 +66,7 @@ export default function AppointmentHoverCard({
   // Timer integration
   const { data: projects } = useWorkProjects();
   const { updateAppointment } = useAppointmentMutations();
-  const { addTimer, timers, updateTimer } = useTimeTrackerManager();
+  const { addTimer, timers, startAppointmentTimer } = useTimeTrackerManager();
 
   // Check if we should show the timer button
   const showTimer = canStartTimerFromAppointment(appointment);
@@ -87,10 +86,7 @@ export default function AppointmentHoverCard({
     }
 
     if (existingTimer) {
-      updateTimer(existingTimer.id, {
-        appointmentId: appointment.id,
-        state: TimerState.Running,
-      });
+      startAppointmentTimer(appointment.id, existingTimer.id);
     } else {
       // Add timer with appointment metadata
       const result = addTimer(project, undefined, appointment.id);

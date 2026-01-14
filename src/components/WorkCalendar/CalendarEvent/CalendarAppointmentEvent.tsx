@@ -1,16 +1,7 @@
-import { useIntl } from "@/hooks/useIntl";
-
-import {
-  Card,
-  Stack,
-  Text,
-  Group,
-  Badge,
-  HoverCard,
-} from "@mantine/core";
+import { Card, Stack, Text, Group, HoverCard } from "@mantine/core";
 import AppointmentHoverCard from "./AppointmentHoverCard";
 
-import { getStatusStyles, getStatusIcon, getStatusText } from "@/lib/appointmentStatusHelpers";
+import { getStatusStyles, getStatusIcon } from "@/lib/appointmentStatusHelpers";
 
 import { CalendarAppointment } from "@/types/workCalendar.types";
 import { AppointmentStatusBadge } from "../Appointment/AppointmentStatusBadge";
@@ -26,7 +17,6 @@ export default function CalendarAppointmentEvent({
   color,
   toY,
 }: CalendarAppointmentEventProps) {
-  const { getLocalizedText } = useIntl();
   const start = new Date(a.start_date);
   const end = new Date(a.end_date);
   const top = toY(start);
@@ -87,9 +77,7 @@ export default function CalendarAppointmentEvent({
                 {a.projectTitle}
               </Text>
             )}
-            {height > 30 && (
-              <AppointmentStatusBadge status={a.status} />
-            )}
+            {height > 30 && <AppointmentStatusBadge status={a.status} />}
           </Stack>
         </Card>
       </HoverCard.Target>
