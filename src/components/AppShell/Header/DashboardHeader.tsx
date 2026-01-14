@@ -15,7 +15,7 @@ import { useWorkStore } from "@/stores/workManagerStore";
 
 import {
   IconBriefcase,
-  IconCalendar,
+  IconCalendarSmile,
   IconCurrencyDollar,
   IconSettings,
 } from "@tabler/icons-react";
@@ -79,7 +79,7 @@ export default function DashboardHeader() {
           component={Link}
           to="/calendar"
           variant="subtle"
-          leftSection={<IconCalendar />}
+          leftSection={<IconCalendarSmile />}
         >
           {getLocalizedText("Kalender", "Calendar")}
         </Button>

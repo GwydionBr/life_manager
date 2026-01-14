@@ -15,7 +15,7 @@ import { TimeColumn } from "@/components/WorkCalendar/TimeColumn";
 import ColumnHeader from "@/components/WorkCalendar/Calendar/ColumnHeader";
 import PrevActionIcon from "@/components/UI/ActionIcons/PrevActionIcon";
 import NextActionIcon from "@/components/UI/ActionIcons/NextActionIcon";
-import NewSessionModal from "@/components/Work/WorkTimeEntry/NewTimeEntryModal";
+import NewCalendarEntryModal from "@/components/WorkCalendar/CalendarEntry/NewCalendarEntryModal";
 
 import { clamp } from "@/components/WorkCalendar/calendarUtils";
 import { startOfDay } from "date-fns";
@@ -219,9 +219,9 @@ export default function CalendarGrid({
   // ============================================================================
 
   /**
-   * Calculate initial values for new session modal
+   * Calculate initial dates for new entry modal
    */
-  const newSessionInitialValues = useMemo(() => {
+  const newEntryDates = useMemo(() => {
     if (!newSessionDay || !startNewSession || !endNewSession) {
       return undefined;
     }
@@ -230,18 +230,12 @@ export default function CalendarGrid({
     const endY = Math.max(startNewSession, endNewSession);
     const startTime = yToTime(startY, newSessionDay);
     const endTime = yToTime(endY, newSessionDay);
-    const activeSeconds = (endTime.getTime() - startTime.getTime()) / 1000;
 
     return {
-      start_time: startTime.toISOString(),
-      end_time: endTime.toISOString(),
-      active_seconds: activeSeconds,
-      paused_seconds: 0,
-      currency: settings?.default_currency ?? "USD",
-      salary: settings?.default_salary_amount ?? 0,
-      hourly_payment: settings?.default_project_hourly_payment ?? false,
+      startDate: startTime,
+      endDate: endTime,
     };
-  }, [newSessionDay, startNewSession, endNewSession, yToTime, settings]);
+  }, [newSessionDay, startNewSession, endNewSession, yToTime]);
 
   // ============================================================================
   // Render
@@ -352,11 +346,12 @@ export default function CalendarGrid({
         </Group>
       </Stack>
 
-      {/* New Session Modal */}
-      <NewSessionModal
+      {/* New Calendar Entry Modal */}
+      <NewCalendarEntryModal
         opened={sessionFormModalOpened}
         onClose={handleCloseModal}
-        initialValues={newSessionInitialValues}
+        initialStartDate={newEntryDates?.startDate}
+        initialEndDate={newEntryDates?.endDate}
       />
     </Box>
   );

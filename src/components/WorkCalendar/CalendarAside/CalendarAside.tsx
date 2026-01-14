@@ -34,7 +34,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { useAppointments } from "@/db/collections/work/appointment/use-appointment-query";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { AppointmentStatus, Appointment } from "@/types/workCalendar.types";
-import NewAppointmentModal from "../Appointment/NewAppointmentModal";
+import NewCalendarEntryModal from "../CalendarEntry/NewCalendarEntryModal";
 import EditAppointmentDrawer from "../Appointment/EditAppointmentDrawer";
 
 import { AppointmentStatusBadge } from "../Appointment/AppointmentStatusBadge";
@@ -154,9 +154,10 @@ export default function CalendarAside({ isBig }: CalendarAsideProps) {
             {todayAppointments.length}
           </Badge>
         </Box>
-        <NewAppointmentModal
+        <NewCalendarEntryModal
           opened={newAppointmentModalOpened}
           onClose={closeNewAppointmentModal}
+          initialEntryType="appointment"
         />
         {selectedAppointment && (
           <EditAppointmentDrawer
@@ -280,9 +281,10 @@ export default function CalendarAside({ isBig }: CalendarAsideProps) {
           </Stack>
         </Collapse>
       </Stack>
-      <NewAppointmentModal
+      <NewCalendarEntryModal
         opened={newAppointmentModalOpened}
         onClose={closeNewAppointmentModal}
+        initialEntryType="appointment"
       />
       {selectedAppointment && (
         <EditAppointmentDrawer

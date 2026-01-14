@@ -6,7 +6,7 @@ import { ScrollArea, Stack } from "@mantine/core";
 import CalendarGrid from "./Calendar/CalendarGrid";
 import EditTimeEntryDrawer from "@/components/Work/WorkTimeEntry/EditTimeEntryDrawer";
 import EditAppointmentDrawer from "./Appointment/EditAppointmentDrawer";
-import NewAppointmentModal from "./Appointment/NewAppointmentModal";
+import NewCalendarEntryModal from "./CalendarEntry/NewCalendarEntryModal";
 import CalendarLegend from "./Calendar/CalendarLegend";
 
 export default function WorkCalendar() {
@@ -116,7 +116,7 @@ export default function WorkCalendar() {
           onClose={closeAppointmentDrawer}
         />
       )}
-      <NewAppointmentModal
+      <NewCalendarEntryModal
         opened={newAppointmentModalOpened}
         onClose={closeNewAppointmentModal}
       />

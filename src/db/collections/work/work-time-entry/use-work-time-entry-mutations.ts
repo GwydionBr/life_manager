@@ -125,6 +125,8 @@ export const useWorkTimeEntryMutations = () => {
           return;
         }
 
+        console.log(adjustedTimeEntries);
+
         const result = await addWorkTimeEntry(adjustedTimeEntries);
 
         if (!result) {

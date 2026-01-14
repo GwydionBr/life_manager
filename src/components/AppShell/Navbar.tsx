@@ -14,7 +14,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import {
   IconBriefcase,
-  IconCalendar,
+  IconCalendarSmile,
   IconCurrencyDollar,
   IconSettings,
 } from "@tabler/icons-react";
@@ -88,7 +88,7 @@ export default function Navbar({ currentApp }: NavbarProps) {
             color={calendarColor}
             variant={currentApp === AppOptions.CALENDAR ? "light" : "subtle"}
           >
-            <IconCalendar />
+            <IconCalendarSmile />
           </ActionIcon>
           {/* <ActionIcon
         component={Link}
