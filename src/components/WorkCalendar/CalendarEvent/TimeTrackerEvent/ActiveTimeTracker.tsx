@@ -1,5 +1,5 @@
 import { Box, Group, Stack, Text, Indicator } from "@mantine/core";
-import { TimerState } from "@/types/timeTracker.types";
+import { useIntl } from "@/hooks/useIntl";
 import { TimerData } from "@/stores/timeTrackerManagerStore";
 
 interface ActiveTimeTrackerProps {
@@ -7,7 +7,7 @@ interface ActiveTimeTrackerProps {
   height: number;
   top: number;
   bottom: number;
-  timer: TimerData;
+  activeTimer: TimerData;
   isYesterday: boolean | null;
   color: string;
   backgroundColor: string;
@@ -19,12 +19,13 @@ export default function ActiveTimeTracker({
   height,
   top,
   bottom,
-  timer,
+  activeTimer,
   isYesterday: _isYesterday,
   color,
   backgroundColor,
   title,
 }: ActiveTimeTrackerProps) {
+  const { formatDuration } = useIntl();
   return (
     <Box>
       <Box
@@ -56,13 +57,9 @@ export default function ActiveTimeTracker({
           }}
         >
           <Group justify="center" align="center" px="xs">
-            <Indicator
-              size={10}
-              color="red"
-              processing={timer.state === TimerState.Running}
-            />
+            <Indicator size={10} color="red" processing={true} />
             <Text size="xs" ta="center" fw={600}>
-              {timer.activeTime}
+              {formatDuration(activeTimer.activeSeconds)}
             </Text>
           </Group>
           {title && (
@@ -72,19 +69,6 @@ export default function ActiveTimeTracker({
           )}
         </Stack>
       </Box>
-      {/* {isYesterday === false && (
-        <Box
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 0,
-            width: "100%",
-            height: 4,
-            background: "red",
-            zIndex: 16,
-          }}
-        />
-      )} */}
       <Box
         style={{
           position: "absolute",

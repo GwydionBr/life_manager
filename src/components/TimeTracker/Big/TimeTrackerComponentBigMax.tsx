@@ -12,7 +12,7 @@ import {
   Collapse,
   Box,
 } from "@mantine/core";
-import { TimerRoundingSettings, TimerState } from "@/types/timeTracker.types";
+import { TimerState } from "@/types/timeTracker.types";
 import { IconPlayerPlay, IconPlayerStop, IconX } from "@tabler/icons-react";
 import { getStatusColor } from "@/lib/workHelperFunctions";
 import ModifyTimeTrackerModal from "../ModifyTimeTracker/ModifyTimeTrackerModal";
@@ -22,18 +22,10 @@ import TimeTrackerMemoRow from "../TimeTrackerRow/TimeTrackerMemoRow";
 import TimeTrackerFinanceRow from "../TimeTrackerRow/TimeTrackerFinanceRow";
 import TimeTrackerTimeRow from "../TimeTrackerRow/TimeTrackerTimeRow";
 import ExternalLinkActionIcon from "@/components/UI/ActionIcons/ExternalLinkActionIcon";
-import { TimerData } from "@/stores/timeTrackerManagerStore";
+import { TimeTrackerState } from "@/hooks/useTimeTracker";
 
 interface TimeTrackerComponentBigMaxProps {
-  timer: TimerData;
-  state: TimerState;
-  activeSeconds: number;
-  activeTime: string;
-  roundedActiveTime: string;
-  isSubmitting: boolean;
-  moneyEarned: string;
-  storedActiveSeconds: number;
-  timerRoundingSettings: TimerRoundingSettings;
+  timerState: TimeTrackerState;
   memo: string;
   color: string | null;
   backgroundColor: string;
@@ -41,29 +33,17 @@ interface TimeTrackerComponentBigMaxProps {
   submitTimer: () => void;
   cancelTimer: () => void;
   removeTimer: () => void;
-  setTempTimerRounding: (timerRoundingSettings: TimerRoundingSettings) => void;
-  modifyActiveSeconds: (delta: number) => void;
   setMemo: (memo: string) => void;
 }
 
 export default function TimeTrackerComponentBigMax({
-  timer,
-  state,
-  activeSeconds,
-  activeTime,
-  roundedActiveTime,
-  isSubmitting,
-  moneyEarned,
-  storedActiveSeconds,
-  timerRoundingSettings,
+  timerState,
   memo,
   color,
   backgroundColor,
   startTimer,
   submitTimer,
   cancelTimer,
-  modifyActiveSeconds,
-  setTempTimerRounding,
   removeTimer,
   setMemo,
 }: TimeTrackerComponentBigMaxProps) {
@@ -71,9 +51,9 @@ export default function TimeTrackerComponentBigMax({
   const navigate = useNavigate();
 
   const getLocaleState = () => {
-    if (state === TimerState.Running) {
+    if (timerState.state === TimerState.Running) {
       return getLocalizedText("Aktiv", "Running");
-    } else if (state === TimerState.Stopped) {
+    } else if (timerState.state === TimerState.Stopped) {
       return getLocalizedText("Gestoppt", "Stopped");
     }
   };
@@ -92,29 +72,19 @@ export default function TimeTrackerComponentBigMax({
         bg={backgroundColor}
         style={{ border: `2px solid ${color ?? "teal"}` }}
       >
-        <LoadingOverlay visible={isSubmitting} overlayProps={{ blur: 2 }} />
+        <LoadingOverlay visible={false} overlayProps={{ blur: 2 }} />
         <Stack gap="md" align="center">
           {/* State Badge */}
           <Group justify="space-between" align="center" w="100%">
             <Stack gap={0}>
               <ModifyTimeTrackerModal
-                activeTime={activeTime}
-                state={state}
-                timerRoundingSettings={timerRoundingSettings}
-                activeSeconds={activeSeconds}
-                storedActiveSeconds={storedActiveSeconds}
-                modifyActiveSeconds={modifyActiveSeconds}
-                setTempTimerRounding={setTempTimerRounding}
+                timerState={timerState}
               />
               <TimeTrackerInfoHoverCard
-                currency={timer.currency}
-                timerRoundingSettings={timerRoundingSettings}
-                projectTitle={timer.projectTitle}
-                salary={timer.salary}
-                hourlyPayment={timer.hourlyPayment}
+                timerState={timerState}
               />
             </Stack>
-            <Badge size="lg" color={getStatusColor(state)}>
+            <Badge size="lg" color={getStatusColor(timerState.state)}>
               {getLocaleState()}
             </Badge>
             <Stack>
@@ -123,7 +93,7 @@ export default function TimeTrackerComponentBigMax({
                 onClick={() => {
                   navigate({
                     to: "/work",
-                    search: { projectId: timer.projectId },
+                    search: { projectId: timerState.projectId },
                   });
                 }}
                 tooltipLabel={getLocalizedText(
@@ -138,32 +108,32 @@ export default function TimeTrackerComponentBigMax({
           {/* Project Title */}
           <Group justify="space-between" align="center">
             <Text size="xl" fw={700}>
-              {timer.projectTitle}
+              {timerState.projectTitle}
             </Text>
           </Group>
 
           {/* Time Tracker Rows */}
           <Stack gap="md">
             <TimeTrackerMemoRow value={memo} setMemo={setMemo} />
-            {timer.hourlyPayment && (
+            {timerState.hourlyPayment && (
               <TimeTrackerFinanceRow
-                currency={timer.currency}
-                moneyEarned={moneyEarned}
-                state={state}
+                currency={timerState.currency}
+                moneyEarned={timerState.moneyEarned ?? "0.00"}
+                state={timerState.state}
                 color={color}
               />
             )}
             <TimeTrackerTimeRow
-              activeTime={activeTime}
-              roundedActiveTime={roundedActiveTime}
-              state={state}
+              activeTime={timerState.activeTime}
+              roundedActiveTime={timerState.roundedActiveTime}
+              state={timerState.state}
               color={color}
             />
           </Stack>
 
           {/* Buttons */}
           <Stack gap="md" w="100%" align="center">
-            {state === TimerState.Stopped && (
+            {timerState.state === TimerState.Stopped && (
               <Button
                 w="60%"
                 onClick={startTimer}
@@ -175,7 +145,7 @@ export default function TimeTrackerComponentBigMax({
               </Button>
             )}
 
-            <Collapse in={state !== TimerState.Stopped} transitionDuration={400} w="60%">
+            <Collapse in={timerState.state !== TimerState.Stopped} transitionDuration={400} w="60%">
               <Stack gap="md" align="center">
                 <Button
                   fullWidth
@@ -183,7 +153,7 @@ export default function TimeTrackerComponentBigMax({
                   color="red"
                   leftSection={<IconPlayerStop size={20} />}
                   size="md"
-                  disabled={isSubmitting}
+                  disabled={false}
                 >
                   {getLocalizedText("Stoppen", "Stop")}
                 </Button>
@@ -193,7 +163,7 @@ export default function TimeTrackerComponentBigMax({
                   color="gray"
                   leftSection={<IconX size={20} />}
                   size="md"
-                  disabled={isSubmitting}
+                  disabled={false}
                 >
                   {getLocalizedText("Abbrechen", "Cancel")}
                 </Button>

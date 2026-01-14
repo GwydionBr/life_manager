@@ -16,53 +16,29 @@ import CancelActionIcon from "../TimeTrackerActionIcons/CancelActionIcon";
 import TimeTrackerInfoHoverCard from "../TimeTrackerInfoHoverCard";
 import ModifyTimeTrackerModal from "../ModifyTimeTracker/ModifyTimeTrackerModal";
 
-import { TimerRoundingSettings, TimerState } from "@/types/timeTracker.types";
-import { Currency } from "@/types/settings.types";
+import { TimerState } from "@/types/timeTracker.types";
+import { TimeTrackerState } from "@/hooks/useTimeTracker";
 
 interface TimeTrackerComponentSmallProps {
   showSmall: boolean;
-  isSubmitting: boolean;
-  roundedActiveTime: string;
-  state: TimerState;
-  activeTime: string;
-  activeSeconds: number;
-  timerRoundingSettings: TimerRoundingSettings;
-  projectTitle: string;
-  salary: number;
-  currency: Currency;
-  hourlyPayment: boolean;
-  storedActiveSeconds: number;
+  timerState: TimeTrackerState;
   color: string | null;
   backgroundColor: string;
   setShowSmall: (showSmall: boolean) => void;
   submitTimer: () => void;
   startTimer: () => void;
   cancelTimer: () => void;
-  modifyActiveSeconds: (delta: number) => void;
-  setTempTimerRounding: (timerRoundingSettings: TimerRoundingSettings) => void;
 }
 
 export default function TimeTrackerComponentSmall({
   showSmall,
-  isSubmitting,
-  roundedActiveTime,
-  state,
-  activeTime,
-  activeSeconds,
-  timerRoundingSettings,
-  projectTitle,
-  salary,
-  currency,
-  hourlyPayment,
+  timerState,
   color,
   backgroundColor,
   setShowSmall: _setShowSmall,
-  storedActiveSeconds,
   submitTimer,
   startTimer,
   cancelTimer,
-  modifyActiveSeconds,
-  setTempTimerRounding,
 }: TimeTrackerComponentSmallProps) {
   const { getLocalizedText } = useIntl();
 
@@ -82,24 +58,10 @@ export default function TimeTrackerComponentSmall({
       >
         <Collapse in={showSmall} transitionDuration={400}>
           <Stack gap="xs" align="center" justify="center" pos="relative">
-            <LoadingOverlay visible={isSubmitting} overlayProps={{ blur: 2 }} />
+            <LoadingOverlay visible={false} overlayProps={{ blur: 2 }} />
             <Stack gap={0}>
-              <ModifyTimeTrackerModal
-                modifyActiveSeconds={modifyActiveSeconds}
-                setTempTimerRounding={setTempTimerRounding}
-                activeTime={activeTime}
-                state={state}
-                activeSeconds={activeSeconds}
-                timerRoundingSettings={timerRoundingSettings}
-                storedActiveSeconds={storedActiveSeconds}
-              />
-              <TimeTrackerInfoHoverCard
-                currency={currency}
-                timerRoundingSettings={timerRoundingSettings}
-                projectTitle={projectTitle}
-                salary={salary}
-                hourlyPayment={hourlyPayment}
-              />
+              <ModifyTimeTrackerModal timerState={timerState} />
+              <TimeTrackerInfoHoverCard timerState={timerState} />
             </Stack>
             <Divider />
             <Card
@@ -112,7 +74,7 @@ export default function TimeTrackerComponentSmall({
               withBorder
               style={{
                 border:
-                  state === TimerState.Running
+                  timerState.state === TimerState.Running
                     ? `2px solid var(--mantine-color-blue-6)`
                     : "none",
               }}
@@ -120,29 +82,27 @@ export default function TimeTrackerComponentSmall({
               <Text fz={11} c="dimmed" ta="center">
                 {getLocalizedText("Aktiv", "Active")}
               </Text>
-              <Text fz={11} fw={state === "running" ? 700 : 400} ta="center">
-                {activeTime}
+              <Text
+                fz={11}
+                fw={timerState.state === TimerState.Running ? 700 : 400}
+                ta="center"
+              >
+                {timerState.activeTime}
               </Text>
               <Text fz={11} c="dimmed" ta="center">
-                {roundedActiveTime}
+                {timerState.roundedActiveTime}
               </Text>
             </Card>
-            {state === TimerState.Stopped && (
+            {timerState.state === TimerState.Stopped && (
               <StartActionIcon startTimer={startTimer} />
             )}
             <Collapse
-              in={state === TimerState.Running}
+              in={timerState.state === TimerState.Running}
               transitionDuration={400}
             >
               <Stack gap="xs" align="center" justify="center">
-                <StopActionIcon
-                  stopTimer={submitTimer}
-                  disabled={isSubmitting}
-                />
-                <CancelActionIcon
-                  cancelTimer={cancelTimer}
-                  disabled={isSubmitting}
-                />
+                <StopActionIcon stopTimer={submitTimer} disabled={false} />
+                <CancelActionIcon cancelTimer={cancelTimer} disabled={false} />
               </Stack>
             </Collapse>
           </Stack>

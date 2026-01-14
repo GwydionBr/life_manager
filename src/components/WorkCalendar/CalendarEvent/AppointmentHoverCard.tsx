@@ -25,7 +25,6 @@ import { useAppointmentMutations } from "@/db/collections/work/appointment/use-a
 import { useTimeTrackerManager } from "@/stores/timeTrackerManagerStore";
 import {
   canStartTimerFromAppointment,
-  shouldShowTimerButton,
   getProjectRoundingSettings,
 } from "@/lib/appointmentTimerHelpers";
 import {
@@ -33,6 +32,7 @@ import {
   showActionErrorNotification,
 } from "@/lib/notificationFunctions";
 import { AppointmentStatusBadge } from "../Appointment/AppointmentStatusBadge";
+import { TimerState } from "@/types/timeTracker.types";
 
 interface AppointmentHoverCardProps {
   appointment: CalendarAppointment;
@@ -72,17 +72,17 @@ export default function AppointmentHoverCard({
   const { data: projects } = useWorkProjects();
   const { data: settings } = useSettings();
   const { updateAppointment } = useAppointmentMutations();
-  const { addTimer, getAllTimers } = useTimeTrackerManager();
+  const { addTimer, timers, updateTimer } = useTimeTrackerManager();
 
   // Check if we should show the timer button
-  const existingTimers = getAllTimers();
-  const showTimer =
-    canStartTimerFromAppointment(appointment) &&
-    shouldShowTimerButton(appointment, existingTimers);
+  const showTimer = canStartTimerFromAppointment(appointment);
 
   const handleStartTimer = async () => {
     // Find the project
     const project = projects?.find((p) => p.id === appointment.work_project_id);
+    const existingTimer = Object.values(timers).find(
+      (t) => t.projectId === appointment.work_project_id
+    );
 
     if (!project) {
       showActionErrorNotification(
@@ -91,36 +91,29 @@ export default function AppointmentHoverCard({
       return;
     }
 
-    // Get rounding settings
-    const roundingSettings = getProjectRoundingSettings(project, {
-      roundingInterval: settings?.rounding_interval ?? 0,
-      roundingDirection: settings?.rounding_direction ?? "up",
-      roundInTimeFragments: settings?.round_in_time_sections ?? false,
-      timeFragmentInterval: settings?.time_section_interval ?? 15,
-    });
-
-    // Add timer with appointment metadata
-    const result = addTimer(project, roundingSettings, {
-      appointmentId: appointment.id,
-      appointmentTitle: appointment.title,
-    });
-
-    if (result.success) {
-      // Update appointment status to active
-      await updateAppointment(appointment.id, { status: "active" });
-
-      showActionSuccessNotification(
-        getLocalizedText("Timer gestartet", "Timer started")
-      );
+    if (existingTimer) {
+      updateTimer(existingTimer.id, {
+        appointmentId: appointment.id,
+        state: TimerState.Running,
+      });
     } else {
-      showActionErrorNotification(
-        result.error
-          ? getLocalizedText(result.error.german, result.error.english)
-          : getLocalizedText(
-              "Timer konnte nicht gestartet werden",
-              "Failed to start timer"
-            )
-      );
+      // Add timer with appointment metadata
+      const result = addTimer(project, undefined, appointment.id);
+      if ("timerId" in result) {
+        // Update appointment status to active
+        await updateAppointment(appointment.id, { status: "active" });
+
+        showActionSuccessNotification(
+          getLocalizedText("Timer gestartet", "Timer started")
+        );
+      } else {
+        showActionErrorNotification(
+          getLocalizedText(
+            "Timer konnte nicht gestartet werden",
+            "Failed to start timer"
+          )
+        );
+      }
     }
   };
 

@@ -1,5 +1,5 @@
 import { Appointment, WorkProject } from "@/types/work.types";
-import { TimerData } from "@/stores/timeTrackerManagerStore";
+import { Timer } from "@/stores/timeTrackerManagerStore";
 import { TimerRoundingSettings } from "@/types/timeTracker.types";
 
 /**
@@ -30,30 +30,6 @@ export function canStartTimerFromAppointment(
   return Boolean(
     appointment.work_project_id && !appointment.work_time_entry_id
   );
-}
-
-/**
- * Checks if a timer should be shown for an appointment.
- *
- * @param appointment - The appointment to check
- * @param existingTimers - Array of existing timers
- * @returns True if timer button should be shown
- */
-export function shouldShowTimerButton(
-  appointment: Appointment,
-  existingTimers: TimerData[]
-): boolean {
-  // Must be able to start timer
-  if (!canStartTimerFromAppointment(appointment)) {
-    return false;
-  }
-
-  // Check if timer already exists for this project
-  const hasExistingTimer = existingTimers.some(
-    (timer) => timer.projectId === appointment.work_project_id
-  );
-
-  return !hasExistingTimer;
 }
 
 /**

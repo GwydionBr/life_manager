@@ -7,26 +7,14 @@ import MoreActionIcon from "@/components/UI/ActionIcons/MoreActionIcon";
 import ModifyTime from "@/components/TimeTracker/ModifyTimeTracker/ModifyTime";
 import ModifyRounding from "@/components/TimeTracker/ModifyTimeTracker/ModifyRounding";
 
-import { TimerRoundingSettings, TimerState } from "@/types/timeTracker.types";
+import { TimeTrackerState } from "@/hooks/useTimeTracker";
 
 interface ModifyTimeTrackerModalProps {
-  modifyActiveSeconds: (delta: number) => void;
-  setTempTimerRounding: (timerRoundingSettings: TimerRoundingSettings) => void;
-  activeTime: string;
-  state: TimerState;
-  activeSeconds: number;
-  storedActiveSeconds: number;
-  timerRoundingSettings: TimerRoundingSettings;
+  timerState: TimeTrackerState;
 }
 
 export default function ModifyTimeTrackerModal({
-  modifyActiveSeconds,
-  setTempTimerRounding,
-  activeTime,
-  state,
-  activeSeconds,
-  storedActiveSeconds,
-  timerRoundingSettings,
+  timerState,
 }: ModifyTimeTrackerModalProps) {
   const { getLocalizedText } = useIntl();
   const [opened, setOpened] = useState(false);
@@ -78,18 +66,11 @@ export default function ModifyTimeTrackerModal({
             </Tabs.Tab>
           </Tabs.List>
           <Tabs.Panel value="time">
-            <ModifyTime
-              modifyActiveSeconds={modifyActiveSeconds}
-              activeTime={activeTime}
-              state={state}
-              storedActiveSeconds={storedActiveSeconds}
-            />
+            <ModifyTime timerState={timerState} />
           </Tabs.Panel>
           <Tabs.Panel value="rounding">
             <ModifyRounding
-              setTempTimerRounding={setTempTimerRounding}
-              activeSeconds={activeSeconds}
-              timerRoundingSettings={timerRoundingSettings}
+              timerState={timerState}
               onClose={() => setOpened(false)}
             />
           </Tabs.Panel>

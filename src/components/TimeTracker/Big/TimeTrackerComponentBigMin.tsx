@@ -9,28 +9,19 @@ import {
   Text,
   Transition,
 } from "@mantine/core";
-import { TimerRoundingSettings, TimerState } from "@/types/timeTracker.types";
+import { TimerState } from "@/types/timeTracker.types";
 import StartActionIcon from "@/components/TimeTracker/TimeTrackerActionIcons/StartActionIcons";
 import StopActionIcon from "@/components/TimeTracker/TimeTrackerActionIcons/StopActionIcon";
 import CancelActionIcon from "@/components/TimeTracker/TimeTrackerActionIcons/CancelActionIcon";
 import XActionIcon from "@/components/UI/ActionIcons/XActionIcon";
 import ModifyTimeTrackerModal from "@/components/TimeTracker/ModifyTimeTracker/ModifyTimeTrackerModal";
 import TimeTrackerInfoHoverCard from "@/components/TimeTracker/TimeTrackerInfoHoverCard";
-import { TimerData } from "@/stores/timeTrackerManagerStore";
+import { TimeTrackerState } from "@/hooks/useTimeTracker";
 
 interface TimeTrackerComponentBigMinProps {
-  timer: TimerData;
-  state: TimerState;
-  activeSeconds: number;
-  activeTime: string;
-  roundedActiveTime: string;
-  isSubmitting: boolean;
-  timerRoundingSettings: TimerRoundingSettings; 
-  storedActiveSeconds: number;
+  timerState: TimeTrackerState;
   color: string | null;
   backgroundColor: string;
-  modifyActiveSeconds: (delta: number) => void;
-  setTempTimerRounding: (timerRoundingSettings: TimerRoundingSettings) => void;
   startTimer: () => void;
   submitTimer: () => void;
   cancelTimer: () => void;
@@ -38,16 +29,7 @@ interface TimeTrackerComponentBigMinProps {
 }
 
 export default function TimeTrackerComponentBigMin({
-  timer,
-  state,
-  activeSeconds,
-  activeTime,
-  roundedActiveTime,
-  isSubmitting,
-  storedActiveSeconds,
-  timerRoundingSettings,
-  modifyActiveSeconds,
-  setTempTimerRounding,
+  timerState,
   startTimer,
   submitTimer,
   cancelTimer,
@@ -71,26 +53,16 @@ export default function TimeTrackerComponentBigMin({
         bg={backgroundColor}
         style={{ border: `2px solid ${color ?? "teal"}` }}
       >
-        <LoadingOverlay visible={isSubmitting} overlayProps={{ blur: 2 }} />
+        <LoadingOverlay visible={false} overlayProps={{ blur: 2 }} />
         <Group justify="center" align="center">
           <ModifyTimeTrackerModal
-            activeTime={activeTime}
-            state={state}
-            timerRoundingSettings={timerRoundingSettings}
-            activeSeconds={activeSeconds}
-            storedActiveSeconds={storedActiveSeconds}
-            modifyActiveSeconds={modifyActiveSeconds}
-            setTempTimerRounding={setTempTimerRounding}
+            timerState={timerState}
           />
           <TimeTrackerInfoHoverCard
-            currency={timer.currency}
-            timerRoundingSettings={timerRoundingSettings}
-            projectTitle={timer.projectTitle}
-            salary={timer.salary}
-            hourlyPayment={timer.hourlyPayment}
+            timerState={timerState}
           />
           <Text size="xs" c="dimmed" ta="center">
-            {timer.projectTitle}
+            {timerState.projectTitle}
           </Text>
           <XActionIcon onClick={removeTimer} size="xs" />
         </Group>
@@ -102,7 +74,7 @@ export default function TimeTrackerComponentBigMin({
             withBorder
             style={{
               borderColor:
-                state === TimerState.Running
+                timerState.state === TimerState.Running
                   ? "var(--mantine-color-blue-6)"
                   : "",
             }}
@@ -111,29 +83,29 @@ export default function TimeTrackerComponentBigMin({
               <Text size="xs" c="dimmed">
                 {getLocalizedText("Aktiv", "Active")}
               </Text>
-              {!timerRoundingSettings?.roundInTimeFragments ? (
+              {!timerState.timerRoundingSettings?.roundInTimeFragments ? (
                 <Stack>
-                  <Text size="xs" fw={state === TimerState.Running ? 700 : 400}>
-                    {activeTime}
+                  <Text size="xs" fw={timerState.state === TimerState.Running ? 700 : 400}>
+                    {timerState.activeTime}
                   </Text>
                   <Text size="xs" c="dimmed">
-                    {roundedActiveTime}
+                    {timerState.roundedActiveTime}
                   </Text>
                 </Stack>
               ) : (
                 <Group>
-                  <Text size="xs" fw={state === TimerState.Running ? 700 : 400}>
-                    {activeTime}
+                  <Text size="xs" fw={timerState.state === TimerState.Running ? 700 : 400}>
+                    {timerState.activeTime}
                   </Text>
                   <Text size="xs" c="dimmed">
-                    {roundedActiveTime}
+                    {timerState.roundedActiveTime}
                   </Text>
                 </Group>
               )}
             </Stack>
           </Card>
           <Transition
-            mounted={state === TimerState.Stopped}
+            mounted={timerState.state === TimerState.Stopped}
             transition="fade-left"
             duration={400}
           >
@@ -144,7 +116,7 @@ export default function TimeTrackerComponentBigMin({
             )}
           </Transition>
           <Transition
-            mounted={state === TimerState.Running}
+            mounted={timerState.state === TimerState.Running}
             transition="fade-left"
             duration={400}
           >
@@ -152,11 +124,11 @@ export default function TimeTrackerComponentBigMin({
               <Group gap={5} align="center" justify="center" style={styles}>
                 <StopActionIcon
                   stopTimer={submitTimer}
-                  disabled={isSubmitting}
+                  disabled={false}
                 />
                 <CancelActionIcon
                   cancelTimer={cancelTimer}
-                  disabled={isSubmitting}
+                  disabled={false}
                 />
               </Group>
             )}

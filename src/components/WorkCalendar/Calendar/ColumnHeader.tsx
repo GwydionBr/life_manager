@@ -25,7 +25,6 @@ import {
 import { CalendarDay } from "@/types/workCalendar.types";
 import { calculateSessionTimeForDay } from "../calendarUtils";
 import { isToday } from "date-fns";
-import { TimerState } from "@/types/timeTracker.types";
 import { WorkProject } from "@/types/work.types";
 
 interface ColumnHeaderProps {
@@ -44,12 +43,13 @@ export default function ColumnHeader({
   const { hovered, ref } = useHover();
   const { formatDate, formatMoney, formatDuration, getLocalizedText } =
     useIntl();
-  const { isTimerRunning, timers } = useTimeTrackerManager();
+  const { runningTimerCount, activeTimerData } = useTimeTrackerManager();
 
-  const timer = useMemo(
-    () => Object.values(timers).find((t) => t.state === TimerState.Running),
-    [timers]
+  const activeTimer = useMemo(
+    () => Object.values(activeTimerData).find((t) => t.activeSeconds > 0),
+    [activeTimerData]
   );
+
   const isDayToday = day ? isToday(day.day) : false;
   const totalTime = useMemo(() => {
     if (!day) return 0;
@@ -129,11 +129,11 @@ export default function ColumnHeader({
                   )}
                 </Group>
                 <Group justify="center" gap={6} wrap="nowrap">
-                  {timer && isToday(day.day) && (
+                  {activeTimer && isToday(day.day) && (
                     <Indicator
                       size={12}
                       color="red"
-                      processing={timer.state === TimerState.Running}
+                      processing={true}
                       withBorder
                     />
                   )}
@@ -150,8 +150,8 @@ export default function ColumnHeader({
                     >
                       {formatDuration(
                         totalTime +
-                          (isToday(day.day) && isTimerRunning
-                            ? (timer?.activeSeconds ?? 0)
+                          (isToday(day.day) && runningTimerCount > 0
+                            ? (activeTimer?.activeSeconds ?? 0)
                             : 0)
                       )}
                     </Badge>
@@ -181,11 +181,8 @@ export default function ColumnHeader({
               ) ?? 0;
             const totalTimeWithTimer =
               totalTime +
-              (day &&
-              isToday(day.day) &&
-              isTimerRunning &&
-              timer?.projectId === p.id
-                ? (timer?.activeSeconds ?? 0)
+              (day && isToday(day.day) && activeTimer?.projectId === p.id
+                ? (activeTimer?.activeSeconds ?? 0)
                 : 0);
 
             const earnings = (p.salary * totalTimeWithTimer) / 3600;
@@ -263,8 +260,8 @@ export default function ColumnHeader({
                     <Text size="sm" fw={600}>
                       {formatDuration(
                         totalTime +
-                          (day && isToday(day.day) && isTimerRunning
-                            ? (timer?.activeSeconds ?? 0)
+                          (day && isToday(day.day) && activeTimer
+                            ? (activeTimer.activeSeconds ?? 0)
                             : 0)
                       )}
                     </Text>

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { TimerState } from "@/types/timeTracker.types";
 import { useIntl } from "@/hooks/useIntl";
+import { useTimeTrackerManager } from "@/stores/timeTrackerManagerStore";
 
 import {
   Stack,
@@ -8,7 +8,6 @@ import {
   Box,
   Group,
   Button,
-  Divider,
   Alert,
   TextInput,
   Select,
@@ -20,35 +19,30 @@ import {
   IconAlertCircle,
   IconClock,
   IconPlayerPlay,
-  IconPlayerPause,
   IconPlus,
   IconMinus,
   IconSettings,
 } from "@tabler/icons-react";
 import TimeTrackerTimeRow from "../TimeTrackerRow/TimeTrackerTimeRow";
+import { TimeTrackerState } from "@/hooks/useTimeTracker";
 
 interface ModifyTimeProps {
-  modifyActiveSeconds: (delta: number) => void;
-  activeTime: string;
-  state: TimerState;
-  storedActiveSeconds: number;
+  timerState: TimeTrackerState;
 }
 
-export default function ModifyTime({
-  modifyActiveSeconds,
-  activeTime,
-  state,
-  storedActiveSeconds,
-}: ModifyTimeProps) {
+export default function ModifyTime({ timerState }: ModifyTimeProps) {
   const { getLocalizedText } = useIntl();
   const [activeTimeInput, setActiveTimeInput] = useState("");
   const [timeUnit, setTimeUnit] = useState<"seconds" | "minutes" | "hours">(
     "minutes"
   );
   const [errorMessage, setErrorMessage] = useState("");
+  const { updateTimer } = useTimeTrackerManager();
 
   const handleActiveTimeChange = (change: number) => {
-    modifyActiveSeconds(change);
+    updateTimer(timerState.id, {
+      deltaStartTime: timerState.deltaStartTime + change,
+    });
   };
 
   const parseTimeInput = (
@@ -88,15 +82,9 @@ export default function ModifyTime({
   const handleCustomActiveTimeChange = () => {
     const seconds = parseTimeInput(activeTimeInput, timeUnit);
     if (seconds !== 0) {
-      // Berechne die neue aktive Zeit basierend auf den aktuellen storedActiveSeconds
-      const newStoredActiveSeconds = storedActiveSeconds + seconds;
-
-      if (newStoredActiveSeconds < 0) {
-        setErrorMessage("Active time cannot fall below 0.");
-        return;
-      }
-
-      modifyActiveSeconds(seconds);
+      updateTimer(timerState.id, {
+        deltaStartTime: timerState.deltaStartTime + seconds,
+      });
       setActiveTimeInput("");
       setErrorMessage("");
     }
@@ -114,9 +102,9 @@ export default function ModifyTime({
 
         <Group gap="xl" justify="center">
           <TimeTrackerTimeRow
-            activeTime={activeTime}
-            roundedActiveTime=""
-            state={state}
+            activeTime={timerState.activeTime}
+            roundedActiveTime={timerState.roundedActiveTime}
+            state={timerState.state}
             color={null}
           />
         </Group>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useIntl } from "@/hooks/useIntl";
+import { useTimeTrackerManager } from "@/stores/timeTrackerManagerStore";
 
 import {
   Stack,
@@ -33,26 +34,26 @@ import { getRoundedSeconds } from "@/lib/workHelperFunctions";
 import { TimerRoundingSettings } from "@/types/timeTracker.types";
 import { getRoundingLabel } from "@/lib/timeTrackerFunctions";
 import { SettingsTab } from "@/stores/settingsStore";
+import { TimeTrackerState } from "@/hooks/useTimeTracker";
 
 interface ModifyRoundingProps {
-  setTempTimerRounding: (timerRoundingSettings: TimerRoundingSettings) => void;
-  activeSeconds: number;
-  timerRoundingSettings: TimerRoundingSettings;
+  timerState: TimeTrackerState;
   onClose: () => void;
 }
 
 export default function ModifyRounding({
-  setTempTimerRounding,
-  activeSeconds,
-  timerRoundingSettings,
+  timerState,
   onClose,
 }: ModifyRoundingProps) {
   const { getLocalizedText } = useIntl();
   const { locale, setSelectedTab, setIsModalOpen } = useSettingsStore();
+  const { updateTimer } = useTimeTrackerManager();
   const [roundingSettings, setRoundingSettings] =
-    useState<TimerRoundingSettings>(timerRoundingSettings);
+    useState<TimerRoundingSettings>(timerState.timerRoundingSettings);
   const [loading, setLoading] = useState(false);
   const [previewRoundedSeconds, setPreviewRoundedSeconds] = useState(0);
+
+  const timerRoundingSettings = timerState.timerRoundingSettings;
 
   useEffect(() => {
     // Initialize with current time tracker settings
@@ -62,18 +63,20 @@ export default function ModifyRounding({
   // Calculate preview of rounded seconds
   useEffect(() => {
     const rounded = getRoundedSeconds(
-      activeSeconds,
+      timerState.activeSeconds,
       roundingSettings.roundingInterval,
       roundingSettings.roundingDirection
     );
     setPreviewRoundedSeconds(rounded);
-  }, [roundingSettings, activeSeconds]);
+  }, [roundingSettings, timerState.activeSeconds]);
 
   async function handleApplyRounding() {
     setLoading(true);
 
     // Update time tracker rounding settings only
-    setTempTimerRounding(roundingSettings);
+    updateTimer(timerState.id, {
+      timerRoundingSettings: roundingSettings,
+    });
 
     setLoading(false);
   }
@@ -244,7 +247,7 @@ export default function ModifyRounding({
                 {getLocalizedText("Aktive Zeit", "Current Active Time")}
               </Text>
               <Text fw={600} c="blue.7">
-                {formatTime(activeSeconds)}
+                {formatTime(timerState.activeSeconds)}
               </Text>
             </Box>
 
@@ -261,7 +264,7 @@ export default function ModifyRounding({
             </Box>
           </Group>
 
-          {activeSeconds !== previewRoundedSeconds && (
+          {timerState.activeSeconds !== previewRoundedSeconds && (
             <Alert
               icon={<IconInfoCircle size="1rem" />}
               color="blue"
@@ -273,8 +276,10 @@ export default function ModifyRounding({
                   "Zeit wird angepasst um",
                   "Time will be adjusted by"
                 )}
-                {formatTime(Math.abs(previewRoundedSeconds - activeSeconds))}(
-                {previewRoundedSeconds > activeSeconds ? "+" : "-"})
+                {formatTime(
+                  Math.abs(previewRoundedSeconds - timerState.activeSeconds)
+                )}
+                ({previewRoundedSeconds > timerState.activeSeconds ? "+" : "-"})
               </Text>
             </Alert>
           )}

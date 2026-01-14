@@ -6,7 +6,6 @@ import { useWorkProjects } from "@/db/collections/work/work-project/use-work-pro
 import { alpha, Stack, Text } from "@mantine/core";
 import { endOfDay, isToday, isYesterday, startOfDay } from "date-fns";
 import ActiveTimeTracker from "./ActiveTimeTracker";
-import { TimerState } from "@/types/timeTracker.types";
 
 interface TimeTrackerEventProps {
   toY: (date: Date) => number;
@@ -18,26 +17,32 @@ export default function TimeTrackerEvent({
   currentTime,
   day,
 }: TimeTrackerEventProps) {
-  const { isTimerRunning, timers } = useTimeTrackerManager();
+  const { timers, runningTimerCount, activeTimerData } =
+    useTimeTrackerManager();
+
+  const activeTimer = useMemo(
+    () => Object.values(activeTimerData).find((t) => t.activeSeconds > 0),
+    [activeTimerData]
+  );
 
   const timer = useMemo(
-    () => Object.values(timers).find((t) => t.state === TimerState.Running),
-    [timers]
+    () => Object.values(timers).find((t) => t.id === activeTimer?.id),
+    [timers, activeTimer?.id]
   );
 
   const { locale, format_24h } = useIntl();
   const { data: projects } = useWorkProjects();
 
   const project = useMemo(
-    () => projects.find((p) => p.id === timer?.projectId),
-    [projects, timer?.projectId]
+    () => projects.find((p) => p.id === activeTimer?.projectId),
+    [projects, activeTimer?.projectId]
   );
 
   const color = project?.color ?? "var(--mantine-color-red-6)";
   const backgroundColor = alpha(color, 0.1);
 
   if (!isToday(day)) {
-    if (isYesterday(day) && isTimerRunning && timer) {
+    if (isYesterday(day) && runningTimerCount > 0 && timer && activeTimer) {
       // Check if the running timer started yesterday
       const timerStartDate = new Date(timer.startTime ?? 0);
       if (isYesterday(timerStartDate)) {
@@ -54,10 +59,10 @@ export default function TimeTrackerEvent({
             height={height}
             top={top}
             bottom={bottom}
-            timer={timer}
+            activeTimer={activeTimer}
             color={color}
             backgroundColor={backgroundColor}
-            title={timer.projectTitle}
+            title={project?.title ?? ""}
           />
         );
       }
@@ -65,7 +70,7 @@ export default function TimeTrackerEvent({
     return null;
   }
 
-  if (!isTimerRunning || !timer) {
+  if (runningTimerCount === 0 || !timer || !activeTimer) {
     return (
       <Stack
         gap={1}
@@ -105,10 +110,10 @@ export default function TimeTrackerEvent({
       height={height}
       top={top}
       bottom={bottom}
-      timer={timer}
+      activeTimer={activeTimer}
       color={color}
       backgroundColor={backgroundColor}
-      title={timer.projectTitle}
+      title={project?.title ?? ""}
     />
   );
 }

@@ -1,435 +1,240 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { TimerRoundingSettings, TimerState } from "@/types/timeTracker.types";
+import { useEffect, useCallback, useState, useMemo } from "react";
+import { useAppointmentById } from "@/db/collections/work/appointment/use-appointment-query";
+import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
+import { useSettings } from "@/db/collections/settings/use-settings-query";
+
 import {
   secondsToTimerFormat,
   getRoundedSeconds,
 } from "@/lib/workHelperFunctions";
-import { calculateSessionTimeValues } from "@/lib/timeTrackerFunctions";
-import { Currency } from "@/types/settings.types";
-import { TablesInsert } from "@/types/db.types";
 
-/**
- * State interface for a single time tracker instance.
- *
- * This represents the complete state of one timer, including:
- * - Project information (id, title, payment details)
- * - Timer state (running, stopped)
- * - Time tracking (active seconds, formatted times)
- * - Rounding settings (permanent and temporary overrides)
- * - Financial calculations (money earned based on time and salary)
- *
- * Note: The distinction between `startTime` and `tempStartTime` is used to handle
- * timer resumptions and modifications. `storedActiveSeconds`
- * are used to accumulate time across pause/resume cycles.
- */
-interface TimeTrackerState {
-  projectId: string;
+import { Timer, useTimeTrackerManager } from "@/stores/timeTrackerManagerStore";
+import { Currency } from "@/types/settings.types";
+import { InsertWorkTimeEntry } from "@/types/work.types";
+import { getProjectRoundingSettings } from "@/lib/appointmentTimerHelpers";
+import { TimerRoundingSettings, TimerState } from "@/types/timeTracker.types";
+
+interface TimeTrackerStateData extends Timer {
+  // Timer data
+  activeTime: string;
+  roundedActiveTime: string;
+  activeSeconds: number;
+  moneyEarned?: string;
+  effectiveStartTime?: number;
+  effectiveEndTime?: number;
+
+  // Appointment data
+  appointmentTitle?: string;
+
+  // Project data
   projectTitle: string;
   currency: Currency;
   salary: number;
   hourlyPayment: boolean;
-  userId: string;
-  timerRoundingSettings: TimerRoundingSettings;
-  tempTimerRoundingSettings?: TimerRoundingSettings; // Temporary override for rounding (e.g., for current session only)
-  moneyEarned: string;
-  activeTime: string; // Formatted as "HH:MM:SS"
-  roundedActiveTime: string; // Active time after applying rounding rules
-  state: TimerState;
-  activeSeconds: number; // Total active seconds (not rounded)
-  startTime: number | null; // Original start timestamp (used for session calculation)
-  tempStartTime: number | null; // Current reference point for time calculations (updated on pause/resume)
-  storedActiveSeconds: number; // Accumulated active seconds before current running period
-  memo: string | null;
-  appointmentId?: string;
-  appointmentTitle?: string;
 }
 
-/**
- * Custom hook for managing a single time tracker instance.
- *
- * This hook handles all timer logic including:
- * - Starting, pausing, resuming, and stopping the timer
- * - Updating time displays every second
- * - Calculating money earned based on time and salary
- * - Applying rounding rules to time calculations
- * - Managing timer state transitions
- *
- * @param initialState - Initial state for the timer (project info, settings, etc.)
- * @returns Timer state and control functions
- *
- * Improvement suggestion: Consider extracting the update loop logic into a separate
- * function or using a reducer pattern to reduce complexity in the callback.
- */
-export function useTimeTracker(initialState: TimeTrackerState) {
-  const [state, setState] = useState<TimeTrackerState>(initialState);
+export interface TimeTrackerState extends TimeTrackerStateData {
+  timerRoundingSettings: TimerRoundingSettings;
+}
 
-  // Reference to the interval ID so we can clear it when needed
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+interface TimeTrackerReturn {
+  timerState: TimeTrackerState;
+  getCurrentTimeEntry: () => InsertWorkTimeEntry;
+}
 
-  /**
-   * Starts the timer update loop that runs every second.
-   *
-   * This function:
-   * 1. Clears any existing interval to prevent duplicates
-   * 2. Creates a new interval that updates the timer state every second
-   * 3. Immediately runs the update once (so UI updates instantly)
-   *
-   * The update loop handles two states:
-   * - Running: Calculates active time, rounded time, and money earned
-   */
-  const startLoop = useCallback(() => {
-    // Clear any existing interval to prevent memory leaks and duplicate intervals
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
+export function useTimeTracker(timer: Timer): TimeTrackerReturn {
+  const { data: appointment } = useAppointmentById(timer.appointmentId ?? "");
+  const { data: workProjects } = useWorkProjects();
+  const { data: settings } = useSettings();
+  const { updateTimerData } = useTimeTrackerManager();
 
-    /**
-     * Update function called every second.
-     *
-     * Calculates current time based on:
-     * - tempStartTime: The reference point for the current running period
-     * - storedActiveSeconds: Accumulated time from previous periods
-     *
-     * This approach allows the timer to accurately track time across multiple
-     * running/stopped cycles.
-     */
-    const updateLoop = () => {
-      setState((prevState) => {
-        if (prevState.state === TimerState.Running) {
-          // Calculate total active seconds: time since tempStartTime + previously stored seconds
-          const newActiveSeconds =
-            Math.floor((Date.now() - (prevState.tempStartTime ?? 0)) / 1000) +
-            prevState.storedActiveSeconds;
+  const project = useMemo(
+    () => workProjects.find((p) => p.id === timer.projectId),
+    [workProjects, timer.projectId]
+  );
 
-          // Format the active time for display
-          const newActiveTime = secondsToTimerFormat(newActiveSeconds);
+  const [timerState, setTimerState] = useState<TimeTrackerStateData>({
+    ...timer,
+    projectTitle: project?.title ?? "",
+    currency: project?.currency ?? "USD",
+    salary: project?.salary ?? 0,
+    hourlyPayment: project?.hourly_payment ?? false,
+    activeTime: "00:00",
+    roundedActiveTime: "00:00",
+    activeSeconds: 0,
+    appointmentId: timer.appointmentId,
+    appointmentTitle: appointment?.title,
+  });
 
-          // Calculate rounded time using either temp or permanent rounding settings
-          // Temp settings take precedence (used for session-specific rounding overrides)
-          const newRoundedActiveTime = secondsToTimerFormat(
-            getRoundedSeconds(
-              newActiveSeconds,
-              prevState.tempTimerRoundingSettings?.roundingInterval ??
-                prevState.timerRoundingSettings.roundingInterval,
-              prevState.tempTimerRoundingSettings?.roundingDirection ??
-                prevState.timerRoundingSettings.roundingDirection
-            )
-          );
-
-          // Update browser tab title to show current time and project
-          document.title = `${newActiveTime} - ${prevState.projectTitle} | Work Manager`;
-
-          // Calculate money earned based on rounded seconds
-          // Formula: (rounded seconds / 3600) * hourly salary
-          return {
-            ...prevState,
-            activeSeconds: newActiveSeconds,
-            activeTime: newActiveTime,
-            roundedActiveTime: newRoundedActiveTime,
-            moneyEarned: (
-              (getRoundedSeconds(
-                newActiveSeconds,
-                prevState.tempTimerRoundingSettings?.roundingInterval ??
-                  prevState.timerRoundingSettings.roundingInterval,
-                prevState.tempTimerRoundingSettings?.roundingDirection ??
-                  prevState.timerRoundingSettings.roundingDirection
-              ) /
-                3600) *
-              prevState.salary
-            ).toFixed(2),
-          };
-        }
-        // If stopped, no updates needed
-        return prevState;
+  const timerRoundingSettings: TimerRoundingSettings = useMemo(() => {
+    if (timer.timerRoundingSettings) {
+      return timer.timerRoundingSettings;
+    } else if (project) {
+      return getProjectRoundingSettings(project, {
+        roundingInterval: settings?.rounding_interval ?? 1,
+        roundingDirection: settings?.rounding_direction ?? "up",
+        roundInTimeFragments: settings?.round_in_time_sections ?? false,
+        timeFragmentInterval: settings?.time_section_interval ?? 15,
       });
-    };
-
-    // Start the interval (updates every 1000ms = 1 second)
-    intervalRef.current = setInterval(updateLoop, 1000);
-    // Run immediately so UI updates right away (don't wait for first interval)
-    updateLoop();
-  }, []);
-
-  // ============================================================================
-  // Timer Control Actions
-  // ============================================================================
-
-  /**
-   * Modifies the active seconds by a delta amount (positive or negative).
-   *
-   * This is used for manual time adjustments (e.g., user adds/subtracts time).
-   *
-   * The function:
-   * 1. Calculates new active seconds (ensuring it doesn't go below 0)
-   * 2. Recalculates the startTime to maintain consistency
-   * 3. Updates both stored and current active seconds
-   *
-   * @param delta - Number of seconds to add (positive) or subtract (negative)
-   */
-  const modifyActiveSeconds = useCallback(
-    (delta: number) => {
-      // Ensure active seconds never go below 0
-      const newActiveSeconds = Math.max(0, state.activeSeconds + delta);
-      const now = new Date().getTime();
-      // Recalculate start time to maintain consistency with the new active seconds
-      const newStartTime = new Date(now - newActiveSeconds * 1000);
-
-      // Update both stored and current values, reset temp start time
-      // This ensures the timer continues correctly from the adjusted time
-      setState((prev) => ({
-        ...prev,
-        startTime: newStartTime.getTime(),
-        activeSeconds: newActiveSeconds,
-        activeTime: secondsToTimerFormat(newActiveSeconds),
-        storedActiveSeconds: newActiveSeconds,
-        tempStartTime: Date.now(),
-      }));
-    },
-    [state.activeSeconds]
-  );
-
-
-  /**
-   * Restores/resumes the timer update loop.
-   *
-   * Used when the timer needs to be restored (e.g., after page reload or
-   * when re-initializing a persisted timer).
-   */
-  const restoreTimer = useCallback(() => {
-    startLoop();
-  }, [startLoop]);
-
-  /**
-   * Configures the timer with project information.
-   *
-   * This can only be called when the timer is stopped to prevent
-   * changing project settings while a timer is running.
-   *
-   * @param projectId - ID of the project being tracked
-   * @param projectTitle - Display name of the project
-   * @param currency - Currency for payment calculations
-   * @param salary - Hourly salary rate
-   * @param hourlyPayment - Whether payment is hourly (vs fixed)
-   * @param userId - ID of the user tracking time
-   * @param memo - Optional memo/note for this timer session
-   *
-   * Improvement suggestion: Consider accepting a project object instead of
-   * individual parameters to reduce parameter count and improve maintainability.
-   */
-  const configureProject = useCallback(
-    (
-      projectId: string,
-      projectTitle: string,
-      currency: Currency,
-      salary: number,
-      hourlyPayment: boolean,
-      userId: string,
-      memo: string | null
-    ) => {
-      // Only allow configuration when timer is stopped
-      if (state.state !== TimerState.Stopped) return;
-
-      setState((prev) => ({
-        ...prev,
-        projectId,
-        projectTitle,
-        currency,
-        salary,
-        hourlyPayment,
-        userId,
-        memo,
-      }));
-    },
-    [state.state]
-  );
-
-  /**
-   * Starts the timer.
-   *
-   * Can only be called when:
-   * - Timer is in Stopped state
-   * - A project has been configured (projectTitle exists)
-   *
-   * Sets both startTime and tempStartTime to current time to begin tracking.
-   */
-  const startTimer = useCallback(() => {
-    if (state.state !== TimerState.Stopped || !state.projectTitle) return;
-
-    setState((prev) => ({
-      ...prev,
-      state: TimerState.Running,
-      startTime: Date.now(), // Original start time (used for session calculation)
-      tempStartTime: Date.now(), // Current reference point for time calculations
-    }));
-    startLoop(); // Start the update loop
-  }, [state.state, state.projectTitle, startLoop]);
-
-  /**
-   * Stops the timer and resets all values to initial state.
-   *
-   * This:
-   * 1. Clears the update interval
-   * 2. Resets the browser tab title
-   * 3. Resets all timer values to zero/initial state
-   * 4. Clears temporary rounding settings and memo
-   *
-   * Note: This does NOT save the session - use getCurrentSession() before
-   * calling stopTimer() if you need to persist the session.
-   */
-  const stopTimer = useCallback(() => {
-    // Clear the update interval to stop time tracking
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
     }
-    // Reset browser tab title
-    document.title = `Work Manager`;
+    return {
+      roundingInterval: settings?.rounding_interval ?? 1,
+      roundingDirection: settings?.rounding_direction ?? "up",
+      roundInTimeFragments: settings?.round_in_time_sections ?? false,
+      timeFragmentInterval: settings?.time_section_interval ?? 15,
+    };
+  }, [project, settings, timer.timerRoundingSettings]);
 
-    // Reset all timer state to initial values
-    setState((prev) => ({
-      ...prev,
-      state: TimerState.Stopped,
-      moneyEarned: "0.00",
+  // Reset timer state to initial values
+  const resetTimer = useCallback(() => {
+    setTimerState({
+      ...timer,
+      activeSeconds: 0,
       activeTime: "00:00",
       roundedActiveTime: "00:00",
-      activeSeconds: 0,
-      tempTimerRoundingSettings: undefined, // Clear temporary rounding overrides
-      startTime: null,
-      tempStartTime: null,
-      storedActiveSeconds: 0,
-      memo: null, // Clear memo
-      appointmentId: undefined,
-      appointmentTitle: undefined,
-    }));
-  }, []);
+      moneyEarned: undefined,
+      effectiveStartTime: undefined,
+      effectiveEndTime: undefined,
+      appointmentTitle: appointment?.title,
+      projectTitle: project?.title ?? "",
+      currency: project?.currency ?? "USD",
+      salary: project?.salary ?? 0,
+      hourlyPayment: project?.hourly_payment ?? false,
+    });
+  }, [timer, appointment, project]);
 
-  /**
-   * Cancels the timer (alias for stopTimer).
-   *
-   * Improvement suggestion: Consider if this is needed or if stopTimer
-   * should be used directly. Having both might cause confusion.
-   */
-  const cancelTimer = useCallback(() => {
-    stopTimer();
-  }, [stopTimer]);
+  // Calculate timer values based on current state
+  const calculateTimerValues = useCallback(() => {
+    const isRunning = timer.state === TimerState.Running;
 
-  /**
-   * Cleanup effect: Clears the interval when component unmounts.
-   *
-   * This prevents memory leaks by ensuring the interval is cleared
-   * even if the component is unmounted while the timer is running.
-   */
+    if (!timer.startTime) {
+      return {
+        activeSeconds: 0,
+        activeTime: "00:00",
+        roundedActiveTime: "00:00",
+        moneyEarned: undefined,
+        effectiveStartTime: undefined,
+        effectiveEndTime: undefined,
+      };
+    }
+
+    // Apply delta adjustments (in seconds) to start and end times
+    // deltaStartTime and deltaEndTime can be negative, positive, or 0
+    // They allow users to adjust the timer if they started/stopped it at the wrong time
+    const effectiveStartTime = timer.startTime + timer.deltaStartTime * 1000;
+    const actualEndTime = isRunning ? Date.now() : timer.startTime;
+    const effectiveEndTime = actualEndTime + timer.deltaEndTime * 1000;
+
+    console.log("effectiveStartTime", effectiveStartTime);
+    console.log("actualEndTime", actualEndTime);
+    console.log("effectiveEndTime", effectiveEndTime);
+
+    // Calculate active seconds
+    const activeSeconds = Math.max(
+      0,
+      Math.floor((effectiveEndTime - effectiveStartTime) / 1000)
+    );
+
+    // Calculate rounded seconds
+    const roundedSeconds = getRoundedSeconds(
+      activeSeconds,
+      timerRoundingSettings.roundingInterval,
+      timerRoundingSettings.roundingDirection
+    );
+
+    // Format time strings
+    const activeTime = secondsToTimerFormat(activeSeconds);
+    const roundedActiveTime = secondsToTimerFormat(roundedSeconds);
+
+    // Calculate money earned if project has salary
+    let moneyEarned: string | undefined;
+    if (project?.salary) {
+      const hours = roundedSeconds / 3600;
+      const earned = project.hourly_payment
+        ? hours * project.salary
+        : (hours / 160) * project.salary; // Assuming 160 hours per month for non-hourly
+      moneyEarned = earned.toFixed(2);
+    }
+    updateTimerData(timer.id, {
+      activeSeconds,
+    });
+
+    return {
+      activeSeconds,
+      activeTime,
+      roundedActiveTime,
+      moneyEarned,
+      effectiveStartTime,
+      effectiveEndTime,
+    };
+  }, [timer, project, timerRoundingSettings, updateTimerData]);
+
+  // Update timer state when running
   useEffect(() => {
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, []);
+    if (timer.state !== TimerState.Running) {
+      console.log("resetting timer");
+      resetTimer();
+      return;
+    }
+    console.log("timer.state", timer.state);
 
-  /**
-   * Sets the permanent timer rounding settings.
-   *
-   * These settings persist and are used as the default for all sessions.
-   *
-   * @param timerRoundingSettings - The rounding configuration to use
-   */
-  const setTimerRounding = useCallback(
-    (timerRoundingSettings: TimerRoundingSettings) => {
-      setState((prev) => ({
+    // Update immediately when starting
+    const updateTimer = () => {
+      const values = calculateTimerValues();
+      console.log("values", values);
+      setTimerState((prev) => ({
         ...prev,
-        timerRoundingSettings,
+        ...timer,
+        ...values,
+        appointmentTitle: appointment?.title,
+        projectTitle: project?.title ?? "",
+        currency: project?.currency ?? "USD",
+        salary: project?.salary ?? 0,
+        hourlyPayment: project?.hourly_payment ?? false,
       }));
-    },
-    []
-  );
-
-  /**
-   * Sets temporary timer rounding settings (overrides permanent settings).
-   *
-   * These settings take precedence over permanent settings and are typically
-   * used for session-specific rounding adjustments. They are cleared when
-   * the timer is stopped.
-   *
-   * @param timerRoundingSettings - The temporary rounding configuration
-   */
-  const setTempTimerRounding = useCallback(
-    (timerRoundingSettings: TimerRoundingSettings) => {
-      setState((prev) => ({
-        ...prev,
-        tempTimerRoundingSettings: timerRoundingSettings,
-      }));
-    },
-    []
-  );
-
-  /**
-   * Generates a timer session object ready to be saved to the database.
-   *
-   * This function:
-   * 1. Uses calculateSessionTimeValues to compute time values
-   * 2. Creates a database-ready session object
-   *
-   * Note: The distinction between `true_end_time` (actual end) and `end_time`
-   * (calculated end based on rounded time) allows tracking of actual vs billed time.
-   *
-   * @returns A timer session object ready for database insertion
-   */
-  const getCurrentSession = useCallback(() => {
-    // Calculate time values using the extracted helper function
-    const { finalActiveSeconds, normalizedStartTime, calculatedEndTime } =
-      calculateSessionTimeValues(
-        state.activeSeconds,
-        state.startTime,
-        state.timerRoundingSettings,
-        state.tempTimerRoundingSettings
-      );
-
-    // Create database-ready session object
-    const newTimerSession: TablesInsert<"work_time_entry"> = {
-      user_id: state.userId,
-      work_project_id: state.projectId,
-      start_time: normalizedStartTime.toISOString(), // Normalized start time
-      true_end_time: new Date().toISOString(), // Actual end time (when function is called)
-      end_time: calculatedEndTime.toISOString(), // Calculated end time (based on rounded time)
-      hourly_payment: state.hourlyPayment,
-      active_seconds: finalActiveSeconds, // Rounded active seconds
-      salary: state.salary,
-      currency: state.currency,
-      memo: state.memo,
     };
 
-    return newTimerSession;
-  }, [
-    state.tempTimerRoundingSettings,
-    state.timerRoundingSettings,
-    state.salary,
-    state.currency,
-    state.hourlyPayment,
-    state.userId,
-    state.projectId,
-    state.startTime,
-    state.activeSeconds,
-    state.memo,
-  ]);
+    updateTimer();
 
-  /**
-   * Returns the timer state and all control functions.
-   *
-   * The state is spread into the return object, so components can access
-   * timer values directly (e.g., `timer.activeTime`) along with control
-   * functions (e.g., `timer.startTimer()`).
-   */
+    // Set up interval for running timer
+    const interval = setInterval(updateTimer, 500);
+
+    return () => clearInterval(interval);
+  }, [timer, appointment, project, calculateTimerValues, resetTimer]);
+
+  const getCurrentTimeEntry = useCallback(() => {
+    // Calculate the effective start and end times with delta adjustments
+    const effectiveStartTime = timer.startTime
+      ? timer.startTime + timer.deltaStartTime * 1000
+      : Date.now();
+
+    const actualEndTime =
+      timer.state === TimerState.Running
+        ? Date.now()
+        : (timer.startTime ?? Date.now());
+    const effectiveEndTime = actualEndTime + timer.deltaEndTime * 1000;
+
+    const timeEntry: InsertWorkTimeEntry = {
+      start_time: new Date(effectiveStartTime).toISOString(),
+      end_time: new Date(effectiveEndTime).toISOString(),
+      active_seconds: timerState.activeSeconds,
+      currency: project?.currency ?? "USD",
+      salary: project?.salary ?? 0,
+      hourly_payment: project?.hourly_payment ?? false,
+      memo: timer.memo,
+      work_project_id: timer.projectId,
+      id: timer.id,
+      created_at: new Date().toISOString(),
+      true_end_time: new Date(actualEndTime).toISOString(),
+    };
+    return timeEntry;
+  }, [timer, project, timerState.activeSeconds]);
+
   return {
-    ...state,
-    configureProject,
-    restoreTimer,
-    startTimer,
-    stopTimer,
-    cancelTimer,
-    getCurrentSession,
-    modifyActiveSeconds,
-    setTempTimerRounding,
-    setTimerRounding,
+    timerState: {
+      ...timerState,
+      timerRoundingSettings,
+    },
+    getCurrentTimeEntry,
   };
 }

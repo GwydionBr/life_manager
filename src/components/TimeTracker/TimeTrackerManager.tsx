@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMounted } from "@mantine/hooks";
-import {
-  TimerData,
-  useTimeTrackerManager,
-} from "@/stores/timeTrackerManagerStore";
+import { useTimeTrackerManager } from "@/stores/timeTrackerManagerStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useWorkStore } from "@/stores/workManagerStore";
 import { useIntl } from "@/hooks/useIntl";
@@ -24,37 +21,16 @@ import TimeTrackerInstance from "./TimeTrackerInstance";
 import PlusActionIcon from "@/components/UI/ActionIcons/PlusActionIcon";
 import TimeTrackerActionIcon from "./TimeTrackerActionIcons/TimeTrackerActionIcon";
 import { getStatusColor } from "@/lib/workHelperFunctions";
-import { useSettings } from "@/db/collections/settings/use-settings-query";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
 import { WorkProject } from "@/types/work.types";
 import classes from "./TimeTracker.module.css";
 
-/**
- * Props for the TimeTrackerManager component.
- *
- * This is the main container component that manages multiple timer instances.
- */
 interface TimerManagerProps {
   isBig: boolean; // Whether to show timers in big or small mode
   isTimeTrackerMinimized: boolean; // Whether timers are minimized
   setIsTimeTrackerMinimized: (value: boolean) => void; // Callback to toggle minimized state
 }
 
-/**
- * TimeTrackerManager Component
- *
- * Main container component that manages multiple timer instances. It:
- * - Displays all active timers from the store
- * - Provides UI to add new timers
- * - Shows a summary icon with timer count and status
- * - Automatically creates a timer for the active project if none exist
- * - Handles error messages when timer creation fails
- * - Ensures timers have proper rounding settings
- *
- * The component uses a two-tier state management:
- * 1. Zustand store (timerData) - persisted timer data
- * 2. Local state (timers) - processed/enriched timer data for rendering
- */
 export default function TimerManager({
   isBig,
   isTimeTrackerMinimized,
@@ -67,7 +43,6 @@ export default function TimerManager({
 
   const { getLocalizedText } = useIntl();
 
-  const { data: settings } = useSettings();
   const { data: projects, isReady: isProjectsReady } = useWorkProjects();
 
   const { currentAppColor } = useSettingsStore();
@@ -76,18 +51,9 @@ export default function TimerManager({
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     null
   );
-  const [timers, setTimers] = useState<TimerData[]>([]);
 
-  // Store functions and data
-  const {
-    getAllTimers,
-    addTimer,
-    timers: timerData, // Raw timer data from store
-    updateTimer,
-  } = useTimeTrackerManager();
+  const { addTimer, timers, runningTimerCount } = useTimeTrackerManager();
 
-  // Get active project from work store
-  // Find the currently active project
   const activeProject = useMemo(
     () => projects.find((p) => p.id === activeProjectId),
     [projects, activeProjectId]
@@ -97,7 +63,9 @@ export default function TimerManager({
     return (
       projects
         .filter(
-          (p) => p.id !== timers.find((t) => t.projectId === p.id)?.projectId
+          (p) =>
+            p.id !==
+            Object.values(timers).find((t) => t.projectId === p.id)?.projectId
         )
         .map((p) => ({
           label: p.title,
@@ -110,158 +78,59 @@ export default function TimerManager({
     return alpha(getThemeColor(currentAppColor, theme), 0.4);
   }, [currentAppColor, theme]);
 
-  /**
-   * Process timers and ensure they have rounding settings.
-   *
-   * This effect:
-   * 1. Gets all timers from the store
-   * 2. Checks if any timer is missing rounding settings
-   * 3. Updates the store with default settings if missing
-   * 4. Updates local state with processed timers
-   *
-   * This is a migration/safety mechanism to ensure old timers (created
-   * before rounding settings were required) get proper defaults.
-   *
-   * Improvement suggestion: This could be moved to the store's addTimer
-   * method or a migration function to ensure timers always have settings
-   * from the start, eliminating the need for this check.
-   */
-  useEffect(() => {
-    const allTimers = getAllTimers();
-    const newTimers = allTimers.map((timer) => {
-      // Check if timer is missing rounding settings (legacy timer)
-      if (timer.timerRoundingSettings === undefined) {
-        // Update store with default rounding settings
-        updateTimer(timer.id, {
-          timerRoundingSettings: {
-            roundingInterval: settings?.rounding_interval ?? 0,
-            roundingDirection: settings?.rounding_direction ?? "up",
-            roundInTimeFragments: settings?.round_in_time_sections ?? false,
-            timeFragmentInterval: settings?.time_section_interval ?? 0,
-          },
-        });
-        // Return timer with settings for local state
-        const newTimer = {
-          ...timer,
-          timerRoundingSettings: {
-            roundingInterval: settings?.rounding_interval ?? 0,
-            roundingDirection: settings?.rounding_direction ?? "up",
-            roundInTimeFragments: settings?.round_in_time_sections ?? false,
-            timeFragmentInterval: settings?.time_section_interval ?? 0,
-          },
-        };
-        return newTimer;
-      }
-      return timer;
-    });
-
-    setTimers(newTimers);
-    // TODO Check if this is needed
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timerData, getAllTimers]);
-
-  /**
-   * Handler for adding a new timer.
-   *
-   * This function:
-   * 1. Attempts to add a timer for the given project
-   * 2. Uses default rounding settings from global settings
-   * 3. Displays localized error messages if creation fails
-   * 4. Auto-dismisses error messages after 5 seconds
-   *
-   * @param project - The project to create a timer for
-   *
-   * Improvement suggestion: Consider showing a success notification
-   * when timer is created successfully for better UX feedback.
-   */
   const handleAddTimer = useCallback(
     (project: WorkProject) => {
       // Attempt to add timer with default rounding settings
-      const result = addTimer(project, {
-        roundingInterval: settings?.rounding_interval ?? 0,
-        roundingDirection: settings?.rounding_direction ?? "up",
-        roundInTimeFragments: settings?.round_in_time_sections ?? false,
-        timeFragmentInterval: settings?.time_section_interval ?? 0,
-      });
+      const result = addTimer(project);
 
       // Handle errors with localized messages
-      if (!result.success) {
+      if ("error" in result) {
         setErrorMessage(
-          result.error
-            ? getLocalizedText(result.error.german, result.error.english)
+          result.error === "limit"
+            ? getLocalizedText(
+                "Maximale Anzahl an Timern erreicht",
+                "Maximum number of timers reached"
+              )
             : getLocalizedText(
-                "Timer konnte nicht hinzugefügt werden",
-                "Failed to add timer"
+                "Ein Timer für dieses Projekt existiert bereits",
+                "A timer for this project already exists"
               )
         );
-        // Auto-dismiss error after 5 seconds
+        // Auto-dismiss error after 4 seconds
         setTimeout(() => {
           setErrorMessage(null);
-        }, 5000);
+        }, 4000);
       }
       setSelectedProjectId(null);
     },
-    [addTimer, settings, getLocalizedText]
+    [addTimer, getLocalizedText]
   );
 
-  /**
-   * Auto-create timer for active project if none exist.
-   *
-   * This effect automatically creates a timer for the active project
-   * when:
-   * - No timers exist (timers.length === 0)
-   * - Projects data is ready (isProjectsReady)
-   * - An active project is selected (activeProject exists)
-   *
-   * This provides a better UX by automatically setting up a timer
-   * when the user navigates to the work section with a project selected.
-   */
+  // Auto-create timer for active project if none exist
   useEffect(() => {
-    if (timers.length === 0 && isProjectsReady) {
+    if (Object.keys(timers).length === 0 && isProjectsReady) {
       if (activeProject) {
         handleAddTimer(activeProject);
       }
     }
   }, [timers, activeProject, isProjectsReady, handleAddTimer]);
 
+  // Auto-select project if active project is not selected
   useEffect(() => {
     if (
       activeProject &&
-      !timers.some((t) => t.projectId === activeProject.id)
+      !Object.values(timers).some((t) => t.projectId === activeProject.id)
     ) {
       setSelectedProjectId(activeProject.id);
     }
   }, [activeProject, timers]);
 
-  /**
-   * Calculate aggregate timer states for the summary icon.
-   *
-   * These computed values determine the status and count shown in the
-   * TimeTrackerActionIcon. The priority is:
-   * 1. Running (if any timer is running)
-   * 3. Stopped (if all timers are stopped)
-   */
-  const isOneTimerRunning = timers.some(
-    (timer) => timer.state === TimerState.Running
+  // Determine main status: Running > Stopped
+  const mainTimerStatus = useMemo(
+    () => (runningTimerCount > 0 ? TimerState.Running : TimerState.Stopped),
+    [runningTimerCount]
   );
 
-  // Determine main status: Running > Stopped
-  const mainTimerStatus = isOneTimerRunning
-    ? TimerState.Running
-    : TimerState.Stopped;
-
-  // Count active timers (running) for the indicator badge
-  const activeTimerCount = timers.filter(
-    (timer) => timer.state === TimerState.Running
-  ).length;
-
-  /**
-   * Render loading/placeholder state during SSR hydration.
-   *
-   * Shows a skeleton UI with disabled actions until client-side
-   * hydration is complete. This prevents SSR mismatches with
-   * persisted store data.
-   */
   if (!isMounted) {
     return (
       <Stack align="center" gap="md" mb="md">
@@ -277,18 +146,6 @@ export default function TimerManager({
     );
   }
 
-  /**
-   * Main render: Timer management UI.
-   *
-   * Displays:
-   * - Add timer button (PlusActionIcon)
-   * - Summary icon with timer count and status (TimeTrackerActionIcon)
-   * - Error alerts (if timer creation fails)
-   * - All timer instances (sorted by creation date, newest first)
-   *
-   * Timers are sorted by createdAt in descending order, so the
-   * most recently created timer appears first.
-   */
   return (
     <Stack align="center" gap="md" mb="md">
       <Box className={classes.toolbar}>
@@ -307,7 +164,7 @@ export default function TimerManager({
                 ? getLocalizedText("Timer vergrößern", "Expand Timer")
                 : getLocalizedText("Timer verkleinern", "Minimize Timer")
             }
-            indicatorLabel={activeTimerCount.toString()}
+            indicatorLabel={runningTimerCount.toString()}
             state={mainTimerStatus}
             getStatusColor={() => getStatusColor(mainTimerStatus)}
           />
@@ -324,7 +181,7 @@ export default function TimerManager({
               searchable
               leftSection={
                 <Text fz="xs" c="dimmed">
-                  {timers.length}/10
+                  {Object.keys(timers).length}/10
                 </Text>
               }
               rightSectionPointerEvents="auto"
@@ -369,7 +226,7 @@ export default function TimerManager({
       )}
 
       {/* Render all timer instances, sorted by creation date (newest first) */}
-      {timers
+      {Object.values(timers)
         .sort((a, b) => b.createdAt - a.createdAt)
         .map((timer) => (
           <TimeTrackerInstance
@@ -378,7 +235,6 @@ export default function TimerManager({
             isBig={isBig}
             isTimeTrackerMinimized={isTimeTrackerMinimized}
             setIsTimeTrackerMinimized={setIsTimeTrackerMinimized}
-            forceEndTimer={timer.forceEndTimer}
           />
         ))}
     </Stack>

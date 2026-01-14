@@ -6,19 +6,15 @@ import { useNotificationMutations } from "@/db/collections/notification/use-noti
 import { useAppointments } from "@/db/collections/work/appointment/use-appointment-query";
 import { useAppointmentMutations } from "@/db/collections/work/appointment/use-appointment-mutations";
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
-import { useSettings } from "@/db/collections/settings/use-settings-query";
 import { useTimeTrackerManager } from "@/stores/timeTrackerManagerStore";
 import { type Notification as NotificationData } from "@/types/system.types";
 import { useSettingsStore } from "@/stores/settingsStore";
-import {
-  canStartTimerFromAppointment,
-  shouldShowTimerButton,
-  getProjectRoundingSettings,
-} from "@/lib/appointmentTimerHelpers";
+import { canStartTimerFromAppointment } from "@/lib/appointmentTimerHelpers";
 import {
   showActionSuccessNotification,
   showActionErrorNotification,
 } from "@/lib/notificationFunctions";
+import { TimerState } from "@/types/timeTracker.types";
 
 import { notifications } from "@mantine/notifications";
 import { Group, Text, Button } from "@mantine/core";
@@ -94,8 +90,7 @@ export function useNotificationHandler() {
   const { data: appointments } = useAppointments();
   const { updateAppointment } = useAppointmentMutations();
   const { data: projects } = useWorkProjects();
-  const { data: settings } = useSettings();
-  const { addTimer, getAllTimers } = useTimeTrackerManager();
+  const { addTimer, timers, updateTimer } = useTimeTrackerManager();
   const { getLocalizedText } = useIntl();
 
   // Track which notifications we've already shown as toasts
@@ -224,73 +219,55 @@ export function useNotificationHandler() {
       const project = projects?.find(
         (p) => p.id === appointment.work_project_id
       );
-
       if (!project) {
         showActionErrorNotification(
           getLocalizedText("Projekt nicht gefunden", "Project not found")
         );
         return;
       }
-
-      // Check if timer already exists
-      const existingTimers = getAllTimers();
-      if (!shouldShowTimerButton(appointment, existingTimers)) {
-        showActionErrorNotification(
-          getLocalizedText(
-            "Timer für dieses Projekt existiert bereits",
-            "Timer for this project already exists"
-          )
-        );
-        return;
-      }
-
-      // Get rounding settings
-      const roundingSettings = getProjectRoundingSettings(project, {
-        roundingInterval: settings?.rounding_interval ?? 0,
-        roundingDirection: settings?.rounding_direction ?? "up",
-        roundInTimeFragments: settings?.round_in_time_sections ?? false,
-        timeFragmentInterval: settings?.time_section_interval ?? 15,
-      });
-
-      // Add timer with appointment metadata
-      const result = addTimer(project, roundingSettings, {
-        appointmentId: appointment.id,
-        appointmentTitle: appointment.title,
-      });
-
-      if (result.success) {
-        // Update appointment status to active
-        await updateAppointment(appointment.id, { status: "active" });
-
-        showActionSuccessNotification(
-          getLocalizedText("Timer gestartet", "Timer started")
-        );
-
-        // Mark notification as read
-        markAsRead(notification.id);
-
-        // Navigate to calendar
-        router.navigate({ to: "/calendar" });
+      const existingTimer = Object.values(timers).find(
+        (t) => t.projectId === appointment.work_project_id
+      );
+      if (existingTimer) {
+        updateTimer(existingTimer.id, {
+          appointmentId: appointment.id,
+          state: TimerState.Running,
+        });
       } else {
-        showActionErrorNotification(
-          result.error
-            ? getLocalizedText(result.error.german, result.error.english)
-            : getLocalizedText(
-                "Timer konnte nicht gestartet werden",
-                "Failed to start timer"
-              )
-        );
+        // Add timer with appointment metadata
+        const result = addTimer(project, undefined, appointment.id);
+
+        if ("timerId" in result) {
+          // Update appointment status to active
+          await updateAppointment(appointment.id, { status: "active" });
+
+          showActionSuccessNotification(
+            getLocalizedText("Timer gestartet", "Timer started")
+          );
+        } else {
+          showActionErrorNotification(
+            getLocalizedText(
+              "Timer konnte nicht gestartet werden",
+              "Failed to start timer"
+            )
+          );
+        }
       }
+      // Mark notification as read
+      markAsRead(notification.id);
+
+      // Navigate to calendar
+      router.navigate({ to: "/calendar" });
     },
     [
       appointments,
       projects,
-      settings,
-      getAllTimers,
       addTimer,
+      updateTimer,
       updateAppointment,
       markAsRead,
       router,
+      timers,
       getLocalizedText,
     ]
   );
@@ -310,8 +287,7 @@ export function useNotificationHandler() {
       const showTimerButton =
         isAppointmentStart &&
         appointment &&
-        canStartTimerFromAppointment(appointment) &&
-        shouldShowTimerButton(appointment, getAllTimers());
+        canStartTimerFromAppointment(appointment);
 
       notifications.show({
         id: notification.id,
@@ -356,7 +332,6 @@ export function useNotificationHandler() {
       handleNotificationClick,
       handleStartTimerFromNotification,
       appointments,
-      getAllTimers,
       getLocalizedText,
     ]
   );
