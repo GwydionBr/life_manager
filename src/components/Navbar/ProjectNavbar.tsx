@@ -23,7 +23,7 @@ import { SettingsTab } from "@/stores/settingsStore";
 import {
   IconArrowBarRight,
   IconClipboardList,
-  IconFilePlus,
+  IconClipboardPlus,
   IconSearch,
 } from "@tabler/icons-react";
 import DelayedTooltip from "@/components/UI/DelayedTooltip";
@@ -256,7 +256,7 @@ export default function ProjectNavbar() {
                 label={getLocalizedText("Neues Projekt", "New Project")}
               >
                 <ActionIcon h={35} onClick={openProjectModal} variant="subtle">
-                  <IconFilePlus size={20} />
+                  <IconClipboardPlus size={20} />
                 </ActionIcon>
               </DelayedTooltip>
               <Divider orientation="vertical" />

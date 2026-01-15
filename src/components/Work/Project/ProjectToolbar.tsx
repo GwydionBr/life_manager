@@ -4,7 +4,7 @@ import { useIntl } from "@/hooks/useIntl";
 import { usePayoutMutations } from "@/db/collections/finance/payout/use-payout-mutations";
 
 import { Stack, Card, Group, Popover, ActionIcon } from "@mantine/core";
-import { IconClockPlus } from "@tabler/icons-react";
+import { IconCalendarPlus, IconClockPlus } from "@tabler/icons-react";
 import FilterActionIcon from "@/components/UI/ActionIcons/FilterActionIcon";
 import PayoutActionIcon from "@/components/UI/ActionIcons/PayoutActionIcon";
 import ProjectFilter from "@/components/Work/Project/ProjectFilter";
@@ -12,9 +12,11 @@ import HourlyPayoutCard from "@/components/Finances/Payout/HourlyPayout/HourlyPa
 import ProjectPayoutCard from "@/components/Finances/Payout/ProjectPayout/ProjectPayoutCard";
 import PayoutConversionModal from "@/components/Finances/Payout/PayoutConversionModal";
 import SelectActionIcon from "@/components/UI/ActionIcons/SelectActionIcon";
-import NewSessionModal from "@/components/Work/WorkTimeEntry/NewTimeEntryModal";
+import NewTimeEntryModal from "@/components/Work/WorkTimeEntry/NewTimeEntryModal";
+import NewAppointmentModal from "@/components/WorkCalendar/Appointment/NewAppointmentModal";
 import WorkTimeEntrySelector from "@/components/Work/WorkTimeEntry/TimeEntrySelector";
 import DelayedTooltip from "@/components/UI/DelayedTooltip";
+
 import { WorkProject, WorkTimeEntry } from "@/types/work.types";
 import { Currency } from "@/types/settings.types";
 
@@ -32,7 +34,8 @@ export default function ProjectToolbar({
   const { getLocalizedText, formatDate } = useIntl();
   const {
     filterOpened,
-    newWorkTimeEntryFormOpened: sessionFormOpened,
+    newWorkTimeEntryFormOpened,
+    newAppointmentFormOpened,
     payoutOpened,
     payoutConversionOpened,
     filterTimeSpan,
@@ -40,7 +43,8 @@ export default function ProjectToolbar({
     selectedTimeEntryIds,
     setSelectedTimeEntryIds,
     setFilterOpened,
-    setNewWorkTimeEntryFormOpened: setSessionFormOpened,
+    setNewWorkTimeEntryFormOpened,
+    setNewAppointmentFormOpened,
     setPayoutOpened,
     setPayoutConversionOpened,
     setFilterTimeSpan,
@@ -154,7 +158,7 @@ export default function ProjectToolbar({
         }}
       >
         <Group justify="space-between" p={5}>
-          <Group>
+          <Group w={80}>
             <Popover
               opened={filterOpened}
               onClose={() => setFilterOpened(false)}
@@ -237,25 +241,45 @@ export default function ProjectToolbar({
               </Popover.Dropdown>
             </Popover>
           </Group>
-          <DelayedTooltip
-            label={getLocalizedText("Sitzung hinzufügen", "Add Session")}
-          >
-            <ActionIcon
-              onClick={() => {
-                setSessionFormOpened(true);
-                setSelectedModeActive(false);
-              }}
-              size="md"
-              variant="subtle"
+          <Group gap="xl">
+            <DelayedTooltip
+              label={getLocalizedText("Sitzung hinzufügen", "Add Session")}
             >
-              <IconClockPlus strokeWidth={1.5} />
-            </ActionIcon>
-          </DelayedTooltip>
-          <NewSessionModal
-            opened={sessionFormOpened}
-            onClose={() => setSessionFormOpened(false)}
-            project={project}
-          />
+              <ActionIcon
+                onClick={() => {
+                  setNewWorkTimeEntryFormOpened(true);
+                  setSelectedModeActive(false);
+                }}
+                size="md"
+                variant="subtle"
+              >
+                <IconClockPlus strokeWidth={1.5} />
+              </ActionIcon>
+            </DelayedTooltip>
+            <DelayedTooltip
+              label={getLocalizedText("Termin hinzufügen", "Add Appointment")}
+            >
+              <ActionIcon
+                onClick={() => {
+                  setNewAppointmentFormOpened(true);
+                }}
+                size="md"
+                variant="subtle"
+              >
+                <IconCalendarPlus strokeWidth={1.5} />
+              </ActionIcon>
+            </DelayedTooltip>
+            <NewAppointmentModal
+              opened={newAppointmentFormOpened}
+              onClose={() => setNewAppointmentFormOpened(false)}
+              project={project}
+            />
+            <NewTimeEntryModal
+              opened={newWorkTimeEntryFormOpened}
+              onClose={() => setNewWorkTimeEntryFormOpened(false)}
+              project={project}
+            />
+          </Group>
           <Popover
             opened={selectedModeActive}
             onClose={() => setSelectedModeActive(false)}
@@ -266,24 +290,26 @@ export default function ProjectToolbar({
             returnFocus
           >
             <Popover.Target>
-              <SelectActionIcon
-                disabled={selectableSessions.length === 0}
-                onClick={handleTimeEntrySelectionToggle}
-                tooltipLabel={
-                  selectedModeActive
-                    ? getLocalizedText(
-                        "Auswahlmodus deaktivieren",
-                        "Deactivate selection mode"
-                      )
-                    : getLocalizedText(
-                        "Auswahlmodus aktivieren",
-                        "Activate selection mode"
-                      )
-                }
-                size="md"
-                selected={selectedModeActive}
-                mainControl={true}
-              />
+              <Group w={80} justify="flex-end">
+                <SelectActionIcon
+                  disabled={selectableSessions.length === 0}
+                  onClick={handleTimeEntrySelectionToggle}
+                  tooltipLabel={
+                    selectedModeActive
+                      ? getLocalizedText(
+                          "Auswahlmodus deaktivieren",
+                          "Deactivate selection mode"
+                        )
+                      : getLocalizedText(
+                          "Auswahlmodus aktivieren",
+                          "Activate selection mode"
+                        )
+                  }
+                  size="md"
+                  selected={selectedModeActive}
+                  mainControl={true}
+                />
+              </Group>
             </Popover.Target>
             <Popover.Dropdown
               maw={400}

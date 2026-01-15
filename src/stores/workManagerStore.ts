@@ -7,6 +7,7 @@ interface WorkStoreState {
   analysisOpened: boolean;
   editProjectOpened: boolean;
   newWorkTimeEntryFormOpened: boolean;
+  newAppointmentFormOpened: boolean;
   isWorkNavbarOpen: boolean;
   filterOpened: boolean;
   payoutOpened: boolean;
@@ -24,6 +25,8 @@ interface WorkStoreActions {
   toggleEditProjectOpened: () => void;
   setNewWorkTimeEntryFormOpened: (opened: boolean) => void;
   toggleNewWorkTimeEntryFormOpened: () => void;
+  setNewAppointmentFormOpened: (opened: boolean) => void;
+  toggleNewAppointmentFormOpened: () => void;
   setIsWorkNavbarOpen: (opened: boolean) => void;
   toggleWorkNavbar: () => void;
   setFilterOpened: (opened: boolean) => void;
@@ -52,6 +55,7 @@ const initialState: WorkStoreState = {
   selectedModeActive: false,
   selectedTimeEntryIds: [],
   newWorkTimeEntryFormOpened: false,
+  newAppointmentFormOpened: false,
 };
 
 export const useWorkStore = create<WorkStoreState & WorkStoreActions>()(
@@ -118,6 +122,12 @@ export const useWorkStore = create<WorkStoreState & WorkStoreActions>()(
       },
       toggleNewWorkTimeEntryFormOpened() {
         set({ newWorkTimeEntryFormOpened: !get().newWorkTimeEntryFormOpened });
+      },
+      setNewAppointmentFormOpened(opened) {
+        set({ newAppointmentFormOpened: opened });
+      },
+      toggleNewAppointmentFormOpened() {
+        set({ newAppointmentFormOpened: !get().newAppointmentFormOpened });
       },
       resetStore: () =>
         set({

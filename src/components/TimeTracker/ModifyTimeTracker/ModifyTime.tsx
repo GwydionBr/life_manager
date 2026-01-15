@@ -36,17 +36,10 @@ interface ModifyTimeProps {
 }
 
 export default function ModifyTime({ timerState }: ModifyTimeProps) {
-  const { getLocalizedText, formatDuration, formatDateTime } = useIntl();
+  const { getLocalizedText, formatDateTime } = useIntl();
   const [startTimeMinutes, setStartTimeMinutes] = useState<number>(0);
   const [endTimeMinutes, setEndTimeMinutes] = useState<number>(0);
   const { updateTimer } = useTimeTrackerManager();
-
-  // // Format timestamp to readable time
-  // const formatTime = (timestamp: number | null | undefined): string => {
-  //   if (!timestamp) return "--:--";
-  //   const date = new Date(timestamp);
-  //   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  // };
 
   // Calculate slider values and range
   const sliderData = useMemo(() => {
@@ -245,7 +238,9 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
                         fw={700}
                         c="light-dark(var(--mantine-color-green-8), var(--mantine-color-green-3))"
                       >
-                        {formatDateTime(new Date(timerState.effectiveStartTime ?? 0))}
+                        {formatDateTime(
+                          new Date(timerState.effectiveStartTime ?? 0)
+                        )}
                       </Text>
                     </Group>
                   </>
@@ -325,7 +320,9 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
                         fw={700}
                         c="light-dark(var(--mantine-color-red-8), var(--mantine-color-red-3))"
                       >
-                        {formatDateTime(new Date(timerState.effectiveEndTime ?? 0))}
+                        {formatDateTime(
+                          new Date(timerState.effectiveEndTime ?? 0)
+                        )}
                       </Text>
                     </Group>
                   </>

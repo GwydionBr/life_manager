@@ -100,25 +100,6 @@ export function useNotificationHandler() {
     new Date().toISOString()
   );
 
-  // Track browser notification permission
-  const [browserPermission, setBrowserPermission] =
-    useState<NotificationPermission>("default");
-
-  // Request browser notification permission on mount
-  useEffect(() => {
-    if (!isBrowserNotificationSupported()) return;
-
-    // Check current permission
-    setBrowserPermission(Notification.permission);
-
-    // Request permission if not yet granted or denied
-    if (Notification.permission === "default") {
-      Notification.requestPermission().then((permission) => {
-        setBrowserPermission(permission);
-      });
-    }
-  }, []);
-
   /**
    * Show a browser/system notification.
    * Only shows for high priority when permission is granted.
@@ -126,7 +107,7 @@ export function useNotificationHandler() {
   const showBrowserNotification = useCallback(
     (notification: NotificationData) => {
       if (!isBrowserNotificationSupported()) return;
-      if (browserPermission !== "granted") return;
+      if (Notification.permission !== "granted") return;
 
       // Check if user has enabled browser notifications in settings
       if (!browserNotificationsEnabled) return;
@@ -163,7 +144,7 @@ export function useNotificationHandler() {
         browserNotification.close();
       };
     },
-    [browserPermission, browserNotificationsEnabled, router, updateNotification]
+    [browserNotificationsEnabled, router, updateNotification]
   );
 
   /**
