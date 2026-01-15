@@ -2,7 +2,15 @@ import { useIntl } from "@/hooks/useIntl";
 import { useCalendarStore } from "@/stores/calendarStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 
-import { Group, ActionIcon, Text, Grid, SegmentedControl, Stack } from "@mantine/core";
+import {
+  Group,
+  ActionIcon,
+  Text,
+  Grid,
+  SegmentedControl,
+  Stack,
+  ScrollArea,
+} from "@mantine/core";
 import { IconArrowsSort, IconCalendarPlus } from "@tabler/icons-react";
 import DelayedTooltip from "@/components/UI/DelayedTooltip";
 import CalendarLegendButton from "./CalendarLegendButton";
@@ -62,7 +70,9 @@ export default function CalendarLegend({
             <DelayedTooltip
               label={
                 <Stack align="center">
-                  <Text>{getLocalizedText("Termin hinzufügen", "Add appointment")}</Text>
+                  <Text>
+                    {getLocalizedText("Termin hinzufügen", "Add appointment")}
+                  </Text>
                   <Shortcut keys={["mod", "Shift", "A"]} />
                 </Stack>
               }
@@ -81,17 +91,19 @@ export default function CalendarLegend({
         </Group>
       </Grid.Col>
       <Grid.Col span={{ base: 6, md: 8 }}>
-        {visibleProjects.length > 0 ? (
-          <Group justify="center" wrap="wrap" gap="xs" w="100%">
-            {visibleProjects.map((p) => (
-              <CalendarLegendButton key={p.id} p={p} />
-            ))}
-          </Group>
-        ) : (
-          <Text ta="center" size="sm" c="dimmed">
-            {getLocalizedText("Keine Einträge gefunden", "No entries found")}
-          </Text>
-        )}
+        <ScrollArea.Autosize h="100%" type="never">
+          {visibleProjects.length > 0 ? (
+            <Group align="center" justify="center" wrap="nowrap" gap="xs" w="100%">
+              {visibleProjects.map((p) => (
+                <CalendarLegendButton key={p.id} p={p} />
+              ))}
+            </Group>
+          ) : (
+            <Text ta="center" size="sm" c="dimmed">
+              {getLocalizedText("Keine Einträge gefunden", "No entries found")}
+            </Text>
+          )}
+        </ScrollArea.Autosize>
       </Grid.Col>
 
       <Grid.Col span={{ base: 3, md: 2 }}>

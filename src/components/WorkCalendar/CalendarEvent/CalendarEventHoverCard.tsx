@@ -6,11 +6,11 @@ import {
   IconNote,
 } from "@tabler/icons-react";
 
-import { CalendarSession } from "@/types/workCalendar.types";
+import { CalendarTimeEntry } from "@/types/workCalendar.types";
 import { alpha, Card, Stack, Text, Group, Divider } from "@mantine/core";
 
 interface CalendarEventHoverCardProps {
-  s: CalendarSession;
+  s: CalendarTimeEntry;
   color: string;
 }
 

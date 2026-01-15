@@ -16,6 +16,7 @@ import {
   SimpleGrid,
   RangeSlider,
   rem,
+  ActionIcon,
 } from "@mantine/core";
 import {
   IconClock,
@@ -35,17 +36,17 @@ interface ModifyTimeProps {
 }
 
 export default function ModifyTime({ timerState }: ModifyTimeProps) {
-  const { getLocalizedText } = useIntl();
+  const { getLocalizedText, formatDuration, formatDateTime } = useIntl();
   const [startTimeMinutes, setStartTimeMinutes] = useState<number>(0);
   const [endTimeMinutes, setEndTimeMinutes] = useState<number>(0);
   const { updateTimer } = useTimeTrackerManager();
 
-  // Format timestamp to readable time
-  const formatTime = (timestamp: number | null | undefined): string => {
-    if (!timestamp) return "--:--";
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
+  // // Format timestamp to readable time
+  // const formatTime = (timestamp: number | null | undefined): string => {
+  //   if (!timestamp) return "--:--";
+  //   const date = new Date(timestamp);
+  //   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  // };
 
   // Calculate slider values and range
   const sliderData = useMemo(() => {
@@ -186,6 +187,24 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
               >
                 {getLocalizedText("Startzeit", "Start Time")}
               </Text>
+              <Group>
+                <ActionIcon
+                  variant="light"
+                  color="red"
+                  size="md"
+                  onClick={() => handleStartTimeChange(-1)}
+                >
+                  <IconMinus size={14} />
+                </ActionIcon>
+                <ActionIcon
+                  variant="light"
+                  color="green"
+                  size="md"
+                  onClick={() => handleStartTimeChange(1)}
+                >
+                  <IconPlus size={14} />
+                </ActionIcon>
+              </Group>
             </Group>
             <Card
               withBorder
@@ -198,7 +217,7 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
                     {getLocalizedText("Original:", "Original:")}
                   </Text>
                   <Text size="sm" fw={500}>
-                    {formatTime(timerState.startTime)}
+                    {formatDateTime(new Date(timerState.startTime ?? 0))}
                   </Text>
                 </Group>
                 {timerState.deltaStartTime !== 0 && (
@@ -226,7 +245,7 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
                         fw={700}
                         c="light-dark(var(--mantine-color-green-8), var(--mantine-color-green-3))"
                       >
-                        {formatTime(timerState.effectiveStartTime)}
+                        {formatDateTime(new Date(timerState.effectiveStartTime ?? 0))}
                       </Text>
                     </Group>
                   </>
@@ -246,6 +265,24 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
               >
                 {getLocalizedText("Endzeit", "End Time")}
               </Text>
+              <Group>
+                <ActionIcon
+                  variant="light"
+                  color="red"
+                  size="md"
+                  onClick={() => handleEndTimeChange(-1)}
+                >
+                  <IconMinus size={14} />
+                </ActionIcon>
+                <ActionIcon
+                  variant="light"
+                  color="green"
+                  size="md"
+                  onClick={() => handleEndTimeChange(1)}
+                >
+                  <IconPlus size={14} />
+                </ActionIcon>
+              </Group>
             </Group>
             <Card
               withBorder
@@ -260,7 +297,7 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
                   <Text size="sm" fw={500}>
                     {timerState.state === "running"
                       ? getLocalizedText("Läuft...", "Running...")
-                      : formatTime(Date.now())}
+                      : formatDateTime(new Date(Date.now()))}
                   </Text>
                 </Group>
                 {timerState.deltaEndTime !== 0 && (
@@ -288,7 +325,7 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
                         fw={700}
                         c="light-dark(var(--mantine-color-red-8), var(--mantine-color-red-3))"
                       >
-                        {formatTime(timerState.effectiveEndTime)}
+                        {formatDateTime(new Date(timerState.effectiveEndTime ?? 0))}
                       </Text>
                     </Group>
                   </>
@@ -335,7 +372,7 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
                   fw={600}
                   c="light-dark(var(--mantine-color-green-7), var(--mantine-color-green-4))"
                 >
-                  {formatTime(timerState.effectiveStartTime)}
+                  {formatDateTime(new Date(timerState.effectiveStartTime ?? 0))}
                 </Text>
               </Group>
               <Group gap={4}>
@@ -345,7 +382,7 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
                   fw={600}
                   c="light-dark(var(--mantine-color-red-7), var(--mantine-color-red-4))"
                 >
-                  {formatTime(timerState.effectiveEndTime)}
+                  {formatDateTime(new Date(timerState.effectiveEndTime ?? 0))}
                 </Text>
               </Group>
             </Group>
@@ -364,7 +401,7 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
               marks={[
                 {
                   value: 0,
-                  label: formatTime(sliderData.originalStartTime),
+                  label: formatDateTime(new Date(sliderData.originalStartTime)),
                 },
                 {
                   value: Math.round(
@@ -372,7 +409,7 @@ export default function ModifyTime({ timerState }: ModifyTimeProps) {
                       sliderData.originalStartTime) /
                       (60 * 1000)
                   ),
-                  label: formatTime(sliderData.originalEndTime),
+                  label: formatDateTime(new Date(sliderData.originalEndTime)),
                 },
               ]}
               styles={{

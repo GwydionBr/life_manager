@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useIntl } from "@/hooks/useIntl";
 
-import { Group, Modal, Text, useModalsStack } from "@mantine/core";
+import { Modal, useModalsStack } from "@mantine/core";
 import CashflowForm from "@/components/Finances/CashFlow/CashflowForm";
 import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 import { IconCashPlus, IconCategoryPlus } from "@tabler/icons-react";
 import { Tables } from "@/types/db.types";
+import ModalTitle from "@/components/UI/Modal/ModalTitle";
 
 interface CashFlowModalProps {
   opened: boolean;
@@ -19,9 +20,7 @@ export default function CashFlowModal({
   isSingle = true,
 }: CashFlowModalProps) {
   const modalStack = useModalsStack(["cash-flow", "category-form"]);
-  const [categories, setCategories] = useState<Tables<"tag">[]>(
-    []
-  );
+  const [categories, setCategories] = useState<Tables<"tag">[]>([]);
   const { getLocalizedText } = useIntl();
   useEffect(() => {
     if (opened) {
@@ -43,12 +42,10 @@ export default function CashFlowModal({
         {...modalStack.register("cash-flow")}
         onClose={handleClose}
         title={
-          <Group>
-            <IconCashPlus />
-            <Text>
-              {getLocalizedText("Zahlung hinzufügen", "Add Cash Flow")}
-            </Text>
-          </Group>
+          <ModalTitle
+            icon={<IconCashPlus />}
+            title={getLocalizedText("Zahlung hinzufügen", "Add Cash Flow")}
+          />
         }
       >
         <CashflowForm
@@ -63,12 +60,10 @@ export default function CashFlowModal({
         {...modalStack.register("category-form")}
         onClose={() => modalStack.close("category-form")}
         title={
-          <Group>
-            <IconCategoryPlus />
-            <Text>
-              {getLocalizedText("Kategorie hinzufügen", "Add Category")}
-            </Text>
-          </Group>
+          <ModalTitle
+            icon={<IconCategoryPlus />}
+            title={getLocalizedText("Kategorie hinzufügen", "Add Category")}
+          />
         }
       >
         <FinanceTagForm

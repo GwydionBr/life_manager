@@ -1,14 +1,19 @@
 import { useState, useEffect } from "react";
 import { useIntl } from "@/hooks/useIntl";
 
-import { Group, Modal, Text, useModalsStack } from "@mantine/core";
+import { Modal, useModalsStack } from "@mantine/core";
 import AppointmentForm from "./AppointmentForm";
 import ProjectForm from "@/components/Work/Project/ProjectForm";
-import { IconCalendarPlus } from "@tabler/icons-react";
+import {
+  IconCalendarPlus,
+  IconClipboardPlus,
+  IconTagPlus,
+} from "@tabler/icons-react";
 import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 import { WorkProject } from "@/types/work.types";
 import { useAppointmentMutations } from "@/db/collections/work/appointment/use-appointment-mutations";
 import { InsertAppointment } from "@/types/work.types";
+import ModalTitle from "@/components/UI/Modal/ModalTitle";
 
 interface NewAppointmentModalProps {
   opened: boolean;
@@ -96,12 +101,10 @@ export default function NewAppointmentModal({
         {...stack.register("appointment-form")}
         onClose={handleClose}
         title={
-          <Group>
-            <IconCalendarPlus />
-            <Text>
-              {getLocalizedText("Termin hinzufügen", "Add Appointment")}
-            </Text>
-          </Group>
+          <ModalTitle
+            icon={<IconCalendarPlus />}
+            title={getLocalizedText("Termin hinzufügen", "Add Appointment")}
+          />
         }
         transitionProps={{ transition: "fade-right", duration: 400 }}
       >
@@ -119,7 +122,12 @@ export default function NewAppointmentModal({
       <Modal
         size="lg"
         {...stack.register("project-form")}
-        title={getLocalizedText("Projekt hinzufügen", "Add Project")}
+        title={
+          <ModalTitle
+            icon={<IconClipboardPlus />}
+            title={getLocalizedText("Projekt hinzufügen", "Add Project")}
+          />
+        }
         transitionProps={{ transition: "fade-right", duration: 400 }}
       >
         <ProjectForm
@@ -137,7 +145,12 @@ export default function NewAppointmentModal({
         size="lg"
         {...stack.register("tag-form")}
         onClose={() => stack.close("tag-form")}
-        title={getLocalizedText("Tag hinzufügen", "Add Tag")}
+        title={
+          <ModalTitle
+            icon={<IconTagPlus />}
+            title={getLocalizedText("Tag hinzufügen", "Add Tag")}
+          />
+        }
       >
         <FinanceTagForm
           onClose={() => stack.close("tag-form")}

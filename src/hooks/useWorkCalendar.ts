@@ -9,7 +9,7 @@ import { useCalendarStore } from "@/stores/calendarStore";
 import { addDays, differenceInCalendarDays, startOfDay } from "date-fns";
 
 import {
-  CalendarSession,
+  CalendarTimeEntry,
   CalendarAppointment,
   CalendarDay,
   CalendarEvent,
@@ -143,7 +143,7 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
    * Sessions are sorted by start time within each day
    */
   const sessionsByDay = useMemo(() => {
-    const map = new Map<string, CalendarSession[]>();
+    const map = new Map<string, CalendarTimeEntry[]>();
 
     // Initialize all days with empty arrays
     days.forEach((d) => {
@@ -156,7 +156,7 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
       const end = new Date(session.end_time);
       const project = projectMap.get(session.work_project_id);
 
-      const calendarSession: CalendarSession = {
+      const calendarSession: CalendarTimeEntry = {
         ...session,
         projectTitle: project?.title ?? "",
         color: project?.color ?? DEFAULT_SESSION_COLOR,

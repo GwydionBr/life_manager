@@ -1,5 +1,6 @@
 import { useDisclosure } from "@mantine/hooks";
 import { useProfile } from "@/db/collections/profile/use-profile-query";
+import { useIntl } from "@/hooks/useIntl";
 
 import {
   Modal,
@@ -17,6 +18,7 @@ import CreateButton from "@/components/UI/Buttons/CreateButton";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
 import DelayedTooltip from "@/components/UI/DelayedTooltip";
 import { workFoldersCollection } from "@/db/collections/work/work-folder/work-folder-collection";
+import ModalTitle from "@/components/UI/Modal/ModalTitle";
 
 const folderSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -26,6 +28,7 @@ const folderSchema = z.object({
 export default function NewFolderButton({ ...props }: ActionIconProps) {
   const [opened, { open, close }] = useDisclosure(false);
   const { data: profile } = useProfile();
+  const { getLocalizedText } = useIntl();
 
   const form = useForm({
     initialValues: {
@@ -59,7 +62,12 @@ export default function NewFolderButton({ ...props }: ActionIconProps) {
       <Modal
         opened={opened}
         onClose={handleClose}
-        title="Add Folder"
+        title={
+          <ModalTitle
+            icon={<IconFolderPlus />}
+            title={getLocalizedText("Add Folder", "Add Folder")}
+          />
+        }
         size="md"
         padding="md"
       >
@@ -67,13 +75,19 @@ export default function NewFolderButton({ ...props }: ActionIconProps) {
           <Stack>
             <TextInput
               data-autofocus
-              label="Title"
-              placeholder="Enter folder title"
+              label={getLocalizedText("Name", "Title")}
+              placeholder={getLocalizedText(
+                "Folder Title eingeben",
+                "Enter folder title"
+              )}
               {...form.getInputProps("title")}
             />
             <TextInput
-              label="Description"
-              placeholder="Enter folder description (optional)"
+              label={getLocalizedText("Beschreibung", "Description")}
+              placeholder={getLocalizedText(
+                "Folder Beschreibung eingeben (optional)",
+                "Enter folder description (optional)"
+              )}
               {...form.getInputProps("description")}
             />
             <Group justify="flex-end">
@@ -82,16 +96,18 @@ export default function NewFolderButton({ ...props }: ActionIconProps) {
                 type="submit"
                 onClick={form.onSubmit(handleSubmit)}
                 variant="filled"
-                title="Create Folder"
+                title={getLocalizedText("Ordner erstellen", "Create Folder")}
               />
             </Group>
           </Stack>
         </form>
       </Modal>
 
-      <DelayedTooltip label="Add folder">
+      <DelayedTooltip
+        label={getLocalizedText("Ordner hinzufügen", "Add folder")}
+      >
         <ActionIcon
-          aria-label="Add folder"
+          aria-label={getLocalizedText("Ordner hinzufügen", "Add folder")}
           onClick={open}
           variant="subtle"
           {...props}

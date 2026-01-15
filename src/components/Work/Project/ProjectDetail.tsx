@@ -121,7 +121,7 @@ export default function WorkProjectDetailsPage() {
     <Stack align="center" w="100%" px="xl" pb="xl" pt="xs">
       <Collapse in={!analysisOpened} transitionDuration={300} w="100%">
         <Stack w="100%" align="center">
-          <Text size="sm" fw={500} ta="center">
+          <Text size="sm" fw={500} ta="center" lineClamp={2}>
             {project.description}
           </Text>
           <ProjectToolbar

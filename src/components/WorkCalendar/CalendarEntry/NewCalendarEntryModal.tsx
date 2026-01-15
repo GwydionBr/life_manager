@@ -2,10 +2,14 @@ import { useState, useEffect } from "react";
 import { useIntl } from "@/hooks/useIntl";
 import { useSettings } from "@/db/collections/settings/use-settings-query";
 
-import { Group, Modal, Text, useModalsStack } from "@mantine/core";
+import { Modal, useModalsStack } from "@mantine/core";
 import CalendarEntryForm from "./CalendarEntryForm";
 import ProjectForm from "@/components/Work/Project/ProjectForm";
-import { IconCalendarPlus, IconClockPlus } from "@tabler/icons-react";
+import {
+  IconCalendarPlus,
+  IconClipboardPlus,
+  IconTagPlus,
+} from "@tabler/icons-react";
 import { TimerRoundingSettings } from "@/types/timeTracker.types";
 import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 import {
@@ -16,6 +20,7 @@ import {
 import { useWorkTimeEntryMutations } from "@/db/collections/work/work-time-entry/use-work-time-entry-mutations";
 import { useAppointmentMutations } from "@/db/collections/work/appointment/use-appointment-mutations";
 import { Currency } from "@/types/settings.types";
+import ModalTitle from "@/components/UI/Modal/ModalTitle";
 
 interface NewCalendarEntryModalProps {
   opened: boolean;
@@ -158,26 +163,6 @@ export default function NewCalendarEntryModal({
     };
   };
 
-  // Determine the modal icon and title based on initial entry type
-  const getModalHeader = () => {
-    const initialValues = getInitialValues();
-    const isPast = new Date(initialValues.start_time) < new Date();
-
-    if (isPast) {
-      return {
-        icon: <IconClockPlus />,
-        title: getLocalizedText("Eintrag hinzufügen", "Add Entry"),
-      };
-    } else {
-      return {
-        icon: <IconCalendarPlus />,
-        title: getLocalizedText("Eintrag hinzufügen", "Add Entry"),
-      };
-    }
-  };
-
-  const header = getModalHeader();
-
   return (
     <Modal.Stack>
       <Modal
@@ -185,10 +170,10 @@ export default function NewCalendarEntryModal({
         {...stack.register("calendar-entry-form")}
         onClose={handleClose}
         title={
-          <Group>
-            {header.icon}
-            <Text>{header.title}</Text>
-          </Group>
+          <ModalTitle
+            icon={<IconCalendarPlus />}
+            title={getLocalizedText("Eintrag hinzufügen", "Add Entry")}
+          />
         }
         transitionProps={{ transition: "fade-right", duration: 400 }}
       >
@@ -206,7 +191,12 @@ export default function NewCalendarEntryModal({
       <Modal
         size="lg"
         {...stack.register("project-form")}
-        title={getLocalizedText("Projekt hinzufügen", "Add Project")}
+        title={
+          <ModalTitle
+            icon={<IconClipboardPlus />}
+            title={getLocalizedText("Projekt hinzufügen", "Add Project")}
+          />
+        }
         transitionProps={{ transition: "fade-right", duration: 400 }}
       >
         <ProjectForm
@@ -224,7 +214,12 @@ export default function NewCalendarEntryModal({
         size="lg"
         {...stack.register("tag-form")}
         onClose={() => stack.close("tag-form")}
-        title={getLocalizedText("Tag hinzufügen", "Add Tag")}
+        title={
+          <ModalTitle
+            icon={<IconTagPlus />}
+            title={getLocalizedText("Tag hinzufügen", "Add Tag")}
+          />
+        }
       >
         <FinanceTagForm
           onClose={() => stack.close("tag-form")}

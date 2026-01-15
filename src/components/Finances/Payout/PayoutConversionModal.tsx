@@ -19,6 +19,7 @@ import {
 } from "@mantine/core";
 import { IconArrowDown, IconCashBanknotePlus } from "@tabler/icons-react";
 import { currencies } from "@/constants/settings";
+import ModalTitle from "@/components/UI/Modal/ModalTitle";
 
 interface PayoutConversionModalProps {
   opened: boolean;
@@ -70,10 +71,10 @@ export default function PayoutConversionModal({
       opened={opened}
       onClose={handleClose}
       title={
-        <Group gap="xs">
-          <IconCashBanknotePlus size={20} />
-          <Text fw={600}>{getLocalizedText("Auszahlung", "Payout")}</Text>
-        </Group>
+        <ModalTitle
+          icon={<IconCashBanknotePlus />}
+          title={getLocalizedText("Auszahlung", "Payout")}
+        />
       }
       styles={{
         title: {

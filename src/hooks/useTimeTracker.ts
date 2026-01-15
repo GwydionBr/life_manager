@@ -114,6 +114,9 @@ export function useTimeTracker(timer: Timer): TimeTrackerReturn {
     const isRunning = timer.state === TimerState.Running;
 
     if (!timer.startTime) {
+      if (typeof window !== "undefined" ) {
+        document.title = `Life Manager`;
+      }
       return {
         activeSeconds: 0,
         activeTime: "00:00",

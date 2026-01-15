@@ -7,6 +7,8 @@ import ProjectForm from "./ProjectForm";
 import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 
 import { WorkProject } from "@/types/work.types";
+import ModalTitle from "@/components/UI/Modal/ModalTitle";
+import { IconClipboardPlus, IconTagPlus } from "@tabler/icons-react";
 
 interface NewProjectModalProps {
   opened: boolean;
@@ -46,7 +48,12 @@ export default function NewProjectModal({
         {...stack.register("project-form")}
         size="lg"
         onClose={onClose}
-        title={getLocalizedText("Neues Projekt", "New Project")}
+        title={
+          <ModalTitle
+            icon={<IconClipboardPlus />}
+            title={getLocalizedText("Projekt hinzufügen", "Add Project")}
+          />
+        }
       >
         <ProjectForm
           onCancel={onClose}
@@ -60,7 +67,12 @@ export default function NewProjectModal({
       <Modal
         {...stack.register("tag-form")}
         onClose={() => stack.close("tag-form")}
-        title={getLocalizedText("Neues Tag", "New Tag")}
+        title={
+          <ModalTitle
+            icon={<IconTagPlus />}
+            title={getLocalizedText("Tag hinzufügen", "Add Tag")}
+          />
+        }
       >
         <FinanceTagForm
           onClose={() => stack.close("tag-form")}

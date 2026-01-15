@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useIntl } from "@/hooks/useIntl";
 
-import { Text, Modal, Box, Group, Tabs } from "@mantine/core";
+import { Modal, Box, Tabs } from "@mantine/core";
 import { IconSettings } from "@tabler/icons-react";
 import MoreActionIcon from "@/components/UI/ActionIcons/MoreActionIcon";
 import ModifyTime from "@/components/TimeTracker/ModifyTimeTracker/ModifyTime";
 import ModifyRounding from "@/components/TimeTracker/ModifyTimeTracker/ModifyRounding";
 
 import { TimeTrackerState } from "@/hooks/useTimeTracker";
+import ModalTitle from "@/components/UI/Modal/ModalTitle";
 
 interface ModifyTimeTrackerModalProps {
   timerState: TimeTrackerState;
@@ -35,15 +36,13 @@ export default function ModifyTimeTrackerModal({
           setOpened(false);
         }}
         title={
-          <Group gap="xs">
-            <IconSettings size={20} />
-            <Text fw={600}>
-              {getLocalizedText(
-                "Zeiterfassung anpassen",
-                "Modify Time Tracker"
-              )}
-            </Text>
-          </Group>
+          <ModalTitle
+            icon={<IconSettings />}
+            title={getLocalizedText(
+              "Zeiterfassung anpassen",
+              "Adjust Time Tracker"
+            )}
+          />
         }
         size="lg"
         styles={{

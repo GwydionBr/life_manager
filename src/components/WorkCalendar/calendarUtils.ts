@@ -1,5 +1,5 @@
 import {
-  CalendarSession,
+  CalendarTimeEntry,
   CalendarAppointment,
 } from "@/types/workCalendar.types";
 import { startOfDay, endOfDay } from "date-fns";
@@ -133,10 +133,10 @@ export function snapYToInterval(
  * @returns Clipped session with adjusted start/end times
  */
 export function clipSessionToDay(
-  session: CalendarSession,
+  session: CalendarTimeEntry,
   dayStart: Date,
   dayEnd: Date
-): CalendarSession {
+): CalendarTimeEntry {
   const sStart = new Date(session.start_time);
   const sEnd = new Date(session.end_time);
   const start = sStart < dayStart ? dayStart : sStart;
@@ -186,8 +186,8 @@ export function clipAppointmentToDay(
  * @returns Array of merged sessions (may be smaller than input)
  */
 export function mergeAdjacentSessionsForRender(
-  items: CalendarSession[]
-): CalendarSession[] {
+  items: CalendarTimeEntry[]
+): CalendarTimeEntry[] {
   if (items.length === 0) return items;
 
   // Sort by start time to enable linear merging
@@ -196,7 +196,7 @@ export function mergeAdjacentSessionsForRender(
       new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
   );
 
-  const merged: CalendarSession[] = [];
+  const merged: CalendarTimeEntry[] = [];
 
   for (const current of sorted) {
     const prev = merged[merged.length - 1];
@@ -249,7 +249,7 @@ export function mergeAdjacentSessionsForRender(
  * @returns Duration in seconds that the session overlaps with this day
  */
 export function calculateSessionTimeForDay(
-  session: CalendarSession,
+  session: CalendarTimeEntry,
   day: Date
 ): number {
   const dayStart = startOfDay(day);

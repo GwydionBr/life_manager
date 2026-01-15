@@ -22,6 +22,7 @@ interface CalendarStoreState {
   eventIsHovered: boolean;
   eventIsSelected: boolean;
   addingMode: boolean;
+  isCalendarAsideMinimized: boolean;
 }
 
 interface CalendarStoreActions {
@@ -40,6 +41,7 @@ interface CalendarStoreActions {
   setEventIsHovered: (isHovered: boolean) => void;
   setEventIsSelected: (isSelected: boolean) => void;
   setAddingMode: (isAddingMode: boolean) => void;
+  setIsCalendarAsideMinimized: (isMinimized: boolean) => void;
 }
 
 export const useCalendarStore = create<
@@ -68,6 +70,7 @@ export const useCalendarStore = create<
       newEventStartY: null,
       newEventEndY: null,
       newEventDay: null,
+      isCalendarAsideMinimized: true,
       resetStore: () =>
         set({
           activeTimer: null,
@@ -91,8 +94,10 @@ export const useCalendarStore = create<
           newEventStartY: null,
           newEventEndY: null,
           newEventDay: null,
+          isCalendarAsideMinimized: true,
         }),
-
+      setIsCalendarAsideMinimized: (isMinimized: boolean) =>
+        set({ isCalendarAsideMinimized: isMinimized }),
       setActiveTimer: (timer: TimerData | null) => set({ activeTimer: timer }),
       setEventIsHovered: (isHovered: boolean) =>
         set({ eventIsHovered: isHovered }),
@@ -125,6 +130,8 @@ export const useCalendarStore = create<
       name: "calendar-store",
       partialize: (state) => ({
         zoomIndex: state.zoomIndex,
+        isCalendarAsideMinimized: state.isCalendarAsideMinimized,
+        referenceDate: state.referenceDate,
       }),
     }
   )

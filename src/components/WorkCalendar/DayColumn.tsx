@@ -8,10 +8,10 @@ import { alpha, Box, Skeleton, Stack, Text } from "@mantine/core";
 import { clipSessionToDay, clipAppointmentToDay } from "./calendarUtils";
 import { isToday, startOfDay, endOfDay } from "date-fns";
 import {
-  CalendarSession,
+  CalendarTimeEntry,
   CalendarAppointment,
 } from "@/types/workCalendar.types";
-import CalendarSessionEvent from "./CalendarEvent/CalendarSessionEvent";
+import CalendarTimeEntryEvent from "./CalendarEvent/CalendarTimeEntryEvent";
 import CalendarAppointmentEvent from "./CalendarEvent/CalendarAppointmentEvent";
 import TimeTrackerEvent from "./CalendarEvent/TimeTrackerEvent/TimeTrackerEvent";
 import NewSessionEvent from "./CalendarEvent/NewSessionEvent";
@@ -34,7 +34,7 @@ interface DayColumnProps {
   /** Current time (updates periodically) */
   currentTime: Date;
   /** Sessions overlapping this day */
-  sessions: CalendarSession[];
+  sessions: CalendarTimeEntry[];
   /** Appointments overlapping this day */
   appointments: CalendarAppointment[];
   /** Callback when session is clicked */
@@ -226,9 +226,9 @@ export function DayColumn({
           <Box>
             {/* Sessions */}
             {clippedSessions.map((session) => (
-              <CalendarSessionEvent
+              <CalendarTimeEntryEvent
                 key={session.id}
-                isNewSession={startNewSession !== null}
+                isNewTimeEntry={startNewSession !== null}
                 s={session}
                 toY={timeToY}
                 handleSessionClick={handleSessionClick}

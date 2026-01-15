@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
 import { useIntl } from "@/hooks/useIntl";
+import { useCalendarStore } from "@/stores/calendarStore";
+
 import {
   Stack,
   Text,
@@ -46,10 +48,10 @@ interface CalendarAsideProps {
 export default function CalendarAside({ isBig }: CalendarAsideProps) {
   const { getLocalizedText, formatDateRange, formatDate, formatTimeSpan } =
     useIntl();
-  const [isMinimized, setIsMinimized] = useState(false);
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);
-
+  const { isCalendarAsideMinimized, setIsCalendarAsideMinimized } =
+    useCalendarStore();
   const [
     newAppointmentModalOpened,
     { open: openNewAppointmentModal, close: closeNewAppointmentModal },
@@ -198,9 +200,11 @@ export default function CalendarAside({ isBig }: CalendarAsideProps) {
             <ActionIcon
               size="sm"
               variant="subtle"
-              onClick={() => setIsMinimized(!isMinimized)}
+              onClick={() =>
+                setIsCalendarAsideMinimized(!isCalendarAsideMinimized)
+              }
             >
-              {isMinimized ? (
+              {isCalendarAsideMinimized ? (
                 <IconChevronDown size={16} />
               ) : (
                 <IconChevronUp size={16} />
@@ -209,7 +213,7 @@ export default function CalendarAside({ isBig }: CalendarAsideProps) {
           </Group>
         </Group>
 
-        <Collapse in={!isMinimized}>
+        <Collapse in={!isCalendarAsideMinimized}>
           <Stack>
             <Button
               leftSection={<IconCalendarPlus size={16} />}

@@ -44,7 +44,9 @@ export default function TimeTrackerEvent({
   if (!isToday(day)) {
     if (isYesterday(day) && runningTimerCount > 0 && timer && activeTimer) {
       // Check if the running timer started yesterday
-      const timerStartDate = new Date(timer.startTime ?? 0);
+      const timerStartDate = new Date(
+        (timer.startTime ?? 0) + timer.deltaStartTime * 1000
+      );
       if (isYesterday(timerStartDate)) {
         // Timer started yesterday, show it from start time to end of day
         const top = toY(timerStartDate);
@@ -96,7 +98,9 @@ export default function TimeTrackerEvent({
     );
   }
 
-  const startTime = new Date(timer.startTime ?? 0);
+  const startTime = new Date(
+    (timer.startTime ?? 0) + timer.deltaStartTime * 1000
+  );
 
   const top = toY(isToday(startTime) ? startTime : startOfDay(currentTime));
   const bottom = toY(currentTime);

@@ -2,24 +2,24 @@ import { useIntl } from "@/hooks/useIntl";
 
 import { alpha, Card, HoverCard, Stack, Text } from "@mantine/core";
 
-import { CalendarSession } from "@/types/workCalendar.types";
+import { CalendarTimeEntry } from "@/types/workCalendar.types";
 import CalendarEventHoverCard from "./CalendarEventHoverCard";
 
-interface CalendarSessionEventProps {
-  isNewSession?: boolean;
-  s: CalendarSession;
+interface CalendarTimeEntryEventProps {
+  isNewTimeEntry?: boolean;
+  s: CalendarTimeEntry;
   toY: (date: Date) => number;
   color: string;
   handleSessionClick: (sessionId: string) => void;
 }
 
-export default function CalendarSessionEvent({
-  isNewSession,
+export default function CalendarTimeEntryEvent({
+  isNewTimeEntry,
   s,
   color,
   toY,
   handleSessionClick,
-}: CalendarSessionEventProps) {
+}: CalendarTimeEntryEventProps) {
   const { formatDuration } = useIntl();
   const start = new Date(s.start_time);
   const end = new Date(s.end_time);
@@ -33,7 +33,7 @@ export default function CalendarSessionEvent({
       openDelay={200}
       closeDelay={100}
       position="right"
-      disabled={isNewSession}
+      disabled={isNewTimeEntry}
     >
       <HoverCard.Target>
         <Card
@@ -53,7 +53,7 @@ export default function CalendarSessionEvent({
             zIndex: 13,
           }}
           onClick={() => {
-            if (!isNewSession) {
+            if (!isNewTimeEntry) {
               handleSessionClick(s.id);
             }
           }}

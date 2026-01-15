@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Modal, useModalsStack, Group, Text } from "@mantine/core";
+import { Modal, useModalsStack } from "@mantine/core";
 import FinanceProjectForm from "./FinanceProjectForm";
 import { useIntl } from "@/hooks/useIntl";
 import ContactsForm from "@/components/Finances/Contact/ContactForm";
@@ -11,6 +11,7 @@ import {
   IconUserPlus,
 } from "@tabler/icons-react";
 import { Tables } from "@/types/db.types";
+import ModalTitle from "@/components/UI/Modal/ModalTitle";
 
 interface FinanceProjectFormModalProps {
   opened: boolean;
@@ -43,12 +44,13 @@ export default function FinanceProjectFormModal({
         {...stack.register("project-form")}
         onClose={onClose}
         title={
-          <Group>
-            <IconMoneybagPlus />
-            <Text>
-              {getLocalizedText("Neues Finanz Projekt", "New Finance Project")}
-            </Text>
-          </Group>
+          <ModalTitle
+            icon={<IconMoneybagPlus />}
+            title={getLocalizedText(
+              "Finanz Projekt hinzufügen",
+              "Add Finance Project"
+            )}
+          />
         }
         size="lg"
         padding="md"
@@ -67,10 +69,10 @@ export default function FinanceProjectFormModal({
         {...stack.register("contact-form")}
         onClose={() => stack.close("contact-form")}
         title={
-          <Group>
-            <IconUserPlus />
-            <Text>{getLocalizedText("Neuer Kontakt", "New Contact")}</Text>
-          </Group>
+          <ModalTitle
+            icon={<IconUserPlus />}
+            title={getLocalizedText("Kontakt hinzufügen", "Add Contact")}
+          />
         }
         size="lg"
         padding="md"
@@ -84,10 +86,10 @@ export default function FinanceProjectFormModal({
         {...stack.register("tag-form")}
         onClose={() => stack.close("tag-form")}
         title={
-          <Group>
-            <IconTagPlus />
-            <Text>{getLocalizedText("Neues Tag", "New Tag")}</Text>
-          </Group>
+          <ModalTitle
+            icon={<IconTagPlus />}
+            title={getLocalizedText("Tag hinzufügen", "Add Tag")}
+          />
         }
         size="lg"
         padding="md"

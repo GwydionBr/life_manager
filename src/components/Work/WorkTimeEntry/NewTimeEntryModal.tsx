@@ -2,17 +2,22 @@ import { useState, useEffect } from "react";
 import { useIntl } from "@/hooks/useIntl";
 import { useSettings } from "@/db/collections/settings/use-settings-query";
 
-import { Group, Modal, Text, useModalsStack } from "@mantine/core";
+import { Modal, useModalsStack } from "@mantine/core";
 import TimeEntryForm from "./TimeEntryForm";
 import { TablesInsert } from "@/types/db.types";
 import { Currency } from "@/types/settings.types";
 import ProjectForm from "../Project/ProjectForm";
-import { IconClockPlus } from "@tabler/icons-react";
+import {
+  IconClipboardPlus,
+  IconClockPlus,
+  IconTagPlus,
+} from "@tabler/icons-react";
 import { NewWorkTimeEntry } from "@/types/workTimeEntry.types";
 import { TimerRoundingSettings } from "@/types/timeTracker.types";
 import FinanceTagForm from "@/components/Finances/Tag/TagForm";
 import { WorkProject } from "@/types/work.types";
 import { useWorkTimeEntryMutations } from "@/db/collections/work/work-time-entry/use-work-time-entry-mutations";
+import ModalTitle from "@/components/UI/Modal/ModalTitle";
 
 interface NewTimeEntryModalProps {
   opened: boolean;
@@ -105,10 +110,13 @@ export default function NewTimeEntryModal({
         {...stack.register("time-entry-form")}
         onClose={handleClose}
         title={
-          <Group>
-            <IconClockPlus />
-            <Text>{getLocalizedText("Zeit-Eintrag hinzufügen", "Add Time Entry")}</Text>
-          </Group>
+          <ModalTitle
+            icon={<IconClockPlus />}
+            title={getLocalizedText(
+              "Zeit-Eintrag hinzufügen",
+              "Add Time Entry"
+            )}
+          />
         }
         transitionProps={{ transition: "fade-right", duration: 400 }}
       >
@@ -137,7 +145,12 @@ export default function NewTimeEntryModal({
       <Modal
         size="lg"
         {...stack.register("project-form")}
-        title={getLocalizedText("Projekt hinzufügen", "Add Project")}
+        title={
+          <ModalTitle
+            icon={<IconClipboardPlus />}
+            title={getLocalizedText("Projekt hinzufügen", "Add Project")}
+          />
+        }
         transitionProps={{ transition: "fade-right", duration: 400 }}
       >
         <ProjectForm
@@ -155,7 +168,12 @@ export default function NewTimeEntryModal({
         size="lg"
         {...stack.register("tag-form")}
         onClose={() => stack.close("tag-form")}
-        title={getLocalizedText("Tag hinzufügen", "Add Tag")}
+        title={
+          <ModalTitle
+            icon={<IconTagPlus />}
+            title={getLocalizedText("Tag hinzufügen", "Add Tag")}
+          />
+        }
       >
         <FinanceTagForm
           onClose={() => stack.close("tag-form")}

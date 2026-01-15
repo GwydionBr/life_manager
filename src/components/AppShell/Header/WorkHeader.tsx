@@ -148,6 +148,7 @@ export default function WorkHeader() {
             <Group
               align="center"
               justify="center"
+              wrap="nowrap"
               style={{ flex: 1, minWidth: 0 }}
             >
               {leftSalary && (
@@ -155,9 +156,9 @@ export default function WorkHeader() {
                   {leftSalary}
                 </Text>
               )}
-              <Title order={1} style={{ textAlign: "center" }}>
+              <Text ta="center" fz={25} truncate="end" fw={700} style={{ textAlign: "center" }}>
                 {project.title}
-              </Title>
+              </Text>
               {rightSalary && (
                 <Text
                   c={leftSalary ? "blue" : "red"}
