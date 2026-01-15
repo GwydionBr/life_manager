@@ -164,6 +164,13 @@ export default function CalendarHeader() {
               presets={[
                 {
                   value: [
+                    today.subtract(3, "day").format("YYYY-MM-DD"),
+                    today.add(3, "day").format("YYYY-MM-DD"),
+                  ],
+                  label: getLocalizedText("-3 und +3 Tage", "-3 and +3 days"),
+                },
+                {
+                  value: [
                     today.subtract(2, "day").format("YYYY-MM-DD"),
                     today.format("YYYY-MM-DD"),
                   ],

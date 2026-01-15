@@ -22,7 +22,7 @@ const ZOOM_LEVELS = [1, 2, 4, 6, 12] as const;
 
 // Default appointment color when no project is associated
 const DEFAULT_APPOINTMENT_COLOR = "var(--mantine-color-gray-6)";
-const DEFAULT_SESSION_COLOR = "var(--mantine-color-teal-6)";
+const DEFAULT_TIME_ENTRY_COLOR = "var(--mantine-color-teal-6)";
 
 interface UseWorkCalendarReturn {
   // Data
@@ -56,7 +56,7 @@ interface UseWorkCalendarReturn {
   handleCreateAppointment: () => void;
   handleReferenceDateChange: (date: Date) => void;
   handleNextAndPrev: (delta?: number) => void;
-  handleSessionClick: (sessionId: string) => void;
+  handleTimeEntryClick: (timeEntryId: string) => void;
   handleAppointmentClick: (appointmentId: string) => void;
   handleScrollToNow: () => void;
   setAddingMode: (mode: boolean) => void;
@@ -159,7 +159,7 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
       const calendarSession: CalendarTimeEntry = {
         ...session,
         projectTitle: project?.title ?? "",
-        color: project?.color ?? DEFAULT_SESSION_COLOR,
+        color: project?.color ?? DEFAULT_TIME_ENTRY_COLOR,
       };
 
       // Check each day for overlap with this session
@@ -502,7 +502,7 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
     handleCreateAppointment,
     handleReferenceDateChange,
     handleNextAndPrev,
-    handleSessionClick,
+    handleTimeEntryClick: handleSessionClick,
     handleAppointmentClick,
     handleScrollToNow,
     setAddingMode,

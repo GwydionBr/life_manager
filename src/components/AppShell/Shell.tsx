@@ -13,6 +13,7 @@ import Header from "./Header/Header";
 import Navbar from "./Navbar";
 import { getGradientForColor } from "@/constants/colors";
 import { AppOptions } from "@/types/settings.types";
+import { useAppointmentStatusManager } from "@/hooks/useAppointmentStatusManager";
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const {
@@ -30,9 +31,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
   } = useSettingsStore();
   const location = useLocation();
   const theme = useMantineTheme();
+
+  // Run hooks
   useProcessRecurringCashflows();
   useCheckNewVersion();
   useNotificationHandler();
+  useAppointmentStatusManager();
 
   // Determine the current app based on the location pathname
   const currentApp = useMemo(() => {

@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 
 import { TimerData } from "@/types/timeTracker.types";
 import { ViewMode } from "@/types/workCalendar.types";
-import { startOfWeek, endOfWeek } from "date-fns";
+import { addDays } from "date-fns";
 import { WorkProject, WorkTimeEntry } from "@/types/work.types";
 
 interface CalendarStoreState {
@@ -44,57 +44,34 @@ interface CalendarStoreActions {
   setIsCalendarAsideMinimized: (isMinimized: boolean) => void;
 }
 
+const initialState: CalendarStoreState = {
+  activeTimer: null,
+  viewMode: "week",
+  zoomIndex: 1,
+  rasterHeight: 60,
+  eventIsHovered: false,
+  eventIsSelected: false,
+  addingMode: false,
+  selectedProject: null,
+  selectedSession: null,
+  dateRange: [addDays(new Date(), -3), addDays(new Date(), 3)],
+  currentDateRange: [addDays(new Date(), -3), addDays(new Date(), 3)],
+  referenceDate: new Date(),
+  newEventStartY: null,
+  newEventEndY: null,
+  newEventDay: null,
+  isCalendarAsideMinimized: true,
+};
+
 export const useCalendarStore = create<
   CalendarStoreState & CalendarStoreActions
 >()(
   persist(
     (set) => ({
-      activeTimer: null,
-      viewMode: "week",
-      zoomIndex: 1,
-      rasterHeight: 60,
-      eventIsHovered: false,
-      eventIsSelected: false,
-      addingMode: false,
-      selectedProject: null,
-      selectedSession: null,
-      dateRange: [
-        startOfWeek(new Date(), { weekStartsOn: 1 }),
-        endOfWeek(new Date(), { weekStartsOn: 1 }),
-      ],
-      currentDateRange: [
-        startOfWeek(new Date(), { weekStartsOn: 1 }),
-        endOfWeek(new Date(), { weekStartsOn: 1 }),
-      ],
-      referenceDate: new Date(),
-      newEventStartY: null,
-      newEventEndY: null,
-      newEventDay: null,
-      isCalendarAsideMinimized: true,
+      ...initialState,
       resetStore: () =>
         set({
-          activeTimer: null,
-          viewMode: "week",
-          zoomIndex: 1,
-          rasterHeight: 60,
-          eventIsHovered: false,
-          eventIsSelected: false,
-          addingMode: false,
-          selectedProject: null,
-          selectedSession: null,
-          dateRange: [
-            startOfWeek(new Date(), { weekStartsOn: 1 }),
-            endOfWeek(new Date(), { weekStartsOn: 1 }),
-          ],
-          currentDateRange: [
-            startOfWeek(new Date(), { weekStartsOn: 1 }),
-            endOfWeek(new Date(), { weekStartsOn: 1 }),
-          ],
-          referenceDate: new Date(),
-          newEventStartY: null,
-          newEventEndY: null,
-          newEventDay: null,
-          isCalendarAsideMinimized: true,
+          ...initialState,
         }),
       setIsCalendarAsideMinimized: (isMinimized: boolean) =>
         set({ isCalendarAsideMinimized: isMinimized }),
