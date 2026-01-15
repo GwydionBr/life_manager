@@ -26,7 +26,6 @@ export const AppointmentStatus = {
   FINISHED: appointmentStatusValues[2],
   COMPLETED: appointmentStatusValues[3],
   MISSED: appointmentStatusValues[4],
-  CONVERTED: appointmentStatusValues[5],
 } as const satisfies Record<
   string,
   Database["public"]["Enums"]["appointmentStatus"]

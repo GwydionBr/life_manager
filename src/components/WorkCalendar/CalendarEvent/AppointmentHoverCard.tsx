@@ -127,7 +127,10 @@ export default function AppointmentHoverCard({
           >
             {appointment.title}
           </Text>
-          <AppointmentStatusBadge status={appointment.status} />
+          <AppointmentStatusBadge
+            status={appointment.status}
+            converted={appointment.work_time_entry_id !== null}
+          />
         </Group>
       </Card.Section>
       <Stack pt="sm" pb="xs" gap="sm" px="sm">

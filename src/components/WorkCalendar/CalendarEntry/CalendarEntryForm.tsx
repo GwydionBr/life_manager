@@ -90,6 +90,9 @@ export default function CalendarEntryForm({
             start_date: initialValues.start_time,
             end_date: initialValues.end_time,
           }}
+          project={project}
+          onOpenProjectForm={onOpenProjectForm}
+          onProjectChange={onProjectChange}
           newAppointment={true}
           onSubmit={onAppointmentSubmit}
           onCancel={onCancel}

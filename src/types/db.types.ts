@@ -38,7 +38,7 @@ export type Database = {
           is_all_day?: boolean
           reminder?: string | null
           start_date?: string
-          status?: Database["public"]["Enums"]["appointmentStatus"]
+          status: Database["public"]["Enums"]["appointmentStatus"]
           title?: string
           type: Database["public"]["Enums"]["appointment-type"]
           user_id?: string
@@ -1250,6 +1250,12 @@ export type Database = {
         | "finished"
         | "completed"
         | "missed"
+      appointmentStatusOld:
+        | "upcoming"
+        | "active"
+        | "finished"
+        | "completed"
+        | "missed"
         | "converted"
       currency:
         | "USD"
@@ -1412,6 +1418,13 @@ export const Constants = {
       amountUnits: ["kg", "g", "t", "ml", "l", "amount"],
       "appointment-type": ["work", "private", "meeting", "blocked"],
       appointmentStatus: [
+        "upcoming",
+        "active",
+        "finished",
+        "completed",
+        "missed",
+      ],
+      appointmentStatusOld: [
         "upcoming",
         "active",
         "finished",

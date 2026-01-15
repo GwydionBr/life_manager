@@ -263,7 +263,10 @@ export default function EditAppointmentDrawer({
                   {getLocalizedText("Termin bearbeiten", "Edit Appointment")}
                 </Text>
               </Group>
-              <AppointmentStatusBadge status={appointment.status} />
+              <AppointmentStatusBadge
+                status={appointment.status}
+                converted={appointment.work_time_entry_id !== null}
+              />
             </Group>
           }
           size="lg"

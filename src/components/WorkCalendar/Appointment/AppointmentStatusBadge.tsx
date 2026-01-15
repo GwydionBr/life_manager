@@ -16,6 +16,7 @@ import {
 
 interface AppointmentStatusBadgeProps {
   status: Appointment["status"];
+  converted: boolean;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
 }
 
@@ -32,6 +33,7 @@ interface AppointmentStatusBadgeProps {
 export function AppointmentStatusBadge({
   status,
   size = "sm",
+  converted,
 }: AppointmentStatusBadgeProps) {
   const { getLocalizedText } = useIntl();
 
@@ -40,6 +42,9 @@ export function AppointmentStatusBadge({
    */
   function getStatusIcon(status: CalendarAppointment["status"]) {
     const iconSize = 16;
+    if (converted) {
+      return <IconCalendarEvent size={iconSize} />;
+    }
     switch (status) {
       case AppointmentStatus.UPCOMING:
         return <IconClock size={iconSize} />;
@@ -51,8 +56,6 @@ export function AppointmentStatusBadge({
         return <IconCheck size={iconSize} />;
       case AppointmentStatus.MISSED:
         return <IconX size={iconSize} />;
-      case AppointmentStatus.CONVERTED:
-        return <IconCalendarEvent size={iconSize} />;
       default:
         return <IconCalendarEvent size={iconSize} />;
     }
@@ -62,6 +65,9 @@ export function AppointmentStatusBadge({
    * Get status badge color
    */
   function getStatusBadgeColor(status: CalendarAppointment["status"]) {
+    if (converted) {
+      return "violet";
+    }
     switch (status) {
       case AppointmentStatus.UPCOMING:
         return "blue";
@@ -73,8 +79,6 @@ export function AppointmentStatusBadge({
         return "green";
       case AppointmentStatus.MISSED:
         return "red";
-      case AppointmentStatus.CONVERTED:
-        return "violet";
       default:
         return "gray";
     }
@@ -87,6 +91,9 @@ export function AppointmentStatusBadge({
     status: CalendarAppointment["status"],
     getLocalizedText: (de: string, en: string) => string
   ) {
+    if (converted) {
+      return getLocalizedText("Umgewandelt", "Converted");
+    }
     switch (status) {
       case AppointmentStatus.UPCOMING:
         return getLocalizedText("Anstehend", "Upcoming");
@@ -98,8 +105,6 @@ export function AppointmentStatusBadge({
         return getLocalizedText("Abgeschlossen", "Completed");
       case AppointmentStatus.MISSED:
         return getLocalizedText("Verpasst", "Missed");
-      case AppointmentStatus.CONVERTED:
-        return getLocalizedText("Umgewandelt", "Converted");
       default:
         return status;
     }

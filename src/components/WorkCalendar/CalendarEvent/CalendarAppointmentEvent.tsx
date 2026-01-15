@@ -22,7 +22,7 @@ export default function CalendarAppointmentEvent({
   const top = toY(start);
   const bottom = toY(end);
   const height = bottom - top;
-  const statusStyles = getStatusStyles(a.status);
+  const statusStyles = getStatusStyles(a.status, a.work_time_entry_id !== null);
   // const backgroundColor = alpha(color, statusStyles.bgOpacity);
   const statusColor = statusStyles.borderColor;
 
@@ -52,7 +52,7 @@ export default function CalendarAppointmentEvent({
         >
           <Stack h="100%" pl={6} pt={4} gap={2}>
             <Group gap={4} wrap="nowrap">
-              {getStatusIcon(a.status)}
+              {getStatusIcon(a.status, a.work_time_entry_id !== null)}
               <Text size="xs" fw={600} style={{ flex: 1, minWidth: 0 }}>
                 {a.title}
               </Text>
@@ -77,7 +77,12 @@ export default function CalendarAppointmentEvent({
                 {a.projectTitle}
               </Text>
             )}
-            {height > 30 && <AppointmentStatusBadge status={a.status} />}
+            {height > 30 && (
+              <AppointmentStatusBadge
+                status={a.status}
+                converted={a.work_time_entry_id !== null}
+              />
+            )}
           </Stack>
         </Card>
       </HoverCard.Target>

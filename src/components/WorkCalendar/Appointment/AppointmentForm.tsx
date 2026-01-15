@@ -13,6 +13,7 @@ import {
   Fieldset,
   Switch,
   Button,
+  Grid,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { z } from "zod";
@@ -22,11 +23,40 @@ import LocaleDatePickerInput from "@/components/UI/Locale/LocaleDatePickerInput"
 import UpdateButton from "@/components/UI/Buttons/UpdateButton";
 import CreateButton from "@/components/UI/Buttons/CreateButton";
 
+// Helper function to calculate reminder minutes from reminder date and start date
+function calculateReminderMinutes(
+  reminderDate: string | null,
+  startDate: string | null
+): string | null {
+  if (!reminderDate || !startDate) return null;
+  const reminder = new Date(reminderDate);
+  const start = new Date(startDate);
+  const diffMs = start.getTime() - reminder.getTime();
+  const diffMinutes = Math.round(diffMs / (1000 * 60));
+  return diffMinutes > 0 ? diffMinutes.toString() : null;
+}
+
+// Helper function to calculate reminder date from start date and minutes
+function calculateReminderDate(
+  startDate: string | null,
+  minutes: string | null
+): string | null {
+  if (!startDate || !minutes) return null;
+  const start = new Date(startDate);
+  const reminder = new Date(start);
+  reminder.setMinutes(reminder.getMinutes() - parseInt(minutes, 10));
+  if (reminder < addMinutes(new Date(), 5)) {
+    return null;
+  }
+  return reminder.toISOString();
+}
+
 import {
   InsertAppointment,
   UpdateAppointment,
   WorkProject,
 } from "@/types/work.types";
+import { addMinutes } from "date-fns";
 
 interface AppointmentFormProps {
   initialValues: InsertAppointment | UpdateAppointment;
@@ -50,6 +80,18 @@ export default function AppointmentForm({
   const { getLocalizedText } = useIntl();
   const { data: workProjects } = useWorkProjects();
   const [isAllDay, setIsAllDay] = useState(initialValues.is_all_day ?? false);
+
+  // Calculate initial reminder minutes from existing reminder date
+  const initialReminderMinutes = useMemo(() => {
+    return calculateReminderMinutes(
+      initialValues.reminder || null,
+      initialValues.start_date || null
+    );
+  }, [initialValues.reminder, initialValues.start_date]);
+
+  const [reminderMinutes, setReminderMinutes] = useState<string | null>(
+    initialReminderMinutes
+  );
 
   const schema = z.object({
     title: z.string().min(1, {
@@ -117,7 +159,8 @@ export default function AppointmentForm({
   const handleStartDateChange = (value: Date | string | null) => {
     if (!value) return;
     const dateValue = value instanceof Date ? value : new Date(value);
-    form.setFieldValue("start_date", dateValue.toISOString());
+    const newStartDate = dateValue.toISOString();
+    form.setFieldValue("start_date", newStartDate);
 
     // If end_date is before start_date, adjust end_date
     const endDate = new Date(form.values.end_date || new Date());
@@ -130,6 +173,15 @@ export default function AppointmentForm({
         0
       );
       form.setFieldValue("end_date", newEndDate.toISOString());
+    }
+
+    // Update reminder date if reminder minutes are set
+    if (reminderMinutes) {
+      const newReminderDate = calculateReminderDate(
+        newStartDate,
+        reminderMinutes
+      );
+      form.setFieldValue("reminder", newReminderDate);
     }
   };
 
@@ -186,160 +238,218 @@ export default function AppointmentForm({
     },
   ];
 
+  const reminderOptions = [
+    {
+      value: "15",
+      label: getLocalizedText("15 Minuten", "15 minutes"),
+    },
+    {
+      value: "30",
+      label: getLocalizedText("30 Minuten", "30 minutes"),
+    },
+    {
+      value: "60",
+      label: getLocalizedText("1 Stunde", "1 hour"),
+    },
+    {
+      value: "120",
+      label: getLocalizedText("2 Stunden", "2 hours"),
+    },
+    {
+      value: "1440",
+      label: getLocalizedText("1 Tag", "1 day"),
+    },
+    {
+      value: "2880",
+      label: getLocalizedText("2 Tage", "2 days"),
+    },
+  ];
+
+  const handleReminderChange = (value: string | null) => {
+    setReminderMinutes(value);
+    if (value && form.values.start_date) {
+      const reminderDate = calculateReminderDate(form.values.start_date, value);
+      form.setFieldValue("reminder", reminderDate);
+    } else {
+      form.setFieldValue("reminder", null);
+    }
+  };
+
+  // Update reminder when form is submitted to ensure it's calculated correctly
+  const handleFormSubmit = (values: InsertAppointment | UpdateAppointment) => {
+    // Ensure reminder is calculated from current start_date and reminderMinutes
+    const finalValues = {
+      ...values,
+      reminder: calculateReminderDate(
+        values.start_date ?? null,
+        reminderMinutes
+      ),
+    };
+    onSubmit(finalValues);
+  };
+
   return (
-    <form onSubmit={form.onSubmit(onSubmit)}>
-      <Stack>
+    <form onSubmit={form.onSubmit(handleFormSubmit)}>
+      <Stack gap="lg">
         <Fieldset
           legend={getLocalizedText("Grundinformationen", "Basic Information")}
         >
-          <TextInput
-            withAsterisk
-            data-autofocus
-            label={getLocalizedText("Titel", "Title")}
-            placeholder={getLocalizedText("Titel eingeben", "Enter title")}
-            {...form.getInputProps("title")}
-          />
-          <Textarea
-            label={getLocalizedText("Beschreibung", "Description")}
-            placeholder={getLocalizedText(
-              "Beschreibung eingeben",
-              "Enter description"
-            )}
-            {...form.getInputProps("description")}
-            minRows={3}
-          />
-        </Fieldset>
-
-        <Fieldset legend={getLocalizedText("Zeit", "Time")}>
-          <Switch
-            label={getLocalizedText("Ganztägig", "All Day")}
-            checked={isAllDay}
-            onChange={(event) =>
-              handleAllDayToggle(event.currentTarget.checked)
-            }
-            mb="md"
-          />
-          {isAllDay ? (
-            <Group grow>
-              <LocaleDatePickerInput
-                minDate={new Date()}
-                withAsterisk
-                label={getLocalizedText("Startdatum", "Start Date")}
-                value={
-                  form.values.start_date
-                    ? new Date(form.values.start_date)
-                    : null
-                }
-                onChange={handleStartDateChange}
-                error={form.errors.start_date}
-              />
-              <LocaleDatePickerInput
-                minDate={new Date()}
-                withAsterisk
-                label={getLocalizedText("Enddatum", "End Date")}
-                value={
-                  form.values.end_date ? new Date(form.values.end_date) : null
-                }
-                onChange={handleEndDateChange}
-                error={form.errors.end_date}
-              />
-            </Group>
-          ) : (
-            <Group grow>
-              <LocaleDateTimePicker
-                withAsterisk
-                minDate={new Date()}
-                label={getLocalizedText("Startzeit", "Start Time")}
-                value={
-                  form.values.start_date
-                    ? new Date(form.values.start_date)
-                    : null
-                }
-                onChange={handleStartDateChange}
-                error={form.errors.start_date}
-              />
-              <LocaleDateTimePicker
-                withAsterisk
-                minDate={new Date()}
-                label={getLocalizedText("Endzeit", "End Time")}
-                value={
-                  form.values.end_date ? new Date(form.values.end_date) : null
-                }
-                onChange={handleEndDateChange}
-                error={form.errors.end_date}
-              />
-            </Group>
-          )}
-          <LocaleDateTimePicker
-            minDate={new Date()}
-            label={getLocalizedText("Erinnerung", "Reminder")}
-            value={form.values.reminder ? new Date(form.values.reminder) : null}
-            onChange={(value) =>
-              form.setFieldValue(
-                "reminder",
-                value ? new Date(value).toISOString() : null
-              )
-            }
-            error={form.errors.reminder}
-          />
+          <Stack gap="md">
+            <TextInput
+              withAsterisk
+              data-autofocus
+              label={getLocalizedText("Titel", "Title")}
+              placeholder={getLocalizedText("Titel eingeben", "Enter title")}
+              {...form.getInputProps("title")}
+            />
+            <Textarea
+              label={getLocalizedText("Beschreibung", "Description")}
+              placeholder={getLocalizedText(
+                "Beschreibung eingeben",
+                "Enter description"
+              )}
+              {...form.getInputProps("description")}
+              minRows={3}
+            />
+          </Stack>
         </Fieldset>
 
         <Fieldset
-          legend={getLocalizedText("Kategorisierung", "Categorization")}
+          legend={getLocalizedText("Zeit & Erinnerung", "Time & Reminder")}
         >
-          <Select
-            withAsterisk
-            label={getLocalizedText("Typ", "Type")}
-            data={typeOptions}
-            {...form.getInputProps("type")}
-          />
-        </Fieldset>
-
-        <Fieldset legend={getLocalizedText("Projekt", "Project")}>
-          <Select
-            label={getLocalizedText("Projekt", "Project")}
-            value={form.values.work_project_id || null}
-            error={form.errors.work_project_id}
-            placeholder={getLocalizedText(
-              "Projekt auswählen (optional)",
-              "Select project (optional)"
+          <Stack gap="md">
+            <Switch
+              label={getLocalizedText("Ganztägig", "All Day")}
+              checked={isAllDay}
+              onChange={(event) =>
+                handleAllDayToggle(event.currentTarget.checked)
+              }
+            />
+            {isAllDay ? (
+              <Group grow>
+                <LocaleDatePickerInput
+                  minDate={new Date()}
+                  withAsterisk
+                  label={getLocalizedText("Startdatum", "Start Date")}
+                  value={
+                    form.values.start_date
+                      ? new Date(form.values.start_date)
+                      : null
+                  }
+                  onChange={handleStartDateChange}
+                  error={form.errors.start_date}
+                />
+                <LocaleDatePickerInput
+                  minDate={new Date()}
+                  withAsterisk
+                  label={getLocalizedText("Enddatum", "End Date")}
+                  value={
+                    form.values.end_date ? new Date(form.values.end_date) : null
+                  }
+                  onChange={handleEndDateChange}
+                  error={form.errors.end_date}
+                />
+              </Group>
+            ) : (
+              <Group grow>
+                <LocaleDateTimePicker
+                  withAsterisk
+                  minDate={new Date()}
+                  label={getLocalizedText("Startzeit", "Start Time")}
+                  value={
+                    form.values.start_date
+                      ? new Date(form.values.start_date)
+                      : null
+                  }
+                  onChange={handleStartDateChange}
+                  error={form.errors.start_date}
+                />
+                <LocaleDateTimePicker
+                  withAsterisk
+                  minDate={new Date()}
+                  label={getLocalizedText("Endzeit", "End Time")}
+                  value={
+                    form.values.end_date ? new Date(form.values.end_date) : null
+                  }
+                  onChange={handleEndDateChange}
+                  error={form.errors.end_date}
+                />
+              </Group>
             )}
-            data={projects}
-            searchable
-            clearable
-            onChange={handleProjectChange}
-            rightSection={
-              onOpenProjectForm ? (
-                <Button
-                  onClick={onOpenProjectForm}
-                  leftSection={<IconPlus size={18} />}
-                  fw={500}
-                  variant="subtle"
-                >
-                  <Text fz="xs" c="dimmed">
-                    {getLocalizedText("Neu", "New")}
-                  </Text>
-                </Button>
-              ) : undefined
-            }
-            rightSectionWidth={onOpenProjectForm ? 86 : undefined}
-            rightSectionPointerEvents={onOpenProjectForm ? "auto" : undefined}
-          />
+            <Select
+              label={getLocalizedText("Erinnerung", "Reminder")}
+              placeholder={getLocalizedText(
+                "Erinnerung auswählen (optional)",
+                "Select reminder (optional)"
+              )}
+              data={reminderOptions}
+              value={reminderMinutes}
+              onChange={handleReminderChange}
+              clearable
+              error={form.errors.reminder}
+            />
+          </Stack>
         </Fieldset>
 
-        {newAppointment ? (
-          <CreateButton
-            onClick={form.onSubmit(onSubmit)}
-            type="submit"
-            mt="md"
-          />
-        ) : (
-          <UpdateButton
-            onClick={form.onSubmit(onSubmit)}
-            type="submit"
-            mt="md"
-          />
-        )}
+        <Fieldset legend={getLocalizedText("Details", "Details")}>
+          <Grid>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <Select
+                withAsterisk
+                label={getLocalizedText("Typ", "Type")}
+                data={typeOptions}
+                {...form.getInputProps("type")}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <Select
+                label={getLocalizedText("Projekt", "Project")}
+                value={form.values.work_project_id || null}
+                error={form.errors.work_project_id}
+                placeholder={getLocalizedText(
+                  "Projekt auswählen (optional)",
+                  "Select project (optional)"
+                )}
+                data={projects}
+                searchable
+                clearable
+                onChange={handleProjectChange}
+                rightSection={
+                  onOpenProjectForm ? (
+                    <Button
+                      onClick={onOpenProjectForm}
+                      leftSection={<IconPlus size={18} />}
+                      fw={500}
+                      variant="subtle"
+                    >
+                      <Text fz="xs" c="dimmed">
+                        {getLocalizedText("Neu", "New")}
+                      </Text>
+                    </Button>
+                  ) : undefined
+                }
+                rightSectionWidth={onOpenProjectForm ? 86 : undefined}
+                rightSectionPointerEvents={
+                  onOpenProjectForm ? "auto" : undefined
+                }
+              />
+            </Grid.Col>
+          </Grid>
+        </Fieldset>
+
+        <Group justify="flex-end" mt="md">
+          {newAppointment ? (
+            <CreateButton
+              onClick={form.onSubmit(handleFormSubmit)}
+              type="submit"
+            />
+          ) : (
+            <UpdateButton
+              onClick={form.onSubmit(handleFormSubmit)}
+              type="submit"
+            />
+          )}
+        </Group>
       </Stack>
     </form>
   );

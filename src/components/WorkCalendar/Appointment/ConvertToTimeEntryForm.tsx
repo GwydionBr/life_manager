@@ -169,7 +169,6 @@ export function ConvertToTimeEntryForm({
         // Update the appointment with the time entry ID and status
         await updateAppointment(appointment.id, {
           work_time_entry_id: result[0].id,
-          status: "converted",
         });
 
         showActionSuccessNotification(

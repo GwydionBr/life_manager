@@ -11,7 +11,6 @@ import TimeTrackerComponentBig from "./Big/TimeTrackerComponentBig";
 import TimeTrackerComponentSmall from "./Small/TimeTrackerComponentSmall";
 
 import { InsertWorkTimeEntry } from "@/types/work.types";
-import { AppointmentStatus } from "@/types/workCalendar.types";
 
 interface TimeTrackerInstanceProps {
   timer: Timer;
@@ -104,7 +103,6 @@ export default function TimeTrackerInstance({
     if (timer.appointmentId && newTimeEntry) {
       await updateAppointment(timer.appointmentId, {
         work_time_entry_id: newTimeEntry[0].id,
-        status: AppointmentStatus.CONVERTED,
       });
     }
 

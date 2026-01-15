@@ -275,7 +275,10 @@ export default function CalendarAside({ isBig }: CalendarAsideProps) {
                             )}
                           </Text>
                         </Stack>
-                        <AppointmentStatusBadge status={appointment.status} />
+                        <AppointmentStatusBadge
+                          status={appointment.status}
+                          converted={appointment.work_time_entry_id !== null}
+                        />
                       </Group>
                     </Paper>
                   ))}
