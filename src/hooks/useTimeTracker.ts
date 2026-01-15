@@ -161,6 +161,12 @@ export function useTimeTracker(timer: Timer): TimeTrackerReturn {
       activeSeconds,
     });
 
+    // TODO This does not work properly when several timers are running
+    // --- Show ProjectTitle and ActiveTime in tab (document title) ---
+    if (typeof window !== "undefined" && project?.title && activeTime) {
+      document.title = `${activeTime} - ${project.title}`;
+    }
+
     return {
       activeSeconds,
       activeTime,
