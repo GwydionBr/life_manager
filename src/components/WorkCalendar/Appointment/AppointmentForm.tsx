@@ -14,6 +14,7 @@ import {
   Switch,
   Button,
   Grid,
+  ActionIcon,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { z } from "zod";
@@ -416,19 +417,15 @@ export default function AppointmentForm({
                 onChange={handleProjectChange}
                 rightSection={
                   onOpenProjectForm ? (
-                    <Button
+                    <ActionIcon
                       onClick={onOpenProjectForm}
-                      leftSection={<IconPlus size={18} />}
-                      fw={500}
                       variant="subtle"
+                      size="md"
                     >
-                      <Text fz="xs" c="dimmed">
-                        {getLocalizedText("Neu", "New")}
-                      </Text>
-                    </Button>
+                      <IconPlus size={18} strokeWidth={1.5} />
+                    </ActionIcon>
                   ) : undefined
                 }
-                rightSectionWidth={onOpenProjectForm ? 86 : undefined}
                 rightSectionPointerEvents={
                   onOpenProjectForm ? "auto" : undefined
                 }

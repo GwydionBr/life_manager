@@ -107,7 +107,7 @@ export default function ColumnHeader({
             {day && (
               <Stack gap={6} align="center" w="100%">
                 <Group gap={6} justify="center" wrap="nowrap">
-                  {isDayToday && (
+                  {/* {isDayToday && (
                     <Badge
                       size="xs"
                       variant="light"
@@ -116,7 +116,7 @@ export default function ColumnHeader({
                     >
                       {getLocalizedText("Heute", "Today")}
                     </Badge>
-                  )}
+                  )} */}
                   {!isDayToday && (
                     <Text fw={700} size="sm" c="dimmed">
                       {formatDate(day.day)}
