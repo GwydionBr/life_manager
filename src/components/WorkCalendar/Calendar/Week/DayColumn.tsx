@@ -5,20 +5,19 @@ import { useIntl } from "@/hooks/useIntl";
 
 import { alpha, Box, Skeleton, Stack, Text } from "@mantine/core";
 
-import { clipSessionToDay, clipAppointmentToDay } from "./calendarUtils";
+import {
+  clipSessionToDay,
+  clipAppointmentToDay,
+} from "@/components/WorkCalendar/calendarUtils";
 import { isToday, startOfDay, endOfDay } from "date-fns";
 import {
   CalendarTimeEntry,
   CalendarAppointment,
 } from "@/types/workCalendar.types";
-import CalendarTimeEntryEvent from "./CalendarEvent/CalendarTimeEntryEvent";
-import CalendarAppointmentEvent from "./CalendarEvent/CalendarAppointmentEvent";
-import TimeTrackerEvent from "./CalendarEvent/TimeTrackerEvent/TimeTrackerEvent";
-import NewSessionEvent from "./CalendarEvent/NewSessionEvent";
-
-// ============================================================================
-// Types
-// ============================================================================
+import CalendarTimeEntryEvent from "@/components/WorkCalendar/CalendarEvent/CalendarTimeEntryEvent";
+import CalendarAppointmentEvent from "@/components/WorkCalendar/CalendarEvent/CalendarAppointmentEvent";
+import TimeTrackerEvent from "@/components/WorkCalendar/CalendarEvent/TimeTrackerEvent/TimeTrackerEvent";
+import NewSessionEvent from "@/components/WorkCalendar/CalendarEvent/NewSessionEvent";
 
 interface DayColumnProps {
   /** The day this column represents */
@@ -59,15 +58,7 @@ interface DayColumnProps {
   snapYToInterval: (y: number) => number;
 }
 
-// ============================================================================
-// Constants
-// ============================================================================
-
 const SKELETON_COUNT = 24;
-
-// ============================================================================
-// Component
-// ============================================================================
 
 /**
  * Renders a single day column in the calendar.
@@ -114,10 +105,6 @@ export function DayColumn({
   // Snapped Y position for new session indicator
   const snappedY = snapYToInterval(y);
 
-  // ============================================================================
-  // Memoized Calculations
-  // ============================================================================
-
   /**
    * Clip sessions to this day's boundaries.
    * Sessions spanning midnight are clipped to show only the portion within this day.
@@ -136,10 +123,6 @@ export function DayColumn({
     [appointments, dayStart, dayEnd]
   );
 
-  // ============================================================================
-  // Event Handlers
-  // ============================================================================
-
   /**
    * Handle click for new session creation.
    * First click sets start position, second click sets end position.
@@ -154,10 +137,6 @@ export function DayColumn({
       setEndNewSession(newY);
     }
   }
-
-  // ============================================================================
-  // Render
-  // ============================================================================
 
   return (
     <Box
@@ -258,10 +237,6 @@ export function DayColumn({
     </Box>
   );
 }
-
-// ============================================================================
-// Sub-Components
-// ============================================================================
 
 /**
  * Renders horizontal grid lines for each hour/time unit

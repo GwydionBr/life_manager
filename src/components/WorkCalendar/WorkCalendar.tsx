@@ -2,7 +2,7 @@ import { useHotkeys } from "@mantine/hooks";
 import { useWorkCalendar } from "@/hooks/useWorkCalendar";
 
 import { ScrollArea, Stack } from "@mantine/core";
-import CalendarGrid from "./Calendar/CalendarGrid";
+import WeekCalendarGrid from "./Calendar/Week/WeekCalendarGrid";
 import MonthCalendarGrid from "./Calendar/Month/MonthCalendarGrid";
 import EditTimeEntryDrawer from "@/components/Work/WorkTimeEntry/EditTimeEntryDrawer";
 import EditAppointmentDrawer from "./Appointment/EditAppointmentDrawer";
@@ -87,7 +87,7 @@ export default function WorkCalendar() {
             handleDayClick={handleDayClick}
           />
         ) : (
-          <CalendarGrid
+          <WeekCalendarGrid
             visibleProjects={visibleProjects}
             handleNextAndPrev={handleNextAndPrev}
             isFetching={false}

@@ -497,12 +497,15 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
   // Scroll to current time on initial mount
   // Uses useLayoutEffect to run before paint, with a small delay to ensure DOM is ready
   useLayoutEffect(() => {
+    if (viewMode === "month") {
+      return;
+    }
     // Small timeout to ensure ScrollArea has mounted and rendered
     const timeoutId = requestAnimationFrame(() => {
       handleScrollToNow();
     });
     return () => cancelAnimationFrame(timeoutId);
-  }, [handleScrollToNow]);
+  }, [handleScrollToNow, viewMode]);
 
   // This effect is no longer needed since we're using view-specific states
   // Each view maintains its own state independently

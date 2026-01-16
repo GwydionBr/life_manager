@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Box, Stack, Text } from "@mantine/core";
 import { useIntl } from "@/hooks/useIntl";
-import { timeUnitIndexToDate } from "./calendarUtils";
+import { timeUnitIndexToDate } from "../calendarUtils";
 
 // ============================================================================
 // Types

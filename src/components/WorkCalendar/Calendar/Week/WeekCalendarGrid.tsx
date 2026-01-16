@@ -10,8 +10,8 @@ import { useSettings } from "@/db/collections/settings/use-settings-query";
 import { useIntl } from "@/hooks/useIntl";
 
 import { Grid, Stack, Group, Box, Text } from "@mantine/core";
-import { DayColumn } from "@/components/WorkCalendar/DayColumn";
-import { TimeColumn } from "@/components/WorkCalendar/TimeColumn";
+import { DayColumn } from "@/components/WorkCalendar/Calendar/Week/DayColumn";
+import { TimeColumn } from "@/components/WorkCalendar/Calendar/TimeColumn";
 import ColumnHeader from "@/components/WorkCalendar/Calendar/ColumnHeader";
 import PrevActionIcon from "@/components/UI/ActionIcons/PrevActionIcon";
 import NextActionIcon from "@/components/UI/ActionIcons/NextActionIcon";
@@ -23,11 +23,7 @@ import { startOfDay } from "date-fns";
 import { CalendarDay } from "@/types/workCalendar.types";
 import { WorkProject } from "@/types/work.types";
 
-// ============================================================================
-// Types
-// ============================================================================
-
-interface CalendarGridProps {
+interface WeekCalendarGridProps {
   /** Array of calendar days with sessions and appointments */
   days: CalendarDay[];
   /** Whether data is currently loading */
@@ -48,23 +44,15 @@ interface CalendarGridProps {
   visibleProjects: WorkProject[];
 }
 
-// ============================================================================
-// Constants
-// ============================================================================
-
 /** Update interval for current time indicator (ms) */
 const TIME_UPDATE_INTERVAL = 5000;
-
-// ============================================================================
-// Component
-// ============================================================================
 
 /**
  * Main calendar grid component.
  * Displays day columns with time slots, sessions, and appointments.
  * Handles new session creation via click-drag interaction.
  */
-export default function CalendarGrid({
+export default function WeekCalendarGrid({
   days,
   isFetching,
   hourMultiplier,
@@ -74,11 +62,7 @@ export default function CalendarGrid({
   handleSessionClick,
   handleAppointmentClick,
   handleNextAndPrev,
-}: CalendarGridProps) {
-  // ============================================================================
-  // State
-  // ============================================================================
-
+}: WeekCalendarGridProps) {
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
 
   // New session creation state
@@ -91,10 +75,6 @@ export default function CalendarGrid({
     { open: openSessionFormModal, close: closeSessionFormModal },
   ] = useDisclosure(false);
 
-  // ============================================================================
-  // Store & Hooks
-  // ============================================================================
-
   const { addingMode } = useCalendarStore();
   const { formatDateTime } = useIntl();
   const { data: settings } = useSettings();
@@ -104,10 +84,6 @@ export default function CalendarGrid({
   const throttledX = useThrottledValue(x, 50);
   const { hovered, ref: hoverRef } = useHover();
 
-  // ============================================================================
-  // Effects
-  // ============================================================================
-
   // Update current time periodically for the time indicator
   useEffect(() => {
     const interval = setInterval(() => {
@@ -116,10 +92,6 @@ export default function CalendarGrid({
 
     return () => clearInterval(interval);
   }, []);
-
-  // ============================================================================
-  // Time Conversion Functions
-  // ============================================================================
 
   /**
    * Converts a Date to Y-position (pixels) within the day timeline.
@@ -191,10 +163,6 @@ export default function CalendarGrid({
     [settings, yToTime, timeToY]
   );
 
-  // ============================================================================
-  // Event Handlers
-  // ============================================================================
-
   /**
    * Handle grid click for new session creation.
    * Opens the modal when both start and end positions are set.
@@ -214,10 +182,6 @@ export default function CalendarGrid({
     setNewSessionDay(null);
   }
 
-  // ============================================================================
-  // Computed Values
-  // ============================================================================
-
   /**
    * Calculate initial dates for new entry modal
    */
@@ -236,10 +200,6 @@ export default function CalendarGrid({
       endDate: endTime,
     };
   }, [newSessionDay, startNewSession, endNewSession, yToTime]);
-
-  // ============================================================================
-  // Render
-  // ============================================================================
 
   return (
     <Box w="100%">
@@ -356,10 +316,6 @@ export default function CalendarGrid({
     </Box>
   );
 }
-
-// ============================================================================
-// Sub-Components
-// ============================================================================
 
 /**
  * Sticky calendar header with navigation arrows and day labels
