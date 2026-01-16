@@ -18,8 +18,6 @@ import CalendarLegendButton from "./CalendarLegendButton";
 import { ViewMode } from "@/types/workCalendar.types";
 import { WorkProject } from "@/types/work.types";
 import Shortcut from "@/components/UI/Shortcut";
-import { startOfWeek, endOfWeek } from "date-fns";
-import { de } from "date-fns/locale";
 
 interface CalendarLegendProps {
   visibleProjects: WorkProject[];
@@ -33,24 +31,12 @@ export default function CalendarLegend({
   onCreateAppointment,
 }: CalendarLegendProps) {
   const { getLocalizedText } = useIntl();
-  const {
-    viewMode,
-    setViewMode,
-    referenceDate,
-    setDateRange,
-    setCurrentDateRange,
-  } = useCalendarStore();
+  const { viewMode, setViewMode } = useCalendarStore();
   const { isAsideOpen } = useSettingsStore();
 
   const handleViewModeChange = (newMode: ViewMode) => {
+    // Each view maintains its own state, so we just switch views
     setViewMode(newMode);
-    // When switching from month to week, set date range to current week
-    if (viewMode === "month" && newMode === "week") {
-      const weekStart = startOfWeek(referenceDate, { locale: de });
-      const weekEnd = endOfWeek(referenceDate, { locale: de });
-      setDateRange([weekStart, weekEnd]);
-      setCurrentDateRange([weekStart, weekEnd]);
-    }
   };
 
   return (

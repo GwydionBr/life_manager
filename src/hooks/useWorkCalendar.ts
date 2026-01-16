@@ -1,11 +1,4 @@
-import {
-  useMemo,
-  useRef,
-  useCallback,
-  useLayoutEffect,
-  useState,
-  useEffect,
-} from "react";
+import { useMemo, useRef, useCallback, useLayoutEffect, useState } from "react";
 import { useDisclosure, usePrevious, useDidUpdate } from "@mantine/hooks";
 
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
@@ -99,16 +92,17 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
     rasterHeight,
     addingMode,
     setAddingMode,
-    referenceDate,
-    setReferenceDate,
+    // View-specific states
+    dayViewDate,
+    setDayViewDate,
+    weekViewDateRange,
+    setWeekViewDateRange,
+    monthViewDate,
+    setMonthViewDate,
     selectedSession,
     setSelectedSession,
     selectedProject,
     setSelectedProject,
-    dateRange,
-    setDateRange,
-    currentDateRange,
-    setCurrentDateRange,
     zoomIndex,
   } = useCalendarStore();
 
@@ -141,12 +135,12 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
    */
   const days: Date[] = useMemo(() => {
     if (viewMode === "day") {
-      return [startOfDay(referenceDate)];
+      return [startOfDay(dayViewDate)];
     }
 
     if (viewMode === "month") {
-      const monthStart = startOfMonth(referenceDate);
-      const monthEnd = endOfMonth(referenceDate);
+      const monthStart = startOfMonth(monthViewDate);
+      const monthEnd = endOfMonth(monthViewDate);
       const calendarStart = startOfWeek(monthStart, {
         locale: locale === "de-DE" ? de : enUS,
       });
@@ -166,13 +160,13 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
     }
 
     // Week view
-    const [rangeStart, rangeEnd] = currentDateRange;
+    const [rangeStart, rangeEnd] = weekViewDateRange;
     const start = startOfDay(rangeStart);
     const end = startOfDay(rangeEnd);
     const length = differenceInCalendarDays(end, start) + 1;
 
     return Array.from({ length }, (_, i) => addDays(start, i));
-  }, [viewMode, currentDateRange, referenceDate, locale]);
+  }, [viewMode, weekViewDateRange, dayViewDate, monthViewDate, locale]);
 
   /**
    * Create a map of project ID to project for fast lookups
@@ -371,10 +365,10 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
    */
   const handleReferenceDateChange = useCallback(
     (date: Date) => {
-      setReferenceDate(date);
+      setDayViewDate(date);
       setViewMode("day");
     },
-    [setReferenceDate, setViewMode]
+    [setDayViewDate, setViewMode]
   );
 
   /**
@@ -383,41 +377,31 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
   const handleNextAndPrev = useCallback(
     (delta: number = 1) => {
       if (viewMode === "day") {
-        setReferenceDate(addDays(referenceDate, delta));
+        setDayViewDate(addDays(dayViewDate, delta));
         return;
       }
 
       if (viewMode === "month") {
-        const newDate = addMonths(referenceDate, delta);
-        setReferenceDate(newDate);
-        // Update date range to cover the entire month
-        const monthStart = startOfMonth(newDate);
-        const monthEnd = endOfMonth(newDate);
-        setDateRange([monthStart, monthEnd]);
-        setCurrentDateRange([monthStart, monthEnd]);
+        const newDate = addMonths(monthViewDate, delta);
+        setMonthViewDate(newDate);
         return;
       }
 
       // Week view
-      const [s, e] = dateRange;
-      if (s && e) {
-        const len = differenceInCalendarDays(e, s) + 1;
-        const ns = addDays(s, delta * len);
-        const ne = addDays(e, delta * len);
-        setDateRange([ns, ne]);
-        setCurrentDateRange([ns, ne]);
-        setReferenceDate(ns);
-      } else {
-        setReferenceDate(addDays(referenceDate, delta * 7));
-      }
+      const [s, e] = weekViewDateRange;
+      const len = differenceInCalendarDays(e, s) + 1;
+      const ns = addDays(s, delta * len);
+      const ne = addDays(e, delta * len);
+      setWeekViewDateRange([ns, ne]);
     },
     [
       viewMode,
-      referenceDate,
-      dateRange,
-      setReferenceDate,
-      setDateRange,
-      setCurrentDateRange,
+      dayViewDate,
+      monthViewDate,
+      weekViewDateRange,
+      setDayViewDate,
+      setMonthViewDate,
+      setWeekViewDateRange,
     ]
   );
 
@@ -520,31 +504,8 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
     return () => cancelAnimationFrame(timeoutId);
   }, [handleScrollToNow]);
 
-  // Initialize date range when switching to month view
-  useEffect(() => {
-    if (viewMode === "month") {
-      const monthStart = startOfMonth(referenceDate);
-      const monthEnd = endOfMonth(referenceDate);
-      const [currentStart, currentEnd] = currentDateRange;
-
-      // Only update if the current range doesn't match the month
-      if (
-        !currentStart ||
-        !currentEnd ||
-        currentStart.getTime() !== monthStart.getTime() ||
-        currentEnd.getTime() !== monthEnd.getTime()
-      ) {
-        setDateRange([monthStart, monthEnd]);
-        setCurrentDateRange([monthStart, monthEnd]);
-      }
-    }
-  }, [
-    viewMode,
-    referenceDate,
-    currentDateRange,
-    setDateRange,
-    setCurrentDateRange,
-  ]);
+  // This effect is no longer needed since we're using view-specific states
+  // Each view maintains its own state independently
 
   // Maintain scroll position when zoom changes (only on updates, not initial mount)
   useDidUpdate(() => {

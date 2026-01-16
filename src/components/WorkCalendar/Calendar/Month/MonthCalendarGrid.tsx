@@ -47,12 +47,12 @@ export default function MonthCalendarGrid({
   handleDayClick,
 }: MonthCalendarGridProps) {
   const { getWeekdayName } = useIntl();
-  const { referenceDate } = useCalendarStore();
+  const { monthViewDate } = useCalendarStore();
   const { height } = useViewportSize();
 
   // Get the first day of the month
-  const monthStart = startOfMonth(referenceDate);
-  const monthEnd = endOfMonth(referenceDate);
+  const monthStart = startOfMonth(monthViewDate);
+  const monthEnd = endOfMonth(monthViewDate);
 
   // Get the start of the week containing the first day of the month
   const calendarStart = startOfWeek(monthStart, { locale: de });

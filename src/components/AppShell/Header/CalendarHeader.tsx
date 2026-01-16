@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 
 import { useIntl } from "@/hooks/useIntl";
+import { useState } from "react";
 import { useCalendarStore } from "@/stores/calendarStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 
@@ -29,8 +30,6 @@ import {
   addMonths,
   differenceInCalendarDays,
   isSameDay,
-  startOfMonth,
-  endOfMonth,
 } from "date-fns";
 import { useMemo } from "react";
 
@@ -41,18 +40,21 @@ export default function CalendarHeader() {
   const { calendarColor, primaryColor } = useSettingsStore();
   const {
     viewMode,
-    dateRange,
-    currentDateRange,
     addingMode,
-    referenceDate,
     zoomIndex,
     setAddingMode,
-    setDateRange,
-    setCurrentDateRange,
-    setReferenceDate,
     setViewMode,
     changeZoomIndex,
+    // View-specific states
+    dayViewDate,
+    setDayViewDate,
+    weekViewDateRange,
+    setWeekViewDateRange,
+    monthViewDate,
+    setMonthViewDate,
   } = useCalendarStore();
+  const [selectedDateRange, setSelectedDateRange] =
+    useState<[Date | null, Date | null]>(weekViewDateRange);
   const today = dayjs();
   const theme = useMantineTheme();
 
@@ -64,46 +66,38 @@ export default function CalendarHeader() {
 
   function handleNextAndPrev(delta: number = 1) {
     if (viewMode === "day") {
-      setReferenceDate(addDays(referenceDate, delta));
+      setDayViewDate(addDays(dayViewDate, delta));
       return;
     }
 
     if (viewMode === "month") {
-      const newDate = addMonths(referenceDate, delta);
-      setReferenceDate(newDate);
-      const monthStart = startOfMonth(newDate);
-      const monthEnd = endOfMonth(newDate);
-      setDateRange([monthStart, monthEnd]);
-      setCurrentDateRange([monthStart, monthEnd]);
+      const newDate = addMonths(monthViewDate, delta);
+      setMonthViewDate(newDate);
       return;
     }
 
-    const [s, e] = dateRange;
-    if (s && e) {
-      const len = differenceInCalendarDays(e, s) + 1;
-      const ns = addDays(s, delta * len);
-      const ne = addDays(e, delta * len);
-      setDateRange([ns, ne]);
-      setCurrentDateRange([ns, ne]);
-      setReferenceDate(ns);
-    } else {
-      setReferenceDate(addDays(referenceDate, delta * 7));
-    }
+    // Week view
+    const [s, e] = weekViewDateRange;
+    const len = differenceInCalendarDays(e, s) + 1;
+    const ns = addDays(s, delta * len);
+    const ne = addDays(e, delta * len);
+    setWeekViewDateRange([ns, ne]);
   }
 
   function setRangeAndMaybeSwitch(start: Date | null, end: Date | null) {
     if (!start && !end) {
-      setDateRange([currentDateRange[0], currentDateRange[1]]);
       return;
     }
-    setDateRange([start ? new Date(start) : null, end ? new Date(end) : null]);
+
+    setSelectedDateRange([start, end]);
+
+    // If both are selected
     if (start && end) {
-      setCurrentDateRange([start, end]);
       if (isSameDay(start, end)) {
-        setReferenceDate(new Date(start));
+        setDayViewDate(new Date(start));
         setViewMode("day");
       } else {
-        setReferenceDate(new Date(start));
+        setWeekViewDateRange([new Date(start), new Date(end)]);
         setViewMode("week");
       }
     }
@@ -160,26 +154,21 @@ export default function CalendarHeader() {
           <PrevActionIcon onClick={() => handleNextAndPrev(-1)} />
           {viewMode === "day" ? (
             <LocaleDatePickerInput
-              value={referenceDate}
+              value={dayViewDate}
               onChange={(value) => {
                 if (value) {
-                  setReferenceDate(new Date(value));
+                  setDayViewDate(new Date(value));
                 }
               }}
             />
           ) : viewMode === "month" ? (
             <MonthPickerInput
-              value={referenceDate}
+              value={monthViewDate}
               onChange={(value) => {
                 if (value) {
-                  const dateValue =
-                    new Date(value);
+                  const dateValue = new Date(value);
                   if (!isNaN(dateValue.getTime())) {
-                    const monthStart = startOfMonth(dateValue);
-                    const monthEnd = endOfMonth(dateValue);
-                    setReferenceDate(dateValue);
-                    setDateRange([monthStart, monthEnd]);
-                    setCurrentDateRange([monthStart, monthEnd]);
+                    setMonthViewDate(dateValue);
                     setViewMode("month");
                   }
                 }
@@ -190,7 +179,7 @@ export default function CalendarHeader() {
             <DatePickerInput
               allowSingleDateInRange
               type="range"
-              value={dateRange}
+              value={selectedDateRange}
               valueFormat={getLocalizedText("DD. MMM YYYY", "MMM DD, YYYY")}
               onChange={(value) => {
                 const [start, end] = value;

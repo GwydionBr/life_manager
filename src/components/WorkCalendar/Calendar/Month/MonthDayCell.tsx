@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useIntl } from "@/hooks/useIntl";
 
-import { Box, Text, Stack, Badge, HoverCard, alpha } from "@mantine/core";
+import { Box, Text, Stack, Badge, HoverCard } from "@mantine/core";
 import { format } from "date-fns";
 import CalendarEventHoverCard from "@/components/WorkCalendar/CalendarEvent/CalendarEventHoverCard";
 import AppointmentHoverCard from "@/components/WorkCalendar/CalendarEvent/AppointmentHoverCard";
@@ -94,10 +94,8 @@ export function MonthDayCell({
                 <Badge
                   size="xs"
                   variant="filled"
+                  color={color}
                   style={{
-                    backgroundColor: alpha(color, 0.2),
-                    color: color,
-                    border: `1px solid ${color}`,
                     cursor: "pointer",
                     width: "100%",
                     overflow: "hidden",
