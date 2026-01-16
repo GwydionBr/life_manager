@@ -8,7 +8,7 @@ import {
 import { Currency } from "./settings.types";
 import { WorkTimeEntry } from "./work.types";
 
-export type ViewMode = "day" | "week";
+export type ViewMode = "day" | "week" | "month";
 
 export type Appointment = Tables<"appointment">;
 export type InsertAppointment = TablesInsert<"appointment">;

@@ -18,6 +18,8 @@ import CalendarLegendButton from "./CalendarLegendButton";
 import { ViewMode } from "@/types/workCalendar.types";
 import { WorkProject } from "@/types/work.types";
 import Shortcut from "@/components/UI/Shortcut";
+import { startOfWeek, endOfWeek } from "date-fns";
+import { de } from "date-fns/locale";
 
 interface CalendarLegendProps {
   visibleProjects: WorkProject[];
@@ -31,8 +33,25 @@ export default function CalendarLegend({
   onCreateAppointment,
 }: CalendarLegendProps) {
   const { getLocalizedText } = useIntl();
-  const { viewMode, setViewMode } = useCalendarStore();
+  const {
+    viewMode,
+    setViewMode,
+    referenceDate,
+    setDateRange,
+    setCurrentDateRange,
+  } = useCalendarStore();
   const { isAsideOpen } = useSettingsStore();
+
+  const handleViewModeChange = (newMode: ViewMode) => {
+    setViewMode(newMode);
+    // When switching from month to week, set date range to current week
+    if (viewMode === "month" && newMode === "week") {
+      const weekStart = startOfWeek(referenceDate, { locale: de });
+      const weekEnd = endOfWeek(referenceDate, { locale: de });
+      setDateRange([weekStart, weekEnd]);
+      setCurrentDateRange([weekStart, weekEnd]);
+    }
+  };
 
   return (
     <Grid
@@ -93,7 +112,13 @@ export default function CalendarLegend({
       <Grid.Col span={{ base: 6, md: 8 }}>
         <ScrollArea.Autosize h="100%" type="never">
           {visibleProjects.length > 0 ? (
-            <Group align="center" justify="center" wrap="nowrap" gap="xs" w="100%">
+            <Group
+              align="center"
+              justify="center"
+              wrap="nowrap"
+              gap="xs"
+              w="100%"
+            >
               {visibleProjects.map((p) => (
                 <CalendarLegendButton key={p.id} p={p} />
               ))}
@@ -111,12 +136,16 @@ export default function CalendarLegend({
           <SegmentedControl
             color="teal"
             value={viewMode}
-            onChange={(v) => setViewMode(v as ViewMode)}
+            onChange={(v) => handleViewModeChange(v as ViewMode)}
             data={[
               { label: getLocalizedText("Tag", "Day"), value: "day" },
               {
                 label: getLocalizedText("Woche", "Week"),
                 value: "week",
+              },
+              {
+                label: getLocalizedText("Monat", "Month"),
+                value: "month",
               },
             ]}
           />

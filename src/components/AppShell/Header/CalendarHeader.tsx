@@ -21,10 +21,17 @@ import PrevActionIcon from "@/components/UI/ActionIcons/PrevActionIcon";
 import NextActionIcon from "@/components/UI/ActionIcons/NextActionIcon";
 import LocaleDatePickerInput from "@/components/UI/Locale/LocaleDatePickerInput";
 import Shortcut from "@/components/UI/Shortcut";
-import { DatePickerInput } from "@mantine/dates";
+import { DatePickerInput, MonthPickerInput } from "@mantine/dates";
 import { IconCalendar, IconMinus, IconPlus } from "@tabler/icons-react";
 
-import { addDays, differenceInCalendarDays, isSameDay } from "date-fns";
+import {
+  addDays,
+  addMonths,
+  differenceInCalendarDays,
+  isSameDay,
+  startOfMonth,
+  endOfMonth,
+} from "date-fns";
 import { useMemo } from "react";
 
 const zoomLabels = ["1 h", "30 min", "15 min", "10 min", "5 min"];
@@ -60,6 +67,17 @@ export default function CalendarHeader() {
       setReferenceDate(addDays(referenceDate, delta));
       return;
     }
+
+    if (viewMode === "month") {
+      const newDate = addMonths(referenceDate, delta);
+      setReferenceDate(newDate);
+      const monthStart = startOfMonth(newDate);
+      const monthEnd = endOfMonth(newDate);
+      setDateRange([monthStart, monthEnd]);
+      setCurrentDateRange([monthStart, monthEnd]);
+      return;
+    }
+
     const [s, e] = dateRange;
     if (s && e) {
       const len = differenceInCalendarDays(e, s) + 1;
@@ -148,6 +166,25 @@ export default function CalendarHeader() {
                   setReferenceDate(new Date(value));
                 }
               }}
+            />
+          ) : viewMode === "month" ? (
+            <MonthPickerInput
+              value={referenceDate}
+              onChange={(value) => {
+                if (value) {
+                  const dateValue =
+                    new Date(value);
+                  if (!isNaN(dateValue.getTime())) {
+                    const monthStart = startOfMonth(dateValue);
+                    const monthEnd = endOfMonth(dateValue);
+                    setReferenceDate(dateValue);
+                    setDateRange([monthStart, monthEnd]);
+                    setCurrentDateRange([monthStart, monthEnd]);
+                    setViewMode("month");
+                  }
+                }
+              }}
+              valueFormat={getLocalizedText("MMMM YYYY", "MMMM YYYY")}
             />
           ) : (
             <DatePickerInput

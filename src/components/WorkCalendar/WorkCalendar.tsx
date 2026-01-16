@@ -3,6 +3,7 @@ import { useWorkCalendar } from "@/hooks/useWorkCalendar";
 
 import { ScrollArea, Stack } from "@mantine/core";
 import CalendarGrid from "./Calendar/CalendarGrid";
+import MonthCalendarGrid from "./Calendar/Month/MonthCalendarGrid";
 import EditTimeEntryDrawer from "@/components/Work/WorkTimeEntry/EditTimeEntryDrawer";
 import EditAppointmentDrawer from "./Appointment/EditAppointmentDrawer";
 import NewCalendarEntryModal from "./CalendarEntry/NewCalendarEntryModal";
@@ -22,8 +23,10 @@ export default function WorkCalendar() {
     selectedAppointment,
     selectedProject,
     addingMode,
+    viewMode,
     rasterHeight,
     hourMultiplier,
+    clickedDate,
 
     // Refs
     viewport,
@@ -39,6 +42,7 @@ export default function WorkCalendar() {
     handleAppointmentClick,
     handleScrollToNow,
     setAddingMode,
+    handleDayClick,
   } = useWorkCalendar();
 
   useHotkeys([
@@ -71,20 +75,30 @@ export default function WorkCalendar() {
       viewportRef={viewport}
       h="calc(100vh - 55px)"
       type="never"
-      scrollbars="y"
+      scrollbars={viewMode === "month" ? false : "y"}
     >
       <Stack>
-        <CalendarGrid
-          visibleProjects={visibleProjects}
-          handleNextAndPrev={handleNextAndPrev}
-          isFetching={false}
-          days={calendarDays}
-          setReferenceDate={handleReferenceDateChange}
-          handleSessionClick={handleSessionClick}
-          handleAppointmentClick={handleAppointmentClick}
-          hourMultiplier={hourMultiplier}
-          rasterHeight={rasterHeight}
-        />
+        {viewMode === "month" ? (
+          <MonthCalendarGrid
+            handleNextAndPrev={handleNextAndPrev}
+            days={calendarDays}
+            handleSessionClick={handleSessionClick}
+            handleAppointmentClick={handleAppointmentClick}
+            handleDayClick={handleDayClick}
+          />
+        ) : (
+          <CalendarGrid
+            visibleProjects={visibleProjects}
+            handleNextAndPrev={handleNextAndPrev}
+            isFetching={false}
+            days={calendarDays}
+            setReferenceDate={handleReferenceDateChange}
+            handleSessionClick={handleSessionClick}
+            handleAppointmentClick={handleAppointmentClick}
+            hourMultiplier={hourMultiplier}
+            rasterHeight={rasterHeight}
+          />
+        )}
       </Stack>
       <CalendarLegend
         visibleProjects={visibleProjects}
@@ -116,6 +130,28 @@ export default function WorkCalendar() {
       <NewCalendarEntryModal
         opened={newAppointmentModalOpened}
         onClose={closeNewAppointmentModal}
+        initialStartDate={
+          viewMode === "month" && clickedDate
+            ? new Date(
+                clickedDate.getFullYear(),
+                clickedDate.getMonth(),
+                clickedDate.getDate(),
+                9,
+                0
+              )
+            : undefined
+        }
+        initialEndDate={
+          viewMode === "month" && clickedDate
+            ? new Date(
+                clickedDate.getFullYear(),
+                clickedDate.getMonth(),
+                clickedDate.getDate(),
+                10,
+                0
+              )
+            : undefined
+        }
       />
     </ScrollArea>
   );

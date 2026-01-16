@@ -1,4 +1,11 @@
-import { useMemo, useRef, useCallback, useLayoutEffect, useState } from "react";
+import {
+  useMemo,
+  useRef,
+  useCallback,
+  useLayoutEffect,
+  useState,
+  useEffect,
+} from "react";
 import { useDisclosure, usePrevious, useDidUpdate } from "@mantine/hooks";
 
 import { useWorkProjects } from "@/db/collections/work/work-project/use-work-project-query";
@@ -6,7 +13,17 @@ import { useWorkTimeEntries } from "@/db/collections/work/work-time-entry/use-wo
 import { useCalendarAppointments } from "@/db/collections/work/appointment/use-appointment-query";
 import { useCalendarStore } from "@/stores/calendarStore";
 
-import { addDays, differenceInCalendarDays, startOfDay } from "date-fns";
+import {
+  addDays,
+  addMonths,
+  differenceInCalendarDays,
+  startOfDay,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+} from "date-fns";
+import { de, enUS } from "date-fns/locale";
 
 import {
   CalendarTimeEntry,
@@ -16,6 +33,7 @@ import {
   ViewMode,
 } from "@/types/workCalendar.types";
 import { WorkProject, WorkTimeEntry, Appointment } from "@/types/work.types";
+import { useIntl } from "./useIntl";
 
 // Zoom levels for hour height multiplier
 const ZOOM_LEVELS = [1, 2, 4, 6, 12] as const;
@@ -42,6 +60,7 @@ interface UseWorkCalendarReturn {
   zoomIndex: number;
   rasterHeight: number;
   hourMultiplier: number;
+  clickedDate: Date | null;
 
   // Refs
   viewport: React.RefObject<HTMLDivElement | null>;
@@ -60,6 +79,7 @@ interface UseWorkCalendarReturn {
   handleAppointmentClick: (appointmentId: string) => void;
   handleScrollToNow: () => void;
   setAddingMode: (mode: boolean) => void;
+  handleDayClick: (date: Date) => void;
 }
 
 /**
@@ -72,6 +92,7 @@ interface UseWorkCalendarReturn {
  * - Provides sorted events for each day
  */
 export function useWorkCalendar(): UseWorkCalendarReturn {
+  const { locale } = useIntl();
   const {
     viewMode,
     setViewMode,
@@ -110,6 +131,7 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
   ] = useDisclosure(false);
   const viewport = useRef<HTMLDivElement>(null);
   const previousZoomIndex = usePrevious(zoomIndex);
+  const [clickedDate, setClickedDate] = useState<Date | null>(null);
 
   // Current zoom multiplier
   const hourMultiplier = ZOOM_LEVELS[zoomIndex];
@@ -118,18 +140,39 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
    * Generate array of dates to display based on view mode and date range
    */
   const days: Date[] = useMemo(() => {
-    const [rangeStart, rangeEnd] = currentDateRange;
-
     if (viewMode === "day") {
       return [startOfDay(referenceDate)];
     }
 
+    if (viewMode === "month") {
+      const monthStart = startOfMonth(referenceDate);
+      const monthEnd = endOfMonth(referenceDate);
+      const calendarStart = startOfWeek(monthStart, {
+        locale: locale === "de-DE" ? de : enUS,
+      });
+      const calendarEnd = endOfWeek(monthEnd, {
+        locale: locale === "de-DE" ? de : enUS,
+      });
+
+      const daysArray: Date[] = [];
+      let currentDay = calendarStart;
+
+      while (currentDay <= calendarEnd) {
+        daysArray.push(startOfDay(currentDay));
+        currentDay = addDays(currentDay, 1);
+      }
+
+      return daysArray;
+    }
+
+    // Week view
+    const [rangeStart, rangeEnd] = currentDateRange;
     const start = startOfDay(rangeStart);
     const end = startOfDay(rangeEnd);
     const length = differenceInCalendarDays(end, start) + 1;
 
     return Array.from({ length }, (_, i) => addDays(start, i));
-  }, [viewMode, currentDateRange, referenceDate]);
+  }, [viewMode, currentDateRange, referenceDate, locale]);
 
   /**
    * Create a map of project ID to project for fast lookups
@@ -344,6 +387,18 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
         return;
       }
 
+      if (viewMode === "month") {
+        const newDate = addMonths(referenceDate, delta);
+        setReferenceDate(newDate);
+        // Update date range to cover the entire month
+        const monthStart = startOfMonth(newDate);
+        const monthEnd = endOfMonth(newDate);
+        setDateRange([monthStart, monthEnd]);
+        setCurrentDateRange([monthStart, monthEnd]);
+        return;
+      }
+
+      // Week view
       const [s, e] = dateRange;
       if (s && e) {
         const len = differenceInCalendarDays(e, s) + 1;
@@ -443,6 +498,18 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
     openNewAppointmentModal();
   }, [openNewAppointmentModal]);
 
+  /**
+   * Handle day click in month view - open new entry modal with that date
+   */
+  const handleDayClick = useCallback(
+    (date: Date) => {
+      setClickedDate(date);
+      setSelectedAppointment(null);
+      openNewAppointmentModal();
+    },
+    [openNewAppointmentModal]
+  );
+
   // Scroll to current time on initial mount
   // Uses useLayoutEffect to run before paint, with a small delay to ensure DOM is ready
   useLayoutEffect(() => {
@@ -452,6 +519,32 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
     });
     return () => cancelAnimationFrame(timeoutId);
   }, [handleScrollToNow]);
+
+  // Initialize date range when switching to month view
+  useEffect(() => {
+    if (viewMode === "month") {
+      const monthStart = startOfMonth(referenceDate);
+      const monthEnd = endOfMonth(referenceDate);
+      const [currentStart, currentEnd] = currentDateRange;
+
+      // Only update if the current range doesn't match the month
+      if (
+        !currentStart ||
+        !currentEnd ||
+        currentStart.getTime() !== monthStart.getTime() ||
+        currentEnd.getTime() !== monthEnd.getTime()
+      ) {
+        setDateRange([monthStart, monthEnd]);
+        setCurrentDateRange([monthStart, monthEnd]);
+      }
+    }
+  }, [
+    viewMode,
+    referenceDate,
+    currentDateRange,
+    setDateRange,
+    setCurrentDateRange,
+  ]);
 
   // Maintain scroll position when zoom changes (only on updates, not initial mount)
   useDidUpdate(() => {
@@ -488,6 +581,7 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
     zoomIndex,
     rasterHeight,
     hourMultiplier,
+    clickedDate,
 
     // Refs
     viewport,
@@ -498,7 +592,10 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
     openAppointmentDrawer,
     closeAppointmentDrawer: handleCloseAppointmentDrawer,
     openNewAppointmentModal,
-    closeNewAppointmentModal,
+    closeNewAppointmentModal: () => {
+      closeNewAppointmentModal();
+      setClickedDate(null);
+    },
     handleCreateAppointment,
     handleReferenceDateChange,
     handleNextAndPrev,
@@ -506,5 +603,6 @@ export function useWorkCalendar(): UseWorkCalendarReturn {
     handleAppointmentClick,
     handleScrollToNow,
     setAddingMode,
+    handleDayClick,
   };
 }

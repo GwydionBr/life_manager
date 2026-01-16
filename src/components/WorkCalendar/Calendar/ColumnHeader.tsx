@@ -18,7 +18,6 @@ import {
 import {
   IconCurrencyEuro,
   IconCurrencyDollar,
-  IconCalendar,
   IconHourglass,
 } from "@tabler/icons-react";
 

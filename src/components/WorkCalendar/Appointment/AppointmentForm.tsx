@@ -9,10 +9,8 @@ import {
   Textarea,
   Group,
   TextInput,
-  Text,
   Fieldset,
   Switch,
-  Button,
   Grid,
   ActionIcon,
 } from "@mantine/core";

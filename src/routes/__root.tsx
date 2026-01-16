@@ -4,6 +4,8 @@ import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/dates/styles.css";
 import "@mantine/charts/styles.css";
+import "dayjs/locale/de";
+import "dayjs/locale/en";
 
 import useSettingsStore from "@/stores/settingsStore";
 import { useEffect } from "react";
