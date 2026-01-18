@@ -7,7 +7,7 @@ import SelectActionIcon from "@/components/UI/ActionIcons/SelectActionIcon";
 import { Tables } from "@/types/db.types";
 import DeleteButton from "@/components/UI/Buttons/DeleteButton";
 import { IconCashBanknotePlus, IconPencil } from "@tabler/icons-react";
-import { showDeleteConfirmationModal } from "@/lib/notificationFunctions";
+import { showDeleteConfirmationModal } from "@/lib/toastFunctions";
 
 interface WorkTimeEntrySelectorProps {
   selectedTimeEntries: string[];

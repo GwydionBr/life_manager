@@ -38,7 +38,7 @@ import {
   FinanceProject,
   FinanceProjectNavbarTab,
 } from "@/types/finance.types";
-import { showDeleteConfirmationModal } from "@/lib/notificationFunctions";
+import { showDeleteConfirmationModal } from "@/lib/toastFunctions";
 import EditFinanceProjectDrawer from "./EditFinanceProjectDrawer";
 import FinancesNavbar from "@/components/Finances/FinancesNavbar/FinancesNavbar";
 import { SettingsTab } from "@/stores/settingsStore";

@@ -4,8 +4,7 @@ import { useIntl } from "@/hooks/useIntl";
 
 import { Button, ButtonProps } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import { showDeleteConfirmationModal } from "@/lib/notificationFunctions";
-
+import { showDeleteConfirmationModal } from "@/lib/toastFunctions";
 
 export default function DeleteUserButton({ ...props }: ButtonProps) {
   // const { mutate: deleteUser, isPending } = useDeleteUserMutation();

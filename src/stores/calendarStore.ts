@@ -12,7 +12,7 @@ interface CalendarStoreState {
   selectedSession: WorkTimeEntry | null;
   // View-specific date states
   dayViewDate: Date;
-  weekViewDateRange: [Date, Date];
+  weekViewDateRange: [Date , Date];
   monthViewDate: Date;
   // Legacy fields for backward compatibility (computed from view-specific states)
   dateRange: [Date | null, Date | null];

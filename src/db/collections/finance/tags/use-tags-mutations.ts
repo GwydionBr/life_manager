@@ -3,7 +3,7 @@ import { useProfile } from "@/db/collections/profile/use-profile-query";
 import {
   showActionSuccessNotification,
   showActionErrorNotification,
-} from "@/lib/notificationFunctions";
+} from "@/lib/toastFunctions";
 import { useIntl } from "@/hooks/useIntl";
 import { addTag, updateTag, deleteTag } from "./tags-mutations";
 import { InsertTag, UpdateTag, Tag } from "@/types/finance.types";

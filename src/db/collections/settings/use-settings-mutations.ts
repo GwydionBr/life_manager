@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import {
   showActionSuccessNotification,
   showActionErrorNotification,
-} from "@/lib/notificationFunctions";
+} from "@/lib/toastFunctions";
 import { useIntl } from "@/hooks/useIntl";
 import { updateSettings } from "./settings-mutations";
 import { SettingsUpdate } from "@/types/settings.types";

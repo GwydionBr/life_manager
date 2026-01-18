@@ -10,7 +10,7 @@ import {
 import {
   showActionSuccessNotification,
   showActionErrorNotification,
-} from "@/lib/notificationFunctions";
+} from "@/lib/toastFunctions";
 
 import {
   InsertSingleCashFlow,

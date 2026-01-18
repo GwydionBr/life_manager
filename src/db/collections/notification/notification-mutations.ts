@@ -22,7 +22,7 @@ export const addNotification = async (
     user_id: userId,
     type: newNotification.type,
     dismissed_at: newNotification.dismissed_at || null,
-    title: newNotification.title,
+    title: newNotification.title || null,
     body: newNotification.body || null,
     priority: newNotification.priority,
     resource_type: newNotification.resource_type || null,

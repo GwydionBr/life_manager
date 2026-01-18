@@ -26,7 +26,7 @@ import { canStartTimerFromAppointment } from "@/lib/appointmentTimerHelpers";
 import {
   showActionSuccessNotification,
   showActionErrorNotification,
-} from "@/lib/notificationFunctions";
+} from "@/lib/toastFunctions";
 import { AppointmentStatusBadge } from "../Appointment/AppointmentStatusBadge";
 
 interface AppointmentHoverCardProps {

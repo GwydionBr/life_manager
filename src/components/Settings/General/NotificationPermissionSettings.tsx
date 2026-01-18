@@ -1,5 +1,5 @@
 import { useIntl } from "@/hooks/useIntl";
-import { useBrowserNotificationPermission } from "@/hooks/useNotificationHandler";
+import { useBrowserNotificationPermission } from "@/hooks/notificationHooks/useBrowserNotificationPermission";
 import useSettingsStore from "@/stores/settingsStore";
 
 import { Group, Button, Text, Stack, Badge, Switch } from "@mantine/core";

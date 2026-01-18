@@ -7,7 +7,7 @@ import { IconAlertTriangleFilled, IconMoneybag } from "@tabler/icons-react";
 import CancelButton from "@/components/UI/Buttons/CancelButton";
 import DeleteButton from "@/components/UI/Buttons/DeleteButton";
 import DeleteActionIcon from "@/components/UI/ActionIcons/DeleteActionIcon";
-import { showDeleteConfirmationModal } from "@/lib/notificationFunctions";
+import { showDeleteConfirmationModal } from "@/lib/toastFunctions";
 import { FinanceProject } from "@/types/finance.types";
 import FinanceProjectForm from "./FinanceProjectForm";
 import ContactForm from "@/components/Finances/Contact/ContactForm";

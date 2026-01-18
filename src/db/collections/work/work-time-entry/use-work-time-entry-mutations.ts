@@ -7,7 +7,7 @@ import {
   showActionErrorNotification,
   showOverlapNotification,
   showCompleteOverlapNotification,
-} from "@/lib/notificationFunctions";
+} from "@/lib/toastFunctions";
 import { useIntl } from "@/hooks/useIntl";
 import {
   addWorkTimeEntry,

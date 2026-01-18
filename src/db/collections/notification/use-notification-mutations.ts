@@ -16,7 +16,7 @@ import { NotificationType } from "@/types/workCalendar.types";
 import {
   showActionErrorNotification,
   showActionSuccessNotification,
-} from "@/lib/notificationFunctions";
+} from "@/lib/toastFunctions";
 
 /**
  * Hook for Notification operations with automatic notifications.

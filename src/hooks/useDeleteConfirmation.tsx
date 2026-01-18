@@ -1,6 +1,5 @@
-
 import { Stack, Text, List } from "@mantine/core";
-import { showDeleteConfirmationModal } from "@/lib/notificationFunctions";
+import { showDeleteConfirmationModal } from "@/lib/toastFunctions";
 
 interface UseDeleteConfirmationOptions<T> {
   items: T[];

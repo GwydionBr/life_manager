@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 
 import { useIntl } from "@/hooks/useIntl";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCalendarStore } from "@/stores/calendarStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 
@@ -53,8 +53,14 @@ export default function CalendarHeader() {
     monthViewDate,
     setMonthViewDate,
   } = useCalendarStore();
+
   const [selectedDateRange, setSelectedDateRange] =
     useState<[Date | null, Date | null]>(weekViewDateRange);
+
+  useEffect(() => {
+    setSelectedDateRange(weekViewDateRange);
+  }, [weekViewDateRange]);
+
   const today = dayjs();
   const theme = useMantineTheme();
 
@@ -82,6 +88,10 @@ export default function CalendarHeader() {
     const ns = addDays(s, delta * len);
     const ne = addDays(e, delta * len);
     setWeekViewDateRange([ns, ne]);
+  }
+
+  function handleWeekDropdownClose() {
+    setSelectedDateRange(weekViewDateRange);
   }
 
   function setRangeAndMaybeSwitch(start: Date | null, end: Date | null) {
@@ -181,6 +191,7 @@ export default function CalendarHeader() {
               type="range"
               value={selectedDateRange}
               valueFormat={getLocalizedText("DD. MMM YYYY", "MMM DD, YYYY")}
+              onDropdownClose={handleWeekDropdownClose}
               onChange={(value) => {
                 const [start, end] = value;
                 const s = start ? new Date(start) : null;

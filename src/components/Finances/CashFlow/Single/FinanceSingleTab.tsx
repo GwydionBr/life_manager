@@ -36,7 +36,7 @@ import AdjustmentActionIcon from "@/components/UI/ActionIcons/AdjustmentActionIc
 import { SettingsTab } from "@/stores/settingsStore";
 import SelectActionIcon from "@/components/UI/ActionIcons/SelectActionIcon";
 import DeleteActionIcon from "@/components/UI/ActionIcons/DeleteActionIcon";
-import { showDeleteConfirmationModal } from "@/lib/notificationFunctions";
+import { showDeleteConfirmationModal } from "@/lib/toastFunctions";
 import { SingleCashFlow } from "@/types/finance.types";
 // import {
 //   useDeleteSingleCashflowMutation,

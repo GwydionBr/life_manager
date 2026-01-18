@@ -493,7 +493,7 @@ export type Database = {
             | Database["public"]["Enums"]["notificationResourceType"]
             | null
           scheduled_for: string | null
-          title: string
+          title: string | null
           type: Database["public"]["Enums"]["notificationType"]
           user_id: string
         }
@@ -509,7 +509,7 @@ export type Database = {
             | Database["public"]["Enums"]["notificationResourceType"]
             | null
           scheduled_for?: string | null
-          title: string
+          title?: string | null
           type: Database["public"]["Enums"]["notificationType"]
           user_id?: string
         }
@@ -525,7 +525,7 @@ export type Database = {
             | Database["public"]["Enums"]["notificationResourceType"]
             | null
           scheduled_for?: string | null
-          title?: string
+          title?: string | null
           type?: Database["public"]["Enums"]["notificationType"]
           user_id?: string
         }

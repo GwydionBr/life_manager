@@ -5,7 +5,7 @@ import { useIntl } from "@/hooks/useIntl";
 import {
   showActionSuccessNotification,
   showActionErrorNotification,
-} from "@/lib/notificationFunctions";
+} from "@/lib/toastFunctions";
 import {
   addPayout,
   updatePayout,

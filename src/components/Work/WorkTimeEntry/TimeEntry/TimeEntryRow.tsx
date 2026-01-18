@@ -10,7 +10,7 @@ import EditTimeEntryDrawer from "@/components/Work/WorkTimeEntry/EditTimeEntryDr
 import type { Tables } from "@/types/db.types";
 import PencilActionIcon from "@/components/UI/ActionIcons/PencilActionIcon";
 import SelectActionIcon from "@/components/UI/ActionIcons/SelectActionIcon";
-import { showDeleteConfirmationModal } from "@/lib/notificationFunctions";
+import { showDeleteConfirmationModal } from "@/lib/toastFunctions";
 
 import classes from "./TimeEntryRow.module.css";
 import { WorkProject } from "@/types/work.types";

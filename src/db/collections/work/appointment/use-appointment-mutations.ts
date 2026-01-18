@@ -4,7 +4,7 @@ import { useAppointments } from "./use-appointment-query";
 import {
   showActionSuccessNotification,
   showActionErrorNotification,
-} from "@/lib/notificationFunctions";
+} from "@/lib/toastFunctions";
 import { useIntl } from "@/hooks/useIntl";
 import {
   addAppointment,

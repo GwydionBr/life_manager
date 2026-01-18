@@ -7,7 +7,7 @@ export const notificationSchema = z.object({
   user_id: z.string(),
   type: z.enum(Constants.public.Enums.notificationType),
   dismissed_at: z.string().nullable(),
-  title: z.string(),
+  title: z.string().nullable(),
   body: z.string().nullable(),
   priority: z.enum(Constants.public.Enums.priority),
   resource_type: z
@@ -28,7 +28,7 @@ export const notificationDeserializationSchema = z.object({
       (value) => value as Database["public"]["Enums"]["notificationType"]
     ),
   dismissed_at: z.string().nullable(),
-  title: z.string(),
+  title: z.string().nullable(),
   body: z.string().nullable(),
   priority: z
     .string()

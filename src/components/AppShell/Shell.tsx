@@ -3,7 +3,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { useLocation } from "@tanstack/react-router";
 import { useProcessRecurringCashflows } from "@/hooks/useProcessRecurringCashflows";
 import { useCheckNewVersion } from "@/hooks/useCheckNewVersion";
-import { useNotificationHandler } from "@/hooks/useNotificationHandler";
+import { useNotificationHandler } from "@/hooks/notificationHooks/useNotificationHandler";
 
 import { AppShell, alpha, getThemeColor, useMantineTheme } from "@mantine/core";
 import SettingsModal from "@/components/Settings/SettingsModal";

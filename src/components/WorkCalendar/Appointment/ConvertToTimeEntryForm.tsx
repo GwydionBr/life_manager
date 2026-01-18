@@ -17,7 +17,7 @@ import CancelButton from "@/components/UI/Buttons/CancelButton";
 import {
   showActionSuccessNotification,
   showActionErrorNotification,
-} from "@/lib/notificationFunctions";
+} from "@/lib/toastFunctions";
 
 interface ConvertToTimeEntryModalProps {
   appointment: Appointment;
